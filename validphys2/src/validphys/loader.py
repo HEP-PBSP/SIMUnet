@@ -472,6 +472,21 @@ class Loader(LoaderBase):
             for inp in default_filter_rules_input()
         ]
 
+    def get_fit_cfac_dict(self, setname, fit_cfac_ns, theoryid):
+        _, theopath = self.check_theoryID(theoryid)
+        fit_cfac_path_mapping = {}
+        for fit_cfac in fit_cfac_ns:
+            cfactorpath = theopath / 'cfactor' / f'CF_{fit_cfac}_{setname}.dat'
+            if not cfactorpath.exists():
+                msg = (f"Could not find fit cfactor {fit_cfac} for {setname} in {theopath}. "
+                       f"The path {cfactorpath} does not exist."
+                )
+                raise CfactorNotFound(msg)
+            fit_cfac_path_mapping[fit_cfac] = cfactorpath
+
+        return fit_cfac_path_mapping
+
+
     def check_dataset(self,
                       name,
                       *,
@@ -483,7 +498,8 @@ class Loader(LoaderBase):
                       cuts=CutsPolicy.INTERNAL,
                       use_fitcommondata=False,
                       fit=None,
-                      weight=1):
+                      weight=1,
+                      fit_cfac_ns=None):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
@@ -514,9 +530,16 @@ class Loader(LoaderBase):
             elif cuts is CutsPolicy.FROM_CUT_INTERSECTION_NAMESPACE:
                 raise LoaderError(f"Intersection cuts not supported in loader calls.")
 
+        if fit_cfac_ns is not None:
+            fit_cfac_dict = self.get_fit_cfac_dict(name, fit_cfac_ns, theoryno)
+        else: 
+            fit_cfac_dict = None
+
+        import  IPython; IPython.embed()
+
         return DataSetSpec(name=name, commondata=commondata,
                            fkspecs=fkspec, thspec=theoryid, cuts=cuts,
-                           frac=frac, op=op, weight=weight)
+                           frac=frac, op=op, weight=weight, fit_cfac_dict=fit_cfac_dict)
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
         """Loader method for instantiating DataGroupSpec objects. The NNPDF::Experiment
