@@ -11,6 +11,8 @@ from reportengine.compat import yaml
 import validphys
 import n3fit
 from n3fit import vpinterface
+import pandas as pd
+
 
 
 class WriterWrapper:
@@ -39,7 +41,7 @@ class WriterWrapper:
         self.q2 = q2
         self.timings = timings
 
-    def write_data(self, replica_path_set, fitname, tr_chi2, vl_chi2, true_chi2):
+    def write_data(self, replica_path_set, fitname, tr_chi2, vl_chi2, true_chi2, fit_cfactors=None):
         """
         Wrapper around the `storefit` function.
 
@@ -71,6 +73,7 @@ class WriterWrapper:
             replica_path_set,
             fitname,
             self.q2,
+            fit_cfactors=fit_cfactors
         )
 
         # write the log file for the chi2
@@ -229,6 +232,7 @@ def storefit(
     replica_path,
     fitname,
     q20,
+    fit_cfactors=None
 ):
     """
     One-trick function which generates all output in the NNPDF format
@@ -253,6 +257,11 @@ def storefit(
 
     result = pdf_object(xgrid, flavours="n3fit").squeeze()
     lha = evln2lha(result.T).T
+
+    # Save fitcfactor tables
+    if fit_cfactors is not None:
+        with open(f"{replica_path}/fit_cfactors.csv", 'w') as fs:
+            fit_cfactors.to_csv(fs)
 
     data = {
         "replica": replica,

@@ -19,6 +19,9 @@ from n3fit.stopping import Stopping
 from n3fit.vpinterface import N3PDF
 import n3fit.hyper_optimization.penalties
 import n3fit.hyper_optimization.rewards
+from n3fit.layers.CombineCfac import CombineCfacLayer
+import pandas as pd
+
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +93,8 @@ class ModelTrainer:
         nnseeds,
         pass_status="ok",
         failed_status="fail",
+        nfitcfactors=0,
+        fit_cfactors=None,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -146,6 +151,8 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
+        self.nfitcfactors=nfitcfactors
+        self.fit_cfactors = fit_cfactors
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -456,11 +463,20 @@ class ModelTrainer:
         log.info("Generating layers")
 
         # Now we need to loop over all dictionaries (First exp_info, then pos_info and integ_info)
+
+        combiner = CombineCfacLayer(
+                    self.nfitcfactors,
+                    self.fit_cfactors,
+        )
+
+        #log.info(f"Using cfactor scale {self.cfactor_scale}")
+        self.combiner = combiner
+  
         for exp_dict in self.exp_info:
             if not self.mode_hyperopt:
                 log.info("Generating layers for experiment %s", exp_dict["name"])
 
-            exp_layer = model_gen.observable_generator(exp_dict)
+            exp_layer = model_gen.observable_generator(exp_dict, post_observable=combiner)
 
             # Save the input(s) corresponding to this experiment
             self.input_list += exp_layer["inputs"]
@@ -856,6 +872,7 @@ class ModelTrainer:
                 stopping_patience=stopping_epochs,
                 threshold_positivity=threshold_pos,
                 threshold_chi2=threshold_chi2,
+                combiner=self.combiner
             )
 
             # Compile each of the models with the right parameters
@@ -938,4 +955,9 @@ class ModelTrainer:
         # (which contains metadata about the stopping)
         # and the pdf models (which are used to generate the PDF grids and compute arclengths)
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
+
+        dict_out['fit_cfactors'] = pd.DataFrame(
+            [self.combiner.get_weights()[0]], columns=self.fit_cfactors
+        )
+
         return dict_out

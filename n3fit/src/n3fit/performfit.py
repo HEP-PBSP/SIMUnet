@@ -23,6 +23,7 @@ def performfit(
     posdatasets_fitting_pos_dict,
     integdatasets_fitting_integ_dict,
     theoryid,
+    nfitcfactors,
     basis,
     fitbasis,
     sum_rules=True,
@@ -37,7 +38,8 @@ def performfit(
     tensorboard=None,
     debug=False,
     maxcores=None,
-    parallel_models=False
+    parallel_models=False, 
+    fit_cfactors=None
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -194,7 +196,9 @@ def performfit(
             max_cores=maxcores,
             model_file=load,
             sum_rules=sum_rules,
-            parallel_models=n_models
+            parallel_models=n_models,
+            nfitcfactors=nfitcfactors,
+            fit_cfactors=fit_cfactors
         )
 
         # This is just to give a descriptive name to the fit function
@@ -252,6 +256,8 @@ def performfit(
         result = pdf_gen_and_train_function(parameters)
         stopwatch.register_ref("replica_fitted", "replica_set")
 
+        import IPython; IPython.embed()
+
         stopping_object = result["stopping_object"]
         log.info("Stopped at epoch=%d", stopping_object.stop_epoch)
 
@@ -266,6 +272,8 @@ def performfit(
             # Create a pdf instance
             q0 = theoryid.get_description().get("Q0")
             pdf_instance = N3PDF(pdf_model, fit_basis=basis, Q=q0)
+
+            fit_cfactors=result["fit_cfactors"]
 
             # Generate the writer wrapper
             writer_wrapper = WriterWrapper(
@@ -283,7 +291,7 @@ def performfit(
 
             # And write the data down
             writer_wrapper.write_data(
-                replica_path_set, output_path.name, training_chi2, val_chi2, exp_chi2
+                replica_path_set, output_path.name, training_chi2, val_chi2, exp_chi2, fit_cfactors
             )
             log.info(
                     "Best fit for replica #%d, chi2=%.3f (tr=%.3f, vl=%.3f)",

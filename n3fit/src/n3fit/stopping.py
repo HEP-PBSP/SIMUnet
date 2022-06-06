@@ -28,6 +28,7 @@
     be used instead.
 """
 import logging
+from re import A
 import numpy as np
 
 log = logging.getLogger(__name__)
@@ -437,6 +438,7 @@ class Stopping:
         stopping_patience=7000,
         threshold_chi2=10.0,
         dont_stop=False,
+        combiner=None,
     ):
         # Save the validation object
         self._validation = validation_model
@@ -458,6 +460,7 @@ class Stopping:
         self.stop_now = False
         self.stopping_patience = stopping_patience
         self.total_epochs = total_epochs
+        self.combiner = combiner
 
     @property
     def vl_chi2(self):
@@ -591,6 +594,11 @@ class Stopping:
             total_str += ", ".join(partials) + "\n"
         total_str += f"Validation chi2 at this point: {vl_chi2}"
         log.info(total_str)
+
+        if self.combiner is not None:
+            weights = self.combiner.get_weights() 
+            log.info(weights[0])
+            print('{0:.16f}'.format(weights[0][0]))
 
     def stop_here(self):
         """Returns the stopping status

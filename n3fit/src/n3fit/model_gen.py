@@ -10,6 +10,8 @@
 
 """
 from dataclasses import dataclass
+from importlib.util import spec_from_loader
+from re import A
 import numpy as np
 from n3fit.msr import msr_impose
 from n3fit.layers import DIS, DY, ObsRotation, losses
@@ -19,6 +21,12 @@ from n3fit.backends import MetaModel, Input
 from n3fit.backends import operations as op
 from n3fit.backends import MetaLayer, Lambda
 from n3fit.backends import base_layer_selector, regularizer_selector
+from n3fit.layers.CombineCfac import CombineCfacLayer
+import tensorflow as tf
+
+import logging
+log = logging.getLogger(__name__)
+
 
 
 @dataclass
@@ -43,7 +51,10 @@ class ObservableWrapper:
     integrability: bool = False
     positivity: bool = False
     data: np.array = None
+    spec_dict: dict = None
     rotation: ObsRotation = None  # only used for diagonal covmat
+    split: str = None
+    post_observable: CombineCfacLayer = None
 
     def _generate_loss(self, mask=None):
         """Generates the corresponding loss function depending on the values the wrapper
@@ -73,7 +84,37 @@ class ObservableWrapper:
             split_pdf = [pdf]
         # Every obs gets its share of the split
         output_layers = [obs(p_pdf) for p_pdf, obs in zip(split_pdf, self.observables)]
-        # Concatenate all datasets (so that experiments are one single entity)
+
+        for idx, (dataset_dict, output_layer) in enumerate(zip(self.spec_dict['datasets'], output_layers)):
+            # Use get here to prevent having to worry about POSDATSETS
+            fit_cfac_dict = dataset_dict.get('fit_cfac_dict')
+            #quad_fit_cfac = dataset_dict.get('quad_fit_cfac')
+            if fit_cfac_dict is not None:
+                coefficients = np.array([i.central_value for i in fit_cfac_dict.values()])
+                #if quad_fit_cfac is not None:
+                    #quad_coefficients = np.array([i.central_value for i in quad_fit_cfac.values()])
+                    #log.info("Using quadratic cfactors")
+                #else:
+                    #quad_coefficients = np.zeros_like(coefficients)
+                if self.split == 'ex':
+                    cfacs = coefficients
+                    #quad_cfacs = quad_coefficients
+                elif self.split == 'tr':
+                    cfacs = coefficients[:, dataset_dict['ds_tr_mask']]
+                    #quad_cfacs = quad_coefficients[:, dataset_dict['ds_tr_mask']]
+                elif self.split == 'vl':
+                    cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
+                    #quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
+                log.info(f"Applying fit_cfac layer")
+
+                output_layers[idx] = self.post_observable(
+                    output_layer,
+                    cfactor_values=tf.constant(cfacs, dtype='float32'),
+                    #quad_cfactor_values=tf.constant(quad_cfacs, dtype='float32')
+                )
+
+
+        # Concatenate all datasets (so that experiments are one single entity)        
         ret = op.concatenate(output_layers, axis=2)
         if self.rotation is not None:
             ret = self.rotation(ret)
@@ -86,7 +127,7 @@ class ObservableWrapper:
 
 
 def observable_generator(
-    spec_dict, positivity_initial=1.0, integrability=False
+    spec_dict, positivity_initial=1.0, integrability=False, post_observable=None
 ):  # pylint: disable=too-many-locals
     """
     This function generates the observable model for each experiment.
@@ -216,6 +257,9 @@ def observable_generator(
             multiplier=positivity_initial,
             positivity=not integrability,
             integrability=integrability,
+            spec_dict=spec_dict,
+            split='ex',
+            post_observable=post_observable
         )
 
         layer_info = {
@@ -241,6 +285,9 @@ def observable_generator(
         invcovmat=spec_dict["invcovmat"],
         data=spec_dict["expdata"],
         rotation=obsrot_tr,
+        spec_dict=spec_dict,
+        split='tr',
+        post_observable=post_observable
     )
     out_vl = ObservableWrapper(
         f"{spec_name}_val",
@@ -249,6 +296,9 @@ def observable_generator(
         invcovmat=spec_dict["invcovmat_vl"],
         data=spec_dict["expdata_vl"],
         rotation=obsrot_vl,
+        spec_dict=spec_dict,
+        split='vl',
+        post_observable=post_observable
     )
     out_exp = ObservableWrapper(
         f"{spec_name}_exp",
@@ -258,6 +308,9 @@ def observable_generator(
         covmat=spec_dict["covmat"],
         data=spec_dict["expdata_true"],
         rotation=None,
+        spec_dict=spec_dict,
+        split='ex',
+        post_observable=post_observable
     )
 
     layer_info = {
