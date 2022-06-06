@@ -4,6 +4,7 @@ n3fit_data_utils.py
 Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 """
 import numpy as np
+from validphys.fkparser import parse_cfactor
 
 
 def fk_parser(fk, is_hadronic=False):
@@ -70,6 +71,21 @@ def fk_parser(fk, is_hadronic=False):
     }
     return dict_out
 
+def parse_fit_cfac_dict(fit_cfac_dict, cuts):
+    if fit_cfac_dict is None:
+        return None
+    if hasattr(cuts, 'load'):
+        cuts = cuts.load()
+    name_cfac_map = {}
+    for name, path in fit_cfac_dict.items():
+        with open(path, 'rb') as stream:
+            cfac = parse_cfactor(stream)
+            #TODO: Figure out a better way to handle the default
+            cfac.central_value = (cfac.central_value[cuts] - 1) / (-10e-4)
+            cfac.uncertainty = cfac.uncertainty[cuts]
+        name_cfac_map[name] = cfac
+    return name_cfac_map
+
 
 def common_data_reader_dataset(dataset_c, dataset_spec):
     """
@@ -94,6 +110,7 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
 
     instead of the dictionary object that model_gen needs
     """
+    cuts = dataset_spec.cuts
     how_many = dataset_c.GetNSigma()
     dict_fktables = []
     for i in range(how_many):
@@ -107,6 +124,7 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
+        "fit_cfac_dict": parse_fit_cfac_dict(dataset_spec.fit_cfac_dict, cuts)
     }
 
     return [dataset_dict]

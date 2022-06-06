@@ -535,8 +535,6 @@ class Loader(LoaderBase):
         else: 
             fit_cfac_dict = None
 
-        import  IPython; IPython.embed()
-
         return DataSetSpec(name=name, commondata=commondata,
                            fkspecs=fkspec, thspec=theoryid, cuts=cuts,
                            frac=frac, op=op, weight=weight, fit_cfac_dict=fit_cfac_dict)

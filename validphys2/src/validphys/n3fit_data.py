@@ -178,6 +178,7 @@ def _mask_fk_tables(dataset_dicts, tr_masks):
             tr_fks.append(fktable_dict["fktable"][tr_mask])
             vl_fks.append(fktable_dict["fktable"][vl_mask])
             ex_fks.append(fktable_dict.get("fktable"))
+            dataset_dict['ds_tr_mask'] = tr_mask
         dataset_dict["tr_fktables"] = tr_fks
         dataset_dict["vl_fktables"] = vl_fks
         dataset_dict["ex_fktables"] = ex_fks
