@@ -28,7 +28,6 @@
     be used instead.
 """
 import logging
-from re import A
 import numpy as np
 
 log = logging.getLogger(__name__)

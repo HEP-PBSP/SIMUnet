@@ -11,7 +11,6 @@
 """
 from dataclasses import dataclass
 from importlib.util import spec_from_loader
-from re import A
 import numpy as np
 from n3fit.msr import msr_impose
 from n3fit.layers import DIS, DY, ObsRotation, losses
@@ -106,6 +105,8 @@ class ObservableWrapper:
                     cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
                     #quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
                 log.info(f"Applying fit_cfac layer")
+
+                print(self.post_observable.w)
 
                 output_layers[idx] = self.post_observable(
                     output_layer,

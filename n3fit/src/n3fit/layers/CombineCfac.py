@@ -15,7 +15,7 @@ class CombineCfacLayer(Layer):
                 it is the number of Wilson coefficients that we are fitting 
         """
         # Initialise a Layer instance
-        super().__init__()
+        super(CombineCfacLayer, self).__init__()
         # Initialise a layer with `ncfacs` trainable edges
         # where `ncfacs` is the number of Wilson coefficients
         # to train.
@@ -28,7 +28,7 @@ class CombineCfacLayer(Layer):
         )
         self.fit_cfactors= fit_cfactors  
 
-    def __call__(self, inputs, cfactor_values):
+    def call(self, inputs, cfactor_values):
         """
         Makes the forward pass to map the SM observable to the EFT one. 
         Parameters

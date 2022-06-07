@@ -21,6 +21,8 @@ import n3fit.hyper_optimization.penalties
 import n3fit.hyper_optimization.rewards
 from n3fit.layers.CombineCfac import CombineCfacLayer
 import pandas as pd
+import tensorflow as tf
+from keras.utils.vis_utils import plot_model
 
 
 log = logging.getLogger(__name__)
@@ -397,6 +399,7 @@ class ModelTrainer:
 
         if self.print_summary:
             training.summary()
+            plot_model(training, to_file='model_diagram.png', show_shapes=True, show_layer_names=True, expand_nested=True)
 
         models = {
             "training": training,
@@ -780,6 +783,8 @@ class ModelTrainer:
         print("")
         clear_backend_state()
 
+        print("point1")
+
         # When doing hyperopt some entries in the params dictionary
         # can bring with them overriding arguments
         if self.mode_hyperopt:
@@ -797,6 +802,7 @@ class ModelTrainer:
         # when k-folding, these are the same for all folds
         positivity_dict = params.get("positivity", {})
         integrability_dict = params.get("integrability", {})
+        print("point1.1")
         self._generate_observables(
             positivity_dict.get("multiplier"),
             positivity_dict.get("initial"),
@@ -805,6 +811,7 @@ class ModelTrainer:
             epochs,
             params.get("interpolation_points"),
         )
+        print("point1.2")
         threshold_pos = positivity_dict.get("threshold", 1e-6)
         threshold_chi2 = params.get("threshold_chi2", CHI2_THRESHOLD)
 
@@ -816,13 +823,20 @@ class ModelTrainer:
         n3pdfs = []
         exp_models = []
 
+        print("point2")
+
+
         ### Training loop
         for k, partition in enumerate(self.kpartitions):
+
+            print("point3")
             # Each partition of the kfolding needs to have its own separate model
             # and the seed needs to be updated accordingly
             seeds = self._nn_seeds
             if k > 0:
                 seeds = [np.random.randint(0, pow(2, 31)) for _ in seeds]
+
+            print("hola1")
 
             # Generate the pdf model
             pdf_models = self._generate_pdf(
@@ -836,34 +850,49 @@ class ModelTrainer:
                 seeds,
             )
 
+            print("hola2")
+
             # Model generation joins all the different observable layers
             # together with pdf model generated above
             models = self._model_generation(pdf_models, partition, k)
+
+            print("hola3")
 
             # Only after model generation, apply possible weight file
             if self.model_file:
                 log.info("Applying model file %s", self.model_file)
                 for pdf_model in pdf_models:
                     pdf_model.load_weights(self.model_file)
+                    print("hola4")
 
             if k > 0:
                 # Reset the positivity and integrability multipliers
                 pos_and_int = self.training["posdatasets"] + self.training["integdatasets"]
                 initial_values = self.training["posinitials"] + self.training["posinitials"]
                 models["training"].reset_layer_weights_to(pos_and_int, initial_values)
+                print("hola5")
+
+            print("hola6")
 
             # Generate the list containing reporting info necessary for chi2
             reporting = self._prepare_reporting(partition)
 
+            print("hola7")
+
             if self.no_validation:
+                print("hola8")
                 # Substitute the validation model with the training model
                 models["validation"] = models["training"]
                 validation_model = models["training"]
             else:
+                print("hola9")
                 validation_model = models["validation"]
 
             # Generate the stopping_object this object holds statistical information about the fit
             # it is used to perform stopping
+            
+            print("point4")
+
             stopping_object = Stopping(
                 validation_model,
                 reporting,
@@ -885,7 +914,10 @@ class ModelTrainer:
                 epochs=epochs,
             )
 
+            print("point5")
+
             if self.mode_hyperopt:
+                print("point6")
                 # If doing a hyperparameter scan we need to keep track of the loss function
                 # Since hyperopt needs _one_ number take the average in case of many replicas
                 validation_loss = np.mean(stopping_object.vl_chi2)
@@ -927,12 +959,18 @@ class ModelTrainer:
                     l_hyper = [i * pen_mul for i in l_hyper]
                     break
 
+                print("point7")
+
             # endfor
 
         if self.mode_hyperopt:
             # Hyperopt needs a dictionary with information about the losses
             # it is possible to store arbitrary information in the trial file
             # by adding it to this dictionary
+
+            print("point8")
+
+
             dict_out = {
                 "status": passed,
                 "loss": self._hyper_loss(fold_losses=l_hyper, n3pdfs=n3pdfs, experimental_models=exp_models),
@@ -944,6 +982,9 @@ class ModelTrainer:
                     "hyper_losses": l_hyper,
                 },
             }
+
+            print("point8")
+
             return dict_out
 
         # Keep a reference to the models after training for future reporting
@@ -951,13 +992,19 @@ class ModelTrainer:
         self.experimental["model"] = models["experimental"]
         self.validation["model"] = models["validation"]
 
+        print("point9")
+
         # In a normal run, the only information we need to output is the stopping object
         # (which contains metadata about the stopping)
         # and the pdf models (which are used to generate the PDF grids and compute arclengths)
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
 
+        print("point10")
+
         dict_out['fit_cfactors'] = pd.DataFrame(
             [self.combiner.get_weights()[0]], columns=self.fit_cfactors
         )
+
+        print("point11")
 
         return dict_out
