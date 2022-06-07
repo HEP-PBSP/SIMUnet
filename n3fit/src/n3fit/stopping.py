@@ -597,7 +597,7 @@ class Stopping:
         if self.combiner is not None:
             weights = self.combiner.get_weights() 
             log.info(weights[0])
-            print('{0:.16f}'.format(weights[0][0]))
+            #print('{0:.16f}'.format(weights[0][0]))
 
     def stop_here(self):
         """Returns the stopping status
