@@ -106,8 +106,6 @@ class ObservableWrapper:
                     #quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
                 log.info(f"Applying fit_cfac layer")
 
-                print(self.post_observable.w)
-
                 output_layers[idx] = self.post_observable(
                     output_layer,
                     cfactor_values=tf.constant(cfacs, dtype='float32'),

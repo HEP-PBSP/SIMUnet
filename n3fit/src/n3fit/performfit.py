@@ -201,8 +201,6 @@ def performfit(
             fit_cfactors=fit_cfactors
         )
 
-        print("The model trainer has been created. ")
-
         # This is just to give a descriptive name to the fit function
         pdf_gen_and_train_function = the_model_trainer.hyperparametrizable
 
@@ -255,9 +253,7 @@ def performfit(
         # This function performs the actual fit, it reads all the parameters in the #
         # "parameters" dictionary, uses them to generate the NN and trains the net  #
         #############################################################################
-        print("whatever")
         result = pdf_gen_and_train_function(parameters)
-        print("diesnt mater")
         stopwatch.register_ref("replica_fitted", "replica_set")
 
         stopping_object = result["stopping_object"]
@@ -265,8 +261,6 @@ def performfit(
 
         final_time = stopwatch.stop()
         all_training_chi2, all_val_chi2, all_exp_chi2 = the_model_trainer.evaluate(stopping_object)
-
-        print("The first chi2")
 
         pdf_models = result["pdf_models"]
         for i, (replica_number, pdf_model) in enumerate(zip(replica_idxs, pdf_models)):
@@ -312,8 +306,6 @@ def performfit(
                 log.info(" > Saving the weights for future in %s", model_file_path)
                 # Need to use "str" here because TF 2.2 has a bug for paths objects (fixed in 2.3)
                 pdf_model.save_weights(str(model_file_path), save_format="h5")
-
-            print("hello 1")
 
         if tensorboard is not None:
             log.info("Tensorboard logging information is stored at %s", log_path)
