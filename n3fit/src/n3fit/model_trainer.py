@@ -21,8 +21,8 @@ import n3fit.hyper_optimization.penalties
 import n3fit.hyper_optimization.rewards
 from n3fit.layers.CombineCfac import CombineCfacLayer
 import pandas as pd
-import tensorflow as tf
-from keras.utils.vis_utils import plot_model
+#import tensorflow as tf
+#from keras.utils.vis_utils import plot_model
 
 
 log = logging.getLogger(__name__)
@@ -399,7 +399,7 @@ class ModelTrainer:
 
         if self.print_summary:
             training.summary()
-            plot_model(training, to_file='model_diagram.png', show_shapes=True, show_layer_names=True, expand_nested=True)
+            #plot_model(training, to_file='model_diagram.png', show_shapes=True, show_layer_names=True, expand_nested=True)
 
         models = {
             "training": training,
