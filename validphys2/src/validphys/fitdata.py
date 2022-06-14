@@ -34,6 +34,32 @@ FIT_SUMRULES = [
 #t = blessings.Terminal()
 log = logging.getLogger(__name__)
 
+pdfs_fits_read_fit_cfactors = collect('read_fit_cfactors', ('pdfs', 'pdffit'))
+
+def read_fit_cfactors(fit):
+    """
+    Read the csv saved fit cfactors, accounting for the
+    postfit reshuffling, and return a concatenated dataframe
+    for replicas as indices and fit cfactors as columns
+    Parameters
+    ----------
+        fit: FitSpec object
+    Output
+    ------
+        fit_cfactors: pd.DataFrame
+    """
+    # Need to account for postfit reshuffling of replicas
+    paths = replica_paths(fit)
+    paths = list(map(lambda x: x / 'fit_cfactors.csv', paths))
+    try:
+        fit_cfactors = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
+    except FileNotFoundError:
+        raise FileNotFoundError(f"The fit {fit.name} does not have fit cfactors.")
+
+    rows, columns = fit_cfactors.shape
+    fit_cfactors.index = range(1, rows + 1)
+    return fit_cfactors
+
 def num_fitted_replicas(fit):
     """Function to obtain the number of nnfit replicas. That is
     the number of replicas before postfit was run.

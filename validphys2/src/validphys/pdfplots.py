@@ -15,6 +15,7 @@ from types import SimpleNamespace
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors as mcolors
+from matplotlib.gridspec import GridSpec
 
 from reportengine.figure import figure, figuregen
 from reportengine.checks import make_argcheck
@@ -472,6 +473,84 @@ class BandPDFPlotter(PDFPlotter):
                                              plotutils.ComposedHandler()
                                              }
                                  )
+
+
+@figuregen
+def plot_nd_fit_cfactors(read_fit_cfactors):
+    """Plot a histogram for each fit_cfactor coefficient.
+    The nd is used for n-dimensional, if two fit cfactors
+    are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
+    """
+    for label, column in read_fit_cfactors.iteritems():
+        # TODO: surely there is a better way
+        if label == 'Cb':
+            label = r"$\mathbf{C}_{33}^{D\mu}$"
+        fig, ax = plt.subplots()
+
+        ax.hist(column.values)
+
+        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        ax.set_title(f"Distribution for {label} coefficient")
+        ax.set_ylabel("Count")
+        ax.set_xlabel(label)
+        ax.grid(False)
+
+        yield fig
+
+
+@figure
+def plot_2d_fit_cfactors(read_fit_cfactors):
+    """Plot two dimensional distributions of the fit cfactors
+    """
+    rows, columns = read_fit_cfactors.shape
+    labels = read_fit_cfactors.columns
+    if columns != 2:
+        raise RuntimeError(f"Ensure the number of fitted cfactors is 2 not {columns}")
+
+    fig = plt.figure()
+    gs = GridSpec(4, 4)
+
+    ax_scatter = fig.add_subplot(gs[1:4, 0:3])
+    ax_hist_x = fig.add_subplot(gs[0, 0:3])
+    ax_hist_y = fig.add_subplot(gs[1:4, 3])
+
+    ax_scatter.scatter(read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1])
+    ax_scatter.ticklabel_format(axis='both', scilimits=(0, 0), style='sci', useOffset=True)
+
+    ax_hist_x.hist(read_fit_cfactors.iloc[:, 0])
+    ax_hist_y.hist(read_fit_cfactors.iloc[:, 1], orientation = 'horizontal')
+
+    ax_hist_x.set_xticklabels([])
+    ax_hist_y.set_yticklabels([])
+    ax_hist_x.minorticks_on()
+    ax_hist_y.minorticks_on()
+    ax_hist_x.tick_params(axis='x', which='minor', bottom=False)
+    ax_hist_y.tick_params(axis='y', which='minor', left=False)
+    ax_hist_x.grid(False)
+    ax_hist_y.grid(False)
+
+    fig.subplots_adjust(hspace=0.15, wspace=0.15)
+    fig.canvas.draw()
+
+    # Ugly but we need to do this annoying hack to prevent the offset_text
+    # from being hidden beneath the upper histogram. Basically, this bit of
+    # code moves the offset_text multipler e.g 10^-5 and puts it in the
+    # axis labels so it reads e.g W/10^-5.
+    x_offset_text = ax_scatter.xaxis.get_offset_text()
+    y_offset_text = ax_scatter.yaxis.get_offset_text()
+    x_offset_text.set_visible(False)
+    y_offset_text.set_visible(False)
+
+    if x_offset_text.get_text():
+        ax_scatter.set_xlabel(labels[0] + '/' + x_offset_text.get_text().replace('\\times', ''))
+    else:
+        ax_scatter.set_xlabel(labels[0])
+    if y_offset_text.get_text():
+        ax_scatter.set_ylabel(labels[1] + '/' + y_offset_text.get_text().replace('\\times', ''))
+    else:
+        ax_scatter.set_ylabel(labels[1])
+
+    return fig
 
 
 @figuregen
