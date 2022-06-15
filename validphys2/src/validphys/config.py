@@ -316,6 +316,10 @@ class CoreConfig(configparser.Config):
             _, pdf = self.parse_from_("fit", "pdf", write=False)
         return {"pdf": pdf}
 
+    def produce_pdffit(self, pdf):
+        """Like ``fitpdf`` only setting the fit"""
+        return {"fit": self.parse_fit(pdf.name)}
+
     def produce_fitunderlyinglaw(self, fit):
         """Reads closuretest: fakepdf from fit config file and passes as
         pdf

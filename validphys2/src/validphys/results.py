@@ -308,6 +308,28 @@ experiments_covmat_collection = collect(
     "dataset_inputs_covariance_matrix", ("group_dataset_inputs_by_experiment",)
 )
 
+@table
+def fit_cfactor_results_table(read_fit_cfactors):
+    """Table generator to summarise information about
+    the fit cfactors.
+    The returned table contains information about the mean
+    and standard deviation of the fit cfactors, as well as showing the
+    68% (95%) confidence level by computing mean ± std (mean ± 2*std).
+    """
+    means = read_fit_cfactors.mean()
+    stds = read_fit_cfactors.std()
+
+    cl68_lower, cl68_upper = (means - stds, means + stds)
+    cl95_lower, cl95_upper = (means - 2 * stds, means + 2 * stds)
+
+    res = pd.DataFrame(index=read_fit_cfactors.columns)
+    res['68cl bounds'] = list(zip(cl68_lower, cl68_upper))
+    res['95cl bounds'] = list(zip(cl95_lower, cl95_upper))
+    res['mean'] = means
+    res['std'] = stds
+
+    return res
+
 
 def experiments_covmat_no_table(
     experiments_data, experiments_index, experiments_covmat_collection
