@@ -42,6 +42,14 @@
     for the NNLO jet project.
   rule: eta < 0.3
 
+- dataset: ATLAS1JET11_NEW_SCALE
+  reason: |
+    We keep only the first rapidity bin since the chi2 to the whole set of
+    rapidity bins is too large (known problems with correlation matrix).
+    This cut will be removed in the new bunch of fits that we are going to do
+    for the NNLO jet project.
+  rule: eta < 0.3
+
 - dataset: CMS_1JET_8TEV
   reason: |
     We keep only the bins with pTjet>74 GeV because fixed-order theory does
@@ -96,15 +104,15 @@
     for which the asymmetry is small is unfeasible. So we can only fit points
     at NNLO for which the value of the asymmetry is not too small.
   PTO: NNLO
-  rule: "fabs(central_value) >= 0.03"
+  rule: "central_value >= 0.03"
 
-- dataset: ATLAS_WP_JET_8TEV_PT
-  reason: Avoid the region where small-pT resummation effects become important.
-  rule: "p_T >= 30"
+#- dataset: ATLAS_WP_JET_8TEV_PT
+  #reason: Avoid the region where small-pT resummation effects become important.
+  #rule: "p_T >= 30"
 
-- dataset: ATLAS_WM_JET_8TEV_PT
-  reason: Avoid the region where small-pT resummation effects become important.
-  rule: "p_T >= 30"
+#- dataset: ATLAS_WM_JET_8TEV_PT
+  #reason: Avoid the region where small-pT resummation effects become important.
+  #rule: "p_T >= 30"
 
 - dataset: ATLASZPT7TEV
   reason: Avoid the region where resummation effects become important.
@@ -151,67 +159,67 @@
     max_M: 116.0
   rule: M <= max_M
   
-- dataset: CMSDY2D11
-  reason: |
-    Removes data points for which the NNLO K-factors are very large and
-    thus the NLO calculation is unreliable.
-  PTO: NNLO-
-  local_variables:
-    M: sqrt(M2)
-    max_M: 200.0
-  rule: M <= max_M
+#- dataset: CMSDY2D11
+  #reason: |
+    #Removes data points for which the NNLO K-factors are very large and
+    #thus the NLO calculation is unreliable.
+  #PTO: NNLO-
+  #local_variables:
+    #M: sqrt(M2)
+    #max_M: 200.0
+  #rule: M <= max_M
 
-- dataset: CMSDY2D11
-  reason: Remove data points for which electroweak corrections are large.
-  PTO: NNLO-
-  local_variables:
-    M: sqrt(M2)
-    min_M: 30.0
-    max_rapidity: 2.2
-  rule: M >= min_M and etay <= max_rapidity
+#- dataset: CMSDY2D11
+  #reason: Remove data points for which electroweak corrections are large.
+  #PTO: NNLO-
+  #local_variables:
+    #M: sqrt(M2)
+    #min_M: 30.0
+    #max_rapidity: 2.2
+  #rule: M >= min_M and etay <= max_rapidity
 
-- dataset: CMSDY2D11
-  reason: Remove data points for which electroweak corrections are large.
-  PTO: NNLO
-  local_variables:
-    M: sqrt(M2)
-    max_rapidity: 2.2
-    max_M: 200.0
-  rule: M <= max_M and etay <= max_rapidity
+#- dataset: CMSDY2D11
+  #reason: Remove data points for which electroweak corrections are large.
+  #PTO: NNLO
+  #local_variables:
+    #M: sqrt(M2)
+    #max_rapidity: 2.2
+    #max_M: 200.0
+  #rule: M <= max_M and etay <= max_rapidity
 
-- dataset: CMSDY2D12
-  reason: |
-    Removes data points for which the NNLO K-factors are very large and
-    thus the NLO calculation is unreliable.
-  PTO: NNLO-
-  local_variables:
-    M: sqrt(M2)
-    max_M: 200.0
-  rule: M <= max_M
+#- dataset: CMSDY2D12
+  #reason: |
+    #Removes data points for which the NNLO K-factors are very large and
+    #thus the NLO calculation is unreliable.
+  #PTO: NNLO-
+  #local_variables:
+    #M: sqrt(M2)
+    #max_M: 200.0
+  #rule: M <= max_M
 
-- dataset: CMSDY2D12
-  reason: Remove data points for which electroweak corrections are large.
-  PTO: NNLO-
-  local_variables:
-    M: sqrt(M2)
-    min_M: 30.0
-    max_rapidity: 2.2
-  rule: M >= min_M and etay <= max_rapidity
+#- dataset: CMSDY2D12
+  #reason: Remove data points for which electroweak corrections are large.
+  #PTO: NNLO-
+  #local_variables:
+    #M: sqrt(M2)
+    #min_M: 30.0
+    #max_rapidity: 2.2
+  #rule: M >= min_M and etay <= max_rapidity
 
-- dataset: CMSDY2D12
-  reason: Remove data points for which electroweak corrections are large.
-  PTO: NNLO
-  local_variables:
-    M: sqrt(M2)
-    max_rapidity: 2.2
-    max_M: 200.0
-  rule: M <= max_M and etay <= max_rapidity
+#- dataset: CMSDY2D12
+  #reason: Remove data points for which electroweak corrections are large.
+  #PTO: NNLO
+  #local_variables:
+    #M: sqrt(M2)
+    #max_rapidity: 2.2
+    #max_M: 200.0
+  #rule: M <= max_M and etay <= max_rapidity
 
-- dataset: ATLASZHIGHMASS49FB
-  reason: Avoid the region where resummation effects become important.
-  local_variables:
-    max_M: 200.0
-  rule: M_ll <= max_M
+#- dataset: ATLASZHIGHMASS49FB
+  #reason: Avoid the region where resummation effects become important.
+  #local_variables:
+    #max_M: 200.0
+  #rule: M_ll <= max_M
 
 # - dataset: LHCBLOWMASS37PB
 #   rule: "pT <= maxCMSDY2Dminv"
@@ -250,57 +258,57 @@
     maxY: 0.663
   rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
 
-- dataset: DYE605_dw
-  reason: |
-    Remove data points for which the fixed-order perturbative expansion is not
-    reliable since resummation effects are large. A justification of these cuts
-    can be found in arXiv:1507.01006.
-  process_type: DYP
-  local_variables:
-    tau: M2 / sqrts**2
-    ymax: -0.5 * log(tau)
-    maxTau: 0.080
-    maxY: 0.663
-  rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
+#- dataset: DYE605_dw
+  #reason: |
+    #Remove data points for which the fixed-order perturbative expansion is not
+    #reliable since resummation effects are large. A justification of these cuts
+    #can be found in arXiv:1507.01006.
+  #process_type: DYP
+  #local_variables:
+    #tau: M2 / sqrts**2
+    #ymax: -0.5 * log(tau)
+    #maxTau: 0.080
+    #maxY: 0.663
+  #rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
 
-- dataset: DYE605_sh
-  reason: |
-    Remove data points for which the fixed-order perturbative expansion is not
-    reliable since resummation effects are large. A justification of these cuts
-    can be found in arXiv:1507.01006.
-  process_type: DYP
-  local_variables:
-    tau: M2 / sqrts**2
-    ymax: -0.5 * log(tau)
-    maxTau: 0.080
-    maxY: 0.663
-  rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
+#- dataset: DYE605_sh
+  #reason: |
+    #Remove data points for which the fixed-order perturbative expansion is not
+    #reliable since resummation effects are large. A justification of these cuts
+    #can be found in arXiv:1507.01006.
+  #process_type: DYP
+  #local_variables:
+    #tau: M2 / sqrts**2
+    #ymax: -0.5 * log(tau)
+    #maxTau: 0.080
+    #maxY: 0.663
+  #rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
 
-- dataset: DYE605_dw_ite
-  reason: |
-    Remove data points for which the fixed-order perturbative expansion is not
-    reliable since resummation effects are large. A justification of these cuts
-    can be found in arXiv:1507.01006.
-  process_type: DYP
-  local_variables:
-    tau: M2 / sqrts**2
-    ymax: -0.5 * log(tau)
-    maxTau: 0.080
-    maxY: 0.663
-  rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
+#- dataset: DYE605_dw_ite
+  #reason: |
+    #Remove data points for which the fixed-order perturbative expansion is not
+    #reliable since resummation effects are large. A justification of these cuts
+    #can be found in arXiv:1507.01006.
+  #process_type: DYP
+  #local_variables:
+    #tau: M2 / sqrts**2
+    #ymax: -0.5 * log(tau)
+    #maxTau: 0.080
+    #maxY: 0.663
+  #rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
 
-- dataset: DYE605_sh_ite
-  reason: |
-    Remove data points for which the fixed-order perturbative expansion is not
-    reliable since resummation effects are large. A justification of these cuts
-    can be found in arXiv:1507.01006.
-  process_type: DYP
-  local_variables:
-    tau: M2 / sqrts**2
-    ymax: -0.5 * log(tau)
-    maxTau: 0.080
-    maxY: 0.663
-  rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
+#- dataset: DYE605_sh_ite
+  #reason: |
+    #Remove data points for which the fixed-order perturbative expansion is not
+    #reliable since resummation effects are large. A justification of these cuts
+    #can be found in arXiv:1507.01006.
+  #process_type: DYP
+  #local_variables:
+    #tau: M2 / sqrts**2
+    #ymax: -0.5 * log(tau)
+    #maxTau: 0.080
+    #maxY: 0.663
+  #rule: "tau <= maxTau and fabs(y/ymax) <= maxY"
 
 - process_type: DIS_ALL
   reason: Generalised cut for all DIS processes
@@ -342,3 +350,26 @@
   FNS: FONLL-C
   IC: True
   rule: "Q2 > 8"
+
+# Below are cuts that are specific to the PDF4EFT fits
+
+- dataset: CMSDY2D11
+  reason: |
+    Remove points at large values of the rapidity. The theoretical description
+    of these points is poor, even at NNLO QCD + NLO EW. Removing these points
+    results in a significant improvement in this dataset's chi2. Note that this
+    cut is part of the standard NNPDF cuts for this dataset.
+  rule: etay <= 2.2
+
+- dataset: CMSDY2D11
+  reason: |
+    Specific to PDF4EFT fits. Cut points that go beyond LO kinematic limit in
+    rapidity for highest invariant mass bin.
+  rule: etay < 1.5 if M2 == 7.225e+05 else True
+
+- dataset: ATLASDY2D8TEV
+  reason: |
+    Specific to PDF4EFT fits. Cut points that go beyond LO kinematic limit in
+    rapidity for highest invariant mass bin.
+  rule: etay < 1.68 if M2 == 1.0e+06 else True
+
