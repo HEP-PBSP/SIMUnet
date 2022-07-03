@@ -499,26 +499,32 @@ def plot_nd_fit_cfactors(read_fit_cfactors):
 
 
 @figure
-def plot_2d_fit_cfactors(read_fit_cfactors):
-    """Plot two dimensional distributions of the fit cfactors
-    """
+def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
+    """Plot two dimensional distributions of the fit cfactors"""
     rows, columns = read_fit_cfactors.shape
     labels = read_fit_cfactors.columns
     if columns != 2:
         raise RuntimeError(f"Ensure the number of fitted cfactors is 2 not {columns}")
 
     fig = plt.figure()
-    gs = GridSpec(4, 4)
+    gs = GridSpec(6, 4)
 
     ax_scatter = fig.add_subplot(gs[1:4, 0:3])
     ax_hist_x = fig.add_subplot(gs[0, 0:3])
     ax_hist_y = fig.add_subplot(gs[1:4, 3])
+    ax_cbar = fig.add_subplot(gs[5, 0:3])
 
-    ax_scatter.scatter(read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1])
-    ax_scatter.ticklabel_format(axis='both', scilimits=(0, 0), style='sci', useOffset=True)
+    chi2 = [info.chi2 for info in replica_data]
+
+    scatter = ax_scatter.scatter(
+        read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1], c=chi2
+    )
+    ax_scatter.ticklabel_format(
+        axis='both', scilimits=(0, 0), style='sci', useOffset=True
+    )
 
     ax_hist_x.hist(read_fit_cfactors.iloc[:, 0])
-    ax_hist_y.hist(read_fit_cfactors.iloc[:, 1], orientation = 'horizontal')
+    ax_hist_y.hist(read_fit_cfactors.iloc[:, 1], orientation='horizontal')
 
     ax_hist_x.set_xticklabels([])
     ax_hist_y.set_yticklabels([])
@@ -542,13 +548,22 @@ def plot_2d_fit_cfactors(read_fit_cfactors):
     y_offset_text.set_visible(False)
 
     if x_offset_text.get_text():
-        ax_scatter.set_xlabel(labels[0] + '/' + x_offset_text.get_text().replace('\\times', ''))
+        ax_scatter.set_xlabel(
+            labels[0] + '/' + x_offset_text.get_text().replace('\\times', '')
+        )
     else:
         ax_scatter.set_xlabel(labels[0])
     if y_offset_text.get_text():
-        ax_scatter.set_ylabel(labels[1] + '/' + y_offset_text.get_text().replace('\\times', ''))
+        ax_scatter.set_ylabel(
+            labels[1] + '/' + y_offset_text.get_text().replace('\\times', '')
+        )
     else:
         ax_scatter.set_ylabel(labels[1])
+
+    # https://stackoverflow.com/questions/32462881/add-colorbar-to-existing-axis
+    fig.colorbar(
+        scatter, orientation="horizontal", cax=ax_cbar, label=r"$\chi^2$"
+    )
 
     return fig
 
