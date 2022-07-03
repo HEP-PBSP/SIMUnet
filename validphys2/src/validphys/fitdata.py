@@ -14,7 +14,7 @@ from reportengine.compat import yaml
 
 from reportengine import collect
 from reportengine.table import table
-from reportengine.checks import make_argcheck, CheckError
+from reportengine.checks import make_argcheck, CheckError, check
 from reportengine.floatformatting import ValueErrorTuple
 
 from validphys.core import PDF
@@ -24,6 +24,7 @@ from validphys.plotoptions import get_info
 #TODO: Add more stuff here as needed for postfit
 LITERAL_FILES = ['chi2exps.log']
 REPLICA_FILES = ['.dat', '.json']
+CF_FILE = 'fit_cfactors.csv'
 FIT_SUMRULES = [
     "momentum",
     "uvalence",
@@ -36,29 +37,7 @@ log = logging.getLogger(__name__)
 
 pdfs_fits_read_fit_cfactors = collect('read_fit_cfactors', ('pdfs', 'pdffit'))
 
-def read_fit_cfactors(fit):
-    """
-    Read the csv saved fit cfactors, accounting for the
-    postfit reshuffling, and return a concatenated dataframe
-    for replicas as indices and fit cfactors as columns
-    Parameters
-    ----------
-        fit: FitSpec object
-    Output
-    ------
-        fit_cfactors: pd.DataFrame
-    """
-    # Need to account for postfit reshuffling of replicas
-    paths = replica_paths(fit)
-    paths = list(map(lambda x: x / 'fit_cfactors.csv', paths))
-    try:
-        fit_cfactors = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
-    except FileNotFoundError:
-        raise FileNotFoundError(f"The fit {fit.name} does not have fit cfactors.")
 
-    rows, columns = fit_cfactors.shape
-    fit_cfactors.index = range(1, rows + 1)
-    return fit_cfactors
 
 def num_fitted_replicas(fit):
     """Function to obtain the number of nnfit replicas. That is
@@ -228,6 +207,38 @@ def summarise_fits(collected_fit_summaries):
     """ Produces a table of basic comparisons between fits, includes
     all the fields used in fit_summary """
     return pd.concat(collected_fit_summaries, axis=1)
+
+@make_argcheck
+def _check_has_fit_cfactors(fit):
+    """Check that the fit comes with Wilson coefficients fitted"""
+    # No need to look into legacy locations here
+    # TODO: Write these in the LHAPDF header instead.
+    p = fit.path / "postfit" / "replica_1" / CF_FILE
+    check(
+        p.is_file(), f"The fit '{fit.name}' does not have fit cfactors. Path {p} a file"
+    )
+
+
+@_check_has_fit_cfactors
+def read_fit_cfactors(replica_paths):
+    """
+    Read the csv saved fit cfactors, accounting for the
+    postfit reshuffling, and return a concatenated dataframe
+    for replicas as indices and fit cfactors as columns
+    Parameters
+    ----------
+        fit: FitSpec object
+    Output
+    ------
+        fit_cfactors: pd.DataFrame
+    """
+    # Need to account for postfit reshuffling of replicas
+    paths = [p / CF_FILE for p in replica_paths]
+    fit_cfactors = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
+
+    rows, _columns = fit_cfactors.shape
+    fit_cfactors.index = range(1, rows + 1)
+    return fit_cfactors
 
 
 fits_replica_data = collect('replica_data', ('fits',))
