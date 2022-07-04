@@ -103,6 +103,7 @@ class ModelTrainer:
         model_file=None,
         sum_rules=None,
         parallel_models=1,
+        cfactor_scale=1,
     ):
         """
         Parameters
@@ -155,6 +156,7 @@ class ModelTrainer:
         self._parallel_models = parallel_models
         self.nfitcfactors=nfitcfactors
         self.fit_cfactors = fit_cfactors
+        self.cfactor_scale = cfactor_scale
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -469,10 +471,11 @@ class ModelTrainer:
 
         combiner = CombineCfacLayer(
                     self.nfitcfactors,
+                    self.cfactor_scale,
                     self.fit_cfactors,
         )
 
-        #log.info(f"Using cfactor scale {self.cfactor_scale}")
+        log.info(f"Using cfactor scale {self.cfactor_scale}")
         self.combiner = combiner
   
         for exp_dict in self.exp_info:
@@ -963,7 +966,7 @@ class ModelTrainer:
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
 
         dict_out['fit_cfactors'] = pd.DataFrame(
-            [self.combiner.get_weights()[0]], columns=self.fit_cfactors
+            [self.combiner.get_weights()[0] / self.cfactor_scale], columns=self.fit_cfactors
         )
 
         return dict_out

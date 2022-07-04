@@ -109,11 +109,20 @@ class DataResult(StatsResult):
 class ThPredictionsResult(StatsResult):
     """Class holding theory prediction, inherits from StatsResult"""
 
-    def __init__(self, dataobj, stats_class, label=None):
+    def __init__(self, dataobj, stats_class, cfactor_scale=1, label=None):
         self.stats_class = stats_class
         self.label = label
         statsobj = stats_class(dataobj.T)
+        self._rawdata = self.rawdata * cfactor_scale
         super().__init__(statsobj)
+
+    @property
+    def std_error(self):
+        return np.std(self._rawdata, axis=1)
+
+    @property
+    def central_value(self):
+        return np.mean(self._rawdata, axis=1)    
 
     @staticmethod
     def make_label(pdf, dataset):
@@ -131,7 +140,7 @@ class ThPredictionsResult(StatsResult):
         return label
 
     @classmethod
-    def from_convolution(cls, pdf, dataset):
+    def from_convolution(cls, pdf, dataset, cfactor_scale=1.0):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -148,7 +157,7 @@ class ThPredictionsResult(StatsResult):
 
         label = cls.make_label(pdf, dataset)
 
-        return cls(th_predictions, pdf.stats_class, label)
+        return cls(th_predictions, pdf.stats_class, label, cfactor_scale=cfactor_scale)
 
 
 class PositivityResult(StatsResult):
@@ -330,6 +339,50 @@ def fit_cfactor_results_table(read_fit_cfactors):
 
     return res
 
+_read_pdf_cfactors = collect("read_fit_cfactors", ("pdffit",))
+
+def read_pdf_cfactors(_read_pdf_cfactors, pdf):
+    return _read_pdf_cfactors[0]
+
+def dataset_inputs_scaled_fit_cfactor(data, pdf, read_pdf_cfactors, quad_cfacs):
+    """Same as :py:func:`validphys.results.dataset_scaled_fit_cfactor`
+    but for a list of dataset inputs.
+    """
+    res =  np.concatenate(
+        [dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs) for dataset in data.datasets]
+    )
+    return res
+
+def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
+    """For each replica of ``pdf``, scale the fit cfactors by
+    the best fit value.
+    Returns
+    -------
+    res: np.arrays
+        An ``ndat`` x ``nrep`` array containing the scaled fit cfactors.
+    """
+    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts)
+    if parsed_cfacs is None or not read_pdf_cfactors.values.size:
+        # We want an array of ones that ndata x nrep
+        # where ndata is the number of post cut datapoints
+        ndata = len(dataset.load().get_cv())
+        nrep = len(pdf) - 1
+        return np.ones((ndata, nrep))
+    log.debug("Scaling results using linear cfactors")
+    fit_cfac_df = pd.DataFrame(
+        {k: v.central_value.squeeze() for k, v in parsed_cfacs.items()}
+    )
+    scaled_replicas = read_pdf_cfactors.values * fit_cfac_df.values[:, np.newaxis]
+    if quad_cfacs:
+        log.debug("Scaling results using quadratic cfactors")
+        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs)
+        quad_cfac_df = pd.DataFrame(
+            {k: v.central_value.squeeze() for k, v in parsed_quads.items()}
+        )
+        scaled_replicas += (read_pdf_cfactors.values**2) * quad_cfac_df.values[:, np.newaxis]
+
+    return 1 + np.sum(scaled_replicas, axis=2)
+
 
 def experiments_covmat_no_table(
     experiments_data, experiments_index, experiments_covmat_collection
@@ -475,7 +528,7 @@ def procs_corrmat(procs_covmat):
     return groups_corrmat(procs_covmat)
 
 
-def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat):
+def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_scaled_fit_cfactor=None):
     """Tuple of data and theory results for a single pdf. The data will have an associated
     covariance matrix, which can include a contribution from the theory covariance matrix which
     is constructed from scale variation. The inclusion of this covariance matrix by default is used
@@ -487,17 +540,17 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat):
     data = dataset.load()
     return (
         DataResult(data, covariance_matrix, sqrt_covmat),
-        ThPredictionsResult.from_convolution(pdf, dataset),
+        ThPredictionsResult.from_convolution(pdf, dataset, cfactor_scale=dataset_scaled_fit_cfactor),
     )
 
 
 
 def dataset_inputs_results(
-    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
+    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_scaled_fit_cfactor=None
 ):
     """Like `results` but for a group of datasets"""
     return results(
-        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
+        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_scaled_fit_cfactor=dataset_inputs_scaled_fit_cfactor
     )
 
 

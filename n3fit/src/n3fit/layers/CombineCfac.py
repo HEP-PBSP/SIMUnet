@@ -7,7 +7,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet. 
     """
 
-    def __init__(self, nfitcfactors, fit_cfactors):
+    def __init__(self, nfitcfactors, cfac_units, fit_cfactors):
         """
         Parameters
         ----------
@@ -27,6 +27,7 @@ class CombineCfacLayer(Layer):
             trainable=True,
         )
         self.fit_cfactors= fit_cfactors  
+        self.scale = cfac_units
 
     def call(self, inputs, cfactor_values):
         """
@@ -46,6 +47,6 @@ class CombineCfacLayer(Layer):
         # 1) tensor[:, tf.newaxis] adds an extra dimension to the end of the tensor. 
         # 2) tensor_1 * cfactor_values return a tensor of dimensions `(ncfacs, ncfactors)`
         # 3) tf.reduce_sum(tensor, axis=i) sums over the `i` dimension and gets rid of it 
-        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * cfactor_values, axis=0)) * inputs
+        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * cfactor_values, axis=0) / self.scale) * inputs
 
         return ret
