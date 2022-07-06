@@ -507,12 +507,12 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
         raise RuntimeError(f"Ensure the number of fitted cfactors is 2 not {columns}")
 
     fig = plt.figure()
-    gs = GridSpec(6, 4)
+    gs = GridSpec(11, 8)
 
-    ax_scatter = fig.add_subplot(gs[1:4, 0:3])
-    ax_hist_x = fig.add_subplot(gs[0, 0:3])
-    ax_hist_y = fig.add_subplot(gs[1:4, 3])
-    ax_cbar = fig.add_subplot(gs[5, 0:3])
+    ax_scatter = fig.add_subplot(gs[2:8, 0:6])
+    ax_hist_x = fig.add_subplot(gs[0:2, 0:6])
+    ax_hist_y = fig.add_subplot(gs[2:8, 6:8])
+    ax_cbar = fig.add_subplot(gs[10:11, 0:6])
 
     chi2 = [info.chi2 for info in replica_data]
 
