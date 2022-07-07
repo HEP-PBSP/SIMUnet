@@ -18,7 +18,7 @@ from matplotlib import cm, colors as mcolors
 from matplotlib.gridspec import GridSpec
 
 from reportengine.figure import figure, figuregen
-from reportengine.checks import make_argcheck
+from reportengine.checks import make_argcheck, check
 from reportengine.floatformatting import format_number
 
 from validphys import plotutils
@@ -498,13 +498,23 @@ def plot_nd_fit_cfactors(read_fit_cfactors):
         yield fig
 
 
+@make_argcheck
+def _check_two_fitted_cfactors(fit):
+    cf = fit.as_input().get("fit_cfactors_list", [])
+    l = len(cf)
+    check(
+        l == 2,
+        "Exactly two elements are required in "
+        f"`fit_cfactors_list` for fit '{fit}', but {l} found.",
+    )
+
+
 @figure
+@_check_two_fitted_cfactors
 def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
     """Plot two dimensional distributions of the fit cfactors"""
-    rows, columns = read_fit_cfactors.shape
     labels = read_fit_cfactors.columns
-    if columns != 2:
-        raise RuntimeError(f"Ensure the number of fitted cfactors is 2 not {columns}")
+    assert len(labels) == 2
 
     fig = plt.figure()
     gs = GridSpec(11, 8)
