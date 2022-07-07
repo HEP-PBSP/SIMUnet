@@ -211,12 +211,8 @@ def summarise_fits(collected_fit_summaries):
 @make_argcheck
 def _check_has_fit_cfactors(fit):
     """Check that the fit comes with Wilson coefficients fitted"""
-    # No need to look into legacy locations here
-    # TODO: Write these in the LHAPDF header instead.
-    p = fit.path / "postfit" / "replica_1" / CF_FILE
-    check(
-        p.is_file(), f"The fit '{fit.name}' does not have fit cfactors. Path {p} a file"
-    )
+    cf = fit.as_input().get("fit_cfactors_list")
+    check(cf, f"Fit '{fit}' does not contain fitted cfactors.")
 
 
 @_check_has_fit_cfactors
