@@ -13,6 +13,7 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors as mcolors, ticker as mticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scipy.stats as stats
 import pandas as pd
 
@@ -758,6 +759,86 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     )
 
     ax.set_aspect("equal")
+    return fig
+
+
+@figuregen
+def plot_nd_fit_cfactors(read_fit_cfactors):
+    """Plot a histogram for each fit_cfactor coefficient.
+    The nd is used for n-dimensional, if two fit cfactors
+    are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
+    """
+    for label, column in read_fit_cfactors.iteritems():
+        # TODO: surely there is a better way
+        if label == 'Cb':
+            label = r"$\mathbf{C}_{33}^{D\mu}$"
+        fig, ax = plt.subplots()
+
+        ax.hist(column.values)
+
+        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        ax.set_title(f"Distribution for {label} coefficient")
+        ax.set_ylabel("Count")
+        ax.set_xlabel(label)
+        ax.grid(False)
+
+        yield fig
+
+
+@make_argcheck
+def _check_two_fitted_cfactors(fit):
+    cf = fit.as_input().get("fit_cfactors", [])
+    l = len(cf)
+    check(
+        l == 2,
+        "Exactly two elements are required in "
+        f"`fit_cfactors_list` for fit '{fit}', but {l} found.",
+    )
+
+@figure
+@_check_two_fitted_cfactors
+def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
+    """Plot two dimensional distributions of the fit cfactors"""
+    labels = read_fit_cfactors.columns
+    assert len(labels) == 2
+
+    fig, ax = plt.subplots()
+
+    chi2 = [info.chi2 for info in replica_data]
+
+    scatter_plot = ax.scatter(
+        read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1], c=chi2
+    )
+
+    # create new axes to the bottom of the scatter plot
+    # for the colourbar 
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
+
+    # set scientific notation for thei scatter plot
+    ax.ticklabel_format(
+        axis='both', scilimits=(0, 0), style='sci', useOffset=True
+    )
+
+    # append axes to the top and to the right for the histograms 
+    ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+    ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+    # Make some labels invisible
+    ax_histx.xaxis.set_tick_params(labelbottom=False)
+    ax_histy.yaxis.set_tick_params(labelleft=False)
+
+    # populate the histograms
+    ax_histx.hist(read_fit_cfactors.iloc[:, 0])
+    ax_histy.hist(read_fit_cfactors.iloc[:, 1], orientation='horizontal')
+
+    ax_histx.grid(False)
+    ax_histy.grid(False)
+
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
+
     return fig
 
 
