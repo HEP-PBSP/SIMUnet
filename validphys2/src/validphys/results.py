@@ -317,6 +317,7 @@ experiments_covmat_collection = collect(
     "dataset_inputs_covariance_matrix", ("group_dataset_inputs_by_experiment",)
 )
 
+
 @table
 def fit_cfactor_results_table(read_fit_cfactors):
     """Table generator to summarise information about
@@ -325,19 +326,32 @@ def fit_cfactor_results_table(read_fit_cfactors):
     and standard deviation of the fit cfactors, as well as showing the
     68% (95%) confidence level by computing mean ± std (mean ± 2*std).
     """
+    # Get the numbers from the dataframe
     means = read_fit_cfactors.mean()
     stds = read_fit_cfactors.std()
-
+    
     cl68_lower, cl68_upper = (means - stds, means + stds)
     cl95_lower, cl95_upper = (means - 2 * stds, means + 2 * stds)
 
-    res = pd.DataFrame(index=read_fit_cfactors.columns)
-    res['68cl bounds'] = list(zip(cl68_lower, cl68_upper))
-    res['95cl bounds'] = list(zip(cl95_lower, cl95_upper))
-    res['mean'] = means
-    res['std'] = stds
+    # Format the numbers to display 
+    means_disp = list(map(lambda x: "{:.2e}".format(x) , list(means)))
+    stds_disp = list(map(lambda x: "{:.2e}".format(x) , list(stds)))
+    
+    cl68_lower_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl68_lower)))
+    cl68_upper_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl68_upper)))
+    
+    cl95_lower_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl95_lower)))
+    cl95_upper_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl95_upper)))
 
-    return res
+    # fill the dataframe
+    df = pd.DataFrame(index=read_fit_cfactors.columns)
+    df['68cl bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
+    df['95cl bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
+    df['mean'] = means_disp
+    df['std'] = stds_disp
+    
+    return df
+
 
 _read_pdf_cfactors = collect("read_fit_cfactors", ("pdffit",))
 
