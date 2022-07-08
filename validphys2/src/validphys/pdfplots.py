@@ -500,7 +500,7 @@ def plot_nd_fit_cfactors(read_fit_cfactors):
 
 @make_argcheck
 def _check_two_fitted_cfactors(fit):
-    cf = fit.as_input().get("fit_cfactors_list", [])
+    cf = fit.as_input().get("fit_cfactors", [])
     l = len(cf)
     check(
         l == 2,

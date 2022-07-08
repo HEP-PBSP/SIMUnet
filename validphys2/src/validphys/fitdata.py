@@ -211,7 +211,8 @@ def summarise_fits(collected_fit_summaries):
 @make_argcheck
 def _check_has_fit_cfactors(fit):
     """Check that the fit comes with Wilson coefficients fitted"""
-    cf = fit.as_input().get("fit_cfactors_list")
+    cf = fit.as_input().get("fit_cfactors")
+    #import IPython; IPython.embed()
     check(cf, f"Fit '{fit}' does not contain fitted cfactors.")
 
 
