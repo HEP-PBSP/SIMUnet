@@ -6,6 +6,7 @@ Plots of quantities that are mostly functions of the PDFs only.
 import abc
 import logging
 import functools
+from re import A
 import warnings
 import numbers
 import copy
@@ -16,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors as mcolors
 from matplotlib.gridspec import GridSpec
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from reportengine.figure import figure, figuregen
 from reportengine.checks import make_argcheck, check
@@ -508,7 +510,6 @@ def _check_two_fitted_cfactors(fit):
         f"`fit_cfactors_list` for fit '{fit}', but {l} found.",
     )
 
-
 @figure
 @_check_two_fitted_cfactors
 def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
@@ -516,64 +517,42 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
     labels = read_fit_cfactors.columns
     assert len(labels) == 2
 
-    fig = plt.figure()
-    gs = GridSpec(11, 8)
-
-    ax_scatter = fig.add_subplot(gs[2:8, 0:6])
-    ax_hist_x = fig.add_subplot(gs[0:2, 0:6])
-    ax_hist_y = fig.add_subplot(gs[2:8, 6:8])
-    ax_cbar = fig.add_subplot(gs[10:11, 0:6])
+    fig, ax = plt.subplots()
 
     chi2 = [info.chi2 for info in replica_data]
 
-    scatter = ax_scatter.scatter(
+    scatter_plot = ax.scatter(
         read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1], c=chi2
     )
-    ax_scatter.ticklabel_format(
+
+    # create new axes to the bottom of the scatter plot
+    # for the colourbar 
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
+
+    # set scientific notation for thei scatter plot
+    ax.ticklabel_format(
         axis='both', scilimits=(0, 0), style='sci', useOffset=True
     )
 
-    ax_hist_x.hist(read_fit_cfactors.iloc[:, 0])
-    ax_hist_y.hist(read_fit_cfactors.iloc[:, 1], orientation='horizontal')
+    # append axes to the top and to the right for the histograms 
+    ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+    ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
 
-    ax_hist_x.set_xticklabels([])
-    ax_hist_y.set_yticklabels([])
-    ax_hist_x.minorticks_on()
-    ax_hist_y.minorticks_on()
-    ax_hist_x.tick_params(axis='x', which='minor', bottom=False)
-    ax_hist_y.tick_params(axis='y', which='minor', left=False)
-    ax_hist_x.grid(False)
-    ax_hist_y.grid(False)
+    # Make some labels invisible
+    ax_histx.xaxis.set_tick_params(labelbottom=False)
+    ax_histy.yaxis.set_tick_params(labelleft=False)
 
-    fig.subplots_adjust(hspace=0.15, wspace=0.15)
-    fig.canvas.draw()
+    # populate the histograms
+    ax_histx.hist(read_fit_cfactors.iloc[:, 0])
+    ax_histy.hist(read_fit_cfactors.iloc[:, 1], orientation='horizontal')
 
-    # Ugly but we need to do this annoying hack to prevent the offset_text
-    # from being hidden beneath the upper histogram. Basically, this bit of
-    # code moves the offset_text multipler e.g 10^-5 and puts it in the
-    # axis labels so it reads e.g W/10^-5.
-    x_offset_text = ax_scatter.xaxis.get_offset_text()
-    y_offset_text = ax_scatter.yaxis.get_offset_text()
-    x_offset_text.set_visible(False)
-    y_offset_text.set_visible(False)
+    ax_histx.grid(False)
+    ax_histy.grid(False)
 
-    if x_offset_text.get_text():
-        ax_scatter.set_xlabel(
-            labels[0] + '/' + x_offset_text.get_text().replace('\\times', '')
-        )
-    else:
-        ax_scatter.set_xlabel(labels[0])
-    if y_offset_text.get_text():
-        ax_scatter.set_ylabel(
-            labels[1] + '/' + y_offset_text.get_text().replace('\\times', '')
-        )
-    else:
-        ax_scatter.set_ylabel(labels[1])
-
-    # https://stackoverflow.com/questions/32462881/add-colorbar-to-existing-axis
-    fig.colorbar(
-        scatter, orientation="horizontal", cax=ax_cbar, label=r"$\chi^2$"
-    )
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
 
     return fig
 
