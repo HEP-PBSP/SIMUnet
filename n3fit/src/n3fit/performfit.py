@@ -26,6 +26,7 @@ def performfit(
     nfitcfactors,
     basis,
     fitbasis,
+    cfactorscale,
     sum_rules=True,
     parameters,
     replica_path,
@@ -39,7 +40,7 @@ def performfit(
     debug=False,
     maxcores=None,
     parallel_models=False, 
-    fit_cfactors=None
+    fit_cfactors=None,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -198,7 +199,8 @@ def performfit(
             sum_rules=sum_rules,
             parallel_models=n_models,
             nfitcfactors=nfitcfactors,
-            fit_cfactors=fit_cfactors
+            fit_cfactors=fit_cfactors, 
+            cfactor_scale=cfactorscale
         )
 
         # This is just to give a descriptive name to the fit function

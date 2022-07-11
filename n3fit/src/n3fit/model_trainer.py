@@ -93,6 +93,7 @@ class ModelTrainer:
         flavinfo,
         fitbasis,
         nnseeds,
+        cfactor_scale=1,
         pass_status="ok",
         failed_status="fail",
         nfitcfactors=0,
@@ -103,7 +104,6 @@ class ModelTrainer:
         model_file=None,
         sum_rules=None,
         parallel_models=1,
-        cfactor_scale=1,
     ):
         """
         Parameters
@@ -470,9 +470,9 @@ class ModelTrainer:
         # Now we need to loop over all dictionaries (First exp_info, then pos_info and integ_info)
 
         combiner = CombineCfacLayer(
-                    self.nfitcfactors,
-                    self.cfactor_scale,
-                    self.fit_cfactors,
+                    nfitcfactors=self.nfitcfactors,
+                    scale=self.cfactor_scale,
+                    fit_cfactors=self.fit_cfactors,
         )
 
         log.info(f"Using cfactor scale {self.cfactor_scale}")

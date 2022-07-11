@@ -408,11 +408,13 @@ class CoreConfig(configparser.Config):
             return len(fit_cfactors)
         return 0
 
-    def parse_cfactorscale(self, cfactor_scale: float):
-        return cfactor_scale
+    #def parse_cfactorscale(self, cfactor_scale: float):
+        #print(f"cfactor_scale = {cfactor_scale}")
+        #return cfactor_scale
 
-    def produce_cfactor_scale(self, cfactorscale=1.0):
-        return cfactorscale
+    #def produce_cfactor_scale(self, cfactorscale=1.0):
+        #print("do they even call this?")
+        #return cfactorscale
 
     @element_of("dataset_inputs")
     def parse_dataset_input(self, dataset: Mapping):
