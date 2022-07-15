@@ -1,0 +1,13 @@
+meta:
+  title: Kernel density estimation of Wilson coefficients 
+  author: Manuel Morales Alvarado
+  keywords: [simunet, test]
+
+fit: 200622_MMA_Y_noHLLHC 
+
+template_text: |
+ # KDE plot for a Wilson coefficient 
+ {@plot_kde_fit_cfactors@}
+
+actions_:
+  - report(main=True)
