@@ -420,7 +420,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "fit_cfac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "smeft_cfac"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -451,12 +451,12 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        fit_cfac = dataset.get("fit_cfac")
+        smeft_cfac = dataset.get("smeft_cfac")
 
-        # fit_cfac is a boolean 
-        if fit_cfac is not None:
-            if not isinstance(fit_cfac, bool):
-                raise ConfigError(f"fit_cfac must be bool not {type(fit_cfac)}")
+        # smeft_cfac is a boolean 
+        if smeft_cfac is not None:
+            if not isinstance(smeft_cfac, bool):
+                raise ConfigError(f"smeft_cfac must be bool not {type(smeft_cfac)}")
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
             # fit_cfac_ns is a list of string with the Wilsons to fit
