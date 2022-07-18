@@ -784,6 +784,30 @@ def plot_nd_fit_cfactors(read_fit_cfactors):
 
         yield fig
 
+@figuregen
+def plot_kde_fit_cfactors(read_fit_cfactors):
+    """
+    Plots the kernel estimation density for distributions
+    of Wilson coefficients. 
+    Parameters
+    ----------
+        read_fit_cfactors: pd.DataFrame
+    """
+    for label, column in read_fit_cfactors.iteritems():
+        # Initialise Axes instance
+        fig, ax = plt.subplots()
+        # populate the Axes with the KDE
+        ax = plotutils.kde_plot(column.values)
+
+        # Format of the plot
+        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        ax.set_title(f"KDE for {label} coefficient")
+        ax.set_ylabel("Density")
+        ax.set_xlabel(label)
+        ax.grid(True)
+
+        yield fig
+
 
 @make_argcheck
 def _check_two_fitted_cfactors(fit):
