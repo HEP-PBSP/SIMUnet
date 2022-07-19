@@ -403,9 +403,12 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_nfitcfactors(self, fit_cfactors=None):
-        if fit_cfactors is not None:
-            return len(fit_cfactors)
+    def produce_n_eft_coefficients(self, eft_coefficients=None):
+        """
+        Produces the number of EFT coefficients that we are fitting.
+        """
+        if eft_coefficients is not None:
+            return len(eft_coefficients)
         return 0
 
     #def parse_cfactorscale(self, cfactor_scale: float):
@@ -460,7 +463,7 @@ class CoreConfig(configparser.Config):
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
             # fit_cfac_ns is a list of string with the Wilsons to fit
-            _, fit_cfac_ns = self.parse_from_(None, "fit_cfactors", write=False)
+            _, fit_cfac_ns = self.parse_from_(None, "eft_coefficients", write=False)
         else:
             fit_cfac_ns = None
 
