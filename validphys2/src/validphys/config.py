@@ -403,12 +403,12 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_n_bsm_coefficients(self, bsm_coefficients=None):
+    def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.
         """
-        if bsm_coefficients is not None:
-            return len(bsm_coefficients)
+        if bsm_fac_data is not None:
+            return len(bsm_fac_data)
         return 0
 
     #def parse_cfactorscale(self, cfactor_scale: float):
@@ -423,7 +423,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_cfac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_fac"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -454,16 +454,16 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_cfac = dataset.get("bsm_cfac")
+        bsm_fac = dataset.get("bsm_fac")
 
         # bsm_cfac is a boolean 
-        if bsm_cfac is not None:
-            if not isinstance(bsm_cfac, bool):
-                raise ConfigError(f"bsm_cfac must be bool not {type(bsm_cfac)}")
+        if bsm_fac is not None:
+            if not isinstance(bsm_fac, bool):
+                raise ConfigError(f"bsm_fac must be bool not {type(bsm_fac)}")
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
             # fit_cfac_ns is a list of string with the Wilsons to fit
-            _, fit_cfac_ns = self.parse_from_(None, "bsm_coefficients", write=False)
+            _, fit_cfac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
         else:
             fit_cfac_ns = None
 

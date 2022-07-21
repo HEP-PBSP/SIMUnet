@@ -10,7 +10,7 @@ description: "Runcard with new notation. This one performs a simultaenous W-Y fi
 
 dataset_inputs:
   - {dataset: NMCPD, frac: 0.5}
-  #- {dataset: NMC, frac: 0.5, bsm_cfac: True}
+  #- {dataset: NMC, frac: 0.5, bsm_fac: True}
   #- {dataset: SLACP, frac: 0.5}
   #- {dataset: SLACD, frac: 0.5}
   #- {dataset: BCDMSP, frac: 0.5}
@@ -19,16 +19,16 @@ dataset_inputs:
   #- {dataset: CHORUSNBPb, frac: 0.5}
   #- {dataset: NTVNUDMNFe, frac: 0.5, cfac: [MAS]}
   #- {dataset: NTVNBDMNFe, frac: 0.5, cfac: [MAS]}
-  #- {dataset: HERACOMBNCEM, frac: 0.5, bsm_cfac: True}
-  #- {dataset: HERACOMBNCEP460, frac: 0.5, bsm_cfac: True}
-  #- {dataset: HERACOMBNCEP575, frac: 0.5, bsm_cfac: True}
-  #- {dataset: HERACOMBNCEP820, frac: 0.5, bsm_cfac: True}
-  #- {dataset: HERACOMBNCEP920, frac: 0.5, bsm_cfac: True}
+  #- {dataset: HERACOMBNCEM, frac: 0.5, bsm_fac: True}
+  #- {dataset: HERACOMBNCEP460, frac: 0.5, bsm_fac: True}
+  #- {dataset: HERACOMBNCEP575, frac: 0.5, bsm_fac: True}
+  #- {dataset: HERACOMBNCEP820, frac: 0.5, bsm_fac: True}
+  #- {dataset: HERACOMBNCEP920, frac: 0.5, bsm_fac: True}
   #- {dataset: HERACOMBCCEM, frac: 0.5}
   #- {dataset: HERACOMBCCEP, frac: 0.5}
-  #- {dataset: HERAF2CHARM, frac: 0.5, bsm_cfac: True}
-  #- {dataset: H1HERAF2B, frac: 0.5, bsm_cfac: True}
-  #- {dataset: ZEUSHERAF2B, frac: 0.5, bsm_cfac: True}
+  #- {dataset: HERAF2CHARM, frac: 0.5, bsm_fac: True}
+  #- {dataset: H1HERAF2B, frac: 0.5, bsm_fac: True}
+  #- {dataset: ZEUSHERAF2B, frac: 0.5, bsm_fac: True}
   #- {dataset: DYE886R, frac: 1.0}
   #- {dataset: DYE886P, frac: 0.5, cfac: [QCD]}
   #- {dataset: DYE605, frac: 0.5, cfac: [QCD]}
@@ -49,8 +49,8 @@ dataset_inputs:
   #- {dataset: ATLAS_WCHARM_WM_DIFF_7TEV, frac: 1.0}
   #- {dataset: ATLAS_WP_JET_8TEV_PT, frac: 1.0, cfac: [QCD]}
   #- {dataset: ATLAS_WM_JET_8TEV_PT, frac: 1.0, cfac: [QCD]}
-  #- {dataset: ATLASZHIGHMASS49FB, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                       # High-mass DY
-  #- {dataset: ATLASDY2D8TEV, frac: 0.5, cfac: [QCDEWK], bsm_cfac: True}                              # High-mass DY
+  #- {dataset: ATLASZHIGHMASS49FB, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                       # High-mass DY
+  #- {dataset: ATLASDY2D8TEV, frac: 0.5, cfac: [QCDEWK], bsm_fac: True}                              # High-mass DY
   #- {dataset: CMSWEASY840PB, frac: 1.0, cfac: [QCD]}
   #- {dataset: CMSWMASY47FB, frac: 1.0, cfac: [QCD]}
   #- {dataset: CMSZDIFF12, frac: 1.0, cfac: [QCD, NRM]}
@@ -58,16 +58,16 @@ dataset_inputs:
   #- {dataset: CMSWCHARMTOT, frac: 1.0}
   #- {dataset: CMSWCHARMRAT, frac: 1.0}
   #- {dataset: CMS_WCHARM_DIFF_UNNORM_13TEV, frac: 1.0}
-  #- {dataset: CMSDY2D11, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                                # High-mass DY
-  #- {dataset: CMSDY1D12, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                                # High-mass DY
-  - {dataset: CMS_HMDY_13TEV, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                           # High-mass DY
-  - {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                   # HL
-  - {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                   # HL
-  - {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                   # HL
-  - {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_cfac: True}                   # HL
+  #- {dataset: CMSDY2D11, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                                # High-mass DY
+  #- {dataset: CMSDY1D12, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                                # High-mass DY
+  - {dataset: CMS_HMDY_13TEV, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                           # High-mass DY
+  - {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
+  - {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
+  - {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
+  - {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
 
 ############################################################
-bsm_coefficients: ["W", "Y"]
+bsm_fac_data: ["W", "Y"]
 
 ############################################################
 datacuts:
