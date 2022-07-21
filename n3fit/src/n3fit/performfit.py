@@ -23,7 +23,7 @@ def performfit(
     posdatasets_fitting_pos_dict,
     integdatasets_fitting_integ_dict,
     theoryid,
-    n_eft_coefficients,
+    n_bsm_coefficients,
     basis,
     fitbasis,
     cfactorscale,
@@ -198,7 +198,7 @@ def performfit(
             model_file=load,
             sum_rules=sum_rules,
             parallel_models=n_models,
-            n_eft_coefficients=n_eft_coefficients,
+            n_bsm_coefficients=n_bsm_coefficients,
             fit_cfactors=fit_cfactors, 
             cfactor_scale=cfactorscale
         )

@@ -96,7 +96,7 @@ class ModelTrainer:
         cfactor_scale=1,
         pass_status="ok",
         failed_status="fail",
-        n_eft_coefficients=0,
+        n_bsm_coefficients=0,
         fit_cfactors=None,
         debug=False,
         kfold_parameters=None,
@@ -154,7 +154,7 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
-        self.n_eft_coefficients=n_eft_coefficients
+        self.n_bsm_coefficients=n_bsm_coefficients
         self.fit_cfactors = fit_cfactors
         self.cfactor_scale = cfactor_scale
 
@@ -470,7 +470,7 @@ class ModelTrainer:
         # Now we need to loop over all dictionaries (First exp_info, then pos_info and integ_info)
 
         combiner = CombineCfacLayer(
-                    n_eft_coefficients=self.n_eft_coefficients,
+                    n_bsm_coefficients=self.n_bsm_coefficients,
                     scale=self.cfactor_scale,
                     fit_cfactors=self.fit_cfactors,
         )

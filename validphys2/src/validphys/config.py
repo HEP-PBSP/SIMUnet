@@ -403,12 +403,12 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_n_eft_coefficients(self, eft_coefficients=None):
+    def produce_n_bsm_coefficients(self, bsm_coefficients=None):
         """
-        Produces the number of EFT coefficients that we are fitting.
+        Produces the number of BSM coefficients to include in the fit.
         """
-        if eft_coefficients is not None:
-            return len(eft_coefficients)
+        if bsm_coefficients is not None:
+            return len(bsm_coefficients)
         return 0
 
     #def parse_cfactorscale(self, cfactor_scale: float):
@@ -423,7 +423,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "eft_cfac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_cfac"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -454,16 +454,16 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        eft_cfac = dataset.get("eft_cfac")
+        bsm_cfac = dataset.get("bsm_cfac")
 
-        # eft_cfac is a boolean 
-        if eft_cfac is not None:
-            if not isinstance(eft_cfac, bool):
-                raise ConfigError(f"eft_cfac must be bool not {type(eft_cfac)}")
+        # bsm_cfac is a boolean 
+        if bsm_cfac is not None:
+            if not isinstance(bsm_cfac, bool):
+                raise ConfigError(f"bsm_cfac must be bool not {type(bsm_cfac)}")
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
             # fit_cfac_ns is a list of string with the Wilsons to fit
-            _, fit_cfac_ns = self.parse_from_(None, "eft_coefficients", write=False)
+            _, fit_cfac_ns = self.parse_from_(None, "bsm_coefficients", write=False)
         else:
             fit_cfac_ns = None
 
