@@ -1,0 +1,25 @@
+*******************************************************************************************
+SetName: H1HERAF2B
+Author: James Moore jmm232@cam.ac.uk
+Date: 2020
+CodesUsed: APFEL (apfel4eft branch)
+TheoryInput: Gmu EW input scheme
+PDFset: NNPDF31_nnlo_as_0118
+Warnings: For PDF4EFT project.
+Operator: Y
+Coefficient: 1.0
+InputParameters: G_F = 1.1663787e-5 GeV-2, m_Z = 91.1876 GeV, m_W = 80.398 GeV, Gamma_Z = 2.4952 GeV, Gamma_W = 2.085 GeV
+Notes: Correction is for electron channel. SMEFT contribution is linearised and includes SMEFT x QCD effects.
+********************************************************************************************
+0.9996237999999593    0.00000
+0.9990967000000897    0.00000
+0.9990965000000731    0.00000
+0.9981173000001    0.00000
+0.9981154999999511    0.00000
+0.995473900000098    0.00000
+0.995472399999974    0.00000
+0.984783099999941    0.00000
+0.9847862999999837    0.00000
+0.9496915999999125    0.00000
+0.9496946999999469    0.00000
+0.8440230000000817    0.00000
