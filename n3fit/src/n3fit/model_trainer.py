@@ -96,7 +96,7 @@ class ModelTrainer:
         cfactor_scale=1,
         pass_status="ok",
         failed_status="fail",
-        nfitcfactors=0,
+        n_bsm_fac_data=0,
         fit_cfactors=None,
         debug=False,
         kfold_parameters=None,
@@ -136,6 +136,8 @@ class ModelTrainer:
                         whether sum rules should be enabled (All, MSR, VSR, False)
             parallel_models: int
                 number of models to fit in parallel
+            n_bsm_fac_data: int
+                number of bsm coefficients in the fit
         """
         # Save all input information
         self.exp_info = exp_info
@@ -154,7 +156,7 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
-        self.nfitcfactors=nfitcfactors
+        self.n_bsm_fac_data=n_bsm_fac_data
         self.fit_cfactors = fit_cfactors
         self.cfactor_scale = cfactor_scale
 
@@ -470,7 +472,7 @@ class ModelTrainer:
         # Now we need to loop over all dictionaries (First exp_info, then pos_info and integ_info)
 
         combiner = CombineCfacLayer(
-                    nfitcfactors=self.nfitcfactors,
+                    n_bsm_fac_data=self.n_bsm_fac_data,
                     scale=self.cfactor_scale,
                     fit_cfactors=self.fit_cfactors,
         )
