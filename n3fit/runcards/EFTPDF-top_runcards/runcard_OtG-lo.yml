@@ -64,30 +64,30 @@ dataset_inputs:
 - {dataset: LHCB_Z_13TEV_DIMUON, frac: 0.75, cfac: [QCD]}
 - {dataset: LHCB_Z_13TEV_DIELECTRON, frac: 0.75, cfac: [QCD]} # HERE STARTS THE TOP SECTOR 
 #- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD]} # No C-facs
-- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], fit_cfac: True} 
-- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], fit_cfac: True} 
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
 #- {dataset: CMSTTBARTOT5TEV, frac: 0.75, cfac: [QCD]} No C-facs 
 #- {dataset: CMSTTBARTOT7TEV, frac: 0.75, cfac: [QCD]} # No C-facs
-- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], fit_cfac: True} 
-- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], fit_cfac: True} 
-- {dataset: CMSTOPDIFF8TEVTTRAPNORM, frac: 0.75, cfac: [QCD], fit_cfac: True} 
-- {dataset: CMSTTBARTOT13TEV, frac: 0.75, cfac: [QCD], fit_cfac: True}
-- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, frac: 0.75, fit_cfac: True}
-- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, frac: 0.75, cfac: [QCD], fit_cfac: True} 
-- {dataset: CMS_TTBAR_13TEV_LJETS_2D_TTM_ABSYTTNORM, frac: 0.75, cfac: [QCD], fit_cfac: True} 
-#- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, frac: 0.75, fit_cfac: True} # At OtG-lo the cfactor diverges
-#- {dataset: ATLAS_TTBAR_13TEV_ASY, frac: 0.75, fit_cfac: True} # At OtG-lo the cfactor diverges
-#- {dataset: ATLAS_TTBAR_8TEV_ASY, frac: 0.75, fit_cfac: True} # At OtG-lo the cfactor diverges
+- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTOPDIFF8TEVTTRAPNORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTTBARTOT13TEV, frac: 0.75, cfac: [QCD], bsm_fac: True}
+- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, frac: 0.75, bsm_fac: True}
+- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMS_TTBAR_13TEV_LJETS_2D_TTM_ABSYTTNORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+#- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, frac: 0.75, bsm_fac: True} # At OtG-lo the cfactor diverges
+#- {dataset: ATLAS_TTBAR_13TEV_ASY, frac: 0.75, bsm_fac: True} # At OtG-lo the cfactor diverges
+#- {dataset: ATLAS_TTBAR_8TEV_ASY, frac: 0.75, bsm_fac: True} # At OtG-lo the cfactor diverges
 #- {dataset: CMS_TTBAR_13TEV_ASY, frac: 0.75} # At OtG-lo the cfactor diverges
-#- {dataset: CMS_TTBAR_8TEV_ASY, frac: 0.75, fit_cfac: True} # We have cfacs for minurs and plus distributions. FROM HERE DOWNWARDS THEY DON'T ENTER THE BENCHMARK
+#- {dataset: CMS_TTBAR_8TEV_ASY, frac: 0.75, bsm_fac: True} # We have cfacs for minurs and plus distributions. FROM HERE DOWNWARDS THEY DON'T ENTER THE BENCHMARK
 #- {dataset: CMS_TTBARZ_8TEV_TOTAL, frac: 0.75}
 #- {dataset: CMS_TTBARZ_13TEV_TOTAL, frac: 0.75, cfac: [QCD]}
 #- {dataset: ATLAS_TTBARZ_8TEV_TOTAL, frac: 0.75}
@@ -115,7 +115,7 @@ dataset_inputs:
 #- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, frac: 0.75}
 
 ############################################################
-fit_cfactors: ["OtG-lo"]
+bsm_fac_data: ["OtG-lo"]
 
 ############################################################
 datacuts:
