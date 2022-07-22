@@ -865,6 +865,35 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
 
     return fig
 
+@figure
+def plot_chi2_fit_cfactors(read_fit_cfactors, replica_data):
+    """
+    Generates fitcfactor-chi2 scatter plots for all replicas
+    in a fit. 
+    """
+
+    chi2 = [info.chi2 for info in replica_data]
+
+    for label, column in read_fit_cfactors.iteritems():
+
+        fig, ax = plt.subplots()
+
+        ax.scatter(
+            column, chi2, s=40, alpha=0.8
+        )
+
+        # set scientific notation for the scatter plot
+        ax.ticklabel_format(
+            axis='both', scilimits=(0, 0), style='sci', useOffset=True
+        )
+
+        ax.set_xlabel(label)
+        ax.set_ylabel(r"$\chi^2$")
+        ax.set_axisbelow(True)
+        ax.grid(True)
+
+        return fig
+
 
 @figure
 def plot_trainvaliddist(fit, replica_data):
