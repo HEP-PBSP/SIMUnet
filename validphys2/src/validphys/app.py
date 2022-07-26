@@ -54,6 +54,7 @@ providers = [
     "validphys.n3fit_data",
     "validphys.mc2hessian",
     "reportengine.report",
+    "validphys.simunet_plots.simunet_plots"
 ]
 
 log = logging.getLogger(__name__)

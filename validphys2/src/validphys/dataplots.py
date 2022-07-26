@@ -762,27 +762,27 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     return fig
 
 
-@figuregen
-def plot_nd_fit_cfactors(read_fit_cfactors):
-    """Plot a histogram for each fit_cfactor coefficient.
-    The nd is used for n-dimensional, if two fit cfactors
-    are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
-    """
-    for label, column in read_fit_cfactors.iteritems():
-        # TODO: surely there is a better way
-        if label == 'Cb':
-            label = r"$\mathbf{C}_{33}^{D\mu}$"
-        fig, ax = plt.subplots()
+#@figuregen
+#def plot_nd_fit_cfactors(read_fit_cfactors):
+    #"""Plot a histogram for each fit_cfactor coefficient.
+    #The nd is used for n-dimensional, if two fit cfactors
+    #are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
+    #"""
+    #for label, column in read_fit_cfactors.iteritems():
+        ## TODO: surely there is a better way
+        #if label == 'Cb':
+            #label = r"$\mathbf{C}_{33}^{D\mu}$"
+        #fig, ax = plt.subplots()
 
-        ax.hist(column.values)
+        #ax.hist(column.values)
 
-        ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.set_title(f"Distribution for {label} coefficient")
-        ax.set_ylabel("Count")
-        ax.set_xlabel(label)
-        ax.grid(False)
+        #ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+        #ax.set_title(f"Distribution for {label} coefficient")
+        #ax.set_ylabel("Count")
+        #ax.set_xlabel(label)
+        #ax.grid(False)
 
-        yield fig
+        #yield fig
 
 @figuregen
 def plot_kde_fit_cfactors(read_fit_cfactors):
