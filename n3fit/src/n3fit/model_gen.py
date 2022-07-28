@@ -86,10 +86,10 @@ class ObservableWrapper:
 
         for idx, (dataset_dict, output_layer) in enumerate(zip(self.spec_dict['datasets'], output_layers)):
             # Use get here to prevent having to worry about POSDATSETS
-            fit_cfac_dict = dataset_dict.get('fit_cfac_dict')
+            bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
             #quad_fit_cfac = dataset_dict.get('quad_fit_cfac')
-            if fit_cfac_dict is not None:
-                coefficients = np.array([i.central_value for i in fit_cfac_dict.values()])
+            if bsm_fac_data_names_CF is not None:
+                coefficients = np.array([i.central_value for i in bsm_fac_data_names_CF.values()])
                 #if quad_fit_cfac is not None:
                     #quad_coefficients = np.array([i.central_value for i in quad_fit_cfac.values()])
                     #log.info("Using quadratic cfactors")
@@ -104,7 +104,7 @@ class ObservableWrapper:
                 elif self.split == 'vl':
                     cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
                     #quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
-                log.info(f"Applying fit_cfac layer")
+                log.info(f"Applying combination layer")
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
