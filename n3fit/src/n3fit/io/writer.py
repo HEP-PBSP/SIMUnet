@@ -258,7 +258,7 @@ def storefit(
     result = pdf_object(xgrid, flavours="n3fit").squeeze()
     lha = evln2lha(result.T).T
 
-    # Save fitcfactor tables
+    # Save bsm_fac results per replica 
     if bsm_fac_df is not None:
         with open(f"{replica_path}/bsm_fac.csv", 'w') as fs:
             bsm_fac_df.to_csv(fs)

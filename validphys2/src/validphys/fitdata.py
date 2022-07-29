@@ -24,7 +24,7 @@ from validphys.plotoptions import get_info
 #TODO: Add more stuff here as needed for postfit
 LITERAL_FILES = ['chi2exps.log']
 REPLICA_FILES = ['.dat', '.json']
-CF_FILE = 'fit_cfactors.csv'
+BSM_FAC_FILE = 'bsm_fac.csv'
 FIT_SUMRULES = [
     "momentum",
     "uvalence",
@@ -218,9 +218,9 @@ def _check_has_fit_cfactors(fit):
 @_check_has_fit_cfactors
 def read_fit_cfactors(replica_paths):
     """
-    Read the csv saved fit cfactors, accounting for the
+    Read the csv saved BSM factors, accounting for the
     postfit reshuffling, and return a concatenated dataframe
-    for replicas as indices and fit cfactors as columns
+    for replicas as indices and the list BSM factors as columns
     Parameters
     ----------
         replica_paths: list 
@@ -229,7 +229,7 @@ def read_fit_cfactors(replica_paths):
         fit_cfactors: pd.DataFrame
     """
     # Need to account for postfit reshuffling of replicas
-    paths = [p / CF_FILE for p in replica_paths]
+    paths = [p / BSM_FAC_FILE for p in replica_paths]
     fit_cfactors = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
 
     rows, _columns = fit_cfactors.shape
