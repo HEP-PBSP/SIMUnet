@@ -411,8 +411,18 @@ class CoreConfig(configparser.Config):
             return len(bsm_fac_data)
         return 0
 
+    def produce_bsm_fac_data_names(self, bsm_fac_data=None):
+        """
+        Produces the list of the names of the
+        BSM coefficients to include in the fit.
+        """
+        if bsm_fac_data is not None:
+            bsm_fac_data_names = [entry['name'] for entry in bsm_fac_data]
+            return bsm_fac_data_names
+        return [] 
+
     #def parse_cfactorscale(self, cfactor_scale: float):
-        #print(f"cfactor_scale = {cfactor_scale}")
+        #print(f"HELLOOO")
         #return cfactor_scale
 
     #def produce_cfactor_scale(self, cfactorscale=1.0):

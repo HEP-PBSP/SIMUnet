@@ -40,7 +40,7 @@ def performfit(
     debug=False,
     maxcores=None,
     parallel_models=False, 
-    fit_cfactors=None,
+    bsm_fac_data_names=None,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -199,7 +199,7 @@ def performfit(
             sum_rules=sum_rules,
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,
-            fit_cfactors=fit_cfactors, 
+            bsm_fac_data_names=bsm_fac_data_names, 
             cfactor_scale=cfactorscale
         )
 
