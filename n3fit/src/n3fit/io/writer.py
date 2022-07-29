@@ -41,7 +41,7 @@ class WriterWrapper:
         self.q2 = q2
         self.timings = timings
 
-    def write_data(self, replica_path_set, fitname, tr_chi2, vl_chi2, true_chi2, fit_cfactors=None):
+    def write_data(self, replica_path_set, fitname, tr_chi2, vl_chi2, true_chi2, bsm_fac_df=None):
         """
         Wrapper around the `storefit` function.
 
@@ -73,7 +73,7 @@ class WriterWrapper:
             replica_path_set,
             fitname,
             self.q2,
-            fit_cfactors=fit_cfactors
+            bsm_fac_df=bsm_fac_df
         )
 
         # write the log file for the chi2
@@ -232,7 +232,7 @@ def storefit(
     replica_path,
     fitname,
     q20,
-    fit_cfactors=None
+    bsm_fac_df=None
 ):
     """
     One-trick function which generates all output in the NNPDF format
@@ -259,9 +259,9 @@ def storefit(
     lha = evln2lha(result.T).T
 
     # Save fitcfactor tables
-    if fit_cfactors is not None:
-        with open(f"{replica_path}/fit_cfactors.csv", 'w') as fs:
-            fit_cfactors.to_csv(fs)
+    if bsm_fac_df is not None:
+        with open(f"{replica_path}/bsm_fac.csv", 'w') as fs:
+            bsm_fac_df.to_csv(fs)
 
     data = {
         "replica": replica,

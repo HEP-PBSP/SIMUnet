@@ -472,7 +472,6 @@ class CoreConfig(configparser.Config):
                 raise ConfigError(f"bsm_fac must be bool not {type(bsm_fac)}")
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
-            # fit_cfac_ns is a list of string with the Wilsons to fit
             _, bsm_fac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
             bsm_fac_data_names = [dict['name'] for dict in bsm_fac_ns]
         else:

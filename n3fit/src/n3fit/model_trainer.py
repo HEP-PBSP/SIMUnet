@@ -967,7 +967,7 @@ class ModelTrainer:
         # and the pdf models (which are used to generate the PDF grids and compute arclengths)
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
 
-        dict_out['fit_cfactors'] = pd.DataFrame(
+        dict_out['bsm_fac_df'] = pd.DataFrame(
             [self.combiner.get_weights()[0] / self.cfactor_scale], columns=self.bsm_fac_data_names
         )
 
