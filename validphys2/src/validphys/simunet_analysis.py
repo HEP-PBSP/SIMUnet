@@ -25,8 +25,8 @@ log = logging.getLogger(__name__)
 @figuregen
 def plot_nd_bsm_facs(read_bsm_facs):
     """Plot a histogram for each BSM coefficient.
-    The nd is used for n-dimensional, if two fit cfactors
-    are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
+    The nd is used for n-dimensional, if two BSM facs 
+    are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
     """
     for label, column in read_bsm_facs.iteritems():
         # TODO: surely there is a better way
@@ -76,13 +76,16 @@ def _check_two_bsm_facs(fit):
     check(
         l == 2,
         "Exactly two elements are required in "
-        f"`fit_cfactors_list` for fit '{fit}', but {l} found.",
+        f"`bsm_fac_data` for fit '{fit}', but {l} found.",
     )
 
 @figure
 @_check_two_bsm_facs
 def plot_2d_bsm_facs(read_bsm_facs, replica_data):
-    """Plot two dimensional distributions of the fit cfactors"""
+    """
+    Plot two dimensional distributions of the BSM coefficient
+    results
+    """
     labels = read_bsm_facs.columns
     assert len(labels) == 2
 
@@ -158,7 +161,7 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
 @table
 def bsm_facs_bounds(read_bsm_facs):
     """Table generator to summarise information about
-    the fit cfactors.
+    the BSM coefficient results.
     The returned table contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the 68% (95%) confidence level by 

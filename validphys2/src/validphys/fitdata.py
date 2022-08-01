@@ -230,6 +230,7 @@ def read_bsm_facs(replica_paths):
     """
     # Need to account for postfit reshuffling of replicas
     paths = [p / BSM_FAC_FILE for p in replica_paths]
+    import IPython; IPython.embed()
     bsm_fac_results = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
 
     rows, _columns = bsm_fac_results.shape
