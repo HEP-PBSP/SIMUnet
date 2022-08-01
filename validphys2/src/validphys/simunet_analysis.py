@@ -23,12 +23,12 @@ log = logging.getLogger(__name__)
 
 
 @figuregen
-def plot_nd_fit_cfactors(read_fit_cfactors):
-    """Plot a histogram for each fit_cfactor coefficient.
+def plot_nd_bsm_facs(read_bsm_facs):
+    """Plot a histogram for each BSM coefficient.
     The nd is used for n-dimensional, if two fit cfactors
     are present: use instead :py:func:`validphys.results.plot_2d_fit_cfactors`
     """
-    for label, column in read_fit_cfactors.iteritems():
+    for label, column in read_bsm_facs.iteritems():
         # TODO: surely there is a better way
         if label == 'Cb':
             label = r"$\mathbf{C}_{33}^{D\mu}$"
@@ -45,15 +45,15 @@ def plot_nd_fit_cfactors(read_fit_cfactors):
         yield fig
 
 @figuregen
-def plot_kde_fit_cfactors(read_fit_cfactors):
+def plot_kde_bsm_facs(read_bsm_facs):
     """
-    Plots the kernel estimation density for distributions
-    of Wilson coefficients. 
+    Plots the kernel estimation density for a distribution
+    of BSM coefficients. 
     Parameters
     ----------
-        read_fit_cfactors: pd.DataFrame
+        read_bsm_facs: pd.DataFrame
     """
-    for label, column in read_fit_cfactors.iteritems():
+    for label, column in read_bsm_facs.iteritems():
         # Initialise Axes instance
         fig, ax = plt.subplots()
         # populate the Axes with the KDE
@@ -70,8 +70,8 @@ def plot_kde_fit_cfactors(read_fit_cfactors):
 
 
 @make_argcheck
-def _check_two_fitted_cfactors(fit):
-    cf = fit.as_input().get("fit_cfactors", [])
+def _check_two_bsm_facs(fit):
+    cf = fit.as_input().get("bsm_fac_data", [])
     l = len(cf)
     check(
         l == 2,
@@ -80,10 +80,10 @@ def _check_two_fitted_cfactors(fit):
     )
 
 @figure
-@_check_two_fitted_cfactors
-def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
+@_check_two_bsm_facs
+def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     """Plot two dimensional distributions of the fit cfactors"""
-    labels = read_fit_cfactors.columns
+    labels = read_bsm_facs.columns
     assert len(labels) == 2
 
     fig, ax = plt.subplots()
@@ -91,7 +91,7 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
     chi2 = [info.chi2 for info in replica_data]
 
     scatter_plot = ax.scatter(
-        read_fit_cfactors.iloc[:, 0], read_fit_cfactors.iloc[:, 1], c=chi2
+        read_bsm_facs.iloc[:, 0], read_bsm_facs.iloc[:, 1], c=chi2
     )
 
     # create new axes to the bottom of the scatter plot
@@ -114,8 +114,8 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
     ax_histy.yaxis.set_tick_params(labelleft=False)
 
     # populate the histograms
-    ax_histx.hist(read_fit_cfactors.iloc[:, 0])
-    ax_histy.hist(read_fit_cfactors.iloc[:, 1], orientation='horizontal')
+    ax_histx.hist(read_bsm_facs.iloc[:, 0])
+    ax_histy.hist(read_bsm_facs.iloc[:, 1], orientation='horizontal')
 
     ax_histx.grid(False)
     ax_histy.grid(False)
@@ -126,15 +126,15 @@ def plot_2d_fit_cfactors(read_fit_cfactors, replica_data):
     return fig
 
 @figure
-def plot_chi2_fit_cfactors(read_fit_cfactors, replica_data):
+def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
     """
-    Generates fitcfactor-chi2 scatter plots for all replicas
+    Generates bsm_fac value - chi2 scatter plots for all replicas
     in a fit. 
     """
 
     chi2 = [info.chi2 for info in replica_data]
 
-    for label, column in read_fit_cfactors.iteritems():
+    for label, column in read_bsm_facs.iteritems():
 
         fig, ax = plt.subplots()
 
@@ -156,16 +156,17 @@ def plot_chi2_fit_cfactors(read_fit_cfactors, replica_data):
 
 
 @table
-def fit_cfactor_results_table(read_fit_cfactors):
+def bsm_facs_bounds(read_bsm_facs):
     """Table generator to summarise information about
     the fit cfactors.
     The returned table contains information about the mean
-    and standard deviation of the fit cfactors, as well as showing the
-    68% (95%) confidence level by computing mean ± std (mean ± 2*std).
-    """
+    and standard deviation of the BSM coefficients in the fit, 
+    as well as showing the 68% (95%) confidence level by 
+    computing mean ± std (mean ± 2*std).
+    """ 
     # Get the numbers from the dataframe
-    means = read_fit_cfactors.mean()
-    stds = read_fit_cfactors.std()
+    means = read_bsm_facs.mean()
+    stds = read_bsm_facs.std()
     
     cl68_lower, cl68_upper = (means - stds, means + stds)
     cl95_lower, cl95_upper = (means - 2 * stds, means + 2 * stds)
@@ -181,7 +182,7 @@ def fit_cfactor_results_table(read_fit_cfactors):
     cl95_upper_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl95_upper)))
 
     # fill the dataframe
-    df = pd.DataFrame(index=read_fit_cfactors.columns)
+    df = pd.DataFrame(index=read_bsm_facs.columns)
     df['68cl bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
     df['95cl bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
     df['mean'] = means_disp
@@ -189,7 +190,7 @@ def fit_cfactor_results_table(read_fit_cfactors):
     
     return df
 
-_read_pdf_cfactors = collect("read_fit_cfactors", ("pdffit",))
+_read_pdf_cfactors = collect("read_bsm_facs", ("pdffit",))
 
 def read_pdf_cfactors(_read_pdf_cfactors, pdf):
     return _read_pdf_cfactors[0]
