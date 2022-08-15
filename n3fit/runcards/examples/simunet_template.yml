@@ -67,7 +67,9 @@ dataset_inputs:
   - {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
 
 ############################################################
-bsm_fac_data: ["W", "Y"]
+bsm_fac_data:
+ - {name: "W"}
+ - {name: "Y"}
 
 ############################################################
 datacuts:
