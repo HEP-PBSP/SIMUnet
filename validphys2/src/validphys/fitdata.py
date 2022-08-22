@@ -24,7 +24,7 @@ from validphys.plotoptions import get_info
 #TODO: Add more stuff here as needed for postfit
 LITERAL_FILES = ['chi2exps.log']
 REPLICA_FILES = ['.dat', '.json']
-CF_FILE = 'fit_cfactors.csv'
+BSM_FAC_FILE = 'bsm_fac.csv'
 FIT_SUMRULES = [
     "momentum",
     "uvalence",
@@ -35,7 +35,7 @@ FIT_SUMRULES = [
 #t = blessings.Terminal()
 log = logging.getLogger(__name__)
 
-pdfs_fits_read_fit_cfactors = collect('read_fit_cfactors', ('pdfs', 'pdffit'))
+pdfs_fits_read_read_bsm_facs = collect('read_bsm_facs', ('pdfs', 'pdffit'))
 
 
 
@@ -209,32 +209,32 @@ def summarise_fits(collected_fit_summaries):
     return pd.concat(collected_fit_summaries, axis=1)
 
 @make_argcheck
-def _check_has_fit_cfactors(fit):
+def _check_has_bsm_facs(fit):
     """Check that the fit comes with Wilson coefficients fitted"""
     cf = fit.as_input().get("bsm_fac_data")
     check(cf, f"Fit '{fit}' does not contain fitted cfactors.")
 
 
-@_check_has_fit_cfactors
-def read_fit_cfactors(replica_paths):
+@_check_has_bsm_facs
+def read_bsm_facs(replica_paths):
     """
-    Read the csv saved fit cfactors, accounting for the
+    Read the csv saved BSM factors, accounting for the
     postfit reshuffling, and return a concatenated dataframe
-    for replicas as indices and fit cfactors as columns
+    for replicas as indices and the list BSM factors as columns
     Parameters
     ----------
         replica_paths: list 
     Output
     ------
-        fit_cfactors: pd.DataFrame
+        bsm_fac_results: pd.DataFrame
     """
     # Need to account for postfit reshuffling of replicas
-    paths = [p / CF_FILE for p in replica_paths]
-    fit_cfactors = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
+    paths = [p / BSM_FAC_FILE for p in replica_paths]
+    bsm_fac_results = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
 
-    rows, _columns = fit_cfactors.shape
-    fit_cfactors.index = range(1, rows + 1)
-    return fit_cfactors
+    rows, _columns = bsm_fac_results.shape
+    bsm_fac_results.index = range(1, rows + 1)
+    return bsm_fac_results 
 
 
 fits_replica_data = collect('replica_data', ('fits',))

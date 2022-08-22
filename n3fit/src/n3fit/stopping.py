@@ -596,8 +596,12 @@ class Stopping:
 
         if self.combiner is not None:
             weights = self.combiner.get_weights() 
-            log.info(weights[0])
-            #print('{0:.16f}'.format(weights[0][0]))
+            scale = self.combiner.scale
+            # display the effective BSM coefficient
+            # and not just the weight
+            bsm_fac_status= list(map(lambda x: "{:.2e}".format(x) , weights[0] / scale))
+            log.info(bsm_fac_status)
+
 
     def stop_here(self):
         """Returns the stopping status

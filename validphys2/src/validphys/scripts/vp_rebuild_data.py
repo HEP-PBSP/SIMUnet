@@ -50,7 +50,7 @@ REBUILD_CONFIG = dict(
     # TODO: add namespace specifications to API
     closuretest={"from_": "fit"},
     fakedata={"from_": "closuretest"}
-    #fit_cfactors={"from_": "fit"}
+    #bsm_fac_data={"from_": "fit"}
 )
 
 def main():

@@ -7,7 +7,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet. 
     """
 
-    def __init__(self, n_bsm_fac_data, scale, fit_cfactors):
+    def __init__(self, n_bsm_fac_data, scale, bsm_fac_data_names):
         """
         Parameters
         ----------
@@ -23,7 +23,7 @@ class CombineCfacLayer(Layer):
             initial_value=tf.zeros(shape=(n_bsm_fac_data,), dtype="float32"),
             trainable=True,
         )
-        self.fit_cfactors= fit_cfactors  
+        self.bsm_fac_data_names= bsm_fac_data_names  
         self.scale = scale 
 
     def call(self, inputs, cfactor_values):

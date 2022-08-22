@@ -411,8 +411,18 @@ class CoreConfig(configparser.Config):
             return len(bsm_fac_data)
         return 0
 
+    def produce_bsm_fac_data_names(self, bsm_fac_data=None):
+        """
+        Produces the list of the names of the
+        BSM coefficients to include in the fit.
+        """
+        if bsm_fac_data is not None:
+            bsm_fac_data_names = [entry['name'] for entry in bsm_fac_data]
+            return bsm_fac_data_names
+        return [] 
+
     #def parse_cfactorscale(self, cfactor_scale: float):
-        #print(f"cfactor_scale = {cfactor_scale}")
+        #print(f"HELLOOO")
         #return cfactor_scale
 
     #def produce_cfactor_scale(self, cfactorscale=1.0):
@@ -462,10 +472,10 @@ class CoreConfig(configparser.Config):
                 raise ConfigError(f"bsm_fac must be bool not {type(bsm_fac)}")
 
             # TODO: change parsing from fit here. It runs havoc with {@with fits@}
-            # fit_cfac_ns is a list of string with the Wilsons to fit
-            _, fit_cfac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
+            _, bsm_fac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
+            bsm_fac_data_names = [dict['name'] for dict in bsm_fac_ns]
         else:
-            fit_cfac_ns = None
+            bsm_fac_data_names= None
 
         return DataSetInput(
             name=name,
@@ -474,7 +484,7 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
-            fit_cfac_ns=fit_cfac_ns
+            bsm_fac_data_names=bsm_fac_data_names
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -649,7 +659,7 @@ class CoreConfig(configparser.Config):
         cfac = dataset_input.cfac
         frac = dataset_input.frac
         weight = dataset_input.weight
-        fit_cfac_ns = dataset_input.fit_cfac_ns
+        bsm_fac_data_names = dataset_input.bsm_fac_data_names
 
         try:
             ds = self.loader.check_dataset(
@@ -662,7 +672,7 @@ class CoreConfig(configparser.Config):
                 use_fitcommondata=use_fitcommondata,
                 fit=fit,
                 weight=weight,
-                fit_cfac_ns=fit_cfac_ns 
+                bsm_fac_data_names=bsm_fac_data_names
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)

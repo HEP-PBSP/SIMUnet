@@ -40,7 +40,7 @@ def performfit(
     debug=False,
     maxcores=None,
     parallel_models=False, 
-    fit_cfactors=None,
+    bsm_fac_data_names=None,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -199,7 +199,7 @@ def performfit(
             sum_rules=sum_rules,
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,
-            fit_cfactors=fit_cfactors, 
+            bsm_fac_data_names=bsm_fac_data_names, 
             cfactor_scale=cfactorscale
         )
 
@@ -273,7 +273,7 @@ def performfit(
             q0 = theoryid.get_description().get("Q0")
             pdf_instance = N3PDF(pdf_model, fit_basis=basis, Q=q0)
 
-            fit_cfactors=result["fit_cfactors"]
+            bsm_fac_df=result["bsm_fac_df"]
 
             # Generate the writer wrapper
             writer_wrapper = WriterWrapper(
@@ -291,7 +291,7 @@ def performfit(
 
             # And write the data down
             writer_wrapper.write_data(
-                replica_path_set, output_path.name, training_chi2, val_chi2, exp_chi2, fit_cfactors
+                replica_path_set, output_path.name, training_chi2, val_chi2, exp_chi2, bsm_fac_df 
             )
             log.info(
                     "Best fit for replica #%d, chi2=%.3f (tr=%.3f, vl=%.3f)",

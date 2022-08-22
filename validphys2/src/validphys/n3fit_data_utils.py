@@ -71,13 +71,13 @@ def fk_parser(fk, is_hadronic=False):
     }
     return dict_out
 
-def parse_fit_cfac_dict(fit_cfac_dict, cuts):
-    if fit_cfac_dict is None:
+def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
+    if bsm_fac_data_names_CF is None:
         return None
     if hasattr(cuts, 'load'):
         cuts = cuts.load()
     name_cfac_map = {}
-    for name, path in fit_cfac_dict.items():
+    for name, path in bsm_fac_data_names_CF.items():
         with open(path, 'rb') as stream:
             cfac = parse_cfactor(stream)
             #TODO: Figure out a better way to handle the default
@@ -124,7 +124,7 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
-        "fit_cfac_dict": parse_fit_cfac_dict(dataset_spec.fit_cfac_dict, cuts)
+        "bsm_fac_data_names_CF": parse_bsm_fac_data_names_CF(dataset_spec.bsm_fac_data_names_CF, cuts)
     }
 
     return [dataset_dict]

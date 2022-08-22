@@ -97,7 +97,7 @@ class ModelTrainer:
         pass_status="ok",
         failed_status="fail",
         n_bsm_fac_data=0,
-        fit_cfactors=None,
+        bsm_fac_data_names=None,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -157,7 +157,7 @@ class ModelTrainer:
         self._scaler = None
         self._parallel_models = parallel_models
         self.n_bsm_fac_data=n_bsm_fac_data
-        self.fit_cfactors = fit_cfactors
+        self.bsm_fac_data_names=bsm_fac_data_names
         self.cfactor_scale = cfactor_scale
 
         # Initialise internal variables which define behaviour
@@ -474,7 +474,7 @@ class ModelTrainer:
         combiner = CombineCfacLayer(
                     n_bsm_fac_data=self.n_bsm_fac_data,
                     scale=self.cfactor_scale,
-                    fit_cfactors=self.fit_cfactors,
+                    bsm_fac_data_names=self.bsm_fac_data_names,
         )
 
         log.info(f"Using cfactor scale {self.cfactor_scale}")
@@ -967,8 +967,8 @@ class ModelTrainer:
         # and the pdf models (which are used to generate the PDF grids and compute arclengths)
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
 
-        dict_out['fit_cfactors'] = pd.DataFrame(
-            [self.combiner.get_weights()[0] / self.cfactor_scale], columns=self.fit_cfactors
+        dict_out['bsm_fac_df'] = pd.DataFrame(
+            [self.combiner.get_weights()[0] / self.cfactor_scale], columns=self.bsm_fac_data_names
         )
 
         return dict_out
