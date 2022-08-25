@@ -14,8 +14,8 @@ dataset_inputs:
 - {dataset: ATLASPHT15_SF, frac: 0.75, cfac: [QCD, EWK]}         
 - {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True} 
 - {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
-- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], bsm_fac: True} 
-- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], bsm_fac: True, bsm_fac_qcd_on: True} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], bsm_fac: True, bsm_fac_qcd_on: True} 
 
 ############################################################
 bsm_fac_data:
