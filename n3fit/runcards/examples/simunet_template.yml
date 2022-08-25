@@ -1,7 +1,7 @@
 # Configuration file for NNPDF++
 #
 ############################################################
-description: "Runcard template. This one performs a simultaenous W-Y fit with HL data. NNPDF4.0 methodology."
+description: "Runcard template. This one performs a simultaenous fit with some top operators. NNPDF4.0 methodology."
 
 ############################################################
 # frac: training fraction
@@ -9,67 +9,88 @@ description: "Runcard template. This one performs a simultaenous W-Y fit with HL
 # sys: systematics treatment (see systypes)
 
 dataset_inputs:
-  - {dataset: NMCPD, frac: 0.5}
-  - {dataset: NMC, frac: 0.5, bsm_fac: True}
-  - {dataset: SLACP, frac: 0.5}
-  - {dataset: SLACD, frac: 0.5}
-  - {dataset: BCDMSP, frac: 0.5}
-  - {dataset: BCDMSD, frac: 0.5}
-  - {dataset: CHORUSNUPb, frac: 0.5}
-  - {dataset: CHORUSNBPb, frac: 0.5}
-  - {dataset: NTVNUDMNFe, frac: 0.5, cfac: [MAS]}
-  - {dataset: NTVNBDMNFe, frac: 0.5, cfac: [MAS]}
-  - {dataset: HERACOMBNCEM, frac: 0.5, bsm_fac: True}
-  - {dataset: HERACOMBNCEP460, frac: 0.5, bsm_fac: True}
-  - {dataset: HERACOMBNCEP575, frac: 0.5, bsm_fac: True}
-  - {dataset: HERACOMBNCEP820, frac: 0.5, bsm_fac: True}
-  - {dataset: HERACOMBNCEP920, frac: 0.5, bsm_fac: True}
-  - {dataset: HERACOMBCCEM, frac: 0.5}
-  - {dataset: HERACOMBCCEP, frac: 0.5}
-  - {dataset: HERAF2CHARM, frac: 0.5, bsm_fac: True}
-  - {dataset: H1HERAF2B, frac: 0.5, bsm_fac: True}
-  - {dataset: ZEUSHERAF2B, frac: 0.5, bsm_fac: True}
-  - {dataset: DYE886R, frac: 1.0}
-  - {dataset: DYE886P, frac: 0.5, cfac: [QCD]}
-  - {dataset: DYE605, frac: 0.5, cfac: [QCD]}
-  - {dataset: CDFZRAP, frac: 1.0, cfac: [QCD]}
-  - {dataset: D0ZRAP, frac: 1.0, cfac: [QCD]}
-  - {dataset: D0WMASY, frac: 1.0, cfac: [QCD]}
-  - {dataset: LHCBZ940PB, frac: 1.0, cfac: [QCD]}
-  - {dataset: LHCBZEE2FB, frac: 1.0, cfac: [QCD]}
-  - {dataset: LHCBWZMU7TEV, frac: 1.0, cfac: [NRM, QCD]}
-  - {dataset: LHCBWZMU8TEV, frac: 1.0, cfac: [NRM, QCD]}
-  - {dataset: ATLASWZRAP36PB, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLASWZRAP11CC, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLASWZRAP11CF, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLASLOMASSDY11EXT, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLASZPT8TEVMDIST, frac: 0.5, cfac: [QCD]}
-  - {dataset: ATLASZPT8TEVYDIST, frac: 0.5, cfac: [QCD]}
-  - {dataset: ATLAS_WCHARM_WP_DIFF_7TEV, frac: 1.0}
-  - {dataset: ATLAS_WCHARM_WM_DIFF_7TEV, frac: 1.0}
-  - {dataset: ATLAS_WP_JET_8TEV_PT, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLAS_WM_JET_8TEV_PT, frac: 1.0, cfac: [QCD]}
-  - {dataset: ATLASZHIGHMASS49FB, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                       # High-mass DY
-  - {dataset: ATLASDY2D8TEV, frac: 0.5, cfac: [QCDEWK], bsm_fac: True}                              # High-mass DY
-  - {dataset: CMSWEASY840PB, frac: 1.0, cfac: [QCD]}
-  - {dataset: CMSWMASY47FB, frac: 1.0, cfac: [QCD]}
-  - {dataset: CMSZDIFF12, frac: 1.0, cfac: [QCD, NRM]}
-  - {dataset: CMSWMU8TEV, frac: 1.0, cfac: [QCD]}
-  - {dataset: CMSWCHARMTOT, frac: 1.0}
-  - {dataset: CMSWCHARMRAT, frac: 1.0}
-  - {dataset: CMS_WCHARM_DIFF_UNNORM_13TEV, frac: 1.0}
-  - {dataset: CMSDY2D11, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                                # High-mass DY
-  - {dataset: CMSDY1D12, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                                # High-mass DY
-  - {dataset: CMS_HMDY_13TEV, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                           # High-mass DY
-  - {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
-  - {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
-  - {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
-  - {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.5, cfac: [QCD, EWK], bsm_fac: True}                   # HL
+- {dataset: NMCPD_dw_ite, frac: 0.75}
+- {dataset: NMC, frac: 0.75}
+- {dataset: SLACP_dwsh, frac: 0.75}
+- {dataset: SLACD_dw_ite, frac: 0.75}
+- {dataset: BCDMSP_dwsh, frac: 0.75}
+- {dataset: BCDMSD_dw_ite, frac: 0.75}
+- {dataset: CHORUSNUPb_dw_ite, frac: 0.75}
+- {dataset: CHORUSNBPb_dw_ite, frac: 0.75}
+- {dataset: NTVNUDMNFe_dw_ite, frac: 0.75, cfac: [MAS]}
+- {dataset: NTVNBDMNFe_dw_ite, frac: 0.75, cfac: [MAS]}
+- {dataset: HERACOMBNCEM, frac: 0.75}
+- {dataset: HERACOMBNCEP460, frac: 0.75}
+- {dataset: HERACOMBNCEP575, frac: 0.75}
+- {dataset: HERACOMBNCEP820, frac: 0.75}
+- {dataset: HERACOMBNCEP920, frac: 0.75}
+- {dataset: HERACOMBCCEM, frac: 0.75}
+- {dataset: HERACOMBCCEP, frac: 0.75}
+- {dataset: HERACOMB_SIGMARED_C, frac: 0.75} 
+- {dataset: HERACOMB_SIGMARED_B, frac: 0.75}   
+- {dataset: DYE886R_dw_ite, frac: 0.75, cfac: [QCD]}
+- {dataset: DYE886P, frac: 0.75, cfac: [QCD]}
+- {dataset: DYE605_dw_ite, frac: 0.75, cfac: [QCD]}
+- {dataset: DYE906R_dw_ite, frac: 0.75, cfac: [ACC,QCD]}
+- {dataset: CDFZRAP_NEW, frac: 0.75, cfac: [QCD]}
+- {dataset: D0ZRAP_40, frac: 0.75, cfac: [QCD]}
+- {dataset: D0WMASY, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLASWZRAP36PB, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLASLOMASSDY11EXT, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLASWZRAP11CC, frac: 0.75, cfac: [QCD]}               
+- {dataset: ATLASWZRAP11CF, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: [QCDEWK]}
+- {dataset: ATLAS_DY_2D_8TEV_LOWMASS, frac: 0.75, cfac: [QCD]} 
+- {dataset: ATLAS_WZ_TOT_13TEV, frac: 0.75, cfac: [NRM, QCD]}       
+- {dataset: ATLAS_WP_JET_8TEV_PT, frac: 0.75, cfac: [QCD]}         
+- {dataset: ATLAS_WM_JET_8TEV_PT, frac: 0.75, cfac: [QCD]}         
+- {dataset: ATLASZPT8TEVMDIST, frac: 0.75, cfac: [QCD], sys: 10}
+- {dataset: ATLASZPT8TEVYDIST, frac: 0.75, cfac: [QCD], sys: 10}
+- {dataset: ATLAS_1JET_8TEV_R06_DEC, frac: 0.75, cfac: [QCD]}
+- {dataset: ATLAS_2JET_7TEV_R06, frac: 0.75, cfac: [QCD]}     
+- {dataset: ATLASPHT15_SF, frac: 0.75, cfac: [QCD, EWK]}         
+- {dataset: CMSWEASY840PB, frac: 0.75, cfac: [QCD]}
+- {dataset: CMSWMASY47FB, frac: 0.75, cfac: [QCD]}
+- {dataset: CMSDY2D11, frac: 0.75, cfac: [QCD]}
+- {dataset: CMSWMU8TEV, frac: 0.75, cfac: [QCD]}
+- {dataset: CMSZDIFF12, frac: 0.75, cfac: [QCD, NRM], sys: 10}
+- {dataset: CMS_2JET_7TEV, frac: 0.75, cfac: [QCD]}       
+- {dataset: CMS_1JET_8TEV, frac: 0.75, cfac: [QCD]}
+- {dataset: LHCBZ940PB, frac: 0.75, cfac: [QCD]}
+- {dataset: LHCBZEE2FB_40, frac: 0.75, cfac: [QCD]}
+- {dataset: LHCBWZMU7TEV, frac: 0.75, cfac: [NRM, QCD]}
+- {dataset: LHCBWZMU8TEV, frac: 0.75, cfac: [NRM, QCD]}
+- {dataset: LHCB_Z_13TEV_DIMUON, frac: 0.75, cfac: [QCD]}
+- {dataset: LHCB_Z_13TEV_DIELECTRON, frac: 0.75, cfac: [QCD]} # HERE STARTS THE TOP SECTOR 
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_fac: True} 
+- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTOPDIFF8TEVTTRAPNORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMSTTBARTOT13TEV, frac: 0.75, cfac: [QCD], bsm_fac: True}
+- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, frac: 0.75, bsm_fac: True}
+- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, frac: 0.75, cfac: [QCD], bsm_fac: True} 
+- {dataset: CMS_TTBAR_13TEV_LJETS_2D_TTM_ABSYTTNORM, frac: 0.75, cfac: [QCD], bsm_fac: True} 
 
 ############################################################
 bsm_fac_data:
- - {name: "W"}
- - {name: "Y"}
+ - {name: "OtG"}
+ - {name: "O8qd"}
+ - {name: "O8qu"}
+ - {name: "O8dt"}
+ - {name: "O8qt"}
+ - {name: "O8ut"}
+ - {name: "O81qq"}
+ - {name: "O83qq"}
 
 ############################################################
 datacuts:
@@ -79,10 +100,10 @@ datacuts:
 
 ############################################################
 theory:
-  theoryid: 53     # database id
+  theoryid: 200     # database id
 
 ############################################################
-cfactorscale: 10000.0
+cfactorscale: 1.0
 trvlseed: 475038818
 nnseed: 2394641471
 mcseed: 1831662593

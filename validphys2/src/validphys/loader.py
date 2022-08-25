@@ -476,7 +476,7 @@ class Loader(LoaderBase):
         _, theopath = self.check_theoryID(theoryid)
         bsm_fac_names_paths= {}
         for bsm_fac_data_name in bsm_fac_data_names:
-            cfactorpath = theopath / 'cfactor' / f'CF_{bsm_fac_data_name}_{setname}.dat'
+            cfactorpath = theopath / 'bsm_factors' / f'BSM_LO_LIN_{bsm_fac_data_name}_{setname}.dat'
             if not cfactorpath.exists():
                 msg = (f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
                        f"The path {cfactorpath} does not exist."
