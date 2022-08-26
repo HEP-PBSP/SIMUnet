@@ -109,11 +109,11 @@ class DataResult(StatsResult):
 class ThPredictionsResult(StatsResult):
     """Class holding theory prediction, inherits from StatsResult"""
 
-    def __init__(self, dataobj, stats_class, cfactor_scale=1, label=None):
+    def __init__(self, dataobj, stats_class, bsm_fac_data_scales, label=None):
         self.stats_class = stats_class
         self.label = label
         statsobj = stats_class(dataobj.T)
-        self._rawdata = self.rawdata * cfactor_scale
+        self._rawdata = [self.rawdata[i] * bsm_fac_data_scales[i] for i in range(len(self.rawdata))]
         super().__init__(statsobj)
 
     @property
@@ -140,7 +140,7 @@ class ThPredictionsResult(StatsResult):
         return label
 
     @classmethod
-    def from_convolution(cls, pdf, dataset, cfactor_scale=1.0):
+    def from_convolution(cls, pdf, dataset, bsm_fac_data_scales):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -157,7 +157,7 @@ class ThPredictionsResult(StatsResult):
 
         label = cls.make_label(pdf, dataset)
 
-        return cls(th_predictions, pdf.stats_class, label, cfactor_scale=cfactor_scale)
+        return cls(th_predictions, pdf.stats_class, label, bsm_fac_data_scales)
 
 
 class PositivityResult(StatsResult):

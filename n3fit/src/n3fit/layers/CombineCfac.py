@@ -1,13 +1,14 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
+import numpy as np
 
 class CombineCfacLayer(Layer):
     """
     Creates the combination layer of SIMUnet. 
     """
 
-    def __init__(self, n_bsm_fac_data, scale, bsm_fac_data_names):
+    def __init__(self, n_bsm_fac_data, bsm_fac_data_scales, bsm_fac_data_names):
         """
         Parameters
         ----------
@@ -24,7 +25,7 @@ class CombineCfacLayer(Layer):
             trainable=True,
         )
         self.bsm_fac_data_names= bsm_fac_data_names  
-        self.scale = scale 
+        self.bsm_fac_data_scales = bsm_fac_data_scales 
 
     def call(self, inputs, cfactor_values):
         """
@@ -44,6 +45,16 @@ class CombineCfacLayer(Layer):
         # 1) tensor[:, tf.newaxis] adds an extra dimension to the end of the tensor. 
         # 2) tensor_1 * cfactor_values return a tensor of dimensions `(ncfacs, ncfactors)`
         # 3) tf.reduce_sum(tensor, axis=i) sums over the `i` dimension and gets rid of it 
-        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * cfactor_values, axis=0) / self.scale) * inputs
+        
+        # Convert the BSM factor scales 
+        _, ndata = cfactor_values.shape
+        scale_reciprocals = [1/scale for scale in self.bsm_fac_data_scales]
+        scales = np.array(scale_reciprocals)
+        scales = np.tile(scales,(ndata,1)).T
+        scales = tf.constant(scales.tolist(), dtype=float)
+
+        cfactor_values = tf.multiply(cfactor_values,scales)
+
+        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * cfactor_values, axis=0)) * inputs
 
         return ret

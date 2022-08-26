@@ -19,14 +19,14 @@ dataset_inputs:
 
 ############################################################
 bsm_fac_data:
- - {name: "OtG"}
- - {name: "O8qd"}
- - {name: "O8qu"}
- - {name: "O8dt"}
- - {name: "O8qt"}
- - {name: "O8ut"}
- - {name: "O81qq"}
- - {name: "O83qq"}
+ - {name: "OtG", scale: 100}
+ - {name: "O8qd", scale: 10}
+ - {name: "O8qu", scale: 1}
+ - {name: "O8dt", scale: 1}
+ - {name: "O8qt", scale: 1}
+ - {name: "O8ut", scale: 1}
+ - {name: "O81qq", scale: 1}
+ - {name: "O83qq", scale: 1}
 
 ############################################################
 datacuts:
@@ -57,7 +57,7 @@ parameters: # This defines the parameter dictionary that is passed to the Model 
     clipnorm: 6.073e-6
     learning_rate: 2.621e-3
     optimizer_name: Nadam
-  epochs: 30000
+  epochs: 2000
   positivity:
     initial: 184.8
     multiplier:

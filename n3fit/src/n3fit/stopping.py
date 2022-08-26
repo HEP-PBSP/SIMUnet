@@ -596,10 +596,12 @@ class Stopping:
 
         if self.combiner is not None:
             weights = self.combiner.get_weights() 
-            scale = self.combiner.scale
+            scales = self.combiner.bsm_fac_data_scales
             # display the effective BSM coefficient
             # and not just the weight
-            bsm_fac_status= list(map(lambda x: "{:.2e}".format(x) , weights[0] / scale))
+            weights = weights[0]
+            weights = [weights[i] / scales[i] for i in range(len(scales))]
+            bsm_fac_status= list(map(lambda x: "{:.2e}".format(x) , weights))
             log.info(bsm_fac_status)
 
 

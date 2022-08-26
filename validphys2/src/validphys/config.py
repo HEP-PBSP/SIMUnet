@@ -421,6 +421,14 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_names
         return [] 
 
+    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
+        """Produces the list of rescaling values used to multiply predictions going into the fit.
+        """
+        if bsm_fac_data is not None:
+            bsm_fac_data_scales = [entry['scale'] for entry in bsm_fac_data]
+            return bsm_fac_data_scales
+        return []
+
     @element_of("dataset_inputs")
     def parse_dataset_input(self, dataset: Mapping):
         """The mapping that corresponds to the dataset specifications in the
