@@ -39,7 +39,6 @@ theory:
   theoryid: 200     # database id
 
 ############################################################
-cfactorscale: 1.0
 trvlseed: 475038818
 nnseed: 2394641471
 mcseed: 1831662593
