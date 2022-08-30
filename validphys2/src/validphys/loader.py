@@ -503,7 +503,7 @@ class Loader(LoaderBase):
                       fit=None,
                       weight=1,
                       bsm_fac_data_names=None,
-                      bsm_fac_qcd_on=False):
+                      bsm_fac_nlo_qcd=False):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
@@ -535,7 +535,7 @@ class Loader(LoaderBase):
                 raise LoaderError(f"Intersection cuts not supported in loader calls.")
 
         if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno, bsm_fac_qcd_on)
+            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno, bsm_fac_nlo_qcd)
         else: 
             bsm_fac_data_names_CF = None
 

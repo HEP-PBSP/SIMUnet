@@ -322,7 +322,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specidy a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_qcd_on):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_nlo_qcd):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -330,7 +330,7 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_qcd_on = bsm_fac_qcd_on
+        self.bsm_fac_nlo_qcd = bsm_fac_nlo_qcd
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
