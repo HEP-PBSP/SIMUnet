@@ -477,7 +477,7 @@ class ModelTrainer:
                     bsm_fac_data_names=self.bsm_fac_data_names,
         )
 
-        log.info(f"Using cfactor scales: {self.bsm_fac_data_scales}")
+        log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")
         self.combiner = combiner
   
         for exp_dict in self.exp_info:
