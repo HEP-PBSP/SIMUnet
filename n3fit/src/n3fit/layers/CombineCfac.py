@@ -27,15 +27,15 @@ class CombineCfacLayer(Layer):
         self.bsm_fac_data_names= bsm_fac_data_names  
         self.bsm_fac_data_scales = bsm_fac_data_scales 
 
-    def call(self, inputs, cfactor_values):
+    def call(self, inputs, bsm_factor_values):
         """
         Makes the forward pass to map the SM observable to the EFT one. 
         Parameters
         ----------
             inputs: number
                 This is the SM theoretical prediction that comes after the FK convolution.
-            cfactor_values: np.array 
-                Array of SMEFT C-factors for a given dataset, whose length is the 
+            bsm_factor_values: np.array 
+                Array of BSM C-factors for a given dataset, whose length is the 
                 number of datapoints. 
         Returns
         -------
@@ -47,14 +47,14 @@ class CombineCfacLayer(Layer):
         # 3) tf.reduce_sum(tensor, axis=i) sums over the `i` dimension and gets rid of it 
         
         # Convert the BSM factor scales 
-        _, ndata = cfactor_values.shape
+        _, ndata = bsm_factor_values.shape
         scale_reciprocals = [1/scale for scale in self.bsm_fac_data_scales]
         scales = np.array(scale_reciprocals)
         scales = np.tile(scales,(ndata,1)).T
         scales = tf.constant(scales.tolist(), dtype=float)
 
-        cfactor_values = tf.multiply(cfactor_values,scales)
+        bsm_factor_values = tf.multiply(bsm_factor_values,scales)
 
-        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * cfactor_values, axis=0)) * inputs
+        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)) * inputs
 
         return ret
