@@ -42,7 +42,7 @@ theory:
 trvlseed: 475038818
 nnseed: 2394641471
 mcseed: 1831662593
-save: false
+save: "weights.h5"
 genrep: true      # true = generate MC replicas, false = use real data
 
 ############################################################
