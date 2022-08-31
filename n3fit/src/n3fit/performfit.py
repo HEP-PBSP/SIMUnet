@@ -26,7 +26,7 @@ def performfit(
     n_bsm_fac_data,
     basis,
     fitbasis,
-    cfactorscale,
+    bsm_fac_data_scales,
     sum_rules=True,
     parameters,
     replica_path,
@@ -200,7 +200,7 @@ def performfit(
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,
             bsm_fac_data_names=bsm_fac_data_names, 
-            cfactor_scale=cfactorscale
+            bsm_fac_data_scales=bsm_fac_data_scales
         )
 
         # This is just to give a descriptive name to the fit function

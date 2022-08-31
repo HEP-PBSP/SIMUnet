@@ -108,7 +108,7 @@ class ObservableWrapper:
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
-                    cfactor_values=tf.constant(cfacs, dtype='float32'),
+                    bsm_factor_values=tf.constant(cfacs, dtype='float32'),
                     #quad_cfactor_values=tf.constant(quad_cfacs, dtype='float32')
                 )
 

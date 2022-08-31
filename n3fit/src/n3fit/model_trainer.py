@@ -93,11 +93,11 @@ class ModelTrainer:
         flavinfo,
         fitbasis,
         nnseeds,
-        cfactor_scale=1,
         pass_status="ok",
         failed_status="fail",
         n_bsm_fac_data=0,
         bsm_fac_data_names=None,
+        bsm_fac_data_scales=None,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -158,7 +158,7 @@ class ModelTrainer:
         self._parallel_models = parallel_models
         self.n_bsm_fac_data=n_bsm_fac_data
         self.bsm_fac_data_names=bsm_fac_data_names
-        self.cfactor_scale = cfactor_scale
+        self.bsm_fac_data_scales = bsm_fac_data_scales
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -473,11 +473,11 @@ class ModelTrainer:
 
         combiner = CombineCfacLayer(
                     n_bsm_fac_data=self.n_bsm_fac_data,
-                    scale=self.cfactor_scale,
+                    bsm_fac_data_scales=self.bsm_fac_data_scales,
                     bsm_fac_data_names=self.bsm_fac_data_names,
         )
 
-        log.info(f"Using cfactor scale {self.cfactor_scale}")
+        log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")
         self.combiner = combiner
   
         for exp_dict in self.exp_info:
@@ -967,8 +967,10 @@ class ModelTrainer:
         # and the pdf models (which are used to generate the PDF grids and compute arclengths)
         dict_out = {"status": passed, "stopping_object": stopping_object, "pdf_models": pdf_models}
 
-        dict_out['bsm_fac_df'] = pd.DataFrame(
-            [self.combiner.get_weights()[0] / self.cfactor_scale], columns=self.bsm_fac_data_names
-        )
+        # Get the values of the Wilson coefficients, then appropriately rescale each one
+        unscaled_coeffs=self.combiner.get_weights()[0]
+        scaled_coeffs=[unscaled_coeffs[i] / self.bsm_fac_data_scales[i] for i in range(len(unscaled_coeffs))]
+
+        dict_out['bsm_fac_df'] = pd.DataFrame([scaled_coeffs], columns=self.bsm_fac_data_names)
 
         return dict_out

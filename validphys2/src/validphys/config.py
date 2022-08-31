@@ -421,19 +421,19 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_names
         return [] 
 
-    #def parse_cfactorscale(self, cfactor_scale: float):
-        #print(f"HELLOOO")
-        #return cfactor_scale
-
-    #def produce_cfactor_scale(self, cfactorscale=1.0):
-        #print("do they even call this?")
-        #return cfactorscale
+    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
+        """Produces the list of rescaling values used to multiply predictions going into the fit.
+        """
+        if bsm_fac_data is not None:
+            bsm_fac_data_scales = [entry['scale'] for entry in bsm_fac_data]
+            return bsm_fac_data_scales
+        return []
 
     @element_of("dataset_inputs")
     def parse_dataset_input(self, dataset: Mapping):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_fac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_fac", "bsm_fac_nlo_qcd"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -477,6 +477,15 @@ class CoreConfig(configparser.Config):
         else:
             bsm_fac_data_names= None
 
+        bsm_fac_nlo_qcd = dataset.get("bsm_fac_nlo_qcd")
+
+        # bsm_fac_nlo_qcd is a Boolean
+        if bsm_fac_nlo_qcd is not None:
+            if not isinstance(bsm_fac_nlo_qcd, bool):
+                raise ConfigError(f"bsm_fac_nlo_qcd must be bool not {type(bsm_fac_nlo_qcd)}")
+        else:
+            bsm_fac_nlo_qcd = False
+
         return DataSetInput(
             name=name,
             sys=sysnum,
@@ -484,7 +493,8 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
-            bsm_fac_data_names=bsm_fac_data_names
+            bsm_fac_data_names=bsm_fac_data_names,
+            bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -660,6 +670,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
+        bsm_fac_nlo_qcd = dataset_input.bsm_fac_nlo_qcd
 
         try:
             ds = self.loader.check_dataset(
@@ -672,7 +683,8 @@ class CoreConfig(configparser.Config):
                 use_fitcommondata=use_fitcommondata,
                 fit=fit,
                 weight=weight,
-                bsm_fac_data_names=bsm_fac_data_names
+                bsm_fac_data_names=bsm_fac_data_names,
+                bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
