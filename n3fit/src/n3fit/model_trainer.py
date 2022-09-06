@@ -93,6 +93,7 @@ class ModelTrainer:
         flavinfo,
         fitbasis,
         nnseeds,
+        fixed_pdf=False,
         pass_status="ok",
         failed_status="fail",
         n_bsm_fac_data=0,
@@ -159,6 +160,7 @@ class ModelTrainer:
         self.n_bsm_fac_data=n_bsm_fac_data
         self.bsm_fac_data_names=bsm_fac_data_names
         self.bsm_fac_data_scales = bsm_fac_data_scales
+        self.fixed_pdf = fixed_pdf
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -844,6 +846,10 @@ class ModelTrainer:
                 params.get("regularizer_args", None),
                 seeds,
             )
+
+            if self.fixed_pdf:
+                log.info("Performing fixed PDF fit.")
+                pdf_models[0].trainable=False
 
             # Model generation joins all the different observable layers
             # together with pdf model generated above

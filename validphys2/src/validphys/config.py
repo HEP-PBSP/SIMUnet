@@ -403,6 +403,13 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
+    def produce_fixed_pdf(self, load, fixed_pdf_fit=False):
+        """ If using the fixed_pdf option, we require weights to be loaded from file. """
+        if fixed_pdf_fit:
+            if load is None:
+                raise ValueError("When using the fixed PDF option, you must specify weights to load from an existing PDF fit.")
+        return fixed_pdf_fit
+
     def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.
