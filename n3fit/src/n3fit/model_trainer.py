@@ -849,7 +849,8 @@ class ModelTrainer:
 
             if self.fixed_pdf:
                 log.info("Performing fixed PDF fit.")
-                pdf_models[0].trainable=False
+                for i in range(len(pdf_models)):
+                    pdf_models[i].trainable=False
 
             # Model generation joins all the different observable layers
             # together with pdf model generated above
