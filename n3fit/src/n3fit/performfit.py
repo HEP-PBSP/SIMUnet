@@ -27,13 +27,13 @@ def performfit(
     basis,
     fitbasis,
     bsm_fac_data_scales,
-    fixed_pdf=False,
+    fixed_pdf_fit=False,
     sum_rules=True,
     parameters,
     replica_path,
     output_path,
     save=None,
-    load=None,
+    load_weights_from_fit=None,
     hyperscanner=None,
     hyperopt=None,
     kfold_parameters,
@@ -105,8 +105,8 @@ def performfit(
             save: None, str
                 model file where weights will be saved, used in conjunction with
                 ``load``.
-            load: None, str
-                model file from which to load weights from.
+            load_weights_from_fit: None, str
+                PDF fit from which to load weights from.
             hyperscanner: dict
                 dictionary containing the details of the hyperscanner
             hyperopt: int
@@ -193,11 +193,12 @@ def performfit(
             basis,
             fitbasis,
             nnseeds,
-            fixed_pdf=fixed_pdf,
+            replicas,
+            fixed_pdf=fixed_pdf_fit,
             debug=debug,
             kfold_parameters=kfold_parameters,
             max_cores=maxcores,
-            model_file=load,
+            model_file=load_weights_from_fit,
             sum_rules=sum_rules,
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,

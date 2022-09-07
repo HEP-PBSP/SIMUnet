@@ -15,7 +15,7 @@ dataset_inputs:
 - {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True}
 
 ############################################################
-fixed_pdf_fit: False
+fixed_pdf_fit: True
 
 bsm_fac_data:
  - {name: "OtG", scale: 1}
@@ -36,7 +36,7 @@ norm_threshold: 4
 trvlseed: 475038818
 nnseed: 2394641471
 mcseed: 1831662593
-load: "/home/jmm232/rds/hpc-work/simunet_install/SIMUnet/n3fit/runcards/examples/220906-jmm_fixed_test/nnfit/replica_1/weights.h5"
+load_weights_from_fit: 220906-jmm_fixed_test
 save: "weights.h5"
 genrep: true      # true = generate MC replicas, false = use real data
 
