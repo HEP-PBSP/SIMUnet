@@ -23,9 +23,10 @@ from n3fit.layers.CombineCfac import CombineCfacLayer
 import pandas as pd
 #import tensorflow as tf
 #from keras.utils.vis_utils import plot_model
-
+from validphys.loader import Loader
 
 log = logging.getLogger(__name__)
+l = Loader()
 
 # Threshold defaults
 # Any partition with a chi2 over the threshold will discard its hyperparameters
@@ -93,6 +94,8 @@ class ModelTrainer:
         flavinfo,
         fitbasis,
         nnseeds,
+        replicas,
+        fixed_pdf=False,
         pass_status="ok",
         failed_status="fail",
         n_bsm_fac_data=0,
@@ -159,6 +162,8 @@ class ModelTrainer:
         self.n_bsm_fac_data=n_bsm_fac_data
         self.bsm_fac_data_names=bsm_fac_data_names
         self.bsm_fac_data_scales = bsm_fac_data_scales
+        self.fixed_pdf = fixed_pdf
+        self.replicas = replicas
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -845,15 +850,24 @@ class ModelTrainer:
                 seeds,
             )
 
+            if self.fixed_pdf:
+                log.info("Performing fixed PDF fit.")
+                for i in range(len(pdf_models)):
+                    pdf_models[i].trainable=False
+
             # Model generation joins all the different observable layers
             # together with pdf model generated above
             models = self._model_generation(pdf_models, partition, k)
 
             # Only after model generation, apply possible weight file
             if self.model_file:
-                log.info("Applying model file %s", self.model_file)
+                log.info("Using weights from fit: " + str(self.model_file))
+                idx = 0
                 for pdf_model in pdf_models:
-                    pdf_model.load_weights(self.model_file)
+                    weights_path = l.resultspath / self.model_file / 'nnfit' / ('replica_%s' % self.replicas[idx]) / 'weights.h5'
+                    log.info("Loading weights from path: " + str(weights_path))
+                    pdf_model.load_weights(weights_path)
+                    idx += 1
 
             if k > 0:
                 # Reset the positivity and integrability multipliers

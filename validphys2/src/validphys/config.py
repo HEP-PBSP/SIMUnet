@@ -398,7 +398,6 @@ class CoreConfig(configparser.Config):
         basis = fitting["fitbasis"]
         return {"basis": basis}
 
-
     def produce_fitpdfandbasis(self, fitpdf, basisfromfit):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
