@@ -1,13 +1,13 @@
 meta:
-  title: Example analysis
+  title: Example analysis, with new data
   author: James Moore
   keywords: [simunet]
 
 pdfs:
-  - {id: "220906-jmm_fixed_test", label: "Baseline"}
-  - {id: "220906-jmm_fixed_test_3", label: "EFT-lo"}
+  - {id: "220907-jmm-fixed_test", label: "Baseline"}
+  - {id: "220907-jmm-fixed_test_otg_new_data", label: "EFT-lo"}
 
-pdf: {id: "220906-jmm_fixed_test", label: "Baseline"}
+pdf: {id: "220907-jmm-fixed_test", label: "Baseline"}
 
 lumis:
  - lumi_channel: "gg"
@@ -17,7 +17,7 @@ lumis:
 
 sqrts: 13000.0
 
-fit: {id: 220906-jmm_fixed_test_3, label: "EFT-lo"}
+fit: {id: 220907-jmm-fixed_test_otg_new_data, label: "EFT-lo"}
 
 Q: 10
 
