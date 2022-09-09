@@ -489,6 +489,67 @@ class Loader(LoaderBase):
 
         return bsm_fac_names_paths 
 
+    def get_bsm_fac_quad_name_dict(self, setname, bsm_fac_quad_names, theoryid):
+        _, theopath = self.check_theoryID(theoryid)
+        bsm_fac_quad_paths = {}
+
+        nops = len(bsm_fac_quad_names[0])
+
+        # With the quadratics, things are slightly more complicated. Go through the array one
+        # entry at a time, and check the diagonally opposite entry at the same time. If at least
+        # one entry of the pair starts with None, then we need a blank dummy BSM-factor. Otherwise
+        # check if one of the entries of the pair exists - if neither exist, then raise an error.
+
+        for i in range(nops):
+            for j in range(i+1):
+                # If we are expecting a BSM factor, we should check that the path actually exists. 
+                if i == j:
+                    bsm_quad_name = bsm_fac_quad_names[i][j]
+                    cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name}_{setname}.dat'
+                    if bsm_fac_quad_names[i][j][:4] != "None":
+                        if not cfactorpath.exists():
+                            msg = (f"Could not find a BSM factor for {bsm_quad_name} and {setname} in {theopath}. "
+                                   f"The path {cfactorpath} does not exist."
+                            )
+                            raise CfactorNotFound(msg)
+                    bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = cfactorpath
+                else:    
+                    bsm_quad_name_ij = bsm_fac_quad_names[i][j]
+                    ij_cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name_ij}_{setname}.dat'
+
+                    if bsm_quad_name_ij[:4] == "None":
+                        ij_none = True
+                    else:
+                        ij_none = False
+
+                    bsm_quad_name_ji = bsm_fac_quad_names[j][i]
+                    ji_cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name_ji}_{setname}.dat'
+
+                    if bsm_quad_name_ji[:4] == "None":
+                        ji_none = True
+                    else:
+                        ji_none = False
+
+                    if ij_none or ji_none:
+                        # We no longer care about producing the C-factor, just use a dummy
+                        if ij_none:
+                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
+                        else:
+                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ji_cfactorpath
+
+                    else:
+                        if not ij_cfactorpath.exists() and not ji_cfactorpath.exists():
+                            msg = (f"Could not find a BSM factor for {bsm_quad_name_ij} or {bsm_quad_name_ji} and {setname} in {theopath}. "
+                                   f"The paths {ij_cfactorpath} and {ji_cfactorpath} do not exist."
+                            )
+                            raise CfactorNotFound(msg)
+                        
+                        if ij_cfactorpath.exists():
+                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
+                        else:
+                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ji_cfactorpath
+                    
+        return bsm_fac_quad_paths
 
     def check_dataset(self,
                       name,
@@ -502,7 +563,8 @@ class Loader(LoaderBase):
                       use_fitcommondata=False,
                       fit=None,
                       weight=1,
-                      bsm_fac_data_names=None):
+                      bsm_fac_data_names=None,
+                      bsm_fac_quad_names=None):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
@@ -538,9 +600,19 @@ class Loader(LoaderBase):
         else: 
             bsm_fac_data_names_CF = None
 
+        # Now comes the trickier part! The quadratic ones...
+        if bsm_fac_quad_names is not None:
+            bsm_fac_quad_names_CF = self.get_bsm_fac_quad_name_dict(name, bsm_fac_quad_names, theoryno)
+        else:
+            bsm_fac_quad_names_CF = None
+
+        print(name)
+        print(bsm_fac_data_names_CF)
+        print(bsm_fac_quad_names_CF)
+
         return DataSetSpec(name=name, commondata=commondata,
                            fkspecs=fkspec, thspec=theoryid, cuts=cuts,
-                           frac=frac, op=op, weight=weight, bsm_fac_data_names_CF=bsm_fac_data_names_CF)
+                           frac=frac, op=op, weight=weight, bsm_fac_data_names_CF=bsm_fac_data_names_CF, bsm_fac_quad_names_CF=bsm_fac_quad_names_CF)
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
         """Loader method for instantiating DataGroupSpec objects. The NNPDF::Experiment

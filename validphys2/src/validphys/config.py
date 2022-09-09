@@ -56,6 +56,7 @@ from validphys.plotoptions import get_info
 import validphys.scalevariations
 
 import pandas as pd
+import numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -436,13 +437,15 @@ class CoreConfig(configparser.Config):
         """
         if len(bsm_fac_data_names) != 0:
             bsm_fac_quad_names = []
-            for op1 in bsm_fac_data_names:
-                for op2 in bsm_fac_data_names:
-                    if op1 == op2:
-                        bsm_fac_quad_names += [op1]
+            for i in range(len(bsm_fac_data_names)):
+                current_quad_names = []
+                for j in range(len(bsm_fac_data_names)):
+                    if i == j:
+                        current_quad_names += [bsm_fac_data_names[i]]
                     else:
                         # Cross-term is created
-                        bsm_fac_quad_names += [op1 + "*" + op2]
+                        current_quad_names += [bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]]
+                bsm_fac_quad_names += [current_quad_names]
             return bsm_fac_quad_names
         return []
 
@@ -460,16 +463,16 @@ class CoreConfig(configparser.Config):
         regardless of whether we actually end up using them or not.
         """
         if len(bsm_fac_data_scales) != 0:
-            bsm_fac_quad_scales = []
-            for scale1 in bsm_fac_data_scales:
-                for scale2 in bsm_fac_data_scales:
+            bsm_fac_quad_scales = np.empty((len(bsm_fac_data_scales), len(bsm_fac_data_scales)))
+            for i in range(len(bsm_fac_data_scales)):
+                for j in range(len(bsm_fac_data_scales)):
                     # Cross-term is created
-                    bsm_fac_quad_scales += [scale1 * scale2]
+                    bsm_fac_quad_scales[i][j] = bsm_fac_data_scales[i] * bsm_fac_data_scales[j]
             return bsm_fac_quad_scales
         return []
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, simunet_bsm_spec):
+    def parse_dataset_input(self, dataset: Mapping, simunet_bsm_spec, bsm_fac_quad_names, bsm_fac_quad_scales):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group"}
@@ -517,20 +520,37 @@ class CoreConfig(configparser.Config):
                 if len(distinct_entries) > 2:
                     raise ValueError("In a given row of the simunet BSM spec file, operators either must have contribution None to the dataset, or must have the same order contribution and must be linear or quadratic. This is not the case for the dataset " + name + ".")
 
-                if not distinct_entries.issubset({'LO_LIN', 'NLO_LIN', 'None'}):
-                    raise ValueError("Unknown option(s) " + str(distinct_entries) + " in simunet BSM spec file, in row " + name + ". Please choose from LO_LIN, NLO_LIN or None.")
+                if not distinct_entries.issubset({'LO_LIN', 'NLO_LIN', 'LO_QUAD', 'NLO_QUAD', 'None'}):
+                    raise ValueError("Unknown option(s) " + str(distinct_entries) + " in simunet BSM spec file, in row " + name + ". Please choose from LO_LIN, NLO_LIN, LO_QUAD, NLO_QUAD or None.")
 
                 # Construct the list of BSM-factor names now the checks are complete.
                 bsm_fac_data_names = []
+                new_bsm_fac_quad_names = []
+
                 for i in range(nops):
-                    bsm_fac_data_names += [bsm_fac[bsm_op_names[i]] + "_" + bsm_op_names[i]]
+                    # If we are just dealing with linear contributions, all is well with the world
+                    if bsm_fac[bsm_op_names[i]] in ["LO_LIN", "NLO_LIN", "None"]:
+                        bsm_fac_data_names += [bsm_fac[bsm_op_names[i]] + "_" + bsm_op_names[i]]
+                        # There are no quadratics in this case
+                        new_bsm_fac_quad_names += [["None_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
+                    # Else, we must get BOTH linear and quadratic contributions
+                    elif bsm_fac[bsm_op_names[i]] == "LO_QUAD":
+                        bsm_fac_data_names += ["LO_LIN_" + bsm_op_names[i]]
+                        new_bsm_fac_quad_names += [["LO_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
+                    elif bsm_fac[bsm_op_names[i]] == "NLO_QUAD":
+                        bsm_fac_data_names += ["NLO_LIN_" + bsm_op_names[i]]
+                        new_bsm_fac_quad_names += [["NLO_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
 
             else:
                 # There are no BSM corrections for this set in this fit
                 bsm_fac_data_names = None
+                new_bsm_fac_quad_names = None
 
         else:
             bsm_fac_data_names = None
+            new_bsm_fac_quad_names = None
+
+        bsm_fac_quad_names = new_bsm_fac_quad_names
 
         return DataSetInput(
             name=name,
@@ -540,6 +560,7 @@ class CoreConfig(configparser.Config):
             weight=weight,
             custom_group=custom_group,
             bsm_fac_data_names=bsm_fac_data_names,
+            bsm_fac_quad_names=new_bsm_fac_quad_names,
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -715,6 +736,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
+        bsm_fac_quad_names = dataset_input.bsm_fac_quad_names
 
         try:
             ds = self.loader.check_dataset(
@@ -728,6 +750,7 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 bsm_fac_data_names=bsm_fac_data_names,
+                bsm_fac_quad_names=bsm_fac_quad_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
