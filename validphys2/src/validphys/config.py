@@ -430,6 +430,22 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_names
         return [] 
 
+    def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
+        """Produces a list of names of the quadratics that could be included in the fit, regardless
+        of whether we actually end up using them or not.
+        """
+        if len(bsm_fac_data_names) != 0:
+            bsm_fac_quad_names = []
+            for op1 in bsm_fac_data_names:
+                for op2 in bsm_fac_data_names:
+                    if op1 == op2:
+                        bsm_fac_quad_names += [op1]
+                    else:
+                        # Cross-term is created
+                        bsm_fac_quad_names += [op1 + "*" + op2]
+            return bsm_fac_quad_names
+        return []
+
     def produce_bsm_fac_data_scales(self, simunet_bsm_spec):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
@@ -437,6 +453,19 @@ class CoreConfig(configparser.Config):
             bsm_fac_data_scales = simunet_bsm_spec.loc["Scale",:].values
             bsm_fac_data_scales = [float(scale) for scale in bsm_fac_data_scales]
             return bsm_fac_data_scales
+        return []
+
+    def produce_bsm_fac_quad_scales(self, bsm_fac_data_scales):
+        """Produces a list of scales for the quadratics that could be included in the fit,
+        regardless of whether we actually end up using them or not.
+        """
+        if len(bsm_fac_data_scales) != 0:
+            bsm_fac_quad_scales = []
+            for scale1 in bsm_fac_data_scales:
+                for scale2 in bsm_fac_data_scales:
+                    # Cross-term is created
+                    bsm_fac_quad_scales += [scale1 * scale2]
+            return bsm_fac_quad_scales
         return []
 
     @element_of("dataset_inputs")
