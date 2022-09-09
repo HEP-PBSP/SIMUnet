@@ -6,6 +6,7 @@ Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 import numpy as np
 from validphys.fkparser import parse_cfactor
 
+from validphys.coredata import CFactorData
 
 def fk_parser(fk, is_hadronic=False):
     """
@@ -78,12 +79,26 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
         cuts = cuts.load()
     name_cfac_map = {}
     for name, path in bsm_fac_data_names_CF.items():
-        with open(path, 'rb') as stream:
-            cfac = parse_cfactor(stream)
-            #TODO: Figure out a better way to handle the default
-            cfac.central_value = (cfac.central_value[cuts] - 1)
-            cfac.uncertainty = cfac.uncertainty[cuts]
+
+        if name[:4] == "None":
+            # Now is the time to make a dummy BSM-factor
+            central = [0.0]*len(cuts)
+            uncertainty = [0.0]*len(cuts)
+            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
+
+        else:
+            with open(path, 'rb') as stream:
+                cfac = parse_cfactor(stream)
+                #TODO: Figure out a better way to handle the default
+                cfac.central_value = (cfac.central_value[cuts] - 1)
+                cfac.uncertainty = cfac.uncertainty[cuts]
+        
         name_cfac_map[name] = cfac
+    
+        print(name)
+        print(path)
+        print(cfac.central_value)
+    
     return name_cfac_map
 
 

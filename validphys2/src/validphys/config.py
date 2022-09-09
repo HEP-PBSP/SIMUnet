@@ -55,6 +55,8 @@ from validphys.plotoptions import get_info
 
 import validphys.scalevariations
 
+import pandas as pd
+
 log = logging.getLogger(__name__)
 
 
@@ -402,37 +404,47 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_n_bsm_fac_data(self, bsm_fac_data=None):
+    def produce_simunet_bsm_spec(self, simunet_bsm_spec_path):
+        """Reads in the simunet_bsm_spec csv file as a pandas dataframe.
+        """
+        if simunet_bsm_spec_path is not None:
+            return pd.read_csv(simunet_bsm_spec_path, delim_whitespace=True, index_col=0)
+        return None
+
+    def produce_n_bsm_fac_data(self, simunet_bsm_spec):
         """
         Produces the number of BSM coefficients to include in the fit.
         """
-        if bsm_fac_data is not None:
-            return len(bsm_fac_data)
+        if simunet_bsm_spec is not None:
+            _, n_bsm_fac_data = simunet_bsm_spec.shape
+            return n_bsm_fac_data
         return 0
 
-    def produce_bsm_fac_data_names(self, bsm_fac_data=None):
+    def produce_bsm_fac_data_names(self, simunet_bsm_spec):
         """
         Produces the list of the names of the
         BSM coefficients to include in the fit.
         """
-        if bsm_fac_data is not None:
-            bsm_fac_data_names = [entry['name'] for entry in bsm_fac_data]
+        if simunet_bsm_spec is not None:
+            bsm_fac_data_names = simunet_bsm_spec.columns
+            print(bsm_fac_data_names)
             return bsm_fac_data_names
         return [] 
 
-    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
+    def produce_bsm_fac_data_scales(self, simunet_bsm_spec):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
-        if bsm_fac_data is not None:
-            bsm_fac_data_scales = [entry['scale'] for entry in bsm_fac_data]
+        if simunet_bsm_spec is not None:
+            bsm_fac_data_scales = simunet_bsm_spec.loc["Scale",:].values
+            bsm_fac_data_scales = [float(scale) for scale in bsm_fac_data_scales]
             return bsm_fac_data_scales
         return []
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping):
+    def parse_dataset_input(self, dataset: Mapping, simunet_bsm_spec):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_fac", "bsm_fac_nlo_qcd"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -463,27 +475,34 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_fac = dataset.get("bsm_fac")
+        if simunet_bsm_spec is not None:
+            if name in simunet_bsm_spec.index:
+                # Record the information about the BSM corrections for this set in the fit
+                bsm_fac = simunet_bsm_spec.loc[name, :]
+                _, nops = simunet_bsm_spec.shape
+                bsm_op_names = simunet_bsm_spec.columns
 
-        # bsm_cfac is a boolean 
-        if bsm_fac is not None:
-            if not isinstance(bsm_fac, bool):
-                raise ConfigError(f"bsm_fac must be bool not {type(bsm_fac)}")
+                # Run some tests on the BSM-factors specified in the simunet file. 
+                # In particular, check that the corrections are the same order/quadratic
+                # across all operators in the set.
+                distinct_entries = set(bsm_fac)
+                if len(distinct_entries) > 2:
+                    raise ValueError("In a given row of the simunet BSM spec file, operators either must have contribution None to the dataset, or must have the same order contribution and must be linear or quadratic. This is not the case for the dataset " + name + ".")
 
-            # TODO: change parsing from fit here. It runs havoc with {@with fits@}
-            _, bsm_fac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
-            bsm_fac_data_names = [dict['name'] for dict in bsm_fac_ns]
+                if not distinct_entries.issubset({'LO_LIN', 'NLO_LIN', 'None'}):
+                    raise ValueError("Unknown option(s) " + str(distinct_entries) + " in simunet BSM spec file, in row " + name + ". Please choose from LO_LIN, NLO_LIN or None.")
+
+                # Construct the list of BSM-factor names now the checks are complete.
+                bsm_fac_data_names = []
+                for i in range(nops):
+                    bsm_fac_data_names += [bsm_fac[bsm_op_names[i]] + "_" + bsm_op_names[i]]
+
+            else:
+                # There are no BSM corrections for this set in this fit
+                bsm_fac_data_names = None
+
         else:
-            bsm_fac_data_names= None
-
-        bsm_fac_nlo_qcd = dataset.get("bsm_fac_nlo_qcd")
-
-        # bsm_fac_nlo_qcd is a Boolean
-        if bsm_fac_nlo_qcd is not None:
-            if not isinstance(bsm_fac_nlo_qcd, bool):
-                raise ConfigError(f"bsm_fac_nlo_qcd must be bool not {type(bsm_fac_nlo_qcd)}")
-        else:
-            bsm_fac_nlo_qcd = False
+            bsm_fac_data_names = None
 
         return DataSetInput(
             name=name,
@@ -493,7 +512,6 @@ class CoreConfig(configparser.Config):
             weight=weight,
             custom_group=custom_group,
             bsm_fac_data_names=bsm_fac_data_names,
-            bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -669,7 +687,6 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
-        bsm_fac_nlo_qcd = dataset_input.bsm_fac_nlo_qcd
 
         try:
             ds = self.loader.check_dataset(
@@ -683,7 +700,6 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 bsm_fac_data_names=bsm_fac_data_names,
-                bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)

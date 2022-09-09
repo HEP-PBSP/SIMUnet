@@ -472,19 +472,19 @@ class Loader(LoaderBase):
             for inp in default_filter_rules_input()
         ]
 
-    def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid, qcd_on):
+    def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
         _, theopath = self.check_theoryID(theoryid)
         bsm_fac_names_paths= {}
         for bsm_fac_data_name in bsm_fac_data_names:
-            if qcd_on:
-                cfactorpath = theopath / 'bsm_factors' / f'BSM_NLO_LIN_{bsm_fac_data_name}_{setname}.dat'
-            else:
-                cfactorpath = theopath / 'bsm_factors' / f'BSM_LO_LIN_{bsm_fac_data_name}_{setname}.dat'
-            if not cfactorpath.exists():
-                msg = (f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
-                       f"The path {cfactorpath} does not exist."
-                )
-                raise CfactorNotFound(msg)
+            cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_fac_data_name}_{setname}.dat'
+    
+            # If we are expecting a BSM factor, we should check that the path actually exists.
+            if bsm_fac_data_name[:4] != "None":         
+                if not cfactorpath.exists():
+                    msg = (f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
+                           f"The path {cfactorpath} does not exist."
+                    )
+                    raise CfactorNotFound(msg)
             bsm_fac_names_paths[bsm_fac_data_name] = cfactorpath
 
         return bsm_fac_names_paths 
@@ -502,8 +502,7 @@ class Loader(LoaderBase):
                       use_fitcommondata=False,
                       fit=None,
                       weight=1,
-                      bsm_fac_data_names=None,
-                      bsm_fac_nlo_qcd=False):
+                      bsm_fac_data_names=None):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
@@ -535,7 +534,7 @@ class Loader(LoaderBase):
                 raise LoaderError(f"Intersection cuts not supported in loader calls.")
 
         if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno, bsm_fac_nlo_qcd)
+            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno)
         else: 
             bsm_fac_data_names_CF = None
 

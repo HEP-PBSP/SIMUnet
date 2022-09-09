@@ -12,21 +12,12 @@ dataset_inputs:
 - {dataset: NMC, frac: 0.75}
 - {dataset: DYE886P, frac: 0.75, cfac: [QCD]}
 - {dataset: ATLASPHT15_SF, frac: 0.75, cfac: [QCD, EWK]}         
-- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True} 
-- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_fac: True} 
-- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD], bsm_fac: True, bsm_fac_nlo_qcd: True} 
-- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD], bsm_fac: True, bsm_fac_nlo_qcd: True} 
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD]} 
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD]} 
+- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD]} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD]} 
 
-############################################################
-bsm_fac_data:
- - {name: "OtG", scale: 100}
- - {name: "O8qd", scale: 10}
- - {name: "O8qu", scale: 1}
- - {name: "O8dt", scale: 1}
- - {name: "O8qt", scale: 1}
- - {name: "O8ut", scale: 1}
- - {name: "O81qq", scale: 1}
- - {name: "O83qq", scale: 1}
+simunet_bsm_spec_path: "bsm_spec.dat"
 
 ############################################################
 datacuts:
