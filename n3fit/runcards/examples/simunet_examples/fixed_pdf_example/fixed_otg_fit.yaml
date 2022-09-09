@@ -12,13 +12,11 @@ dataset_inputs:
 - {dataset: NMC, frac: 0.75}
 - {dataset: HERACOMBNCEP920, frac: 0.75}
 - {dataset: CMSDY2D11, frac: 0.75, cfac: [QCD]}
-- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_fac: True}
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD]}
 
 ############################################################
 fixed_pdf_fit: True
-
-bsm_fac_data:
- - {name: "OtG", scale: 1}
+simunet_bsm_spec_path: "bsm_spec.dat"
 
 ############################################################
 datacuts:
