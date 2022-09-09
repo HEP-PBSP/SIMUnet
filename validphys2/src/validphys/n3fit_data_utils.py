@@ -94,11 +94,6 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
                 cfac.uncertainty = cfac.uncertainty[cuts]
         
         name_cfac_map[name] = cfac
-    
-        print(name)
-        print(path)
-        print(cfac.central_value)
-    
     return name_cfac_map
 
 
