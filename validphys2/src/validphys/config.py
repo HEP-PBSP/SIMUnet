@@ -427,7 +427,6 @@ class CoreConfig(configparser.Config):
         """
         if simunet_bsm_spec is not None:
             bsm_fac_data_names = simunet_bsm_spec.columns
-            print(bsm_fac_data_names)
             return bsm_fac_data_names
         return [] 
 
