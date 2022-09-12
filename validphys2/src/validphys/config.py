@@ -405,7 +405,7 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_simunet_bsm_spec(self, simunet_bsm_spec_path):
+    def produce_simunet_bsm_spec(self, simunet_bsm_spec_path=None):
         """Reads in the simunet_bsm_spec csv file as a pandas dataframe.
         """
         if simunet_bsm_spec_path is not None:
