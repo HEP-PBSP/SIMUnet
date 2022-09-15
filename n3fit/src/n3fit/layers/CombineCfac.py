@@ -49,14 +49,38 @@ class CombineCfacLayer(Layer):
         # 3) tf.reduce_sum(tensor, axis=i) sums over the `i` dimension and gets rid of it 
         
         # Convert the BSM factor scales 
-        _, ndata = bsm_factor_values.shape
+        nops, ndata = bsm_factor_values.shape
         scale_reciprocals = [1/scale for scale in self.bsm_fac_data_scales]
         scales = np.array(scale_reciprocals)
         scales = np.tile(scales,(ndata,1)).T
         scales = tf.constant(scales.tolist(), dtype=float)
 
-        print("Current quadratic BSM factor values")
-        print(quad_bsm_factor_values)
+        # Convert the quadratic BSM factor scales
+        # It's useful to flatten the BSM factor scales first
+        flat_quad_scales = []
+        for i in range(nops):
+            for j in range(nops):
+                # Now is our chance to eliminate duplicates (e.g. Oi*Oj and Oj*Oi should not both
+                # enter the predictions if i is different from j).
+                if i > j:
+                    flat_quad_scales += [0.0]
+                else:
+                    flat_quad_scales += [self.bsm_fac_quad_scales[i][j]]
+
+        quad_scale_reciprocals = []
+        for i in range(len(flat_quad_scales)):
+            if flat_quad_scales[i] == 0.0:
+                quad_scale_reciprocals += [0.0]
+            else:
+                quad_scale_reciprocals += [1/flat_quad_scales[i]]        
+
+        quad_scales = np.array(quad_scale_reciprocals)
+        quad_scales = np.tile(quad_scales,(ndata,1)).T
+        quad_scales = tf.constant(quad_scales.tolist(), dtype=float)        
+
+        # Multiply by the scales
+        bsm_factor_values = tf.multiply(bsm_factor_values,scales)
+        quad_bsm_factor_values = tf.multiply(quad_bsm_factor_values,quad_scales) 
 
         ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)) * inputs
 
