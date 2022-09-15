@@ -82,6 +82,8 @@ class CombineCfacLayer(Layer):
         bsm_factor_values = tf.multiply(bsm_factor_values,scales)
         quad_bsm_factor_values = tf.multiply(quad_bsm_factor_values,quad_scales) 
 
-        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)) * inputs
+        linear = tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)
+        quad_weights = tf.stack([self.w[i]*self.w[j] for i in range(nops) for j in range(nops)])
+        quadratic = tf.reduce_sum(quad_weights[:, tf.newaxis] * quad_bsm_factor_values, axis=0)
 
-        return ret
+        return (1 + linear + quadratic) * inputs
