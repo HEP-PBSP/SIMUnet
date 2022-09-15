@@ -534,8 +534,10 @@ class Loader(LoaderBase):
                         # We no longer care about producing the C-factor, just use a dummy
                         if ij_none:
                             bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
+                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ij_cfactorpath
                         else:
                             bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ji_cfactorpath
+                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ji_cfactorpath
 
                     else:
                         if not ij_cfactorpath.exists() and not ji_cfactorpath.exists():
@@ -546,9 +548,11 @@ class Loader(LoaderBase):
                         
                         if ij_cfactorpath.exists():
                             bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
+                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ij_cfactorpath
                         else:
                             bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ji_cfactorpath
-                    
+                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ji_cfactorpath
+
         return bsm_fac_quad_paths
 
     def check_dataset(self,
@@ -606,13 +610,9 @@ class Loader(LoaderBase):
         else:
             bsm_fac_quad_names_CF = None
 
-        print(name)
-        print(bsm_fac_data_names_CF)
-        print(bsm_fac_quad_names_CF)
-
         return DataSetSpec(name=name, commondata=commondata,
                            fkspecs=fkspec, thspec=theoryid, cuts=cuts,
-                           frac=frac, op=op, weight=weight, bsm_fac_data_names_CF=bsm_fac_data_names_CF, bsm_fac_quad_names_CF=bsm_fac_quad_names_CF)
+                           frac=frac, op=op, weight=weight, bsm_fac_data_names_CF=bsm_fac_data_names_CF, bsm_fac_quad_names_CF=bsm_fac_quad_names_CF, bsm_fac_quad_names=bsm_fac_quad_names, bsm_fac_data_names=bsm_fac_data_names)
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
         """Loader method for instantiating DataGroupSpec objects. The NNPDF::Experiment

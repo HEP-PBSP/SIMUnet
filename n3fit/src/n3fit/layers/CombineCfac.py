@@ -8,7 +8,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet. 
     """
 
-    def __init__(self, n_bsm_fac_data, bsm_fac_data_scales, bsm_fac_data_names):
+    def __init__(self, n_bsm_fac_data, bsm_fac_data_scales, bsm_fac_quad_scales, bsm_fac_data_names, bsm_fac_quad_names):
         """
         Parameters
         ----------
@@ -26,8 +26,10 @@ class CombineCfacLayer(Layer):
         )
         self.bsm_fac_data_names= bsm_fac_data_names  
         self.bsm_fac_data_scales = bsm_fac_data_scales 
+        self.bsm_fac_quad_names = bsm_fac_quad_names
+        self.bsm_fac_quad_scales = bsm_fac_quad_scales
 
-    def call(self, inputs, bsm_factor_values):
+    def call(self, inputs, bsm_factor_values, quad_bsm_factor_values):
         """
         Makes the forward pass to map the SM observable to the EFT one. 
         Parameters
@@ -53,7 +55,8 @@ class CombineCfacLayer(Layer):
         scales = np.tile(scales,(ndata,1)).T
         scales = tf.constant(scales.tolist(), dtype=float)
 
-        bsm_factor_values = tf.multiply(bsm_factor_values,scales)
+        print("Current quadratic BSM factor values")
+        print(quad_bsm_factor_values)
 
         ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)) * inputs
 

@@ -536,10 +536,24 @@ class CoreConfig(configparser.Config):
                     # Else, we must get BOTH linear and quadratic contributions
                     elif bsm_fac[bsm_op_names[i]] == "LO_QUAD":
                         bsm_fac_data_names += ["LO_LIN_" + bsm_op_names[i]]
-                        new_bsm_fac_quad_names += [["LO_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
+                        # We have to be a bit careful when appending the rest, as some will be None
+                        quad_append = []
+                        for j in range(nops):
+                            if bsm_fac[bsm_op_names[j]] == "None":
+                                quad_append += ["None_QUAD_" + bsm_fac_quad_names[i][j]]
+                            else:
+                                quad_append += ["LO_QUAD_" + bsm_fac_quad_names[i][j]]
+                        new_bsm_fac_quad_names += [quad_append]
                     elif bsm_fac[bsm_op_names[i]] == "NLO_QUAD":
                         bsm_fac_data_names += ["NLO_LIN_" + bsm_op_names[i]]
-                        new_bsm_fac_quad_names += [["NLO_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
+                        # We have to be a bit careful when appending the rest, as some will be None
+                        quad_append = []
+                        for j in range(nops):
+                            if bsm_fac[bsm_op_names[j]] == "None":
+                                quad_append += ["None_QUAD_" + bsm_fac_quad_names[i][j]]
+                            else:
+                                quad_append += ["NLO_QUAD_" + bsm_fac_quad_names[i][j]]
+                        new_bsm_fac_quad_names += [quad_append]
 
             else:
                 # There are no BSM corrections for this set in this fit

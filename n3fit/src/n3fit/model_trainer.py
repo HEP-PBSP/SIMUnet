@@ -100,7 +100,9 @@ class ModelTrainer:
         failed_status="fail",
         n_bsm_fac_data=0,
         bsm_fac_data_names=None,
+        bsm_fac_quad_names=None,
         bsm_fac_data_scales=None,
+        bsm_fac_quad_scales=None,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -162,6 +164,8 @@ class ModelTrainer:
         self.n_bsm_fac_data=n_bsm_fac_data
         self.bsm_fac_data_names=bsm_fac_data_names
         self.bsm_fac_data_scales = bsm_fac_data_scales
+        self.bsm_fac_quad_names = bsm_fac_quad_names
+        self.bsm_fac_quad_scales = bsm_fac_quad_scales
         self.fixed_pdf = fixed_pdf
         self.replicas = replicas
 
@@ -479,7 +483,9 @@ class ModelTrainer:
         combiner = CombineCfacLayer(
                     n_bsm_fac_data=self.n_bsm_fac_data,
                     bsm_fac_data_scales=self.bsm_fac_data_scales,
+                    bsm_fac_quad_scales=self.bsm_fac_quad_scales,
                     bsm_fac_data_names=self.bsm_fac_data_names,
+                    bsm_fac_quad_names=self.bsm_fac_quad_names,
         )
 
         log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")

@@ -27,6 +27,7 @@ def performfit(
     basis,
     fitbasis,
     bsm_fac_data_scales,
+    bsm_fac_quad_scales,
     fixed_pdf_fit=False,
     sum_rules=True,
     parameters,
@@ -42,6 +43,7 @@ def performfit(
     maxcores=None,
     parallel_models=False, 
     bsm_fac_data_names=None,
+    bsm_fac_quad_names=None,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -203,7 +205,9 @@ def performfit(
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,
             bsm_fac_data_names=bsm_fac_data_names, 
-            bsm_fac_data_scales=bsm_fac_data_scales
+            bsm_fac_quad_names=bsm_fac_quad_names,
+            bsm_fac_data_scales=bsm_fac_data_scales,
+            bsm_fac_quad_scales=bsm_fac_quad_scales,
         )
 
         # This is just to give a descriptive name to the fit function
