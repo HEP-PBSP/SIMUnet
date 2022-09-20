@@ -405,29 +405,23 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_simunet_bsm_spec(self, simunet_bsm_spec_path=None):
-        """Reads in the simunet_bsm_spec csv file as a pandas dataframe.
-        """
-        if simunet_bsm_spec_path is not None:
-            return pd.read_csv(simunet_bsm_spec_path, delim_whitespace=True, index_col=0)
-        return None
-
-    def produce_n_bsm_fac_data(self, simunet_bsm_spec):
+    def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.
         """
-        if simunet_bsm_spec is not None:
-            _, n_bsm_fac_data = simunet_bsm_spec.shape
-            return n_bsm_fac_data
+        if bsm_fac_data is not None:
+            return len(bsm_fac_data)
         return 0
 
-    def produce_bsm_fac_data_names(self, simunet_bsm_spec):
+    def produce_bsm_fac_data_names(self, bsm_fac_data=None):
         """
         Produces the list of the names of the
         BSM coefficients to include in the fit.
         """
-        if simunet_bsm_spec is not None:
-            bsm_fac_data_names = simunet_bsm_spec.columns
+        if bsm_fac_data is not None:
+            bsm_fac_data_names = []
+            for entry in bsm_fac_data:
+                bsm_fac_data_names += [entry['name']]
             return bsm_fac_data_names
         return [] 
 
@@ -449,12 +443,13 @@ class CoreConfig(configparser.Config):
             return bsm_fac_quad_names
         return []
 
-    def produce_bsm_fac_data_scales(self, simunet_bsm_spec):
+    def produce_bsm_fac_data_scales(self, bsm_fac_data):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
-        if simunet_bsm_spec is not None:
-            bsm_fac_data_scales = simunet_bsm_spec.loc["Scale",:].values
-            bsm_fac_data_scales = [float(scale) for scale in bsm_fac_data_scales]
+        if bsm_fac_data is not None:
+            bsm_fac_data_scales = []
+            for entry in bsm_fac_data:
+                bsm_fac_data_scales += [entry['scale']]
             return bsm_fac_data_scales
         return []
 
@@ -471,11 +466,19 @@ class CoreConfig(configparser.Config):
             return bsm_fac_quad_scales
         return []
 
+    def parse_bsm_sector_data(self, bsm_sector_data=None):
+        if bsm_sector_data is not None:
+            new_bsm_sector_data = {}
+            for entry in bsm_sector_data:
+                new_bsm_sector_data[entry['name']] = entry['operators']
+            return new_bsm_sector_data
+        return {}
+
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, simunet_bsm_spec, bsm_fac_quad_names, bsm_fac_quad_scales):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, bsm_sector_data, n_bsm_fac_data):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -506,65 +509,60 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        if simunet_bsm_spec is not None:
-            if name in simunet_bsm_spec.index:
-                # Record the information about the BSM corrections for this set in the fit
-                bsm_fac = simunet_bsm_spec.loc[name, :]
-                _, nops = simunet_bsm_spec.shape
-                bsm_op_names = simunet_bsm_spec.columns
+        bsm_sector = dataset.get("bsm_sector")
+        bsm_order = dataset.get("bsm_order")
 
-                # Run some tests on the BSM-factors specified in the simunet file. 
-                # In particular, check that the corrections are the same order/quadratic
-                # across all operators in the set.
-                distinct_entries = set(bsm_fac)
-                if len(distinct_entries) > 2:
-                    raise ValueError("In a given row of the simunet BSM spec file, operators either must have contribution None to the dataset, or must have the same order contribution and must be linear or quadratic. This is not the case for the dataset " + name + ".")
+        if bsm_fac_data is not None:
+            if bsm_order is not None :
+                new_bsm_fac_data_names = []
+                # Now go through all operators, and see which are in the appropriate sector.
+                for op in bsm_fac_data_names:
+                    if op in bsm_sector_data[bsm_sector]:
+                        if bsm_order == "LO_QUAD":
+                            new_bsm_fac_data_names += ["LO_LIN_" + op]
+                        elif bsm_order == "NLO_QUAD":
+                            new_bsm_fac_data_names += ["NLO_LIN_" + op]
+                        else:
+                            new_bsm_fac_data_names += [bsm_order + "_" + op]
+                    else:
+                        new_bsm_fac_data_names += ["None_" + op]
 
-                if not distinct_entries.issubset({'LO_LIN', 'NLO_LIN', 'LO_QUAD', 'NLO_QUAD', 'None'}):
-                    raise ValueError("Unknown option(s) " + str(distinct_entries) + " in simunet BSM spec file, in row " + name + ". Please choose from LO_LIN, NLO_LIN, LO_QUAD, NLO_QUAD or None.")
+                # This takes care of linear. Now need to do the same for quadratic, if it's 
+                # switched on...
 
-                # Construct the list of BSM-factor names now the checks are complete.
-                bsm_fac_data_names = []
-                new_bsm_fac_quad_names = []
+                if bsm_order in ["LO_QUAD", "NLO_QUAD"]:
+                    # Some care needed here...
+                    new_bsm_fac_quad_names = pd.DataFrame(index=range(n_bsm_fac_data), columns=range(n_bsm_fac_data))
 
-                for i in range(nops):
-                    # If we are just dealing with linear contributions, all is well with the world
-                    if bsm_fac[bsm_op_names[i]] in ["LO_LIN", "NLO_LIN", "None"]:
-                        bsm_fac_data_names += [bsm_fac[bsm_op_names[i]] + "_" + bsm_op_names[i]]
-                        # There are no quadratics in this case
-                        new_bsm_fac_quad_names += [["None_QUAD_" + op for op in bsm_fac_quad_names[i][:]]]
-                    # Else, we must get BOTH linear and quadratic contributions
-                    elif bsm_fac[bsm_op_names[i]] == "LO_QUAD":
-                        bsm_fac_data_names += ["LO_LIN_" + bsm_op_names[i]]
-                        # We have to be a bit careful when appending the rest, as some will be None
-                        quad_append = []
-                        for j in range(nops):
-                            if bsm_fac[bsm_op_names[j]] == "None":
-                                quad_append += ["None_QUAD_" + bsm_fac_quad_names[i][j]]
+                    for i in range(n_bsm_fac_data):
+                        for j in range(n_bsm_fac_data):
+                            if bsm_fac_data_names[i] in bsm_sector_data[bsm_sector]:
+                                if bsm_fac_data_names[j] in bsm_sector_data[bsm_sector]:
+                                    if i == j:
+                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i]
+                                    else:
+                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
+                                         new_bsm_fac_quad_names.iloc[j,i] = bsm_order + "_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
+                                else:
+                                    if i == j:
+                                         new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]
+                                    else:
+                                        # Ignore contribution entirely
+                                        new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
+                                        new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
                             else:
-                                quad_append += ["LO_QUAD_" + bsm_fac_quad_names[i][j]]
-                        new_bsm_fac_quad_names += [quad_append]
-                    elif bsm_fac[bsm_op_names[i]] == "NLO_QUAD":
-                        bsm_fac_data_names += ["NLO_LIN_" + bsm_op_names[i]]
-                        # We have to be a bit careful when appending the rest, as some will be None
-                        quad_append = []
-                        for j in range(nops):
-                            if bsm_fac[bsm_op_names[j]] == "None":
-                                quad_append += ["None_QUAD_" + bsm_fac_quad_names[i][j]]
-                            else:
-                                quad_append += ["NLO_QUAD_" + bsm_fac_quad_names[i][j]]
-                        new_bsm_fac_quad_names += [quad_append]
+                                if i == j:
+                                    new_bsm_fac_quad_names.iloc[i][j] = "None_" + bsm_fac_data_names[i]
+                                elif i == j:
+                                    new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[j]
+                                    new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[i]
+                    new_bsm_fac_quad_names = new_bsm_fac_quad_names.values.tolist()         
+                else:
+                    new_bsm_fac_quad_names = None
 
             else:
-                # There are no BSM corrections for this set in this fit
-                bsm_fac_data_names = None
+                new_bsm_fac_data_names = None
                 new_bsm_fac_quad_names = None
-
-        else:
-            bsm_fac_data_names = None
-            new_bsm_fac_quad_names = None
-
-        bsm_fac_quad_names = new_bsm_fac_quad_names
 
         return DataSetInput(
             name=name,
@@ -573,7 +571,7 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
-            bsm_fac_data_names=bsm_fac_data_names,
+            bsm_fac_data_names=new_bsm_fac_data_names,
             bsm_fac_quad_names=new_bsm_fac_quad_names,
         )
 

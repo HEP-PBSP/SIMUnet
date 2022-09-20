@@ -493,7 +493,7 @@ class Loader(LoaderBase):
         _, theopath = self.check_theoryID(theoryid)
         bsm_fac_quad_paths = {}
 
-        nops = len(bsm_fac_quad_names[0])
+        nops = len(bsm_fac_quad_names)
 
         # With the quadratics, things are slightly more complicated. Go through the array one
         # entry at a time, and check the diagonally opposite entry at the same time. If at least

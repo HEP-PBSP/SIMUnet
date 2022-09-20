@@ -12,12 +12,19 @@ dataset_inputs:
 - {dataset: NMC, frac: 0.75}
 - {dataset: DYE886P, frac: 0.75, cfac: [QCD]}
 - {dataset: ATLASPHT15_SF, frac: 0.75, cfac: [QCD, EWK]}         
-- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD]} 
-- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD]} 
-- {dataset: CMSTTBARTOT8TEV, frac: 0.75, cfac: [QCD]} 
-- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, frac: 0.75, cfac: [QCD]} 
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBARZ_8TEV_TOTAL, bsm_sector: "ttz", bsm_order: "LO_QUAD"} 
+- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, frac: 0.75, bsm_sector: "tw", bsm_order: "LO_LIN"} 
 
-simunet_bsm_spec_path: "bsm_spec.dat"
+bsm_fac_data:
+- {name: "OtG", scale: 100}
+- {name: "Opt", scale: 10}
+- {name: "OtZ", scale: 1}
+
+bsm_sector_data:
+- {name: "ttbar", operators: ["OtG"]}
+- {name: "ttz", operators: ["Opt", "OtZ"]}
+- {name: "tw", operators: ["OtG"]}
 
 ############################################################
 datacuts:
