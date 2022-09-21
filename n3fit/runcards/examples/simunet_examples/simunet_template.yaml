@@ -17,6 +17,7 @@ dataset_inputs:
 - {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, frac: 0.75, bsm_sector: "tw", bsm_order: "LO_LIN"} 
 
 fixed_pdf_fit: False
+# load_weights_from_fit: 220907-jmm-fixed_test # If this is uncommented, training starts here.
 
 bsm_fac_data:
 - {name: "OtG", scale: 100}
