@@ -215,7 +215,7 @@ def _check_has_bsm_facs(fit):
     check(cf, f"Fit '{fit}' does not contain fitted cfactors.")
 
 
-@_check_has_bsm_facs
+#@_check_has_bsm_facs
 def read_bsm_facs(replica_paths):
     """
     Read the csv saved BSM factors, accounting for the

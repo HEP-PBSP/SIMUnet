@@ -8,7 +8,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet. 
     """
 
-    def __init__(self, n_bsm_fac_data, bsm_fac_data_scales, bsm_fac_data_names):
+    def __init__(self, n_bsm_fac_data, bsm_fac_data_scales, bsm_fac_quad_scales, bsm_fac_data_names, bsm_fac_quad_names):
         """
         Parameters
         ----------
@@ -26,8 +26,10 @@ class CombineCfacLayer(Layer):
         )
         self.bsm_fac_data_names= bsm_fac_data_names  
         self.bsm_fac_data_scales = bsm_fac_data_scales 
+        self.bsm_fac_quad_names = bsm_fac_quad_names
+        self.bsm_fac_quad_scales = bsm_fac_quad_scales
 
-    def call(self, inputs, bsm_factor_values):
+    def call(self, inputs, bsm_factor_values, quad_bsm_factor_values):
         """
         Makes the forward pass to map the SM observable to the EFT one. 
         Parameters
@@ -47,14 +49,41 @@ class CombineCfacLayer(Layer):
         # 3) tf.reduce_sum(tensor, axis=i) sums over the `i` dimension and gets rid of it 
         
         # Convert the BSM factor scales 
-        _, ndata = bsm_factor_values.shape
+        nops, ndata = bsm_factor_values.shape
         scale_reciprocals = [1/scale for scale in self.bsm_fac_data_scales]
         scales = np.array(scale_reciprocals)
         scales = np.tile(scales,(ndata,1)).T
         scales = tf.constant(scales.tolist(), dtype=float)
 
+        # Convert the quadratic BSM factor scales
+        # It's useful to flatten the BSM factor scales first
+        flat_quad_scales = []
+        for i in range(nops):
+            for j in range(nops):
+                # Now is our chance to eliminate duplicates (e.g. Oi*Oj and Oj*Oi should not both
+                # enter the predictions if i is different from j).
+                if i > j:
+                    flat_quad_scales += [0.0]
+                else:
+                    flat_quad_scales += [self.bsm_fac_quad_scales[i][j]]
+
+        quad_scale_reciprocals = []
+        for i in range(len(flat_quad_scales)):
+            if flat_quad_scales[i] == 0.0:
+                quad_scale_reciprocals += [0.0]
+            else:
+                quad_scale_reciprocals += [1/flat_quad_scales[i]]        
+
+        quad_scales = np.array(quad_scale_reciprocals)
+        quad_scales = np.tile(quad_scales,(ndata,1)).T
+        quad_scales = tf.constant(quad_scales.tolist(), dtype=float)        
+
+        # Multiply by the scales
         bsm_factor_values = tf.multiply(bsm_factor_values,scales)
+        quad_bsm_factor_values = tf.multiply(quad_bsm_factor_values,quad_scales) 
 
-        ret = (1 + tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)) * inputs
+        linear = tf.reduce_sum(self.w[:, tf.newaxis] * bsm_factor_values, axis=0)
+        quad_weights = tf.stack([self.w[i]*self.w[j] for i in range(nops) for j in range(nops)])
+        quadratic = tf.reduce_sum(quad_weights[:, tf.newaxis] * quad_bsm_factor_values, axis=0)
 
-        return ret
+        return (1 + linear + quadratic) * inputs

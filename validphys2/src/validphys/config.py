@@ -55,6 +55,9 @@ from validphys.plotoptions import get_info
 
 import validphys.scalevariations
 
+import pandas as pd
+import numpy as np
+
 log = logging.getLogger(__name__)
 
 
@@ -416,23 +419,66 @@ class CoreConfig(configparser.Config):
         BSM coefficients to include in the fit.
         """
         if bsm_fac_data is not None:
-            bsm_fac_data_names = [entry['name'] for entry in bsm_fac_data]
+            bsm_fac_data_names = []
+            for entry in bsm_fac_data:
+                bsm_fac_data_names += [entry['name']]
             return bsm_fac_data_names
         return [] 
 
-    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
+    def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
+        """Produces a list of names of the quadratics that could be included in the fit, regardless
+        of whether we actually end up using them or not.
+        """
+        if len(bsm_fac_data_names) != 0:
+            bsm_fac_quad_names = []
+            for i in range(len(bsm_fac_data_names)):
+                current_quad_names = []
+                for j in range(len(bsm_fac_data_names)):
+                    if i == j:
+                        current_quad_names += [bsm_fac_data_names[i]]
+                    else:
+                        # Cross-term is created
+                        current_quad_names += [bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]]
+                bsm_fac_quad_names += [current_quad_names]
+            return bsm_fac_quad_names
+        return []
+
+    def produce_bsm_fac_data_scales(self, bsm_fac_data):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
         if bsm_fac_data is not None:
-            bsm_fac_data_scales = [entry['scale'] for entry in bsm_fac_data]
+            bsm_fac_data_scales = []
+            for entry in bsm_fac_data:
+                bsm_fac_data_scales += [entry['scale']]
             return bsm_fac_data_scales
         return []
 
+    def produce_bsm_fac_quad_scales(self, bsm_fac_data_scales):
+        """Produces a list of scales for the quadratics that could be included in the fit,
+        regardless of whether we actually end up using them or not.
+        """
+        if len(bsm_fac_data_scales) != 0:
+            bsm_fac_quad_scales = np.empty((len(bsm_fac_data_scales), len(bsm_fac_data_scales)))
+            for i in range(len(bsm_fac_data_scales)):
+                for j in range(len(bsm_fac_data_scales)):
+                    # Cross-term is created
+                    bsm_fac_quad_scales[i][j] = bsm_fac_data_scales[i] * bsm_fac_data_scales[j]
+            return bsm_fac_quad_scales
+        return []
+
+    def parse_bsm_sector_data(self, bsm_sector_data=None):
+        if bsm_sector_data is not None:
+            new_bsm_sector_data = {}
+            for entry in bsm_sector_data:
+                new_bsm_sector_data[entry['name']] = entry['operators']
+            return new_bsm_sector_data
+        return {}
+
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, bsm_sector_data, n_bsm_fac_data):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_fac", "bsm_fac_nlo_qcd"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -463,27 +509,60 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_fac = dataset.get("bsm_fac")
+        bsm_sector = dataset.get("bsm_sector")
+        bsm_order = dataset.get("bsm_order")
 
-        # bsm_cfac is a boolean 
-        if bsm_fac is not None:
-            if not isinstance(bsm_fac, bool):
-                raise ConfigError(f"bsm_fac must be bool not {type(bsm_fac)}")
+        if bsm_fac_data is not None:
+            if bsm_order is not None :
+                new_bsm_fac_data_names = []
+                # Now go through all operators, and see which are in the appropriate sector.
+                for op in bsm_fac_data_names:
+                    if op in bsm_sector_data[bsm_sector]:
+                        if bsm_order == "LO_QUAD":
+                            new_bsm_fac_data_names += ["LO_LIN_" + op]
+                        elif bsm_order == "NLO_QUAD":
+                            new_bsm_fac_data_names += ["NLO_LIN_" + op]
+                        else:
+                            new_bsm_fac_data_names += [bsm_order + "_" + op]
+                    else:
+                        new_bsm_fac_data_names += ["None_" + op]
 
-            # TODO: change parsing from fit here. It runs havoc with {@with fits@}
-            _, bsm_fac_ns = self.parse_from_(None, "bsm_fac_data", write=False)
-            bsm_fac_data_names = [dict['name'] for dict in bsm_fac_ns]
-        else:
-            bsm_fac_data_names= None
+                # This takes care of linear. Now need to do the same for quadratic, if it's 
+                # switched on...
 
-        bsm_fac_nlo_qcd = dataset.get("bsm_fac_nlo_qcd")
+                if bsm_order in ["LO_QUAD", "NLO_QUAD"]:
+                    # Some care needed here...
+                    new_bsm_fac_quad_names = pd.DataFrame(index=range(n_bsm_fac_data), columns=range(n_bsm_fac_data))
 
-        # bsm_fac_nlo_qcd is a Boolean
-        if bsm_fac_nlo_qcd is not None:
-            if not isinstance(bsm_fac_nlo_qcd, bool):
-                raise ConfigError(f"bsm_fac_nlo_qcd must be bool not {type(bsm_fac_nlo_qcd)}")
-        else:
-            bsm_fac_nlo_qcd = False
+                    for i in range(n_bsm_fac_data):
+                        for j in range(n_bsm_fac_data):
+                            if bsm_fac_data_names[i] in bsm_sector_data[bsm_sector]:
+                                if bsm_fac_data_names[j] in bsm_sector_data[bsm_sector]:
+                                    if i == j:
+                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i]
+                                    else:
+                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
+                                         new_bsm_fac_quad_names.iloc[j,i] = bsm_order + "_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
+                                else:
+                                    if i == j:
+                                         new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]
+                                    else:
+                                        # Ignore contribution entirely
+                                        new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
+                                        new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
+                            else:
+                                if i == j:
+                                    new_bsm_fac_quad_names.iloc[i][j] = "None_" + bsm_fac_data_names[i]
+                                elif i == j:
+                                    new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[j]
+                                    new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[i]
+                    new_bsm_fac_quad_names = new_bsm_fac_quad_names.values.tolist()         
+                else:
+                    new_bsm_fac_quad_names = None
+
+            else:
+                new_bsm_fac_data_names = None
+                new_bsm_fac_quad_names = None
 
         return DataSetInput(
             name=name,
@@ -492,8 +571,8 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
-            bsm_fac_data_names=bsm_fac_data_names,
-            bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
+            bsm_fac_data_names=new_bsm_fac_data_names,
+            bsm_fac_quad_names=new_bsm_fac_quad_names,
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -669,7 +748,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
-        bsm_fac_nlo_qcd = dataset_input.bsm_fac_nlo_qcd
+        bsm_fac_quad_names = dataset_input.bsm_fac_quad_names
 
         try:
             ds = self.loader.check_dataset(
@@ -683,7 +762,7 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 bsm_fac_data_names=bsm_fac_data_names,
-                bsm_fac_nlo_qcd=bsm_fac_nlo_qcd
+                bsm_fac_quad_names=bsm_fac_quad_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)

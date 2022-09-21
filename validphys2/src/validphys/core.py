@@ -322,7 +322,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specidy a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_nlo_qcd):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_quad_names):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -330,7 +330,7 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_nlo_qcd = bsm_fac_nlo_qcd
+        self.bsm_fac_quad_names = bsm_fac_quad_names
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -447,7 +447,7 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None):
+                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_quad_names_CF=None, bsm_fac_data_names=None, bsm_fac_quad_names=None):
         self.name = name
         self.commondata = commondata
 
@@ -458,7 +458,12 @@ class DataSetSpec(TupleComp):
 
         self.cuts = cuts
         self.frac = frac
-        self.bsm_fac_data_names_CF= bsm_fac_data_names_CF 
+        self.bsm_fac_data_names_CF = bsm_fac_data_names_CF 
+        self.bsm_fac_quad_names_CF = bsm_fac_quad_names_CF
+
+        # These are important because they are ORDERED correctly, but the dictionaries might not be
+        self.bsm_fac_data_names = bsm_fac_data_names
+        self.bsm_fac_quad_names = bsm_fac_quad_names
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere

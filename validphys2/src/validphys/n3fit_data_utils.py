@@ -6,6 +6,7 @@ Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 import numpy as np
 from validphys.fkparser import parse_cfactor
 
+from validphys.coredata import CFactorData
 
 def fk_parser(fk, is_hadronic=False):
     """
@@ -78,14 +79,46 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
         cuts = cuts.load()
     name_cfac_map = {}
     for name, path in bsm_fac_data_names_CF.items():
-        with open(path, 'rb') as stream:
-            cfac = parse_cfactor(stream)
-            #TODO: Figure out a better way to handle the default
-            cfac.central_value = (cfac.central_value[cuts] - 1)
-            cfac.uncertainty = cfac.uncertainty[cuts]
+
+        if name[:4] == "None":
+            # Now is the time to make a dummy BSM-factor
+            central = [0.0]*len(cuts)
+            uncertainty = [0.0]*len(cuts)
+            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
+
+        else:
+            with open(path, 'rb') as stream:
+                cfac = parse_cfactor(stream)
+                #TODO: Figure out a better way to handle the default
+                cfac.central_value = (cfac.central_value[cuts] - 1)
+                cfac.uncertainty = cfac.uncertainty[cuts]
+        
         name_cfac_map[name] = cfac
     return name_cfac_map
 
+def parse_bsm_fac_quad_names_CF(bsm_fac_quad_names_CF, cuts):
+    if bsm_fac_quad_names_CF is None:
+        return None
+    if hasattr(cuts, 'load'):
+        cuts = cuts.load()
+    name_cfac_map = {}
+    for name, path in bsm_fac_quad_names_CF.items():
+
+        if name[:4] == "None":
+            # Now is the time to make a dummy BSM-factor
+            central = [0.0]*len(cuts)
+            uncertainty = [0.0]*len(cuts)
+            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
+
+        else:
+            with open(path, 'rb') as stream:
+                cfac = parse_cfactor(stream)
+                #TODO: Figure out a better way to handly the default
+                cfac.central_value = (cfac.central_value[cuts] - 1)
+                cfac.uncertainty = cfac.uncertainty[cuts]
+
+        name_cfac_map[name] = cfac
+    return name_cfac_map
 
 def common_data_reader_dataset(dataset_c, dataset_spec):
     """
@@ -124,7 +157,10 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
-        "bsm_fac_data_names_CF": parse_bsm_fac_data_names_CF(dataset_spec.bsm_fac_data_names_CF, cuts)
+        "bsm_fac_data_names_CF": parse_bsm_fac_data_names_CF(dataset_spec.bsm_fac_data_names_CF, cuts),
+        "bsm_fac_quad_names_CF": parse_bsm_fac_quad_names_CF(dataset_spec.bsm_fac_quad_names_CF, cuts),
+        "bsm_fac_data_names": dataset_spec.bsm_fac_data_names,
+        "bsm_fac_quad_names": dataset_spec.bsm_fac_quad_names
     }
 
     return [dataset_dict]

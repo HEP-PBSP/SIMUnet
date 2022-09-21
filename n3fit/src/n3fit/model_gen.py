@@ -87,29 +87,39 @@ class ObservableWrapper:
         for idx, (dataset_dict, output_layer) in enumerate(zip(self.spec_dict['datasets'], output_layers)):
             # Use get here to prevent having to worry about POSDATSETS
             bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
-            #quad_fit_cfac = dataset_dict.get('quad_fit_cfac')
+            bsm_fac_quad_names_CF = dataset_dict.get('bsm_fac_quad_names_CF')
+            bsm_fac_data_names = dataset_dict.get('bsm_fac_data_names')
+            bsm_fac_quad_names = dataset_dict.get('bsm_fac_quad_names')
+
+            # It's useful to flatten the list of quadratic names first
+            if bsm_fac_quad_names_CF is not None:
+                flat_bsm_fac_quad_names = []
+                for i in range(len(bsm_fac_quad_names)):
+                    for j in range(len(bsm_fac_quad_names)):
+                        flat_bsm_fac_quad_names += [bsm_fac_quad_names[i][j]]
+
             if bsm_fac_data_names_CF is not None:
-                coefficients = np.array([i.central_value for i in bsm_fac_data_names_CF.values()])
-                #if quad_fit_cfac is not None:
-                    #quad_coefficients = np.array([i.central_value for i in quad_fit_cfac.values()])
-                    #log.info("Using quadratic cfactors")
-                #else:
-                    #quad_coefficients = np.zeros_like(coefficients)
+                coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+                if bsm_fac_quad_names_CF is not None:
+                    quad_coefficients = np.array([bsm_fac_quad_names_CF[i].central_value for i in flat_bsm_fac_quad_names])
+                else:
+                    nops, ndat = coefficients.shape
+                    quad_coefficients = np.zeros((nops**2, ndat))
                 if self.split == 'ex':
                     cfacs = coefficients
-                    #quad_cfacs = quad_coefficients
+                    quad_cfacs = quad_coefficients
                 elif self.split == 'tr':
                     cfacs = coefficients[:, dataset_dict['ds_tr_mask']]
-                    #quad_cfacs = quad_coefficients[:, dataset_dict['ds_tr_mask']]
+                    quad_cfacs = quad_coefficients[:, dataset_dict['ds_tr_mask']]
                 elif self.split == 'vl':
                     cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
-                    #quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
+                    quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
                 log.info(f"Applying combination layer")
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
                     bsm_factor_values=tf.constant(cfacs, dtype='float32'),
-                    #quad_cfactor_values=tf.constant(quad_cfacs, dtype='float32')
+                    quad_bsm_factor_values=tf.constant(quad_cfacs, dtype='float32')
                 )
 
 
