@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 results.py
-
 Tools to obtain theory predictions and basic statistical estimators.
 """
 from __future__ import generator_stop
@@ -109,20 +108,11 @@ class DataResult(StatsResult):
 class ThPredictionsResult(StatsResult):
     """Class holding theory prediction, inherits from StatsResult"""
 
-    def __init__(self, dataobj, stats_class, bsm_fac_data_scales, label=None):
+    def __init__(self, dataobj, stats_class, label=None):
         self.stats_class = stats_class
         self.label = label
         statsobj = stats_class(dataobj.T)
-        self._rawdata = [self.rawdata[i] * bsm_fac_data_scales[i] for i in range(len(self.rawdata))]
         super().__init__(statsobj)
-
-    @property
-    def std_error(self):
-        return np.std(self._rawdata, axis=1)
-
-    @property
-    def central_value(self):
-        return np.mean(self._rawdata, axis=1)    
 
     @staticmethod
     def make_label(pdf, dataset):
@@ -140,7 +130,7 @@ class ThPredictionsResult(StatsResult):
         return label
 
     @classmethod
-    def from_convolution(cls, pdf, dataset, bsm_fac_data_scales):
+    def from_convolution(cls, pdf, dataset):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -157,7 +147,7 @@ class ThPredictionsResult(StatsResult):
 
         label = cls.make_label(pdf, dataset)
 
-        return cls(th_predictions, pdf.stats_class, label, bsm_fac_data_scales)
+        return cls(th_predictions, pdf.stats_class, label)
 
 
 class PositivityResult(StatsResult):
@@ -180,11 +170,9 @@ def groups_index(groups_data):
     """Return a pandas.MultiIndex with levels for group, dataset and point
     respectively, the group is determined by a key in the dataset metadata, and
     controlled by `metadata_group` key in the runcard.
-
     Example
     -------
     TODO: add example
-
     """
     records = []
     for group in groups_data:
@@ -317,6 +305,7 @@ experiments_covmat_collection = collect(
     "dataset_inputs_covariance_matrix", ("group_dataset_inputs_by_experiment",)
 )
 
+
 def experiments_covmat_no_table(
     experiments_data, experiments_index, experiments_covmat_collection
 ):
@@ -355,11 +344,8 @@ def relabel_experiments_to_groups(input_covmat, groups_index):
 def groups_covmat_no_table(experiments_covmat_no_table, groups_index):
     """Export the covariance matrix for the groups. It exports the full
     (symmetric) matrix, with the 3 first rows and columns being:
-
         - group name
-
         - dataset name
-
         - index of the point within the dataset.
     """
     return relabel_experiments_to_groups(experiments_covmat_no_table, groups_index)
@@ -461,29 +447,28 @@ def procs_corrmat(procs_covmat):
     return groups_corrmat(procs_covmat)
 
 
-def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_scaled_fit_cfactor=None):
+def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat):
     """Tuple of data and theory results for a single pdf. The data will have an associated
     covariance matrix, which can include a contribution from the theory covariance matrix which
     is constructed from scale variation. The inclusion of this covariance matrix by default is used
     where available, however this behaviour can be modified with the flag `use_theorycovmat`.
-
     The theory is specified as part of the dataset.
     A group of datasets is also allowed.
     (as a result of the C++ code layout)."""
     data = dataset.load()
     return (
         DataResult(data, covariance_matrix, sqrt_covmat),
-        ThPredictionsResult.from_convolution(pdf, dataset, cfactor_scale=dataset_scaled_fit_cfactor),
+        ThPredictionsResult.from_convolution(pdf, dataset),
     )
 
 
 
 def dataset_inputs_results(
-    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_scaled_fit_cfactor=None
+    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
 ):
     """Like `results` but for a group of datasets"""
     return results(
-        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_scaled_fit_cfactor=dataset_inputs_scaled_fit_cfactor
+        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
     )
 
 
@@ -548,9 +533,7 @@ def dataset_inputs_abs_chi2_data(dataset_inputs_results):
 
 def phi_data(abs_chi2_data):
     """Calculate phi using values returned by `abs_chi2_data`.
-
     Returns tuple of (float, int): (phi, numpoints)
-
     For more information on how phi is calculated see Eq.(24) in
     1410.8849
     """
@@ -570,18 +553,12 @@ def total_phi_data_from_experiments(experiments_phi_data):
     """Like :py:func:`dataset_inputs_phi_data` except calculate phi for
     each experiment and then sum the contributions. Note that since
     the definition of phi is
-
         phi = sqrt( (<chi2[T_k]> - chi2[<T_k>]) / n_data ),
-
     where k is the replica index, the total phi is
-
         sqrt( sum(n_data*phi**2) / sum(n_data) )
-
     where the sums run over experiment
-
     This is only a valid method of calculating total phi provided that there are
     no inter-experimental correlations.
-
     """
 
     unnorm_phi_squared, ndata = np.sum(
@@ -596,7 +573,6 @@ def dataset_inputs_bootstrap_phi_data(dataset_inputs_results, bootstrap_samples=
     then returns a bootstrap distribution of phi.
     By default `bootstrap_samples` is set to a sensible value (500). However
     a different value can be specified in the runcard.
-
     For more information on how phi is calculated see `phi_data`
     """
     dt, th = dataset_inputs_results
@@ -683,7 +659,6 @@ def procs_chi2_table(
 def closure_shifts(experiments_index, fit, use_cuts, experiments):
     """Save the differenve between the fitted data and the real commondata
     values.
-
     Actually shifts is what should be saved in the first place, rather than
     thi confusing fiddling with Commondata, but until we can implement this at
     the C++ level, we just dave it here.
@@ -734,15 +709,10 @@ chi2_stat_labels = {
 def experiments_chi2_stats(total_chi2_data):
     """Compute several estimators from the chi² for an
     aggregate of experiments:
-
      - central_mean
-
      - npoints
-
      - perreplica_mean
-
      - perreplica_std
-
      - chi2_per_data
     """
     rep_data, central_result, npoints = total_chi2_data
@@ -761,15 +731,10 @@ def experiments_chi2_stats(total_chi2_data):
 
 def chi2_stats(abs_chi2_data):
     """Compute several estimators from the chi²:
-
      - central_mean
-
      - npoints
-
      - perreplica_mean
-
      - perreplica_std
-
      - chi2_per_data
     """
     rep_data, central_result, npoints = abs_chi2_data
@@ -815,10 +780,8 @@ def fits_groups_chi2_table(
     """A table with the chi2 computed with the theory corresponding to each fit
     for all datasets in the fit, grouped according to a key in the metadata, the
     grouping can be controlled with `metadata_group`.
-
     If points_per_data is True, the chi² will be shown divided by ndata.
     Otherwise chi² values will be absolute.
-
     """
     dfs = []
     cols = ("ndata", r"$\chi^2/ndata$") if per_point_data else ("ndata", r"$\chi^2$")
@@ -850,7 +813,6 @@ def fits_groups_phi_table(fits_name_with_covmat_label, fits_groups, fits_groups_
     """For every fit, returns phi and number of data points for each group of
     datasets, which are grouped according to a key in the metadata. The behaviour
     of the grouping can be controlled with `metadata_group` runcard key.
-
     """
     dfs = []
     cols = ("ndata", r"$\phi$")
@@ -1042,10 +1004,8 @@ def total_chi2_data_from_experiments(experiments_chi2_data, pdf):
     """Like :py:func:`dataset_inputs_abs_chi2_data`, except sums the contribution
     from each experiment which is more efficient in the case that the total
     covariance matrix is block diagonal in experiments.
-
     This is valid as long as there are no cross experiment correlations from
     e.g. theory covariance matrices.
-
     """
 
     central_result = np.sum(
@@ -1151,11 +1111,8 @@ def dataspecs_dataset_chi2_difference_table(
 ):
     r"""Returns a table with difference between the chi2 and the expected chi2
     in units of the expected chi2 standard deviation, given by
-
         chi2_diff = (\chi2 - N)/sqrt(2N)
-
     for each dataset for each dataspec.
-
     """
     dfs = []
     cols = [r"$(\chi^2 - N)/\sqrt{2N}$"]
