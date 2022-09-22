@@ -552,8 +552,8 @@ class CoreConfig(configparser.Config):
                                         new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
                             else:
                                 if i == j:
-                                    new_bsm_fac_quad_names.iloc[i][j] = "None_" + bsm_fac_data_names[i]
-                                elif i == j:
+                                    new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]
+                                else:
                                     new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[j]
                                     new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[i]
                     new_bsm_fac_quad_names = new_bsm_fac_quad_names.values.tolist()         
