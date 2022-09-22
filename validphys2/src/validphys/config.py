@@ -443,7 +443,7 @@ class CoreConfig(configparser.Config):
             return bsm_fac_quad_names
         return []
 
-    def produce_bsm_fac_data_scales(self, bsm_fac_data):
+    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
         if bsm_fac_data is not None:
@@ -475,7 +475,7 @@ class CoreConfig(configparser.Config):
         return {}
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, bsm_sector_data, n_bsm_fac_data):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
@@ -563,6 +563,10 @@ class CoreConfig(configparser.Config):
             else:
                 new_bsm_fac_data_names = None
                 new_bsm_fac_quad_names = None
+
+        else:
+            new_bsm_fac_data_names = None
+            new_bsm_fac_quad_names = None
 
         return DataSetInput(
             name=name,
