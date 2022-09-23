@@ -155,8 +155,6 @@ class ThPredictionsResult(StatsResult):
                 "if you want to use the fktable intrinsic cuts set `use_cuts: 'internal'`"
             ) from e
 
-        th_predictions = th_predictions.iloc[:,1:]
-
         label = cls.make_label(pdf, dataset)
 
         return cls(th_predictions, pdf.stats_class, bsm_factor, label)
@@ -335,14 +333,17 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
         ndata = len(dataset.load().get_cv())
-        nrep = len(pdf) - 1
+        nrep = len(pdf)
         return np.ones((ndata, nrep))
 
     fit_bsm_fac_df = pd.DataFrame(
         {k: v.central_value for k, v in parsed_bsm_facs.items()}
     )
     scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
-    return 1 + np.sum(scaled_replicas, axis=2)
+    replica_result = 1 + np.sum(scaled_replicas, axis=2)
+    average_result = np.average(replica_result, axis=1, keepdims=True)
+    result = np.concatenate((average_result, replica_result), axis=1)
+    return result
 
 
 experiments_covmat_collection = collect(
