@@ -112,17 +112,9 @@ class ThPredictionsResult(StatsResult):
     def __init__(self, dataobj, stats_class, bsm_factor, label=None):
         self.stats_class = stats_class
         self.label = label
+        dataobj = pd.DataFrame(dataobj.values * bsm_factor)
         statsobj = stats_class(dataobj.T)
-        self._rawdata = dataobj.values * bsm_factor
         super().__init__(statsobj)
-
-    @property
-    def std_error(self):
-        return np.std(self._rawdata, axis=1)
-
-    @property
-    def central_value(self):
-        return np.mean(self._rawdata, axis=1)
 
     @staticmethod
     def make_label(pdf, dataset):
