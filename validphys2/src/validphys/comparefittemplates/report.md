@@ -11,6 +11,10 @@ We are comparing:
 
 {@ summarise_fits @}
 
+Regularisation summary
+----------------------
+{@summarise_regularisation_settings@}
+
 Theory covariance summary
 -------------------------
 {@summarise_theory_covmat_fits@}

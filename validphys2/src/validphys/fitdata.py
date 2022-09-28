@@ -368,6 +368,12 @@ def fit_theory_covmat_summary(fit, fitthcovmat):
 
 fits_theory_covmat_summary = collect('fit_theory_covmat_summary', ('fits',))
 
+def summarise_regularisation_settings(norm_threshold=None):
+    """Summarise the regularisation of the covariance matrix; for use in vp-comparefits."""
+    if norm_threshold is not None:
+        return f"""Regularising covariance matrices with {norm_threshold=}"""
+    return "Covariance matrices are unregularised."
+
 @table
 def summarise_theory_covmat_fits(fits_theory_covmat_summary):
     """Collects the theory covmat summary for all fits and concatenates them into a single table"""
