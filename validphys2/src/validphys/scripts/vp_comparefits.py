@@ -157,6 +157,10 @@ class CompareFitApp(App):
             default = pwd.getpwuid(os.getuid())[4]
         return prompt_toolkit.prompt("Enter author name: ", default=default)
 
+    def interactive_norm_threshold(self):
+        default = None
+        return prompt_toolkit.prompt("Enter norm threshold: ", default=default)
+
     def interactive_keywords(self):
         if isinstance(self.environment.loader, RemoteLoader):
             completer = WordCompleter(words=KeywordsWithCache(self.environment.loader))
