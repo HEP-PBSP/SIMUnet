@@ -72,6 +72,11 @@ class CompareFitApp(App):
             help="Use the closure comparison template.",
             action='store_true')
 
+        parser.add_argument(
+            '--norm_threshold',
+            default=None,
+            help="The norm_threshold that should be applied, if the fits use regularised covariance matrices.")
+
         parser.set_defaults()
 
     def try_complete_args(self):
@@ -79,7 +84,7 @@ class CompareFitApp(App):
         argnames = (
             'current_fit', 'reference_fit', 'title', 'author', 'keywords')
         optionalnames = (
-            'current_fit_label', 'reference_fit_label')
+            'current_fit_label', 'reference_fit_label', 'norm_threshold')
         boolnames = (
             'thcovmat_if_present',)
         badargs = [argname for argname in argnames if not args[argname]]
@@ -217,6 +222,9 @@ class CompareFitApp(App):
             'speclabel': args['reference_fit_label']
         }
         autosettings['use_thcovmat_if_present'] = args['thcovmat_if_present']
+        if args['norm_threshold'] != None:
+            args['norm_threshold'] = float(args['norm_threshold'])
+        autosettings['norm_threshold']=args['norm_threshold']
         return autosettings
 
 
