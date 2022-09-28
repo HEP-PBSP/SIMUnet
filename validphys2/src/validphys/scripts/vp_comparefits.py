@@ -82,9 +82,9 @@ class CompareFitApp(App):
     def try_complete_args(self):
         args = self.args
         argnames = (
-            'current_fit', 'reference_fit', 'title', 'author', 'keywords')
+            'current_fit', 'reference_fit', 'title', 'author', 'keywords', 'norm_threshold')
         optionalnames = (
-            'current_fit_label', 'reference_fit_label', 'norm_threshold')
+            'current_fit_label', 'reference_fit_label')
         boolnames = (
             'thcovmat_if_present',)
         badargs = [argname for argname in argnames if not args[argname]]
@@ -158,8 +158,14 @@ class CompareFitApp(App):
         return prompt_toolkit.prompt("Enter author name: ", default=default)
 
     def interactive_norm_threshold(self):
-        default = None
-        return prompt_toolkit.prompt("Enter norm threshold: ", default=default)
+        while True:
+            res = prompt_toolkit.prompt("Enter norm threshold: ")
+            if not res:
+                return None
+            try:
+                return float(res)
+            except ValueError:
+                continue
 
     def interactive_keywords(self):
         if isinstance(self.environment.loader, RemoteLoader):
