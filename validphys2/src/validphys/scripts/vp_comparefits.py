@@ -75,7 +75,7 @@ class CompareFitApp(App):
         parser.add_argument(
             '--norm_threshold',
             default=None,
-            help="The norm_threshold that should be applied, if the fits use regularised covariance matrices.")
+            help="Covariance matrix regularisation threshold.")
 
         parser.set_defaults()
 
