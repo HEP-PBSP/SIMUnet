@@ -20,27 +20,31 @@ CURRENT_FIT_LABEL_DEFAULT = "Current Fit"
 REFERENCE_FIT_LABEL_DEFAULT = "Reference Fit"
 
 
+class Undefined:
+    """Sentinel for arguments that need to be specified explicitly and are not.
+    This is so we can have None for defaults where it makes sense.
+    """
 
 class CompareFitApp(App):
     def add_positional_arguments(self, parser):
         parser.add_argument(
             'current_fit',
-            default=None,
+            default=Undefined,
             nargs='?',
             help="The fit to produce the report for.",
         )
         parser.add_argument(
             'reference_fit',
-            default=None,
+            default=Undefined,
             nargs='?',
             help="The fit to compare with.")
         # Group together mandatory arguments that are not positional
         mandatory = parser.add_argument_group("mandatory", "Mandatory command line arguments")
         mandatory.add_argument(
-            '--title', help="The title that will be indexed with the report.")
-        mandatory.add_argument('--author', help="The author of the report.")
+            '--title', help="The title that will be indexed with the report.", default=Undefined)
+        mandatory.add_argument('--author', help="The author of the report.", default=Undefined)
         mandatory.add_argument(
-            '--keywords', nargs='+', help="keywords to index the report with.")
+            '--keywords', nargs='+', help="keywords to index the report with.", default=Undefined)
 
         parser.add_argument(
             '--thcovmat_if_present',
@@ -87,7 +91,7 @@ class CompareFitApp(App):
             'current_fit_label', 'reference_fit_label')
         boolnames = (
             'thcovmat_if_present',)
-        badargs = [argname for argname in argnames if not args[argname]]
+        badargs = [argname for argname in argnames if args[argname] is Undefined]
         badbools = [bname for bname in boolnames if args[bname] is None]
         bad = badargs + badbools
         if bad and not args['interactive']:
