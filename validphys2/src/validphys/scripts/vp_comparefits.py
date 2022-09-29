@@ -20,27 +20,31 @@ CURRENT_FIT_LABEL_DEFAULT = "Current Fit"
 REFERENCE_FIT_LABEL_DEFAULT = "Reference Fit"
 
 
+class Undefined:
+    """Sentinel for arguments that need to be specified explicitly and are not.
+    This is so we can have None for defaults where it makes sense.
+    """
 
 class CompareFitApp(App):
     def add_positional_arguments(self, parser):
         parser.add_argument(
             'current_fit',
-            default=None,
+            default=Undefined,
             nargs='?',
             help="The fit to produce the report for.",
         )
         parser.add_argument(
             'reference_fit',
-            default=None,
+            default=Undefined,
             nargs='?',
             help="The fit to compare with.")
         # Group together mandatory arguments that are not positional
         mandatory = parser.add_argument_group("mandatory", "Mandatory command line arguments")
         mandatory.add_argument(
-            '--title', help="The title that will be indexed with the report.")
-        mandatory.add_argument('--author', help="The author of the report.")
+            '--title', help="The title that will be indexed with the report.", default=Undefined)
+        mandatory.add_argument('--author', help="The author of the report.", default=Undefined)
         mandatory.add_argument(
-            '--keywords', nargs='+', help="keywords to index the report with.")
+            '--keywords', nargs='+', help="keywords to index the report with.", default=Undefined)
 
         parser.add_argument(
             '--thcovmat_if_present',
@@ -72,17 +76,22 @@ class CompareFitApp(App):
             help="Use the closure comparison template.",
             action='store_true')
 
+        parser.add_argument(
+            '--norm_threshold',
+            default=None,
+            help="Covariance matrix regularisation threshold.")
+
         parser.set_defaults()
 
     def try_complete_args(self):
         args = self.args
         argnames = (
-            'current_fit', 'reference_fit', 'title', 'author', 'keywords')
+            'current_fit', 'reference_fit', 'title', 'author', 'keywords', 'norm_threshold')
         optionalnames = (
             'current_fit_label', 'reference_fit_label')
         boolnames = (
             'thcovmat_if_present',)
-        badargs = [argname for argname in argnames if not args[argname]]
+        badargs = [argname for argname in argnames if args[argname] is Undefined]
         badbools = [bname for bname in boolnames if args[bname] is None]
         bad = badargs + badbools
         if bad and not args['interactive']:
@@ -152,6 +161,16 @@ class CompareFitApp(App):
             default = pwd.getpwuid(os.getuid())[4]
         return prompt_toolkit.prompt("Enter author name: ", default=default)
 
+    def interactive_norm_threshold(self):
+        while True:
+            res = prompt_toolkit.prompt("Enter norm threshold: ")
+            if not res:
+                return None
+            try:
+                return float(res)
+            except ValueError:
+                continue
+
     def interactive_keywords(self):
         if isinstance(self.environment.loader, RemoteLoader):
             completer = WordCompleter(words=KeywordsWithCache(self.environment.loader))
@@ -217,6 +236,9 @@ class CompareFitApp(App):
             'speclabel': args['reference_fit_label']
         }
         autosettings['use_thcovmat_if_present'] = args['thcovmat_if_present']
+        if args['norm_threshold'] != None:
+            args['norm_threshold'] = float(args['norm_threshold'])
+        autosettings['norm_threshold']=args['norm_threshold']
         return autosettings
 
 

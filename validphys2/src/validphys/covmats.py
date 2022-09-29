@@ -28,6 +28,11 @@ log = logging.getLogger(__name__)
 
 INTRA_DATASET_SYS_NAME = ("UNCORR", "CORR", "THEORYUNCORR", "THEORYCORR")
 
+def summarise_regularisation_settings(norm_threshold=None):
+    """Summarise the regularisation of the covariance matrix; for use in vp-comparefits."""
+    if norm_threshold is not None:
+        return f"""Regularising covariance matrices with {norm_threshold=}"""
+    return "Covariance matrices are unregularised."
 
 def covmat_from_systematics(
     loaded_commondata_with_cuts,
