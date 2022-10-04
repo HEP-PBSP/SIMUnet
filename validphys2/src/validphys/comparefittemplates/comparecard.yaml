@@ -99,11 +99,7 @@ lumi_report:
   meta: Null
   template: lumi.md
 
-bsm_report:
-  meta: Null
-  template: bsm.md
-
-template: report.md
+template: basic_report.md
 
 positivity:
   from_: fit
