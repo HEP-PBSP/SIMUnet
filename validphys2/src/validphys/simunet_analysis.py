@@ -5,7 +5,6 @@ Plots and analysis tools for SIMUnet.
 from __future__ import generator_stop
 
 import logging
-from multiprocessing import BoundedSemaphore
 
 import numpy as np
 import numpy.linalg as la
