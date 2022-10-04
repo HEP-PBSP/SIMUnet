@@ -40,7 +40,7 @@ def display_format(series):
     ----------
         series: pd.Series
     """
-    return list(map(lambda x: "{:.2e}".format(x) , list(series)))
+    return [format_number(x, digits=2) for x in series]
 
 @figuregen
 def plot_nd_bsm_facs(fit):
