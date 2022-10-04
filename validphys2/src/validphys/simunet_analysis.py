@@ -184,7 +184,6 @@ def plot_2d_bsm_facs(fit, replica_data):
 
     return fig
 
-@figure
 def _select_plot_2d_bsm_facs(fit, replica_data, pair):
     """
     Auxiliary function to plot 2D plots
