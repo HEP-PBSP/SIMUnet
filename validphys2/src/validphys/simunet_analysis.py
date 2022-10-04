@@ -253,7 +253,7 @@ def plot_bsm_2d_combs(fit, replica_data):
     bsm_facs_df = read_bsm_facs(paths)
     labels = bsm_facs_df.columns 
 
-    combs = list(itertools.combinations(labels, 2))
+    combs = itertools.combinations(labels, 2)
     for comb in combs:
         fig = _select_plot_2d_bsm_facs(fit, replica_data, pair=comb)
         yield fig 
