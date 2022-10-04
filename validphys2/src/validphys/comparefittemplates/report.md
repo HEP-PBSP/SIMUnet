@@ -117,12 +117,6 @@ Dataset differences and cuts
 
 SIMUnet analysis
 ----------------
-### BSM factor distributions
-{@fits plot_nd_bsm_facs@}
-
-### BSM factor bounds
-{@fits bsm_facs_bounds@}
-
 ### Comparison histograms of BSM factors
 {@plot_nd_bsm_facs_fits@}
 
