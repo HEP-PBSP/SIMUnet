@@ -185,63 +185,60 @@ def plot_2d_bsm_facs(fit, replica_data):
     return fig
 
 @figure
-def _select_plot_2d_bsm_facs(fit, replica_data, pair=None):
+def _select_plot_2d_bsm_facs(fit, replica_data, pair):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
     with BSM factors
     """
-    if pair is None:
-        return plot_2d_bsm_facs(fit, replica_data)
-    else:
-        op_1, op_2 = pair
-        paths = replica_paths(fit)
-        bsm_facs_df = read_bsm_facs(paths)
-        bsm_facs_df = bsm_facs_df[[op_1, op_2]]
-        labels = bsm_facs_df.columns
+    op_1, op_2 = pair
+    paths = replica_paths(fit)
+    bsm_facs_df = read_bsm_facs(paths)
+    bsm_facs_df = bsm_facs_df[[op_1, op_2]]
+    labels = bsm_facs_df.columns
 
-        chi2 = [info.chi2 for info in replica_data]
+    chi2 = [info.chi2 for info in replica_data]
 
-        fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
 
-        chi2 = [info.chi2 for info in replica_data]
+    chi2 = [info.chi2 for info in replica_data]
 
-        scatter_plot = ax.scatter(
-            bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
-        )
+    scatter_plot = ax.scatter(
+        bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
+    )
 
-        # create new axes to the bottom of the scatter plot
-        # for the colourbar 
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("bottom", size="15%", pad=0.7)
-        fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
+    # create new axes to the bottom of the scatter plot
+    # for the colourbar 
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
-        # set scientific notation for thei scatter plot
-        ax.ticklabel_format(
-            axis='both', scilimits=(0, 0), style='sci', useOffset=True
-        )
+    # set scientific notation for thei scatter plot
+    ax.ticklabel_format(
+        axis='both', scilimits=(0, 0), style='sci', useOffset=True
+    )
 
-        # append axes to the top and to the right for the histograms 
-        ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
-        ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+    # append axes to the top and to the right for the histograms 
+    ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+    ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
 
-        # Make some labels invisible
-        ax_histx.xaxis.set_tick_params(labelbottom=False)
-        ax_histy.yaxis.set_tick_params(labelleft=False)
+    # Make some labels invisible
+    ax_histx.xaxis.set_tick_params(labelbottom=False)
+    ax_histy.yaxis.set_tick_params(labelleft=False)
 
-        # populate the histograms
-        ax_histx.hist(bsm_facs_df.iloc[:, 0])
-        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+    # populate the histograms
+    ax_histx.hist(bsm_facs_df.iloc[:, 0])
+    ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
 
-        ax_histx.grid(False)
-        ax_histy.grid(False)
+    ax_histx.grid(False)
+    ax_histy.grid(False)
 
-        ax.set_xlabel(labels[0])
-        ax.set_ylabel(labels[1])
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
 
-        ax.set_axisbelow(True)
+    ax.set_axisbelow(True)
 
-        return fig
+    return fig
 
 @figuregen
 def plot_bsm_2d_combs(fit, replica_data):
