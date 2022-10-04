@@ -118,7 +118,7 @@ Dataset differences and cuts
 SIMUnet analysis
 ----------------
 
-BSM factor distributions
+Individual BSM factor distributions
 ----------------
 {@fits plot_nd_bsm_facs@}
 
