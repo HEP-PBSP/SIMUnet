@@ -5,12 +5,14 @@ Plots and analysis tools for SIMUnet.
 from __future__ import generator_stop
 
 import logging
+from multiprocessing import BoundedSemaphore
 
 import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
+import itertools
 
 from reportengine.figure import figure, figuregen
 from reportengine.checks import make_check, CheckError, make_argcheck, check
@@ -19,16 +21,41 @@ from reportengine.table import table
 
 from validphys import plotutils
 
+from validphys.fitdata import replica_paths
+from validphys.fitdata import read_bsm_facs
+
 log = logging.getLogger(__name__)
 
 
+"""
+Format routines
+---------------
+"""
+def display_format(series):
+    """
+    Determines the format of the BSM factors
+    to be displayed in the tables
+    Parameters
+    ----------
+        series: pd.Series
+    """
+    return list(map(lambda x: "{:.2e}".format(x) , list(series)))
+
+def format_n(number):
+    return "{:.2e}".format(number)
+"""
+---------------
+"""
+
 @figuregen
-def plot_nd_bsm_facs(read_bsm_facs):
+def plot_nd_bsm_facs(fit):
     """Plot a histogram for each BSM coefficient.
     The nd is used for n-dimensional, if two BSM facs 
     are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
     """
-    for label, column in read_bsm_facs.iteritems():
+    paths = replica_paths(fit)
+    bsm_facs_df = read_bsm_facs(paths)
+    for label, column in bsm_facs_df.iteritems():
         # TODO: surely there is a better way
         if label == 'Cb':
             label = r"$\mathbf{C}_{33}^{D\mu}$"
@@ -42,6 +69,37 @@ def plot_nd_bsm_facs(read_bsm_facs):
         ax.set_xlabel(label)
         ax.grid(False)
 
+        yield fig
+
+@figuregen
+def plot_nd_bsm_facs_fits(fits):
+    """
+    Compare histograms of BSM factors between different fits 
+    in SIMUnet
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.extend(bsm_fac_ops)
+    all_ops = list(dict.fromkeys(all_ops))
+    
+    # plot all operators 
+    for op in all_ops:
+        fig, ax = plt.subplots()
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                ax.hist(bsm_facs_df.get([op]).values, alpha=0.5, label=fit.name)
+                ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
+                ax.set_title(f"Distribution for {op} coefficient")
+                ax.set_ylabel("Count")
+                ax.set_xlabel(op)
+                ax.legend()
+                ax.grid(False)
         yield fig
 
 @figuregen
@@ -80,21 +138,24 @@ def _check_two_bsm_facs(fit):
     )
 
 @figure
-@_check_two_bsm_facs
-def plot_2d_bsm_facs(read_bsm_facs, replica_data):
+#@_check_two_bsm_facs
+def plot_2d_bsm_facs(fit, replica_data):
     """
     Plot two dimensional distributions of the BSM coefficient
     results
     """
-    labels = read_bsm_facs.columns
-    assert len(labels) == 2
+    paths = replica_paths(fit)
+    bsm_facs_df = read_bsm_facs(paths)
+    labels = bsm_facs_df.columns
+
+    chi2 = [info.chi2 for info in replica_data]
 
     fig, ax = plt.subplots()
 
     chi2 = [info.chi2 for info in replica_data]
 
     scatter_plot = ax.scatter(
-        read_bsm_facs.iloc[:, 0], read_bsm_facs.iloc[:, 1], c=chi2
+        bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
     )
 
     # create new axes to the bottom of the scatter plot
@@ -117,16 +178,95 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     ax_histy.yaxis.set_tick_params(labelleft=False)
 
     # populate the histograms
-    ax_histx.hist(read_bsm_facs.iloc[:, 0])
-    ax_histy.hist(read_bsm_facs.iloc[:, 1], orientation='horizontal')
+    ax_histx.hist(bsm_facs_df.iloc[:, 0])
+    ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
 
     ax_histx.grid(False)
     ax_histy.grid(False)
 
     ax.set_xlabel(labels[0])
     ax.set_ylabel(labels[1])
+    ax.set_axisbelow(True)
 
     return fig
+
+@figure
+def _select_plot_2d_bsm_facs(fit, replica_data, pair=None):
+    """
+    Auxiliary function to plot 2D plots
+    of pair of operators in a N-dimensional fits
+    with BSM factors
+    """
+    if pair is None:
+        return plot_2d_bsm_facs(fit, replica_data)
+    else:
+        op_1, op_2 = pair
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_facs_df = bsm_facs_df[[op_1, op_2]]
+        labels = bsm_facs_df.columns
+
+        chi2 = [info.chi2 for info in replica_data]
+
+        fig, ax = plt.subplots()
+
+        chi2 = [info.chi2 for info in replica_data]
+
+        scatter_plot = ax.scatter(
+            bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
+        )
+
+        # create new axes to the bottom of the scatter plot
+        # for the colourbar 
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("bottom", size="15%", pad=0.7)
+        fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
+
+        # set scientific notation for thei scatter plot
+        ax.ticklabel_format(
+            axis='both', scilimits=(0, 0), style='sci', useOffset=True
+        )
+
+        # append axes to the top and to the right for the histograms 
+        ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+        ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+        # Make some labels invisible
+        ax_histx.xaxis.set_tick_params(labelbottom=False)
+        ax_histy.yaxis.set_tick_params(labelleft=False)
+
+        # populate the histograms
+        ax_histx.hist(bsm_facs_df.iloc[:, 0])
+        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+
+        ax_histx.grid(False)
+        ax_histy.grid(False)
+
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
+
+        ax.set_axisbelow(True)
+
+        return fig
+
+@figuregen
+def plot_bsm_2d_combs(fit, replica_data):
+    """
+    Plot two dimensional distributions for all pairs
+    of BSM coefficients in a fit
+    Parameters
+    ----------
+        fit: FitSpec
+        replica_data : list
+    """
+    paths = replica_paths(fit)
+    bsm_facs_df = read_bsm_facs(paths)
+    labels = bsm_facs_df.columns 
+
+    combs = list(itertools.combinations(labels, 2))
+    for comb in combs:
+        fig = _select_plot_2d_bsm_facs(fit, replica_data, pair=comb)
+        yield fig 
 
 @figure
 def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
@@ -157,41 +297,148 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
 
         return fig
 
-
 @table
-def bsm_facs_bounds(read_bsm_facs):
-    """Table generator to summarise information about
+def bsm_facs_bounds(fit):
+    """
+    Table generator to summarise information about
     the BSM coefficient results.
+    Paramaters
+    ----------
+        fit: FitSpec 
     The returned table contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the 68% (95%) confidence level by 
     computing mean ± std (mean ± 2*std).
     """ 
+    paths = replica_paths(fit)
+    bsm_facs_df = read_bsm_facs(paths)
+
     # Get the numbers from the dataframe
-    means = read_bsm_facs.mean()
-    stds = read_bsm_facs.std()
+    means = bsm_facs_df.mean()
+    stds = bsm_facs_df.std()
     
     cl68_lower, cl68_upper = (means - stds, means + stds)
     cl95_lower, cl95_upper = (means - 2 * stds, means + 2 * stds)
 
     # Format the numbers to display 
-    means_disp = list(map(lambda x: "{:.2e}".format(x) , list(means)))
-    stds_disp = list(map(lambda x: "{:.2e}".format(x) , list(stds)))
+    means_disp = display_format(means) 
+    stds_disp = display_format(stds) 
     
-    cl68_lower_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl68_lower)))
-    cl68_upper_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl68_upper)))
-    
-    cl95_lower_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl95_lower)))
-    cl95_upper_disp = list(map(lambda x: "{:.2e}".format(x) , list(cl95_upper)))
+    cl68_lower_disp = display_format(cl68_lower)
+    cl68_upper_disp = display_format(cl68_upper) 
 
+    cl95_lower_disp = display_format(cl95_lower)
+    cl95_upper_disp = display_format(cl95_upper) 
+    
     # fill the dataframe
-    df = pd.DataFrame(index=read_bsm_facs.columns)
-    df['68cl bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
-    df['95cl bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
-    df['mean'] = means_disp
-    df['std'] = stds_disp
+    df = pd.DataFrame(index=bsm_facs_df.columns)
+    df['68% CL bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
+    df['95% CL bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
+    df['Mean'] = means_disp
+    df['Std'] = stds_disp
     
     return df
+
+@table
+def bsm_facs_bounds_fits(fits, n_sigma):
+    """
+    Table generator to summarise information about
+    the BSM coefficient results.
+    Paramaters
+    ----------
+        fits: NSList of FitSpec 
+    The returned table contains information about the mean
+    and standard deviation of the BSM coefficients in the fit, 
+    as well as showing the confidence levels by 
+    computing mean ± n_sigma * std.
+    """ 
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.extend(bsm_fac_ops)
+    all_ops = list(dict.fromkeys(all_ops))
+
+    fit_names =  [fit.name for fit in fits]
+    extra_metrics = ['Best-fit shift', 'Broadening']
+    # include extra metrics in columns
+    fit_names.extend(extra_metrics)
+
+    # Initialise df 
+    df = pd.DataFrame(index=all_ops, columns=fit_names)
+    
+    # plot all operators 
+    for op in all_ops:
+        best_fits = []
+        bound_lengths = []
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                mean =  values.mean()
+                std = values.std()
+                cl_lower, cl_upper = (mean - n_sigma * std, mean + n_sigma * std)
+                lower_dis = format_n(cl_lower)
+                upper_dis = format_n(cl_upper)
+                df[fit.name].loc[op] = f"({lower_dis}, {upper_dis})"
+                # best-fit value
+                best_fits.append(mean)
+                # calculate bound length
+                length = cl_upper - cl_lower
+                bound_lengths.append(length)
+            else:
+                df[fit.name].loc[op] = 'Not in fit'
+                # if the operator is not in the fit, then assume SM
+                # for best-fit value
+                best_fits.append(0.0)
+                bound_lengths.append(0.0)
+        # best-fit shift column
+        df['Best-fit shift'].loc[op] = best_fits[0] - best_fits[1]
+        # broadening column
+        curr_len, ref_len = bound_lengths
+        if ref_len > 0:
+            df['Broadening'].loc[op] = str((curr_len - ref_len) / ref_len * 100.0) + ' %'
+        else:
+            df['Broadening'].loc[op] = 'Does not apply'
+
+    # formatting columns
+    for column in df.columns[:2]:
+        if n_sigma == 2:
+            df = df.rename(columns={column: f'95% CL - {column}'})
+        else:
+            df = df.rename(columns={column: f'68% CL - {column}'})
+
+    mapping = {df.columns[0]: '(Current) ' + df.columns[0],
+    df.columns[1]: '(Reference) ' + df.columns[1]}
+
+    df = df.rename(columns=mapping)
+
+    return df
+
+@table
+def bsm_facs_68bounds_fits(fits):
+    """
+    Table generator to obtain the 68% CL
+    for BSM factors while comparing fits.
+    Parameters
+    ----------
+        fits: NSList of FitSpec 
+    """ 
+    return bsm_facs_bounds_fits(fits, n_sigma=1)
+
+@table
+def bsm_facs_95bounds_fits(fits):
+    """
+    Table generator to obtain the 95% CL
+    for BSM factors while comparing fits.
+    Parameters
+    ----------
+        fits: NSList of FitSpec 
+    """ 
+    return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 _read_pdf_cfactors = collect("read_bsm_facs", ("pdffit",))
 
