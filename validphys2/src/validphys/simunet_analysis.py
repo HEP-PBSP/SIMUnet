@@ -18,6 +18,7 @@ from reportengine.figure import figure, figuregen
 from reportengine.checks import make_check, CheckError, make_argcheck, check
 from reportengine import collect
 from reportengine.table import table
+from reportengine.floatformatting import format_number
 
 from validphys import plotutils
 
@@ -40,12 +41,6 @@ def display_format(series):
         series: pd.Series
     """
     return list(map(lambda x: "{:.2e}".format(x) , list(series)))
-
-def format_n(number):
-    return "{:.2e}".format(number)
-"""
----------------
-"""
 
 @figuregen
 def plot_nd_bsm_facs(fit):
@@ -381,8 +376,8 @@ def bsm_facs_bounds_fits(fits, n_sigma):
                 mean =  values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - n_sigma * std, mean + n_sigma * std)
-                lower_dis = format_n(cl_lower)
-                upper_dis = format_n(cl_upper)
+                lower_dis = format_number(cl_lower, digits=2)
+                upper_dis = format_number(cl_upper, digits=2)
                 df[fit.name].loc[op] = f"({lower_dis}, {upper_dis})"
                 # best-fit value
                 best_fits.append(mean)
@@ -396,13 +391,13 @@ def bsm_facs_bounds_fits(fits, n_sigma):
                 best_fits.append(0.0)
                 bound_lengths.append(0.0)
         # best-fit shift column
-        df['Best-fit shift'].loc[op] = best_fits[0] - best_fits[1]
+        df['Best-fit shift'].loc[op] = format_number(best_fits[0] - best_fits[1], digits=2)
         # broadening column
         curr_len, ref_len = bound_lengths
         if ref_len > 0:
-            df['Broadening'].loc[op] = str((curr_len - ref_len) / ref_len * 100.0) + ' %'
+            df['Broadening'].loc[op] = str((curr_len - ref_len) / ref_len * 100.0) + '%'
         else:
-            df['Broadening'].loc[op] = 'Does not apply'
+            df['Broadening'].loc[op] = 'n/a'
 
     # formatting columns
     for column in df.columns[:2]:
