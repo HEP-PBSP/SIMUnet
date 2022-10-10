@@ -75,8 +75,9 @@ def plot_nd_bsm_facs_fits(fits):
         paths = replica_paths(fit)
         bsm_facs_df = read_bsm_facs(paths)
         bsm_fac_ops = bsm_facs_df.columns.tolist()
-        all_ops.extend(bsm_fac_ops)
-    all_ops = list(dict.fromkeys(all_ops))
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators
+    all_ops = {o for fit_ops in all_ops for o in fit_ops} 
     
     # plot all operators 
     for op in all_ops:
@@ -390,10 +391,10 @@ def bsm_facs_bounds_fits(fits, n_sigma):
 
     # formatting columns
     for column in df.columns[:2]:
-        if n_sigma == 2:
-            df = df.rename(columns={column: f'95% CL - {column}'})
-        else:
+        if n_sigma == 1:
             df = df.rename(columns={column: f'68% CL - {column}'})
+        elif n_sigma == 2:
+            df = df.rename(columns={column: f'95% CL - {column}'})
 
     mapping = {df.columns[0]: '(Current) ' + df.columns[0],
     df.columns[1]: '(Reference) ' + df.columns[1]}
