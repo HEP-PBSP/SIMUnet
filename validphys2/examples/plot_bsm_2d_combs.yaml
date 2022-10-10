@@ -1,0 +1,12 @@
+meta:
+  title: Scatter plots of all pair of BSM factors and chi2 per replica
+  author: Manuel Morales Alvarado
+  keywords: [simunet, plot]
+
+fit: 220927_MMA_fit_2 
+
+template_text: |
+ # Plot 
+ {@plot_bsm_2d_combs@}
+actions_:
+  - report(main=True)
