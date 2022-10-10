@@ -82,8 +82,8 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
 
         if name[:4] == "None":
             # Now is the time to make a dummy BSM-factor
-            central = [0.0]*len(cuts)
-            uncertainty = [0.0]*len(cuts)
+            central = np.array([0.0]*len(cuts))
+            uncertainty = np.array([0.0]*len(cuts))
             cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
 
         else:

@@ -38,6 +38,8 @@ from validphys.convolution import (
     PredictionsRequireCutsError,
 )
 
+from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+from validphys.n3fit_data_utils import parse_bsm_fac_quad_names_CF
 
 log = logging.getLogger(__name__)
 
@@ -108,9 +110,10 @@ class DataResult(StatsResult):
 class ThPredictionsResult(StatsResult):
     """Class holding theory prediction, inherits from StatsResult"""
 
-    def __init__(self, dataobj, stats_class, label=None):
+    def __init__(self, dataobj, stats_class, bsm_factor, label=None):
         self.stats_class = stats_class
         self.label = label
+        dataobj = pd.DataFrame(dataobj.values * bsm_factor)
         statsobj = stats_class(dataobj.T)
         super().__init__(statsobj)
 
@@ -130,7 +133,7 @@ class ThPredictionsResult(StatsResult):
         return label
 
     @classmethod
-    def from_convolution(cls, pdf, dataset):
+    def from_convolution(cls, pdf, dataset, bsm_factor):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -147,7 +150,7 @@ class ThPredictionsResult(StatsResult):
 
         label = cls.make_label(pdf, dataset)
 
-        return cls(th_predictions, pdf.stats_class, label)
+        return cls(th_predictions, pdf.stats_class, bsm_factor, label)
 
 
 class PositivityResult(StatsResult):
@@ -301,6 +304,57 @@ def group_result_table_68cl(
     return res
 
 
+def dataset_inputs_bsm_factor(data, pdf, read_bsm_facs):
+    """Same as :py:func:`validphys.results.dataset_bsm_factor`
+    but for a list of dataset inputs.
+    """
+    res =  np.concatenate(
+        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets]
+    )
+    return res
+
+def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
+    """For each replica of ``pdf``, scale the fitted BSM-factors by
+    the best fit value.
+    Returns
+    -------
+    res: np.arrays
+        An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
+    """
+    parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
+    parsed_bsm_quad_facs = parse_bsm_fac_quad_names_CF(dataset.bsm_fac_quad_names_CF, dataset.cuts)
+    if parsed_bsm_facs is None:
+        # We want an array of ones that ndata x nrep
+        # where ndata is the number of post cut datapoints
+        ndata = len(dataset.load().get_cv())
+        nrep = len(pdf)
+        return np.ones((ndata, nrep))
+
+    fit_bsm_fac_df = pd.DataFrame(
+        {k: v.central_value for k, v in parsed_bsm_facs.items()}
+    )
+    scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
+    _, nops = read_bsm_facs.shape
+    if parsed_bsm_quad_facs is not None:
+        # We must also apply quadratic C-factors
+        quad_bsm_fac_df = pd.DataFrame(
+            {k: v.central_value for k, v in parsed_bsm_quad_facs.items()}
+        )
+        for i in range(nops):
+            for j in range(nops):
+                if i <= j:
+                    # Add the contribution from the quadratic
+                    op_products = read_bsm_facs.iloc[:,i].values * read_bsm_facs.iloc[:,j].values
+                    op_name = dataset.bsm_fac_quad_names[i][j] 
+                    op_values = quad_bsm_fac_df[op_name]
+                    np.append(scaled_replicas, op_products[:,np.newaxis] * op_values.values[np.newaxis, :, np.newaxis], axis=2)               
+
+    replica_result = 1 + np.sum(scaled_replicas, axis=2)
+    average_result = np.mean(replica_result, axis=1, keepdims=True)
+    result = np.concatenate((average_result, replica_result), axis=1)
+    return result
+
+
 experiments_covmat_collection = collect(
     "dataset_inputs_covariance_matrix", ("group_dataset_inputs_by_experiment",)
 )
@@ -447,7 +501,7 @@ def procs_corrmat(procs_covmat):
     return groups_corrmat(procs_covmat)
 
 
-def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat):
+def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_bsm_factor):
     """Tuple of data and theory results for a single pdf. The data will have an associated
     covariance matrix, which can include a contribution from the theory covariance matrix which
     is constructed from scale variation. The inclusion of this covariance matrix by default is used
@@ -458,17 +512,17 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat):
     data = dataset.load()
     return (
         DataResult(data, covariance_matrix, sqrt_covmat),
-        ThPredictionsResult.from_convolution(pdf, dataset),
+        ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor),
     )
 
 
 
 def dataset_inputs_results(
-    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
+    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor
 ):
     """Like `results` but for a group of datasets"""
     return results(
-        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat
+        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor
     )
 
 
