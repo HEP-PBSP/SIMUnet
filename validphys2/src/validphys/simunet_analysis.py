@@ -42,14 +42,12 @@ def display_format(series):
     return [format_number(x, digits=2) for x in series]
 
 @figuregen
-def plot_nd_bsm_facs(fit):
+def plot_nd_bsm_facs(read_bsm_facs):
     """Plot a histogram for each BSM coefficient.
     The nd is used for n-dimensional, if two BSM facs 
     are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
     """
-    paths = replica_paths(fit)
-    bsm_facs_df = read_bsm_facs(paths)
-    for label, column in bsm_facs_df.iteritems():
+    for label, column in read_bsm_facs.iteritems():
         # TODO: surely there is a better way
         if label == 'Cb':
             label = r"$\mathbf{C}_{33}^{D\mu}$"
@@ -133,13 +131,12 @@ def _check_two_bsm_facs(fit):
 
 @figure
 #@_check_two_bsm_facs
-def plot_2d_bsm_facs(fit, replica_data):
+def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     """
     Plot two dimensional distributions of the BSM coefficient
     results
     """
-    paths = replica_paths(fit)
-    bsm_facs_df = read_bsm_facs(paths)
+    bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns
 
     chi2 = [info.chi2 for info in replica_data]
@@ -184,15 +181,14 @@ def plot_2d_bsm_facs(fit, replica_data):
 
     return fig
 
-def _select_plot_2d_bsm_facs(fit, replica_data, pair):
+def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
     with BSM factors
     """
     op_1, op_2 = pair
-    paths = replica_paths(fit)
-    bsm_facs_df = read_bsm_facs(paths)
+    bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df[[op_1, op_2]]
     labels = bsm_facs_df.columns
 
@@ -240,22 +236,21 @@ def _select_plot_2d_bsm_facs(fit, replica_data, pair):
     return fig
 
 @figuregen
-def plot_bsm_2d_combs(fit, replica_data):
+def plot_bsm_2d_combs(read_bsm_facs, replica_data):
     """
     Plot two dimensional distributions for all pairs
     of BSM coefficients in a fit
     Parameters
     ----------
-        fit: FitSpec
+        read_bsm_facs: pd.Dataframe 
         replica_data : list
     """
-    paths = replica_paths(fit)
-    bsm_facs_df = read_bsm_facs(paths)
+    bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns 
 
     combs = itertools.combinations(labels, 2)
     for comb in combs:
-        fig = _select_plot_2d_bsm_facs(fit, replica_data, pair=comb)
+        fig = _select_plot_2d_bsm_facs(bsm_facs_df, replica_data, pair=comb)
         yield fig 
 
 @figure
@@ -288,20 +283,19 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
         return fig
 
 @table
-def bsm_facs_bounds(fit):
+def bsm_facs_bounds(read_bsm_facs):
     """
     Table generator to summarise information about
     the BSM coefficient results.
     Paramaters
     ----------
-        fit: FitSpec 
+        read_bsm_facs: pd.Dataframe
     The returned table contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the 68% (95%) confidence level by 
     computing mean ± std (mean ± 2*std).
     """ 
-    paths = replica_paths(fit)
-    bsm_facs_df = read_bsm_facs(paths)
+    bsm_facs_df = read_bsm_facs
 
     # Get the numbers from the dataframe
     means = bsm_facs_df.mean()
