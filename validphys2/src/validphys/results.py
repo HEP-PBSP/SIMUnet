@@ -350,7 +350,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
                     np.append(scaled_replicas, op_products[:,np.newaxis] * op_values.values[np.newaxis, :, np.newaxis], axis=2)               
 
     replica_result = 1 + np.sum(scaled_replicas, axis=2)
-    average_result = np.average(replica_result, axis=1, keepdims=True)
+    average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
     return result
 
