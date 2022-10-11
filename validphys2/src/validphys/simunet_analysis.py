@@ -142,7 +142,7 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
     chi2 = [info.chi2 for info in replica_data]
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(1, 1, figsize=(5, 5))
 
     chi2 = [info.chi2 for info in replica_data]
 
@@ -153,7 +153,8 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     # create new axes to the bottom of the scatter plot
     # for the colourbar 
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    # the width of the colorbar can be changed with `size`
+    cax = divider.append_axes("bottom", size="8%", pad=0.7)
     fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
     # set scientific notation for thei scatter plot
@@ -195,7 +196,9 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
 
     chi2 = [info.chi2 for info in replica_data]
 
-    fig, ax = plt.subplots()
+    # we use this figsize to have a square scatter plot
+    # smaller values do not display too well
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
     chi2 = [info.chi2 for info in replica_data]
 
