@@ -343,11 +343,11 @@ def plot_2d_bsm_facs_fits(fits):
     # Remove repeated operators
     all_ops = {o for fit_ops in all_ops for o in fit_ops}
     # get all pairs
-    pairs = list(itertools.combinations(all_ops, 2))
+    pairs = itertools.combinations(all_ops, 2)
     # plot all pairs of operators
     for pair in pairs:
         op_1, op_2 = pair
-
+        # use this size to keep them sqaure
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
         ax.ticklabel_format(
             axis='both', scilimits=(0, 0), style='sci', useOffset=True
@@ -365,13 +365,14 @@ def plot_2d_bsm_facs_fits(fits):
         for fit in fits:
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
-            scatter_plot = ax.scatter(
-                bsm_facs_df[op_1], bsm_facs_df[op_2], label=fit.name, alpha=0.5, s=40
-            )
-
-            # populate the histograms
-            ax_histx.hist(bsm_facs_df[op_1], alpha=0.5)
-            ax_histy.hist(bsm_facs_df[op_2], orientation='horizontal', alpha=0.5)
+            # display the result in the figure only if the fit has the two operators in the pair
+            if bsm_facs_df.get([op_1]) is not None and bsm_facs_df.get([op_2]) is not None:
+                ax.scatter(
+                    bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.name, alpha=0.5, s=40
+                )
+                # populate the histograms
+                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5)
+                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5)
 
         ax_histx.grid(False)
         ax_histy.grid(False)
