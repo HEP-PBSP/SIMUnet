@@ -1,38 +1,38 @@
 - dataset: ATLAS_TTBARZ_13TEV_PTZNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "p_T<300.0"
+  rule: "p_T>45.0"
 
 - dataset: ATLAS_TTBAR_13TEV_HADRONIC_TTMNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "MQQ<1101"
+  rule: "MQQ>450"
 
 - dataset: CMS_TTBARZ_13TEV_PTZNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "p_T<250.0"
+  rule: "p_T>60.0"
 
 - dataset: CMS_TTBAR_13TEV_LJETS_2D_TTM_ABSYTTNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "(yQQ<1.4) or (mu2<820000)"
+  rule: "(yQQ>0.25) or (mu2>160000)"
 
 - dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "(yQQ<1.4) or (mu2<3610000)"
+  rule: "(yQQ>1.5) or (mu2>160000)"
 
 - dataset: ATLAS_TTBAR_13TEV_TTMNORM
   reason: |
-   We remove the last bin of the normalised distribution because it is
+   We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "MQQ<1600"
+  rule: "MQQ>400"
 
 - dataset: ATLAS_TTB_DIFF_8TEV_LJ_TPTNORM
   reason: |
