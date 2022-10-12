@@ -327,6 +327,62 @@ def bsm_facs_bounds(read_bsm_facs):
     
     return df
 
+@figuregen
+def plot_2d_bsm_facs_fits(fits):
+    """
+    Compare histograms of BSM factors between different fits
+    in SIMUnet
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators
+    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+    # get all pairs
+    pairs = list(itertools.combinations(all_ops, 2))
+    # plot all pairs of operators
+    for pair in pairs:
+        op_1, op_2 = pair
+
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        ax.ticklabel_format(
+            axis='both', scilimits=(0, 0), style='sci', useOffset=True
+        )
+
+        divider = make_axes_locatable(ax)
+        # append axes to the top and to the right for the histograms
+        ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+        ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+        # Make some labels invisible
+        ax_histx.xaxis.set_tick_params(labelbottom=False)
+        ax_histy.yaxis.set_tick_params(labelleft=False)
+
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            scatter_plot = ax.scatter(
+                bsm_facs_df[op_1], bsm_facs_df[op_2], label=fit.name, alpha=0.5, s=40
+            )
+
+            # populate the histograms
+            ax_histx.hist(bsm_facs_df[op_1], alpha=0.5)
+            ax_histy.hist(bsm_facs_df[op_2], orientation='horizontal', alpha=0.5)
+
+        ax_histx.grid(False)
+        ax_histy.grid(False)
+
+        ax.set_xlabel(op_1)
+        ax.set_ylabel(op_2)
+        ax.legend()
+        ax.set_axisbelow(True)
+
+        yield fig
+
 @table
 def bsm_facs_bounds_fits(fits, n_sigma):
     """
