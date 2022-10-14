@@ -142,7 +142,7 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
     chi2 = [info.chi2 for info in replica_data]
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(1, 1, figsize=(5, 5))
 
     chi2 = [info.chi2 for info in replica_data]
 
@@ -153,7 +153,8 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     # create new axes to the bottom of the scatter plot
     # for the colourbar 
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    # the width of the colorbar can be changed with `size`
+    cax = divider.append_axes("bottom", size="8%", pad=0.7)
     fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
     # set scientific notation for thei scatter plot
@@ -195,18 +196,20 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
 
     chi2 = [info.chi2 for info in replica_data]
 
-    fig, ax = plt.subplots()
+    # we use this figsize to have a square scatter plot
+    # smaller values do not display too well
+    fig, ax = plt.subplots(1, 1, figsize=(7, 7))
 
     chi2 = [info.chi2 for info in replica_data]
 
     scatter_plot = ax.scatter(
-        bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
+        bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2, s=40
     )
 
     # create new axes to the bottom of the scatter plot
     # for the colourbar 
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("bottom", size="15%", pad=0.7)
+    cax = divider.append_axes("bottom", size="9%", pad=0.7)
     fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
     # set scientific notation for thei scatter plot
@@ -229,8 +232,8 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
     ax_histx.grid(False)
     ax_histy.grid(False)
 
-    ax.set_xlabel(labels[0])
-    ax.set_ylabel(labels[1])
+    ax.set_xlabel(labels[0], fontsize=15)
+    ax.set_ylabel(labels[1], fontsize=15)
 
     ax.set_axisbelow(True)
 
@@ -323,6 +326,63 @@ def bsm_facs_bounds(read_bsm_facs):
     df['Std'] = stds_disp
     
     return df
+
+@figuregen
+def plot_2d_bsm_facs_fits(fits):
+    """
+    Compare histograms of BSM factors between different fits
+    in SIMUnet
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators
+    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+    # get all pairs
+    pairs = itertools.combinations(all_ops, 2)
+    # plot all pairs of operators
+    for pair in pairs:
+        op_1, op_2 = pair
+        # use this size to keep them sqaure
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        ax.ticklabel_format(
+            axis='both', scilimits=(0, 0), style='sci', useOffset=True
+        )
+
+        divider = make_axes_locatable(ax)
+        # append axes to the top and to the right for the histograms
+        ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+        ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+        # Make some labels invisible
+        ax_histx.xaxis.set_tick_params(labelbottom=False)
+        ax_histy.yaxis.set_tick_params(labelleft=False)
+
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            # display the result in the figure only if the fit has the two operators in the pair
+            if bsm_facs_df.get([op_1]) is not None and bsm_facs_df.get([op_2]) is not None:
+                ax.scatter(
+                    bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.name, alpha=0.5, s=40
+                )
+                # populate the histograms
+                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5)
+                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5)
+
+        ax_histx.grid(False)
+        ax_histy.grid(False)
+
+        ax.set_xlabel(op_1)
+        ax.set_ylabel(op_2)
+        ax.legend()
+        ax.set_axisbelow(True)
+
+        yield fig
 
 @table
 def bsm_facs_bounds_fits(fits, n_sigma):

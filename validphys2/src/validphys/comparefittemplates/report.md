@@ -126,6 +126,9 @@ SIMUnet analysis
 ### 95% CL bounds comparison
 {@bsm_facs_95bounds_fits@}
 
+### Combined 2D histograms
+{@plot_2d_bsm_facs_fits@}
+
 Code versions
 -------------
 {@fits_version_table@}
