@@ -221,7 +221,13 @@ class CompareFitApp(App):
             'theoryid': {
                 'from_': 'theory'
             },
-            'speclabel': args['current_fit_label']
+            'speclabel': args['current_fit_label'],
+            'bsm_fac_data': {
+                'from_': 'fit'
+            },
+            'bsm_sector_data': {
+                'from_': 'fit'
+            }
         }
         refmap = {'id': args['reference_fit'], 'label': args['reference_fit_label']}
         autosettings['reference'] = {
@@ -233,7 +239,13 @@ class CompareFitApp(App):
             'theoryid': {
                 'from_': 'theory'
             },
-            'speclabel': args['reference_fit_label']
+            'speclabel': args['reference_fit_label'],
+            'bsm_fac_data': {
+                'from_': 'fit'
+            },
+            'bsm_sector_data': {
+                'from_': 'fit'
+            }
         }
         autosettings['use_thcovmat_if_present'] = args['thcovmat_if_present']
         if args['norm_threshold'] != None:
