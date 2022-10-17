@@ -534,11 +534,12 @@ def pdf_results(
     pdfs: Sequence,
     covariance_matrix,
     sqrt_covmat,
+    dataset_bsm_factor,
 ):
     """Return a list of results, the first for the data and the rest for
     each of the PDFs."""
 
-    th_results = [ThPredictionsResult.from_convolution(pdf, dataset) for pdf in pdfs]
+    th_results = [ThPredictionsResult.from_convolution(pdf, dataset, dataset_bsm_factor) for pdf in pdfs]
 
     return (DataResult(dataset.load(), covariance_matrix, sqrt_covmat), *th_results)
 
@@ -549,6 +550,7 @@ def one_or_more_results(
     dataset: (DataSetSpec, DataGroupSpec),
     covariance_matrix,
     sqrt_covmat,
+    dataset_bsm_factor,
     pdfs: (type(None), Sequence) = None,
     pdf: (type(None), PDF) = None,
 ):
@@ -557,9 +559,9 @@ def one_or_more_results(
     Which of the two is selected intelligently depending on the namespace,
     when executing as an action."""
     if pdf:
-        return results(dataset, pdf, covariance_matrix, sqrt_covmat)
+        return results(dataset, pdf, covariance_matrix, sqrt_covmat, dataset_bsm_factor)
     else:
-        return pdf_results(dataset, pdfs, covariance_matrix, sqrt_covmat)
+        return pdf_results(dataset, pdfs, covariance_matrix, sqrt_covmat, dataset_bsm_factor)
     raise ValueError("Either 'pdf' or 'pdfs' is required")
 
 
