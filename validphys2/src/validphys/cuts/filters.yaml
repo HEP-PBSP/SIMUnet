@@ -1,3 +1,15 @@
+- dataset: CMS_TTBAR_13TEV_TTMNORM
+  reason: |
+   We remove the /first/ bin of the normalised distribution because it is
+   linearly dependent on the others
+  rule: "MQQ>350.0"
+
+- dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM
+  reason: |
+   We remove the /first/ bin of the normalised distribution because it
+   improves the condition number Z of the distribution. 
+  rule: "MQQ>350.0"
+
 - dataset: ATLAS_TTBARZ_13TEV_PTZNORM
   reason: |
    We remove the /first/ bin of the normalised distribution because it is
