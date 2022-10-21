@@ -38,7 +38,7 @@
   reason: |
    We remove the /first/ bin of the normalised distribution because it is
    linearly dependent on the others
-  rule: "(yQQ>1.5) or (mu2>160000)"
+  rule: "(yQQ>0.3) or (mu2>160000)"
 
 - dataset: ATLAS_TTBAR_13TEV_TTMNORM
   reason: |
