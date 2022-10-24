@@ -645,6 +645,8 @@ class FitSpec(TupleComp):
             for vari in to_take_out:
                 if vari in fitting and vari not in d:
                     d[vari] = fitting[vari]
+        d.setdefault("bsm_fac_data", None)
+        d.setdefault("bsm_sector_data", None)
         return d
 
     def __str__(self):
