@@ -1,0 +1,12 @@
+meta:
+  title: Correlation matrix for all BSM factors in a fit
+  author: MMA
+  keywords: [simunet, plot]
+
+fit: 220929-lm-global-fixedpdf-lin
+
+template_text: |
+ # BSM correlation matrix
+ {@plot_bsm_corr@}
+actions_:
+  - report(main=True)
