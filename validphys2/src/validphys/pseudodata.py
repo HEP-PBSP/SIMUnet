@@ -101,7 +101,7 @@ def read_replica_pseudodata(fit, context_index, replica):
     return DataTrValSpec(pseudodata.drop("type", axis=1), tr.index, val.index)
 
 
-def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genrep=True):
+def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, fixed_observables_exp_data, replica_mcseed, genrep=True):
     """Function that takes in a list of :py:class:`validphys.coredata.CommonData`
     objects and returns a pseudodata replica accounting for
     possible correlations between systematic uncertainties.
@@ -141,11 +141,12 @@ def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genr
        0.30100351, 0.31781208, 0.30827054, 0.30258217, 0.32116842,
        0.34206012, 0.31866286, 0.2790856 , 0.33257621, 0.33680007,
     """
+    all_cd = groups_dataset_inputs_loaded_cd_with_cuts + fixed_observables_exp_data
     if not genrep:
-        return np.concatenate([cd.central_values for cd in groups_dataset_inputs_loaded_cd_with_cuts])
+        return np.concatenate([cd.central_values for cd in all_cd])
 
     # Seed the numpy RNG with the seed and the name of the datasets in this run
-    name_salt = "-".join(i.setname for i in groups_dataset_inputs_loaded_cd_with_cuts)
+    name_salt = "-".join(i.setname for i in all_cd)
     name_seed = int(hashlib.sha256(name_salt.encode()).hexdigest(), 16) % 10 ** 8
     rng = np.random.default_rng(seed=replica_mcseed+name_seed)
 
@@ -157,7 +158,7 @@ def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genr
         special_mult = []
         mult_shifts = []
         check_positive_masks = []
-        for cd in groups_dataset_inputs_loaded_cd_with_cuts:
+        for cd in all_cd:
             # copy here to avoid mutating the central values.
             pseudodata = cd.central_values.to_numpy(copy=True)
 
