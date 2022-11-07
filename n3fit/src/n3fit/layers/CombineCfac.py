@@ -12,8 +12,12 @@ class CombineCfacLayer(Layer):
         """
         Parameters
         ----------
-            n_bsm_fac_data: int
-                number of bsm parameters in the fit
+            scales: np.array
+                The scales by which to divide each contribution.
+            linear_names: list[str]
+                A list of names for the operators
+            quad_names: list[str]
+                A list of names for the quadtaric contributions.
         """
         # Initialise a Layer instance
         if len(scales) != len(linear_names):
@@ -56,13 +60,23 @@ class CombineCfacLayer(Layer):
     def call(self, inputs, linear_values, quad_values):
         """
         Makes the forward pass to map the SM observable to the EFT one.
+
         Parameters
         ----------
             inputs: number
                 This is the SM theoretical prediction that comes after the FK convolution.
-            bsm_factor_values: np.array
-                Array of BSM C-factors for a given dataset, whose length is the
-                number of datapoints.
+            linear_values: dict[str, np.array]
+                Dictionary mapping the namses of the linear BSM C-factors for a
+                given dataset, to arrays with the cfactor values, whose length
+                is the number of datapoints. If not empty, the keys of the
+                dictionary must match the ``linear_names`` attribute.
+            quad_values: dict[str, np.array]
+                Dictionary mapping the namses of the quadratic BSM C-factors for a
+                given dataset, to arrays with the cfactor values, whose length is the
+                number of datapoints. If not empty, the keys of the
+                dictionary must match the ``quad_names`` attribute.
+
+
         Returns
         -------
             output: tf.Tensor
