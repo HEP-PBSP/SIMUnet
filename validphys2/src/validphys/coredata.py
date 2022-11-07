@@ -118,6 +118,18 @@ class CFactorData:
     central_value: np.array
     uncertainty: np.array
 
+    def with_cuts(self, cuts):
+        if hasattr(cuts, 'load'):
+            cuts = cuts.load()
+        if cuts is None:
+            return self
+        return dataclasses.replace(
+            self,
+            central_value=self.central_value[cuts],
+            uncertainty=self.uncertainty[cuts],
+        )
+
+
 
 @dataclasses.dataclass(eq=False)
 class CommonData:
