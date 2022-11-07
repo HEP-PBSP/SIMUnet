@@ -219,6 +219,7 @@ class CommonData:
             self, ndata=newndata, commondata_table=new_commondata_table
         )
 
+
     @property
     def central_values(self):
         return self.commondata_table["data"]
@@ -291,3 +292,9 @@ class CommonData:
             self.multiplicative_errors * central_values[:, np.newaxis] / 100
         )
         return pd.concat((self.additive_errors, converted_mult_errors), axis=1)
+
+    def with_central_value(self, cv):
+        tb = self.commondata_table.copy()
+        tb["data"] = cv
+        return dataclasses.replace(self, commondata_table=tb)
+
