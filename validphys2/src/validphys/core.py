@@ -16,6 +16,8 @@ import inspect
 import json
 import logging
 from pathlib import Path
+import dataclasses
+from typing import Optional
 
 import numpy as np
 
@@ -436,6 +438,18 @@ class SimilarCuts(TupleComp):
         ratio = delta / exp_err
         passed = ratio < self.threshold
         return passed[passed].index
+
+
+class TrivialCuts(TupleComp):
+    _full = True
+
+    def __init__(self, ndata):
+        self.ndata = ndata
+        super().__init__(ndata)
+
+    def load(self):
+        return np.arange(self.ndata)
+
 
 
 def cut_mask(cuts):
@@ -868,3 +882,79 @@ class Filter:
 
     def __str__(self):
         return '%s: %s' % (self.label, self.indexes)
+
+@dataclasses.dataclass(frozen=True)
+class FixedObservableInput:
+    """Representation of the data the user inputs to obtain a fixed observable"""
+    dataset: str
+    weight: float = 1.
+    frac: float = 1.
+    bsm_sector: Optional[str] = None
+    bsm_order: Optional[str] = None
+
+
+@dataclasses.dataclass(frozen=True)
+class FixedObservableSpec:
+    """Representation of a fixed observable"""
+
+    name: str
+    commondata: CommonDataSpec
+    pred_path: Path
+    weight: float = 1.0
+    frac: float = 1
+    # Note: This is not a dict as we want it to be hashable
+    custom_group: Optional[str] = None
+    bsm_fac_data_names_CF: tuple = ((),)
+    bsm_fac_quad_names_CF: tuple = ((),)
+    bsm_fac_quad_names: tuple = ((),)
+    bsm_fac_data_names: tuple = ((),)
+
+    # Bogus cuts to make this more compatible with the usual data
+    @property
+    def cuts(self):
+        return TrivialCuts(self.commondata.ndata)
+
+    def load_exp(self):
+        """Load the experimental data for the fixed observable"""
+        from validphys.commondata import load_commondata
+
+        return load_commondata(self.commondata)
+
+    def load_pred(self):
+        """Load the raw theory predictions (without wilson coefficients)"""
+        from validphys.fkparser import parse_cfactor
+
+        with open(self.pred_path, 'rb') as f:
+            return parse_cfactor(f)
+
+    def _load_bsm_values(self, inp):
+        from validphys.coredata import CFactorData
+        from validphys.fkparser import parse_cfactor
+
+        if inp is None:
+            return None
+        name_cf_map = {}
+        for name, path in inp.items():
+            if name[:4] == "None":
+                cfac = CFactorData(
+                    description="dummy",
+                    central_value=np.zeros(self.commondata.ndata),
+                    uncertainty=np.zeros(self.commondata.ndata),
+                )
+            else:
+                with open(path, "rb") as stream:
+                    cfac = parse_cfactor(stream)
+                    # TODO: Don't do this
+                    cfac.central_value -= 1
+                    # cfac.uncertainty = ???
+            name_cf_map[name] = cfac
+        return name_cf_map
+
+    def load_bsm(self):
+        return self._load_bsm_values(self.bsm_fac_data_names_CF), self._load_bsm_values(
+            self.bsm_fac_quad_names_CF
+        )
+
+    def load(self):
+        from validphys.coredata import FixedObservableData
+        return FixedObservableData.from_spec(self)
