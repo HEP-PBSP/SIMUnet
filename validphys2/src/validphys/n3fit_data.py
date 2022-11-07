@@ -20,6 +20,7 @@ from reportengine.table import table
 from validphys.n3fit_data_utils import (
     common_data_reader_experiment,
     positivity_reader,
+    fixed_observables_with_pseudodata,
 )
 
 log = logging.getLogger(__name__)
@@ -79,6 +80,26 @@ def tr_masks(data, replica_trvlseed):
         np.random.shuffle(mask)
         trmask_partial.append(mask)
     return trmask_partial
+
+def fixed_observables_masks(fixed_observables, replica_trvlseed):
+    nameseed = int(hashlib.sha256(str(fixed_observables).encode()).hexdigest(), 16) % 10 ** 8
+    nameseed += replica_trvlseed
+    # TODO: update this to new random infrastructure.
+    np.random.seed(nameseed)
+    trmask_partial = []
+    for dataset in fixed_observables:
+        cuts = dataset.cuts
+        ndata = len(cuts.load()) if cuts else dataset.commondata.ndata
+        frac = dataset.frac
+        trmax = int(frac * ndata)
+        mask = np.concatenate(
+            [np.ones(trmax, dtype=np.bool), np.zeros(ndata - trmax, dtype=np.bool)]
+        )
+        np.random.shuffle(mask)
+        trmask_partial.append(mask)
+    return trmask_partial
+
+
 
 def kfold_masks(kpartitions, data):
     """Collect the masks (if any) due to kfolding for this data.
@@ -188,9 +209,12 @@ def _mask_fk_tables(dataset_dicts, tr_masks):
 
 def fitting_data_dict(
     data,
+    fixed_observables,
+    fixed_observables_data,
     make_replica,
     dataset_inputs_t0_covmat_from_systematics,
     tr_masks,
+    fixed_observables_masks,
     kfold_masks,
     diagonal_basis=None,
 ):
@@ -236,13 +260,20 @@ def fitting_data_dict(
     """
     # TODO: Plug in the python data loading when available. Including but not
     # limited to: central values, ndata, replica generation, covmat construction
-    spec_c = data.load()
-    ndata = spec_c.GetNData()
-    expdata_true = spec_c.get_cv().reshape(1, ndata)
+    if data.datasets:
+        spec_c = data.load()
+        ndata = spec_c.GetNData()
+        expdata_true = spec_c.get_cv().reshape(1, ndata)
+        datasets = common_data_reader_experiment(spec_c, data)
+    else:
+        ndata = 0
+        expdata_true = np.array([])
+        datasets = []
 
-    expdata = make_replica
-
-    datasets = common_data_reader_experiment(spec_c, data)
+    expdata, fixed_pseudodata = make_replica[:ndata], make_replica[ndata:]
+    pseudodata_fixed_data = fixed_observables_with_pseudodata(
+        fixed_pseudodata, fixed_observables_data
+    )
 
     # t0 covmat
     covmat = dataset_inputs_t0_covmat_from_systematics
@@ -250,6 +281,8 @@ def fitting_data_dict(
 
     if diagonal_basis:
         log.info("working in diagonal basis.")
+        if fixed_observables:
+            raise NotImplementedError("Fixed observables not supported")
         eig, v = np.linalg.eigh(covmat)
         dt_trans = v.T
     else:
@@ -261,8 +294,28 @@ def fitting_data_dict(
     # Copy dataset dict because we mutate it.
     datasets_copy = deepcopy(datasets)
 
-    tr_mask = _mask_fk_tables(datasets_copy, tr_masks)
+    if datasets:
+        tr_mask = _mask_fk_tables(datasets_copy, tr_masks)
+    else:
+        tr_mask = np.array([], dtype=bool)
     vl_mask = ~tr_mask
+
+    fixed_observables_tr = []
+    fixed_observables_vl = []
+
+
+    if fixed_observables_masks:
+        for fo, mask in zip(fixed_observables_data, fixed_observables_masks):
+            tr, vl = fo.split(mask)
+            fixed_observables_tr.append(tr)
+            fixed_observables_vl.append(vl)
+
+        fixed_observable_mask = np.concatenate(fixed_observables_masks, dtype=bool)
+        total_tr_mask = np.concatenate([tr_mask, fixed_observable_mask], dtype=bool)
+    else:
+        total_tr_mask = tr_mask
+
+    total_vl_mask = ~total_tr_mask
 
     if diagonal_basis:
         expdata = np.matmul(dt_trans, expdata)
@@ -277,42 +330,48 @@ def fitting_data_dict(
         dt_trans_tr = dt_trans[tr_mask]
         dt_trans_vl = dt_trans[vl_mask]
     else:
-        covmat_tr = covmat[tr_mask].T[tr_mask]
+        covmat_tr = covmat[total_tr_mask].T[total_tr_mask]
         invcovmat_tr = np.linalg.inv(covmat_tr)
 
-        covmat_vl = covmat[vl_mask].T[vl_mask]
+        covmat_vl = covmat[total_vl_mask].T[total_vl_mask]
         invcovmat_vl = np.linalg.inv(covmat_vl)
 
     ndata_tr = np.count_nonzero(tr_mask)
-    expdata_tr = expdata[tr_mask].reshape(1, ndata_tr)
+    expdata_tr = expdata[tr_mask].reshape(1, -1)
 
 
     ndata_vl = np.count_nonzero(vl_mask)
-    expdata_vl = expdata[vl_mask].reshape(1, ndata_vl)
+    expdata_vl = expdata[vl_mask].reshape(1, -1)
 
     # Now save a dictionary of training/validation/experimental folds
     # for training and validation we need to apply the tr/vl masks
     # for experimental we need to negate the mask
     folds = defaultdict(list)
     for fold in kfold_masks:
+        if fixed_observables_masks:
+            raise NotImplementedError("Fixed observables not supported")
         folds["training"].append(fold[tr_mask])
         folds["validation"].append(fold[vl_mask])
         folds["experimental"].append(~fold)
 
     dict_out = {
         "datasets": datasets_copy,
+        "fixed_sets": fixed_observables,
         "name": str(data),
         "expdata_true": expdata_true,
+        "fixed_true": fixed_observables_data,
         "invcovmat_true": inv_true,
         "covmat": covmat,
         "trmask": tr_mask,
         "invcovmat": invcovmat_tr,
         "ndata": ndata_tr,
         "expdata": expdata_tr,
+        "fixed": fixed_observables_tr,
         "vlmask": vl_mask,
         "invcovmat_vl": invcovmat_vl,
         "ndata_vl": ndata_vl,
         "expdata_vl": expdata_vl,
+        "fixed_vl": fixed_observables_vl,
         "positivity": False,
         "count_chi2": True,
         "folds" : folds,

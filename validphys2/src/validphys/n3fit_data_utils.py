@@ -106,8 +106,8 @@ def parse_bsm_fac_quad_names_CF(bsm_fac_quad_names_CF, cuts):
 
         if name[:4] == "None":
             # Now is the time to make a dummy BSM-factor
-            central = [0.0]*len(cuts)
-            uncertainty = [0.0]*len(cuts)
+            central = np.array([0.0]*len(cuts))
+            uncertainty = np.array([0.0]*len(cuts))
             cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
 
         else:
@@ -119,6 +119,17 @@ def parse_bsm_fac_quad_names_CF(bsm_fac_quad_names_CF, cuts):
 
         name_cfac_map[name] = cfac
     return name_cfac_map
+
+
+def fixed_observables_with_pseudodata(replica_data, fixed_observables_data):
+    out = []
+    i = 0
+    for fo in fixed_observables_data:
+        end = i + fo.ndata
+        out.append(fo.with_central_value(replica_data[i:end]))
+        i = end
+    return out
+
 
 def common_data_reader_dataset(dataset_c, dataset_spec):
     """
