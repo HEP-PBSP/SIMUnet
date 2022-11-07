@@ -12,6 +12,9 @@
 from dataclasses import dataclass
 from importlib.util import spec_from_loader
 import numpy as np
+
+from validphys import bsmnames
+
 from n3fit.msr import msr_impose
 from n3fit.layers import DIS, DY, ObsRotation, losses
 from n3fit.layers import Preprocessing, FkRotation, FlavourToEvolution
@@ -84,7 +87,9 @@ class ObservableWrapper:
         # Every obs gets its share of the split
         output_layers = [obs(p_pdf) for p_pdf, obs in zip(split_pdf, self.observables)]
 
-        for idx, (dataset_dict, output_layer) in enumerate(zip(self.spec_dict['datasets'], output_layers)):
+        for idx, (dataset_dict, output_layer) in enumerate(
+            zip(self.spec_dict['datasets'], output_layers)
+        ):
             # Use get here to prevent having to worry about POSDATSETS
             bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
             bsm_fac_quad_names_CF = dataset_dict.get('bsm_fac_quad_names_CF')
@@ -92,34 +97,55 @@ class ObservableWrapper:
             bsm_fac_quad_names = dataset_dict.get('bsm_fac_quad_names')
 
             # It's useful to flatten the list of quadratic names first
-            if bsm_fac_quad_names_CF is not None:
-                flat_bsm_fac_quad_names = []
-                for i in range(len(bsm_fac_quad_names)):
-                    for j in range(len(bsm_fac_quad_names)):
-                        flat_bsm_fac_quad_names += [bsm_fac_quad_names[i][j]]
 
             if bsm_fac_data_names_CF is not None:
-                coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+
+                # coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+                coefficients = {
+                    bsmnames.linear_datum_to_op(k): v.central_value
+                    for k, v in bsm_fac_data_names_CF.items()
+                }
+
                 if bsm_fac_quad_names_CF is not None:
-                    quad_coefficients = np.array([bsm_fac_quad_names_CF[i].central_value for i in flat_bsm_fac_quad_names])
+                    quad_coefficients = {
+                        bsmnames.linear_datum_to_op(k): v.central_value
+                        for k, v in bsm_fac_quad_names_CF.items()
+                    }
                 else:
-                    nops, ndat = coefficients.shape
-                    quad_coefficients = np.zeros((nops**2, ndat))
+                    ndat = dataset_dict["ndata"]
+                    quad_coefficients = {
+                        name: np.zeros(ndat)
+                        for name in self.post_observable.flat_quadnames
+                    }
+
                 if self.split == 'ex':
                     cfacs = coefficients
                     quad_cfacs = quad_coefficients
                 elif self.split == 'tr':
-                    cfacs = coefficients[:, dataset_dict['ds_tr_mask']]
-                    quad_cfacs = quad_coefficients[:, dataset_dict['ds_tr_mask']]
+                    cfacs = {
+                        k: v[dataset_dict["ds_tr_mask"]]
+                        for k, v in coefficients.items()
+                    }
+                    quad_cfacs = {
+                        k: v[dataset_dict["ds_tr_mask"]]
+                        for k, v in quad_coefficients.items()
+                    }
                 elif self.split == 'vl':
-                    cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
-                    quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
-                log.info(f"Applying combination layer")
+                    # cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
+                    cfacs = {
+                        k: v[~dataset_dict["ds_tr_mask"]]
+                        for k, v in coefficients.items()
+                    }
+                    quad_cfacs = {
+                        k: v[~dataset_dict["ds_tr_mask"]]
+                        for k, v in quad_coefficients.items()
+                    }
+                log.info("Applying combination layer")
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
-                    bsm_factor_values=tf.constant(cfacs, dtype='float32'),
-                    quad_bsm_factor_values=tf.constant(quad_cfacs, dtype='float32')
+                    bsm_factor_values=cfacs,
+                    quad_bsm_factor_values=quad_cfacs,
                 )
 
 
