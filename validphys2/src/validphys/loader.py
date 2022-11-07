@@ -29,7 +29,7 @@ from reportengine import filefinder
 from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             PositivitySetSpec, DataSetSpec, PDF, Cuts, DataGroupSpec,
                             peek_commondata_metadata, CutsPolicy,
-                            InternalCutsWrapper, HyperscanSpec)
+                            InternalCutsWrapper, HyperscanSpec, FixedObservableSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
 
@@ -46,6 +46,8 @@ class DataNotFoundError(LoadFailedError): pass
 class SysNotFoundError(LoadFailedError): pass
 
 class FKTableNotFound(LoadFailedError): pass
+
+class FixedPredictionNotFound(LoadFailedError): pass
 
 class CfactorNotFound(LoadFailedError): pass
 
@@ -474,20 +476,23 @@ class Loader(LoaderBase):
 
     def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
         _, theopath = self.check_theoryID(theoryid)
-        bsm_fac_names_paths= {}
+        bsm_fac_names_paths = {}
         for bsm_fac_data_name in bsm_fac_data_names:
-            cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_fac_data_name}_{setname}.dat'
-    
+            cfactorpath = (
+                theopath / 'bsm_factors' / f'BSM_{bsm_fac_data_name}_{setname}.dat'
+            )
+
             # If we are expecting a BSM factor, we should check that the path actually exists.
-            if bsm_fac_data_name[:4] != "None":         
+            if bsm_fac_data_name[:4] != "None":
                 if not cfactorpath.exists():
-                    msg = (f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
-                           f"The path {cfactorpath} does not exist."
+                    msg = (
+                        f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
+                        f"The path {cfactorpath} does not exist."
                     )
                     raise CfactorNotFound(msg)
             bsm_fac_names_paths[bsm_fac_data_name] = cfactorpath
 
-        return bsm_fac_names_paths 
+        return bsm_fac_names_paths
 
     def get_bsm_fac_quad_name_dict(self, setname, bsm_fac_quad_names, theoryid):
         _, theopath = self.check_theoryID(theoryid)
@@ -545,7 +550,7 @@ class Loader(LoaderBase):
                                    f"The paths {ij_cfactorpath} and {ji_cfactorpath} do not exist."
                             )
                             raise CfactorNotFound(msg)
-                        
+
                         if ij_cfactorpath.exists():
                             bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
                             bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ij_cfactorpath
@@ -555,20 +560,23 @@ class Loader(LoaderBase):
 
         return bsm_fac_quad_paths
 
-    def check_dataset(self,
-                      name,
-                      *,
-                      rules=None,
-                      sysnum=None,
-                      theoryid,
-                      cfac=(),
-                      frac=1,
-                      cuts=CutsPolicy.INTERNAL,
-                      use_fitcommondata=False,
-                      fit=None,
-                      weight=1,
-                      bsm_fac_data_names=None,
-                      bsm_fac_quad_names=None):
+
+    def check_dataset(
+        self,
+        name,
+        *,
+        rules=None,
+        sysnum=None,
+        theoryid,
+        cfac=(),
+        frac=1,
+        cuts=CutsPolicy.INTERNAL,
+        use_fitcommondata=False,
+        fit=None,
+        weight=1,
+        bsm_fac_data_names=None,
+        bsm_fac_quad_names=None,
+    ):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
@@ -610,9 +618,21 @@ class Loader(LoaderBase):
         else:
             bsm_fac_quad_names_CF = None
 
-        return DataSetSpec(name=name, commondata=commondata,
-                           fkspecs=fkspec, thspec=theoryid, cuts=cuts,
-                           frac=frac, op=op, weight=weight, bsm_fac_data_names_CF=bsm_fac_data_names_CF, bsm_fac_quad_names_CF=bsm_fac_quad_names_CF, bsm_fac_quad_names=bsm_fac_quad_names, bsm_fac_data_names=bsm_fac_data_names)
+
+        return DataSetSpec(
+            name=name,
+            commondata=commondata,
+            fkspecs=fkspec,
+            thspec=theoryid,
+            cuts=cuts,
+            frac=frac,
+            op=op,
+            weight=weight,
+            bsm_fac_data_names_CF=bsm_fac_data_names_CF,
+            bsm_fac_quad_names_CF=bsm_fac_quad_names_CF,
+            bsm_fac_quad_names=bsm_fac_quad_names,
+            bsm_fac_data_names=bsm_fac_data_names,
+        )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
         """Loader method for instantiating DataGroupSpec objects. The NNPDF::Experiment
@@ -686,6 +706,46 @@ class Loader(LoaderBase):
         except filefinder.FinderError as e:
             raise LoaderError(e) from e
         return path/name
+
+    def check_fixed_observable(
+        self,
+        fixed_observable_input,
+        theoryid,
+        bsm_fac_data_names=None,
+        bsm_fac_quad_names=None,
+    ):
+        setname = fixed_observable_input.dataset
+        cd = self.check_commondata(setname)
+        theoryid = self.check_theoryID(theoryid)
+        pred_path = theoryid.path / 'fixed' / f'FIXED_{setname}.dat'
+        if not pred_path.is_file():
+            raise FixedPredictionNotFound(
+                f"Could not find fixed prediction for set {setname}. "
+                f"File {pred_path} not found."
+            )
+
+        if bsm_fac_data_names is not None:
+            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(setname, bsm_fac_data_names, theoryid.id)
+        else:
+            bsm_fac_data_names_CF = None
+
+        if bsm_fac_quad_names is not None:
+            bsm_fac_quad_names_CF = self.get_bsm_fac_quad_name_dict(setname, bsm_fac_quad_names, theoryid.id)
+            if len(bsm_fac_quad_names_CF) != len(bsm_fac_quad_names)*len(bsm_fac_quad_names[0]):
+                raise RuntimeError("Don't know what is going on anymore")
+        else:
+            bsm_fac_quad_names_CF = None
+
+        return FixedObservableSpec(
+            name=setname,
+            commondata=cd,
+            pred_path=pred_path,
+            frac=fixed_observable_input.frac,
+            bsm_fac_data_names_CF=bsm_fac_data_names_CF,
+            bsm_fac_quad_names_CF=bsm_fac_quad_names_CF,
+            bsm_fac_quad_names=bsm_fac_quad_names,
+            bsm_fac_data_names=bsm_fac_data_names,
+        )
 
 
 #http://stackoverflow.com/a/15645088/1007990
