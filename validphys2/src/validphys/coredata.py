@@ -206,6 +206,9 @@ class CommonData:
         if cuts is None:
             return self
 
+        # Convert boolean mask to indices
+        if cuts.dtype == bool:
+            cuts = np.arange(self.ndata)[cuts]
         # We must shift the cuts up by 1 since a cut of 0 implies the first data point
         # while commondata indexing starts at 1.
         cuts = list(map(lambda x: x + 1, cuts))
