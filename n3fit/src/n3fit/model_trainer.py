@@ -39,14 +39,47 @@ PUSH_POSITIVITY_EACH = 100
 PUSH_INTEGRABILITY_EACH = 100
 
 
-def _pdf_injection(pdf_layers, observables, masks):
+def _pdf_injection(pdf_layers, fixed_observable_inputs, observables, masks):
     """
     Takes as input a list of PDF layers each corresponding to one observable (also given as a list)
     And (where neded) a mask to select the output.
     Returns a list of obs(pdf).
     Note that the list of masks don't need to be the same size as the list of layers/observables
     """
-    return [f(x, mask=m) for f, x, m in zip_longest(observables, pdf_layers, masks)]
+    return [
+        f(x, list(foi.values()), mask=m)
+        for f, x, foi, m in zip_longest(
+            observables, pdf_layers, fixed_observable_inputs, masks
+        )
+    ]
+
+
+def _setup_meta_model(observables, base_inputs, pdf_model, mask):
+    """Set up inputs and outputs for a meta model"""
+    fixed_observable_inputs = [o.make_fixed_observable_inputs() for o in observables]
+
+
+    input_values = {}
+
+    f_obs = []
+    inp = base_inputs.copy()
+    for foi in fixed_observable_inputs:
+        fo_keras = {}
+        for k, (keras_tensor, tf_tensor) in foi.items():
+            fo_keras[k] = keras_tensor
+            input_values[k] = tf_tensor
+        inp.update(fo_keras)
+        f_obs.append(fo_keras)
+
+    output = _pdf_injection(
+        pdf_model,
+        f_obs,
+        observables,
+        mask,
+    )
+
+    return MetaModel(inp, output, input_values=input_values)
+
 
 
 def _LM_initial_and_multiplier(input_initial, input_multiplier, max_lambda, steps):
@@ -388,8 +421,9 @@ class ModelTrainer:
         # Training and validation leave out the kofld dataset
         # experiment leaves out the negation
 
-        output_tr = _pdf_injection(splitted_pdf, self.training["output"], training_mask)
-        training = MetaModel(full_model_input_dict, output_tr)
+        training = _setup_meta_model(
+            self.training["output"], full_model_input_dict, splitted_pdf, training_mask
+        )
 
         # Validation skips integrability and the "true" chi2 skips also positivity,
         # so we must only use the corresponding subset of PDF functions
@@ -402,13 +436,16 @@ class ModelTrainer:
             elif not obs.integrability and obs.positivity:
                 val_pdfs.append(partial_pdf)
 
-        # We don't want to included the integrablity in the validation
-        output_vl = _pdf_injection(val_pdfs, self.validation["output"], validation_mask)
-        validation = MetaModel(full_model_input_dict, output_vl)
+        validation = _setup_meta_model(
+            self.validation["output"], full_model_input_dict, val_pdfs, validation_mask
+        )
 
-        # Or the positivity in the total chi2
-        output_ex = _pdf_injection(exp_pdfs, self.experimental["output"], experimental_mask)
-        experimental = MetaModel(full_model_input_dict, output_ex)
+        experimental = _setup_meta_model(
+            self.experimental["output"],
+            full_model_input_dict,
+            exp_pdfs,
+            experimental_mask,
+        )
 
         if self.print_summary:
             training.summary()
@@ -479,6 +516,7 @@ class ModelTrainer:
         log.info("Generating layers")
 
         # Now we need to loop over all dictionaries (First exp_info, then pos_info and integ_info)
+        #
 
         combiner = CombineCfacLayer(
                     n_bsm_fac_data=self.n_bsm_fac_data,

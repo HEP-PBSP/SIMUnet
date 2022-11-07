@@ -9,22 +9,21 @@
 
 
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib.util import spec_from_loader
 import numpy as np
+import tensorflow as tf
 
 from validphys import bsmnames
 
 from n3fit.msr import msr_impose
 from n3fit.layers import DIS, DY, ObsRotation, losses
 from n3fit.layers import Preprocessing, FkRotation, FlavourToEvolution
-
 from n3fit.backends import MetaModel, Input
 from n3fit.backends import operations as op
 from n3fit.backends import MetaLayer, Lambda
 from n3fit.backends import base_layer_selector, regularizer_selector
 from n3fit.layers.CombineCfac import CombineCfacLayer
-import tensorflow as tf
 
 import logging
 log = logging.getLogger(__name__)
@@ -52,18 +51,53 @@ class ObservableWrapper:
     multiplier: float = 1.0
     integrability: bool = False
     positivity: bool = False
+    fixed: list = field(default_factory=list)
     data: np.array = None
     spec_dict: dict = None
     rotation: ObsRotation = None  # only used for diagonal covmat
     split: str = None
     post_observable: CombineCfacLayer = None
 
+
+    def make_fixed_observable_inputs(self):
+        """Generate a dictionary with values corresponding to the predictions
+        for the fixed observables. Use the values to call the model.
+        """
+        # Note: Even though the inputs are constant, we still need to generate
+        # them in one step and pass them to the model in another. See
+        #
+        # https://github.com/keras-team/keras/issues/11912
+        #
+        # Also we need the raw tensorflow tensor because there is no way to get
+        # it from the Keras wrapper.
+        res = {}
+        for fo in self.fixed:
+            inp = tf.constant(np.atleast_2d(fo.prediction.central_value))
+            kinp = tf.keras.Input(tensor=inp)
+            res[fo.commondata.setname] = (kinp, inp)
+        return res
+
+    def _all_data(self):
+        """Concatenate experimental data from datasets and fixed observables"""
+        return np.concatenate(
+            [
+                np.atleast_2d(self.data),
+                *[np.atleast_2d(fo.commondata.central_values) for fo in self.fixed],
+            ],
+            axis=1,
+        )
+
+
     def _generate_loss(self, mask=None):
         """Generates the corresponding loss function depending on the values the wrapper
         was initialized with"""
         if self.invcovmat is not None:
             loss = losses.LossInvcovmat(
-                self.invcovmat, self.data, mask, covmat=self.covmat, name=self.name
+                self.invcovmat,
+                self._all_data(),
+                mask,
+                covmat=self.covmat,
+                name=self.name,
             )
         elif self.positivity:
             loss = losses.LossPositivity(name=self.name, c=self.multiplier)
@@ -71,7 +105,8 @@ class ObservableWrapper:
             loss = losses.LossIntegrability(name=self.name, c=self.multiplier)
         return loss
 
-    def _generate_experimental_layer(self, pdf):
+
+    def _generate_experimental_layer(self, pdf, fixed_inputs):
         """Generates the experimental layer from the PDF"""
         # First split the layer into the different datasets (if needed!)
         if len(self.dataset_xsizes) > 1:
@@ -148,16 +183,37 @@ class ObservableWrapper:
                     quad_bsm_factor_values=quad_cfacs,
                 )
 
+        for fo, inp in zip(self.fixed, fixed_inputs):
+            linear = {
+                bsmnames.linear_datum_to_op(k): v.central_value
+                for k, v in fo.linear_bsm.items()
+            }
+            quad = {bsmnames.linear_datum_to_op(k): v.central_value for k, v in fo.quad_bsm.items()}
 
-        # Concatenate all datasets (so that experiments are one single entity)        
+            # NOTE: Generating the input like
+            #
+            # inp = tf.keras.Input(tensor=tf.constant(fo.prediction.central_value))
+            #
+            # doesn't work becuse it needs to be seen by the model instance (despite being constant). See
+            # https://github.com/keras-team/keras/issues/11912
+            output_layers.append(
+                self.post_observable(
+                    inputs=inp,
+                    bsm_factor_values=linear,
+                    quad_bsm_factor_values=quad,
+                )
+            )
+
+        # Concatenate all datasets (so that experiments are one single entity)
         ret = op.concatenate(output_layers, axis=2)
+
         if self.rotation is not None:
             ret = self.rotation(ret)
         return ret
 
-    def __call__(self, pdf_layer, mask=None):
+    def __call__(self, pdf_layer, fixed_inputs, mask=None):
         loss_f = self._generate_loss(mask)
-        experiment_prediction = self._generate_experimental_layer(pdf_layer)
+        experiment_prediction = self._generate_experimental_layer(pdf_layer, fixed_inputs)
         return loss_f(experiment_prediction)
 
 
@@ -313,6 +369,7 @@ def observable_generator(
         obsrot_tr = None
         obsrot_vl = None
 
+
     out_tr = ObservableWrapper(
         spec_name,
         model_obs_tr,
@@ -322,7 +379,8 @@ def observable_generator(
         rotation=obsrot_tr,
         spec_dict=spec_dict,
         split='tr',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed"],
     )
     out_vl = ObservableWrapper(
         f"{spec_name}_val",
@@ -333,7 +391,8 @@ def observable_generator(
         rotation=obsrot_vl,
         spec_dict=spec_dict,
         split='vl',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed_vl"],
     )
     out_exp = ObservableWrapper(
         f"{spec_name}_exp",
@@ -345,7 +404,8 @@ def observable_generator(
         rotation=None,
         spec_dict=spec_dict,
         split='ex',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed_true"],
     )
 
     layer_info = {

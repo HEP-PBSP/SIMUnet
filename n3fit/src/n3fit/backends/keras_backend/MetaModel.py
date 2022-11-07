@@ -103,12 +103,17 @@ class MetaModel(Model):
 
     accepted_optimizers = optimizers
 
-    def __init__(self, input_tensors, output_tensors, scaler=None, **kwargs):
+    def __init__(self, input_tensors, output_tensors, scaler=None, input_values=None, **kwargs):
         self.has_dataset = False
 
-        input_list = input_tensors
-        output_list = output_tensors
+        #input_list = input_tensors
+        #output_list = output_tensors
 
+        if input_values is None:
+            input_values = {}
+
+
+        """
         if isinstance(input_list, dict):
             # if this is a dictionary, convert it to a list for now
             input_list = input_tensors.values()
@@ -118,10 +123,12 @@ class MetaModel(Model):
 
         if isinstance(output_list, dict):
             # if this is a dictionary, convert it to a list for now
+            #
             output_list = output_tensors.values()
         elif not isinstance(output_list, list):
             # if it is not a dict but also not a list, make it into a 1-element list and pray
             output_list = [output_list]
+        """
 
         # Note: there used to be two possible options when creating a model:
         # - Give placeholder tensors (for which the content will be given at run time)
@@ -134,13 +141,60 @@ class MetaModel(Model):
         # whenever x_in/tensor_in is known at compile time
 
         x_in = {}
-        tensors_in = {}
-        input_dict = {}
+        #input_dict = {}
+        # The logic below is confusing. Bypass it for the case where
+        # input_values is given
+        #
+        if isinstance(input_tensors, dict):
+            for k, v in input_tensors.items():
+                if k in input_values:
+                    x_in[k] = input_values[k]
+                elif hasattr(v, "tensor_content"):
+                    x_in[k] = v.tensor_content
+                else:
+                    x_in[k] = None
+            self.tensors_in = input_tensors
+        else:
+            # Deprecated logic
+            input_list = input_tensors
+            tensors_in = {}
+            input_dict = {}
+
+            for input_tensor in input_list:
+                # If the input contains a tensor_content, store it to use at predict/fit/eval times
+                # otherwise, put a placeholder None as it will come from the outside
+                name = input_tensor.name
+                if name is None:
+                    name = input_tensor._keras_history.layer.name
+                name = name.rsplit(":", 1)[0]
+                input_dict[name] = input_tensor
+
+                try:
+                    x_in[name] = op.numpy_to_tensor(input_tensor.tensor_content)
+                    tensors_in[name] = input_tensor
+                except AttributeError:
+                    x_in[name] = None
+                    tensors_in[name] = None
+
+            input_tensors = input_dict
+            self.tensors_in = tensors_in
+
+
+
+        """
         for input_tensor in input_list:
             # If the input contains a tensor_content, store it to use at predict/fit/eval times
             # otherwise, put a placeholder None as it will come from the outside
-            name = input_tensor.name.rsplit(":", 1)[0]
+            name = input_tensor.name
+            # XXX: No idea why this is needed
+            if name is None:
+                name = input_tensor._keras_history.layer.name
+            name = name.rsplit(":", 1)[0]
             input_dict[name] = input_tensor
+
+            # Handled above
+            if name in x_in:
+                continue
             try:
                 x_in[name] = op.numpy_to_tensor(input_tensor.tensor_content)
                 tensors_in[name] = input_tensor
@@ -148,10 +202,11 @@ class MetaModel(Model):
                 x_in[name] = None
                 tensors_in[name] = None
 
-        super().__init__(input_dict, output_list, **kwargs)
+        super().__init__(input_tensors, output_list, **kwargs)
+        """
+        super().__init__(input_tensors, output_tensors, **kwargs)
 
         self.x_in = x_in
-        self.tensors_in = tensors_in
 
         self.target_tensors = None
         self.compute_losses_function = None
@@ -187,10 +242,10 @@ class MetaModel(Model):
             loss_dict: dict
                 a dictionary with all partial losses of the model
         """
-        x = self._parse_input(x)
+        params = self._parse_input(x)
         if y is None:
             y = self.target_tensors
-        history = super().fit(x=x, y=y, epochs=epochs, **kwargs)
+        history = super().fit(x=params, y=y, epochs=epochs, **kwargs)
         loss_dict = history.history
         return loss_dict
 
