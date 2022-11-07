@@ -543,6 +543,16 @@ def pdf_results(
 
     return (DataResult(dataset.load(), covariance_matrix, sqrt_covmat), *th_results)
 
+def fixed_observable_exp_data(fixed_observable):
+    return fixed_observable.load_exp()
+
+fixed_observables_exp_data = collect("fixed_observable_exp_data", ("fixed_observables",))
+
+def fixed_observable_data(fixed_observable):
+    return fixed_observable.load()
+
+fixed_observables_data = collect("fixed_observable_data", ("fixed_observables",))
+
 
 @require_one("pdfs", "pdf")
 @remove_outer("pdfs", "pdf")
