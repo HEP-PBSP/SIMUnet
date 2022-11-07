@@ -29,6 +29,8 @@ bsm_sector_data:
 - {name: "ttz", operators: ["Opt", "OtZ"]}
 - {name: "tw", operators: ["OtG"]}
 
+fixed_observable_inputs:
+  - {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "tw", bsm_order: "NLO_QUAD"}
 ############################################################
 datacuts:
   t0pdfset: PDFEFT_baseline_n3fit_iterated_weights # PDF set to generate t0 covmat
