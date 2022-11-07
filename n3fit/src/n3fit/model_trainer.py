@@ -519,11 +519,11 @@ class ModelTrainer:
         #
 
         combiner = CombineCfacLayer(
-                    n_bsm_fac_data=self.n_bsm_fac_data,
-                    bsm_fac_data_scales=self.bsm_fac_data_scales,
-                    bsm_fac_quad_scales=self.bsm_fac_quad_scales,
-                    bsm_fac_data_names=self.bsm_fac_data_names,
-                    bsm_fac_quad_names=self.bsm_fac_quad_names,
+            scales=np.array(self.bsm_fac_data_scales, dtype=np.float32),
+            linear_names=self.bsm_fac_data_names,
+            quad_names=[
+                name for sublist in self.bsm_fac_quad_names for name in sublist
+            ],
         )
 
         log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")

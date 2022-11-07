@@ -150,7 +150,7 @@ class ObservableWrapper:
                     ndat = dataset_dict["ndata"]
                     quad_coefficients = {
                         name: np.zeros(ndat)
-                        for name in self.post_observable.flat_quadnames
+                        for name in self.post_observable.quad_names
                     }
 
                 if self.split == 'ex':
@@ -179,8 +179,8 @@ class ObservableWrapper:
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
-                    bsm_factor_values=cfacs,
-                    quad_bsm_factor_values=quad_cfacs,
+                    linear_values=cfacs,
+                    quad_values=quad_cfacs,
                 )
 
         for fo, inp in zip(self.fixed, fixed_inputs):
@@ -199,8 +199,8 @@ class ObservableWrapper:
             output_layers.append(
                 self.post_observable(
                     inputs=inp,
-                    bsm_factor_values=linear,
-                    quad_bsm_factor_values=quad,
+                    linear_values=linear,
+                    quad_values=quad,
                 )
             )
 
