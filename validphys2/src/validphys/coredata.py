@@ -340,6 +340,10 @@ class FixedObservableData:
         """Construct an object from a
         :py:class:`validphys.core.FixedObservableSpec` instance."""
         linear, quad = spec.load_bsm()
+        if linear is None:
+            linear = {}
+        if quad is None:
+            quad = {}
         return cls(
             commondata=spec.load_exp(),
             prediction=spec.load_pred(),
