@@ -65,7 +65,7 @@ def load_fktable(spec):
             cfdata = parse_cfactor(f)
         if len(cfdata.central_value) != ndata:
             raise BadCFactorError(
-                "Length of cfactor data does not match the length of the fktable."
+                f"Length of cfactor data {cf} does not match the length of the fktable {spec}."
             )
         cfprod *= cfdata.central_value
     # TODO: Find a way to do this in place
