@@ -72,7 +72,7 @@ class ObservableWrapper:
         # it from the Keras wrapper.
         res = {}
         for fo in self.fixed:
-            inp = tf.constant(np.atleast_2d(fo.prediction.central_value))
+            inp = tf.constant(fo.prediction.central_value.reshape((1, 1, -1)))
             kinp = tf.keras.Input(tensor=inp)
             res[fo.commondata.setname] = (kinp, inp)
         return res
