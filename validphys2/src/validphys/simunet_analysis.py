@@ -25,6 +25,7 @@ from validphys import plotutils
 
 from validphys.fitdata import replica_paths
 from validphys.fitdata import read_bsm_facs
+from validphys.plotutils import grey_centre_cmap
 
 log = logging.getLogger(__name__)
 
@@ -42,9 +43,6 @@ def display_format(series):
         series: pd.Series
     """
     return [format_number(x, digits=2) for x in series]
-
-def pass_threshold(value, threshold=0.5):
-    return np.abs(value) < threshold
 
 """
 ---------------
@@ -356,25 +354,18 @@ def plot_bsm_corr(read_bsm_facs):
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
-    # Generate a mask
-    mask = pass_threshold(corr_mat)
+    # retain only important correlations
+    corr_mat[(np.abs(corr_mat) < 0.5)] = np.nan
 
-    # create new colourmap
-    # https://matplotlib.org/3.1.0/tutorials/colors/colormap-manipulation.html
-    # select cmap and define number of colours to display
-    n_colours = 256
-    viridis = plt.get_cmap('viridis', n_colours)
-    new_colors = viridis(np.linspace(0, 1, n_colours))
-    grey = np.array([0.9 * 256/n_colours, 0.9 * 256/n_colours, 0.9 * 256/n_colours, 1])
-    new_colors[64:192, :] = grey
-    new_cmap = ListedColormap(new_colors)
+    # create colourmap with gret in the centre for colourbar
+    new_cmap = grey_centre_cmap()
 
     # formatting
     ax.xaxis.tick_top() # x axis on top
     ax.xaxis.set_label_position('top')
 
     # create heatmap
-    ax = sns.heatmap(corr_mat, mask=mask,
+    ax = sns.heatmap(corr_mat,
     vmin=-1.0, vmax=1.0, linewidths=.5, square=True, cmap=new_cmap);
 
     return fig
