@@ -46,8 +46,6 @@ def display_format(series):
 def pass_threshold(value, threshold=0.5):
     return np.abs(value) < threshold
 
-vf = np.vectorize(pass_threshold)
-
 """
 ---------------
 """
@@ -359,7 +357,7 @@ def plot_bsm_corr(read_bsm_facs):
     round(corr_mat, 1)
 
     # Generate a mask
-    mask = vf(corr_mat)
+    mask = pass_threshold(corr_mat)
 
     # create new colourmap
     # https://matplotlib.org/3.1.0/tutorials/colors/colormap-manipulation.html
