@@ -772,42 +772,22 @@ def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
     # get epochs from the first replica
     first_path = paths[0]
     with open(first_path, 'r') as in_stream:
-        data = in_stream.read()
-    data = json.loads(data)
-    import IPython; IPython.embed()
-    training, valid = zip(*((dt.training, dt.validation) for dt in replica_data))
-    fig, ax = plt.subplots(
-        figsize=(
-            max(plt.rcParams.get("figure.figsize")),
-            max(plt.rcParams.get("figure.figsize")),
-        )
-    )
-    ax.plot(training, valid, marker="o", linestyle="none", markersize=5, zorder=100)
-    if replica_filters:
-        _scatter_marked(ax, training, valid, replica_filters, zorder=90)
-        ax.legend().set_zorder(10000)
+        data = json.loads(in_stream.read())
+    # obtain epochs
+    epochs = data.keys()
+    tr_chi2 = []
+    val_chi2 = []
 
-    ax.set_title(fit.label)
+    for epoch in epochs:
+        tr_chi2.append(data[epoch]['total']['training'])
+        val_chi2.append(data[epoch]['total']['validation'])
 
-    ax.set_xlabel(r"$\chi^2/N_{dat}$ training")
-    ax.set_ylabel(r"$\chi^2/N_{dat}$ validation")
+    fig, ax = plt.subplots()
 
-    min_max_lims = [
-        min([*ax.get_xlim(), *ax.get_ylim()]),
-        max([*ax.get_xlim(), *ax.get_ylim()]),
-    ]
-    ax.plot(min_max_lims, min_max_lims, ":k")
+    ax.plot(epochs, tr_chi2, label='Training chi2')
+    ax.plot(epochs, val_chi2, label='Validation chi2')
+    ax.legend()
 
-    ax.plot(
-        np.mean(training),
-        np.mean(valid),
-        marker="s",
-        color="red",
-        markersize=7,
-        zorder=1000,
-    )
-
-    ax.set_aspect("equal")
     return fig
 
 @figure
