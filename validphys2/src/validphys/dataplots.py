@@ -5,6 +5,7 @@ Plots of relations between data PDFs and fits.
 from __future__ import generator_stop
 
 import logging
+import json
 import itertools
 from collections import defaultdict
 from collections.abc import Sequence
@@ -761,6 +762,53 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     ax.set_aspect("equal")
     return fig
 
+@figure
+def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
+    """
+    Plot the average across replicas of training and validation chi2 
+    for a given epoch
+    """
+    paths = [p / 'chi2exps.log' for p in replica_paths]
+    # get epochs from the first replica
+    first_path = paths[0]
+    with open(first_path, 'r') as in_stream:
+        data = in_stream.read()
+    data = json.loads(data)
+    import IPython; IPython.embed()
+    training, valid = zip(*((dt.training, dt.validation) for dt in replica_data))
+    fig, ax = plt.subplots(
+        figsize=(
+            max(plt.rcParams.get("figure.figsize")),
+            max(plt.rcParams.get("figure.figsize")),
+        )
+    )
+    ax.plot(training, valid, marker="o", linestyle="none", markersize=5, zorder=100)
+    if replica_filters:
+        _scatter_marked(ax, training, valid, replica_filters, zorder=90)
+        ax.legend().set_zorder(10000)
+
+    ax.set_title(fit.label)
+
+    ax.set_xlabel(r"$\chi^2/N_{dat}$ training")
+    ax.set_ylabel(r"$\chi^2/N_{dat}$ validation")
+
+    min_max_lims = [
+        min([*ax.get_xlim(), *ax.get_ylim()]),
+        max([*ax.get_xlim(), *ax.get_ylim()]),
+    ]
+    ax.plot(min_max_lims, min_max_lims, ":k")
+
+    ax.plot(
+        np.mean(training),
+        np.mean(valid),
+        marker="s",
+        color="red",
+        markersize=7,
+        zorder=1000,
+    )
+
+    ax.set_aspect("equal")
+    return fig
 
 @figure
 def plot_trainvaliddist(fit, replica_data):
