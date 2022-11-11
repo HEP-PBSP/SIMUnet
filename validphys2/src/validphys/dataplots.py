@@ -775,12 +775,15 @@ def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
         data = json.loads(in_stream.read())
     # obtain epochs
     epochs = data.keys()
-    tr_chi2 = []
-    val_chi2 = []
+    # initialise dataframe
 
-    for epoch in epochs:
-        tr_chi2.append(data[epoch]['total']['training'])
-        val_chi2.append(data[epoch]['total']['validation'])
+    first_col = pd.read_json(first_path).loc['total']
+    all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
+
+
+    #for epoch in epochs:
+        #tr_chi2.append(data[epoch]['total']['training'])
+        #val_chi2.append(data[epoch]['total']['validation'])
 
     fig, ax = plt.subplots()
 
