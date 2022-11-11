@@ -951,9 +951,11 @@ class FixedObservableSpec:
         return name_cf_map
 
     def load_bsm(self):
-        return self._load_bsm_values(self.bsm_fac_data_names_CF), self._load_bsm_values(
-            self.bsm_fac_quad_names_CF
+        return (
+            self._load_bsm_values(self.bsm_fac_data_names_CF),
+            self._load_bsm_values(self.bsm_fac_quad_names_CF),
         )
+
 
     def load(self):
         from validphys.coredata import FixedObservableData
