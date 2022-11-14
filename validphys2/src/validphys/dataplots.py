@@ -763,17 +763,12 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     return fig
 
 @figure
-def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
+def plot_tr_val_epoch(fit, replica_paths):
     """
     Plot the average across replicas of training and validation chi2 
     for a given epoch
     """
     paths = [p / 'chi2exps.log' for p in replica_paths]
-    # get epochs from the first replica
-    first_path = paths[0]
-    with open(first_path, 'r') as in_stream:
-        data = json.loads(in_stream.read())
-
     # initialise dataframe
     all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
     # get training and validation data
@@ -784,12 +779,14 @@ def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
     val_chi2 = val_data.mean(axis=1)
 
     fig, ax = plt.subplots()
-
-    ax.plot(tr_chi2.index, tr_chi2, label='Training chi2')
-    ax.plot(val_chi2.index, val_chi2, label='Validation chi2')
+    # formatting
+    ax.plot(tr_chi2.index, tr_chi2, label=r'Training $\chi^2$')
+    ax.plot(val_chi2.index, val_chi2, label=r'Validation $\chi^2$')
     ax.legend()
     ax.grid(True)
     ax.set_title(fit.name)
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel(r'$\chi^2$', rotation='horizontal', labelpad=10.0)
 
     return fig
 
