@@ -773,23 +773,23 @@ def plot_tr_val_epoch(fit, replica_data, replica_paths, replica_filters=None):
     first_path = paths[0]
     with open(first_path, 'r') as in_stream:
         data = json.loads(in_stream.read())
-    # obtain epochs
-    epochs = data.keys()
+
     # initialise dataframe
-
-    first_col = pd.read_json(first_path).loc['total']
     all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
+    # get training and validation data
+    tr_data = all_cols.applymap(lambda x: x['training'])
+    val_data = all_cols.applymap(lambda x: x['validation'])
 
-
-    #for epoch in epochs:
-        #tr_chi2.append(data[epoch]['total']['training'])
-        #val_chi2.append(data[epoch]['total']['validation'])
+    tr_chi2 = tr_data.mean(axis=1)
+    val_chi2 = val_data.mean(axis=1)
 
     fig, ax = plt.subplots()
 
-    ax.plot(epochs, tr_chi2, label='Training chi2')
-    ax.plot(epochs, val_chi2, label='Validation chi2')
+    ax.plot(tr_chi2.index, tr_chi2, label='Training chi2')
+    ax.plot(val_chi2.index, val_chi2, label='Validation chi2')
     ax.legend()
+    ax.grid(True)
+    ax.set_title(fit.name)
 
     return fig
 
