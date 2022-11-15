@@ -772,8 +772,8 @@ def plot_tr_val_epoch(fit, replica_paths):
     # initialise dataframe
     all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
     # get training and validation data
-    tr_data = all_cols.applymap(lambda x: x['training'])
-    val_data = all_cols.applymap(lambda x: x['validation'])
+    tr_data = all_cols.applymap(lambda x: x['training'], na_action='ignore')
+    val_data = all_cols.applymap(lambda x: x['validation'], na_action='ignore')
 
     tr_chi2 = tr_data.mean(axis=1)
     val_chi2 = val_data.mean(axis=1)
