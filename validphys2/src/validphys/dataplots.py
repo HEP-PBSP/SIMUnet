@@ -762,7 +762,7 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     ax.set_aspect("equal")
     return fig
 
-@figure
+@figuregen
 def plot_tr_val_epoch(fit, replica_paths):
     """
     Plot the average across replicas of training and validation chi2 
@@ -788,7 +788,7 @@ def plot_tr_val_epoch(fit, replica_paths):
     ax.set_xlabel('Epoch')
     ax.set_ylabel(r'$\chi^2$', rotation='horizontal', labelpad=10.0)
 
-    return fig
+    yield fig
 
 @figure
 def plot_trainvaliddist(fit, replica_data):
