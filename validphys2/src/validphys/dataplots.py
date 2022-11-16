@@ -5,7 +5,6 @@ Plots of relations between data PDFs and fits.
 from __future__ import generator_stop
 
 import logging
-import json
 import itertools
 from collections import defaultdict
 from collections.abc import Sequence
@@ -761,34 +760,6 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
 
     ax.set_aspect("equal")
     return fig
-
-@figuregen
-def plot_tr_val_epoch(fit, replica_paths):
-    """
-    Plot the average across replicas of training and validation chi2 
-    for a given epoch
-    """
-    paths = [p / 'chi2exps.log' for p in replica_paths]
-    # initialise dataframe
-    all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
-    # get training and validation data
-    tr_data = all_cols.applymap(lambda x: x['training'], na_action='ignore')
-    val_data = all_cols.applymap(lambda x: x['validation'], na_action='ignore')
-
-    tr_chi2 = tr_data.mean(axis=1)
-    val_chi2 = val_data.mean(axis=1)
-
-    fig, ax = plt.subplots()
-    # formatting
-    ax.plot(tr_chi2.index, tr_chi2, label=r'Training $\chi^2$')
-    ax.plot(val_chi2.index, val_chi2, label=r'Validation $\chi^2$')
-    ax.legend()
-    ax.grid(True)
-    ax.set_title(fit.name)
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel(r'$\chi^2$', rotation='horizontal', labelpad=10.0)
-
-    yield fig
 
 @figure
 def plot_trainvaliddist(fit, replica_data):
