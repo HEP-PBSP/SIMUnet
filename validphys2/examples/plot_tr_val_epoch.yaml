@@ -1,0 +1,16 @@
+meta:
+  title: Training and validation chi2 per epoch
+  author: MMA 
+  keywords: [simunet, plot]
+
+fits:
+- 221115_mma_minifit_fixed_ns
+- 221115_mma_minifit_fixed_50
+- 221115_mma_minifit_fixed
+
+
+template_text: |
+ # Training and validation chi2 per epoch 
+ {@fits plot_tr_val_epoch@}
+actions_:
+  - report(main=True)
