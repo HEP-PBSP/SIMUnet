@@ -335,7 +335,7 @@ def bsm_facs_bounds(read_bsm_facs):
     return df
 
 @figure
-def plot_bsm_corr(read_bsm_facs):
+def plot_bsm_corr(fit, read_bsm_facs):
     """
     Correlation matrix to summarise information about
     the BSM coefficient results.
@@ -363,6 +363,7 @@ def plot_bsm_corr(read_bsm_facs):
     # formatting
     ax.xaxis.tick_top() # x axis on top
     ax.xaxis.set_label_position('top')
+    ax.set_title(fit.name, fontsize=20, pad=20)
 
     # create heatmap
     ax = sns.heatmap(corr_mat,
