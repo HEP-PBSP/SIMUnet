@@ -761,7 +761,6 @@ def plot_training_validation(fit, replica_data, replica_filters=None):
     ax.set_aspect("equal")
     return fig
 
-
 @figure
 def plot_trainvaliddist(fit, replica_data):
     """KDEs for the trainning and validation distributions for

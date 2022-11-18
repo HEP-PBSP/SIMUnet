@@ -286,6 +286,35 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
 
         return fig
 
+
+@figuregen
+def plot_tr_val_epoch(fit, replica_paths):
+    """
+    Plot the average across replicas of training and validation chi2 
+    for a given epoch
+    """
+    paths = [p / 'chi2exps.log' for p in replica_paths]
+    # initialise dataframe
+    all_cols = pd.concat([pd.read_json(i).loc['total'] for i in paths], axis=1)
+    # get training and validation data
+    tr_data = all_cols.applymap(lambda x: x['training'], na_action='ignore')
+    val_data = all_cols.applymap(lambda x: x['validation'], na_action='ignore')
+
+    tr_chi2 = tr_data.mean(axis=1)
+    val_chi2 = val_data.mean(axis=1)
+
+    fig, ax = plt.subplots()
+    # formatting
+    ax.plot(tr_chi2.index, tr_chi2, label=r'Training $\chi^2$')
+    ax.plot(val_chi2.index, val_chi2, label=r'Validation $\chi^2$')
+    ax.legend()
+    ax.grid(True)
+    ax.set_title(fit.name)
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel(r'$\chi^2$', rotation='horizontal', labelpad=10.0)
+
+    yield fig
+
 @table
 def bsm_facs_bounds(read_bsm_facs):
     """
