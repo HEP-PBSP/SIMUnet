@@ -321,7 +321,6 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
-    print(dataset)
     parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
     parsed_bsm_quad_facs = parse_bsm_fac_quad_names_CF(dataset.bsm_fac_quad_names_CF, dataset.cuts)
     if parsed_bsm_facs is None:
@@ -359,7 +358,6 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     replica_result = 1 + np.sum(scaled_replicas, axis=2)
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
-    print(result)
     return result
 
 
