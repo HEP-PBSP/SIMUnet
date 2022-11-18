@@ -129,6 +129,9 @@ SIMUnet analysis
 ### Combined 2D histograms
 {@plot_2d_bsm_facs_fits@}
 
+### BSM correlations  
+{@fits plot_bsm_corr@}
+
 Code versions
 -------------
 {@fits_version_table@}
