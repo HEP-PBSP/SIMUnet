@@ -321,6 +321,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
+    print(dataset)
     parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
     parsed_bsm_quad_facs = parse_bsm_fac_quad_names_CF(dataset.bsm_fac_quad_names_CF, dataset.cuts)
     if parsed_bsm_facs is None:
@@ -333,6 +334,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     fit_bsm_fac_df = pd.DataFrame(
         {k: v.central_value for k, v in parsed_bsm_facs.items()}
     )
+    
     scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
     _, nops = read_bsm_facs.shape
     if parsed_bsm_quad_facs is not None:
@@ -347,11 +349,17 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
                     op_products = read_bsm_facs.iloc[:,i].values * read_bsm_facs.iloc[:,j].values
                     op_name = dataset.bsm_fac_quad_names[i][j] 
                     op_values = quad_bsm_fac_df[op_name]
-                    np.append(scaled_replicas, op_products[:,np.newaxis] * op_values.values[np.newaxis, :, np.newaxis], axis=2)               
+                    nreps = len(op_products)
+                    ndat = len(op_values)
+                    new_op_contribution = np.zeros((ndat,nreps,1))
+                    for a in range(ndat):
+                        new_op_contribution[a,:,0] = op_products[:]*op_values[a]
+                    np.append(scaled_replicas, new_op_contribution, axis=2)               
 
     replica_result = 1 + np.sum(scaled_replicas, axis=2)
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
+    print(result)
     return result
 
 
