@@ -132,6 +132,9 @@ SIMUnet analysis
 ### BSM correlations  
 {@fits plot_bsm_corr@}
 
+### PDF-BSM correlations  
+{@plot_bsm_pdf_corr_fits@}
+
 Code versions
 -------------
 {@fits_version_table@}
