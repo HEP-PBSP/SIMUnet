@@ -26,6 +26,7 @@ from validphys import plotutils
 from validphys.fitdata import replica_paths
 from validphys.fitdata import read_bsm_facs
 from validphys.plotutils import grey_centre_cmap
+from validphys.pdfbases import PDG_PARTONS
 
 log = logging.getLogger(__name__)
 
@@ -411,6 +412,43 @@ def plot_bsm_corr(fit, read_bsm_facs):
     vmin=-1.0, vmax=1.0, linewidths=.5, square=True, cmap=new_cmap);
 
     return fig
+
+@figuregen
+def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
+    from validphys.pdfgrids import xplotting_grid
+    # read dataframe
+    bsm_facs_df = read_bsm_facs
+    # reorder BSM facs
+    bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    # get PDF
+    pdf = fitpdf['pdf']
+    # get xplotting_grid
+    x_grid_obj = xplotting_grid(pdf, Q)
+
+    for bsm_fac in bsm_facs_df.columns:
+        # get the values of the BSM factors
+        bsm_fac_vals = bsm_facs_df[bsm_fac].values
+        # Initialise axes
+        fig, ax = plt.subplots()
+        # Define xgrid and scale
+        xgrid = x_grid_obj.xgrid
+        scale = x_grid_obj.scale
+        # get grid values
+        gv = x_grid_obj.grid_values.error_members()
+        for flavour in flavours:
+            flavour_label = PDG_PARTONS[flavour]
+            index = tuple(x_grid_obj.flavours).index(flavour)
+            parton_grids = gv[:, index, ...]
+            # calculate correlation
+            num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
+            den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
+            corr = num / den
+            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_fac + f') {pdf.label}')
+        ax.set_xscale(scale)
+        ax.set_xlabel(r'$x$')
+        ax.set_title(f'Correlation {bsm_fac} - PDFs ' + f'(Q = {Q} GeV)')
+        ax.legend()
+        yield fig
 
 @figuregen
 def plot_2d_bsm_facs_fits(fits):
