@@ -20,6 +20,7 @@ import matplotlib.collections as mcollections
 from matplotlib  import transforms
 from matplotlib.markers import MarkerStyle
 from matplotlib import ticker
+from matplotlib.colors import ListedColormap
 
 from reportengine.floatformatting import format_number
 
@@ -529,3 +530,30 @@ def spiderplot(xticks, vals, label, ax=None):
     ax.legend(fontsize=12)
 
     return ax
+
+def grey_centre_cmap(cmap='viridis', frac=0.5):
+    """
+    Generates a segmented colour map with a fraction `frac`
+    of its full range set to a scale of grey for a correlation plot.
+    Parameters:
+    ----------
+        frac: float
+    Returns:
+    -------
+        matplotlib.colors.ListedColorMap
+    """
+    # https://matplotlib.org/3.1.0/tutorials/colors/colormap-manipulation.html
+    # define number of colours to display
+    n_colours = 256
+    # define cmap
+    viridis = plt.get_cmap(cmap, n_colours)
+    # define colour grid
+    new_colors = viridis(np.linspace(0, 1, n_colours))
+    grey = 0.9 * np.array([1, 1, 1, 1])
+    # find indices 
+    middle_idx = n_colours/2
+    distance = 0.5 * frac * n_colours
+    upper_idx, lower_idx = int(middle_idx + distance), int(middle_idx - distance)
+    new_colors[lower_idx:upper_idx, :] = grey
+
+    return ListedColormap(new_colors)

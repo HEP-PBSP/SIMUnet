@@ -10,7 +10,9 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.colors import ListedColormap
 import pandas as pd
+import seaborn as sns
 import itertools
 
 from reportengine.figure import figure, figuregen
@@ -23,6 +25,7 @@ from validphys import plotutils
 
 from validphys.fitdata import replica_paths
 from validphys.fitdata import read_bsm_facs
+from validphys.plotutils import grey_centre_cmap
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +43,21 @@ def display_format(series):
         series: pd.Series
     """
     return [format_number(x, digits=2) for x in series]
+
+BSM_FAC_DISPLAY = [
+'Opt', 'O3pQ3', 'OpQM', # currents
+'OtZ', 'OtW', 'OtG', # dipoles
+'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq', # octets
+'O1qd','O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq', # singlets
+'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1' # 4-heavy
+]
+
+def reorder_cols(cols):
+    return sorted(cols, key=BSM_FAC_DISPLAY.index)
+
+"""
+---------------
+"""
 
 @figuregen
 def plot_nd_bsm_facs(read_bsm_facs):
@@ -355,6 +373,44 @@ def bsm_facs_bounds(read_bsm_facs):
     df['Std'] = stds_disp
     
     return df
+
+@figure
+def plot_bsm_corr(fit, read_bsm_facs):
+    """
+    Correlation matrix to summarise information about
+    the BSM coefficient results.
+    Paramaters
+    ----------
+        read_bsm_facs: pd.Dataframe
+    """
+
+    # figsize (11, 9) has good proportions
+    fig, ax = plt.subplots(1, 1, figsize=(11, 9))
+    # set background colour
+    ax.set_facecolor("0.9")
+
+    # read dataframe and round numbers
+    bsm_facs_df = read_bsm_facs
+    bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    corr_mat = bsm_facs_df.corr()
+    round(corr_mat, 1)
+
+    # retain only important correlations
+    corr_mat[(np.abs(corr_mat) < 0.5)] = np.nan
+
+    # create colourmap with gret in the centre for colourbar
+    new_cmap = grey_centre_cmap()
+
+    # formatting
+    ax.xaxis.tick_top() # x axis on top
+    ax.xaxis.set_label_position('top')
+    ax.set_title(fit.name, fontsize=20, pad=20)
+
+    # create heatmap
+    ax = sns.heatmap(corr_mat,
+    vmin=-1.0, vmax=1.0, linewidths=.5, square=True, cmap=new_cmap);
+
+    return fig
 
 @figuregen
 def plot_2d_bsm_facs_fits(fits):
