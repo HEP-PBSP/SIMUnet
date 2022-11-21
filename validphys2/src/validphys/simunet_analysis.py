@@ -44,6 +44,17 @@ def display_format(series):
     """
     return [format_number(x, digits=2) for x in series]
 
+BSM_FAC_DISPLAY = [
+'Opt', 'O3pQ3', 'OpQM', # currents
+'OtZ', 'OtW', 'OtG', # dipoles
+'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq', # octets
+'O1qd','O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq', # singlets
+'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1' # 4-heavy
+]
+
+def reorder_cols(cols):
+    return sorted(cols, key=BSM_FAC_DISPLAY.index)
+
 """
 ---------------
 """
@@ -351,6 +362,7 @@ def plot_bsm_corr(fit, read_bsm_facs):
 
     # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
+    bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
