@@ -99,8 +99,11 @@ lumi_report:
   meta: Null
   template: lumi.md
 
-flavours:
-  - 21 # gluon
+flavour_sets:
+ - flavours: [21] # gluon
+ - flavours: [2] # up
+ - flavours: [1] # down 
+ - flavours: [3] # strange
 
 template: report.md
 
