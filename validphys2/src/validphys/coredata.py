@@ -5,6 +5,8 @@ wrappers.
 
 """
 import dataclasses
+from typing import Dict
+
 import numpy as np
 import pandas as pd
 
@@ -303,8 +305,8 @@ class FixedObservableData:
     """Container for a loaded fixed observable"""
     commondata: CommonData
     prediction: CFactorData
-    linear_bsm: dict[str, CFactorData]
-    quad_bsm: dict[str, CFactorData]
+    linear_bsm: Dict[str, CFactorData]
+    quad_bsm: Dict[str, CFactorData]
 
     @property
     def ndata(self):
