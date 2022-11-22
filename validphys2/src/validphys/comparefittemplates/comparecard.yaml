@@ -99,6 +99,9 @@ lumi_report:
   meta: Null
   template: lumi.md
 
+flavours:
+  - 21 # gluon
+
 template: report.md
 
 positivity:

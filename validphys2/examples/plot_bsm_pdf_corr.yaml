@@ -1,0 +1,20 @@
+meta:
+  title: Correlation between PDFs and BSM factors
+  author: MMA 
+  keywords: [simunet, plot]
+
+fits:
+ - 220929-lm-global-fixedpdf-lin 
+# - 220929-lm-global-fixedpdf-quad
+
+Q: 100
+
+flavours:
+ - 2 # up
+ - 21 # gluon
+
+template_text: |
+ # PDF-BSM factor correlations
+ {@fits plot_bsm_pdf_corr@}
+actions_:
+  - report(main=True)
