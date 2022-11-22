@@ -10,7 +10,7 @@ fits:
 Q: 100
 
 flavours:
-# - 2 # up
+ - 2 # up
  - 21 # gluon
 
 template_text: |
