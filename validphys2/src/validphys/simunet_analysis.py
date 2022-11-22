@@ -678,7 +678,7 @@ def bsm_facs_bounds_plot(fits):
         bsm_fac_ops = bsm_facs_df.columns.tolist()
         all_ops.append(bsm_fac_ops)
     # Remove repeated operators
-    all_ops = sorted(list({o for fit_ops in all_ops for o in fit_ops}))
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
 
     # store the relevant values
     bounds_dict = {}
