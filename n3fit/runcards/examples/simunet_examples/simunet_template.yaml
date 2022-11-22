@@ -16,6 +16,9 @@ dataset_inputs:
 - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, bsm_sector: "ttz", bsm_order: "LO_QUAD"} 
 - {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, frac: 0.75, bsm_sector: "tw", bsm_order: "LO_LIN"} 
 
+fixed_observable_inputs:
+  - {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "tw", bsm_order: "NLO_QUAD"}
+
 fixed_pdf_fit: False
 # load_weights_from_fit: 220907-jmm-fixed_test # If this is uncommented, training starts here.
 
@@ -29,8 +32,6 @@ bsm_sector_data:
 - {name: "ttz", operators: ["Opt", "OtZ"]}
 - {name: "tw", operators: ["OtG"]}
 
-fixed_observable_inputs:
-  - {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "tw", bsm_order: "NLO_QUAD"}
 ############################################################
 datacuts:
   t0pdfset: PDFEFT_baseline_n3fit_iterated_weights # PDF set to generate t0 covmat
