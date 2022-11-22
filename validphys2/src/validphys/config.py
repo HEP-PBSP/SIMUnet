@@ -1825,10 +1825,10 @@ class CoreConfig(configparser.Config):
         self,
         fixed_observable_inputs,
         theoryid,
-        bsm_fac_data,
-        bsm_sector_data,
-        bsm_fac_data_names,
-        n_bsm_fac_data,
+        bsm_fac_data=None,
+        bsm_sector_data=None,
+        bsm_fac_data_names=None,
+        n_bsm_fac_data=None,
     ):
         if fixed_observable_inputs is None:
             fixed_observable_inputs = []
