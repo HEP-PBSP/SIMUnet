@@ -329,6 +329,8 @@ class Loader(LoaderBase):
 
     @functools.lru_cache()
     def check_theoryID(self, theoryID):
+        if isinstance(theoryID, TheoryIDSpec):
+            return theoryID
         theoryID = str(theoryID)
         theopath = self.datapath / ('theory_%s' % theoryID)
         if not theopath.exists():

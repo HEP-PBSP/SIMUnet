@@ -574,9 +574,10 @@ class PositivitySetSpec(DataSetSpec):
 #We allow to expand the experiment as a list of datasets
 class DataGroupSpec(TupleComp, namespaces.NSList):
 
-    def __init__(self, name, datasets, dsinputs=None):
+    def __init__(self, name, datasets, dsinputs=None, fixed_observables=None, foinputs=None):
         #This needs to be hashable
         datasets = tuple(datasets)
+        fixed_observables = tuple(fixed_observables)
 
         #TODO: Find a better way for interactive usage.
         if dsinputs is not None:
@@ -586,11 +587,17 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
         self.datasets = datasets
         self.dsinputs = dsinputs
 
+        self.fixed_observables = fixed_observables
+        self.foinputs = foinputs
+
         #TODO: Add dsinputs to comp tuple?
-        super().__init__(name, datasets)
+        super().__init__(name, datasets, fixed_observables)
 
         #TODO: Can we do  better cooperative inherece trick than this?
         namespaces.NSList.__init__(self, dsinputs, nskey='dataset_input')
+
+    def iterfixed(self):
+        return namespaces.NSList(self.foinputs, nskey='fixed_observable_input')
 
     @functools.lru_cache(maxsize=32)
     def load(self):

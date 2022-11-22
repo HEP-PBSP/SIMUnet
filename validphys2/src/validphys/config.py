@@ -1441,6 +1441,7 @@ class CoreConfig(configparser.Config):
     def produce_data(
         self,
         data_input,
+        fixed_observable_inputs=None,
         *,
         group_name="data",
     ):
@@ -1452,7 +1453,29 @@ class CoreConfig(configparser.Config):
             with self.set_context(ns=self._curr_ns.new_child({"dataset_input": dsinp})):
                 datasets.append(self.parse_from_(None, "dataset", write=False)[1])
 
-        return DataGroupSpec(name=group_name, datasets=datasets, dsinputs=data_input)
+        if fixed_observable_inputs is None:
+            fixed_observable_inputs = []
+
+
+        fixed_observables = []
+        for fo in fixed_observable_inputs:
+            with self.set_context(
+                ns=self._curr_ns.new_child({"fixed_observable_input": fo})
+            ):
+                fixed_observables.append(
+                    self.parse_from_(None, "fixed_observable", write=False)[1]
+                )
+
+        return DataGroupSpec(
+            name=group_name,
+            datasets=datasets,
+            dsinputs=data_input,
+            fixed_observables=fixed_observables,
+            foinputs=fixed_observable_inputs,
+        )
+
+    def produce_fixed_inputs_from_data(self, data):
+        return data.iterfixed()
 
     def _parse_data_input_from_(
         self,
@@ -1793,10 +1816,10 @@ class CoreConfig(configparser.Config):
         self,
         fixed_observable_input,
         theoryid,
-        bsm_fac_data,
-        bsm_sector_data,
-        bsm_fac_data_names,
-        n_bsm_fac_data,
+        bsm_fac_data=None,
+        bsm_sector_data=None,
+        bsm_fac_data_names=None,
+        n_bsm_fac_data=None,
     ):
 
         bsm_sector = fixed_observable_input.bsm_sector

@@ -178,6 +178,18 @@ def groups_index(groups_data):
     TODO: add example
     """
     records = []
+
+    def records_append(group, dataset, idat):
+        records.append(
+            dict(
+                [
+                    ("group", str(group.name)),
+                    ("dataset", str(dataset.name)),
+                    ("id", idat),
+                ]
+            )
+        )
+
     for group in groups_data:
         for dataset in group.datasets:
             if dataset.cuts:
@@ -186,15 +198,10 @@ def groups_index(groups_data):
                 # No cuts - use all data
                 data_id = np.arange(dataset.commondata.ndata, dtype=int)
             for idat in data_id:
-                records.append(
-                    dict(
-                        [
-                            ("group", str(group.name)),
-                            ("dataset", str(dataset.name)),
-                            ("id", idat),
-                        ]
-                    )
-                )
+                records_append(group, dataset, idat)
+        for fo in group.fixed_observables:
+            for idat in fo.cuts.load():
+                records_append(group, fo, idat)
 
     columns = ["group", "dataset", "id"]
     df = pd.DataFrame(records, columns=columns)

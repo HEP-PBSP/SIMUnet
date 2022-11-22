@@ -447,6 +447,11 @@ def validation_pseudodata(pseudodata_table, training_mask):
 exps_tr_masks = collect("tr_masks", ("group_dataset_inputs_by_experiment",))
 replicas_exps_tr_masks = collect("exps_tr_masks", ("replicas",))
 
+exps_fixed_tr_masks = collect(
+    "fixed_observables_masks", ("group_dataset_inputs_by_experiment",)
+)
+replicas_fixed_tr_masks = collect("exps_fixed_tr_masks", ("replicas",))
+
 
 @table
 def replica_training_mask_table(replica_training_mask):
@@ -454,7 +459,9 @@ def replica_training_mask_table(replica_training_mask):
     """
     return replica_training_mask
 
-def replica_training_mask(exps_tr_masks, replica, experiments_index):
+def replica_training_mask(
+    exps_tr_masks, exps_fixed_tr_masks, replica, experiments_index
+):
     """Save the boolean mask used to split data into training and validation
     for a given replica as a pandas DataFrame, indexed by
     :py:func:`validphys.results.experiments_index`. Can be used to reconstruct
@@ -502,8 +509,8 @@ def replica_training_mask(exps_tr_masks, replica, experiments_index):
     """
     all_masks = np.concatenate([
         ds_mask
-        for exp_masks in exps_tr_masks
-        for ds_mask in exp_masks
+        for exp_masks, fixed_masks in zip(exps_tr_masks,  exps_fixed_tr_masks)
+        for ds_mask in (*exp_masks, *fixed_masks)
     ])
     return pd.DataFrame(
         all_masks,
