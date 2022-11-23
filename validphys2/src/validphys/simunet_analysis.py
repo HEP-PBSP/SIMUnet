@@ -10,6 +10,7 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
 import pandas as pd
@@ -712,8 +713,11 @@ def bsm_facs_bounds_plot(fits):
     colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
 
     for scale in scales:
-        # formatting plots
+        # initialise plots
         fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
 
         for fit in fits:
             bounds = bounds_dict[fit.name]
@@ -725,24 +729,31 @@ def bsm_facs_bounds_plot(fits):
             ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + fit.name,
             color=colour_key[fits.index(fit)], lw=2.0)
 
-        # line for SM prediction
-        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
-
-        # set scientific notation for thei scatter plot
-        ax.set_yscale(scale)
-
         # set x positions for labels and labels
         ax.set_xticks(np.arange(len(all_ops)))
-        ax.set_xticklabels(all_ops, rotation='vertical', fontsize=12)
+        ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
 
-        # set y positions for labels
-        #y_values = [-10.0, -1.0, -0.1, 0.1, 1.0, 10.0] 
-        #ax.set_yticks(y_values)
-        #ax.set_yticklabels(y_values)
-        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=12)
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
 
-        # get rid of scientific notation in y axis
-        ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-10, -1, -0.1, 0.0, 0.1, 1, 10] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis
+            #ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+            #ax.set_yticks(y_values)
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
 
         # final formatting
         ax.legend()
