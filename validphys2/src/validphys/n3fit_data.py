@@ -261,7 +261,10 @@ def fitting_data_dict(
     # TODO: Plug in the python data loading when available. Including but not
     # limited to: central values, ndata, replica generation, covmat construction
     if data.datasets:
-        spec_c = data.load()
+        try:
+            spec_c = data.load()
+        except:
+            breakpoint()
         ndata = spec_c.GetNData()
         expdata_true = spec_c.get_cv().reshape(1, ndata)
         datasets = common_data_reader_experiment(spec_c, data)

@@ -738,13 +738,26 @@ class Loader(LoaderBase):
         else:
             bsm_fac_quad_names_CF = None
 
+        if bsm_fac_data_names is not None:
+            bsm_fac_data_names = tuple(bsm_fac_data_names)
+
+        if bsm_fac_quad_names is not None:
+            bsm_fac_quad_names = tuple(tuple(part) for part in bsm_fac_quad_names)
+
+        if bsm_fac_data_names_CF is not None:
+            bsm_fac_data_names_CF = tuple(bsm_fac_data_names_CF.items())
+
+        if bsm_fac_quad_names_CF is not None:
+            bsm_fac_quad_names_CF = tuple(bsm_fac_quad_names_CF.items())
+
+
         return FixedObservableSpec(
             name=setname,
             commondata=cd,
             pred_path=pred_path,
             frac=fixed_observable_input.frac,
-            bsm_fac_data_names_CF=bsm_fac_data_names_CF,
-            bsm_fac_quad_names_CF=bsm_fac_quad_names_CF,
+            bsm_fac_data_names_CF_data=bsm_fac_data_names_CF,
+            bsm_fac_quad_names_CF_data=bsm_fac_quad_names_CF,
             bsm_fac_quad_names=bsm_fac_quad_names,
             bsm_fac_data_names=bsm_fac_data_names,
         )

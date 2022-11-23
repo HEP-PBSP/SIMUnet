@@ -577,7 +577,8 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
     def __init__(self, name, datasets, dsinputs=None, fixed_observables=None, foinputs=None):
         #This needs to be hashable
         datasets = tuple(datasets)
-        fixed_observables = tuple(fixed_observables)
+        if fixed_observables is not None:
+            fixed_observables = tuple(fixed_observables)
 
         #TODO: Find a better way for interactive usage.
         if dsinputs is not None:
@@ -911,10 +912,19 @@ class FixedObservableSpec:
     frac: float = 1
     # Note: This is not a dict as we want it to be hashable
     custom_group: Optional[str] = None
-    bsm_fac_data_names_CF: tuple = ((),)
-    bsm_fac_quad_names_CF: tuple = ((),)
-    bsm_fac_quad_names: tuple = ((),)
-    bsm_fac_data_names: tuple = ((),)
+    bsm_fac_data_names_CF_data: tuple = ()
+    bsm_fac_quad_names_CF_data: tuple = ()
+    bsm_fac_quad_names: tuple = ()
+    bsm_fac_data_names: tuple = ()
+
+    @property
+    def bsm_fac_data_names_CF(self):
+        return dict(self.bsm_fac_data_names_CF_data)
+
+    @property
+    def bsm_fac_quad_names_CF(self):
+        return dict(self.bsm_fac_quad_names_CF_data)
+
 
     # Bogus cuts to make this more compatible with the usual data
     @property
