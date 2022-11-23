@@ -678,7 +678,7 @@ def bsm_facs_bounds_plot(fits):
         bsm_facs_df = read_bsm_facs(paths)
         bsm_fac_ops = bsm_facs_df.columns.tolist()
         all_ops.append(bsm_fac_ops)
-    # Remove repeated operators
+    # Remove repeated operators and reorder
     all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
 
     # store the relevant values
@@ -747,9 +747,9 @@ def bsm_facs_bounds_plot(fits):
             y_values = [-10, -1, -0.1, 0.0, 0.1, 1, 10] 
             ax.set_yticks(y_values)
 
-            # get rid of scientific notation in y axis
-            #ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
-            #ax.set_yticks(y_values)
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
 
         # treatment of linear scale
         else:
