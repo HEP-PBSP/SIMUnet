@@ -1,0 +1,15 @@
+meta:
+  title: BSM factor 95% CL bounds plots
+  author: MMA 
+  keywords: [simunet, plot]
+
+fits:
+- 221118-lm-global-fixedpdf-nlo-quad
+#- 221107-lm-global-fixedpdf-lo-lin
+- 221118-lm-global-fixedpdf-nlo-quad_valsplit
+
+template_text: |
+ # 95% CL bounds
+ {@plot_bsm_facs_bounds@}
+actions_:
+  - report(main=True)
