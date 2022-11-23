@@ -308,7 +308,7 @@ def fitting_data_dict(
 
 
     if fixed_observables_masks:
-        for fo, mask in zip(fixed_observables_data, fixed_observables_masks):
+        for fo, mask in zip(pseudodata_fixed_data, fixed_observables_masks):
             tr, vl = fo.split(mask)
             fixed_observables_tr.append(tr)
             fixed_observables_vl.append(vl)
