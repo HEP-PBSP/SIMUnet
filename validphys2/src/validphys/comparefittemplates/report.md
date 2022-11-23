@@ -120,6 +120,9 @@ SIMUnet analysis
 ### Comparison histograms of BSM factors
 {@plot_nd_bsm_facs_fits@}
 
+### Plots of the bounds
+{@plot_bsm_facs_bounds@}
+
 ### 68% CL bounds comparison
 {@bsm_facs_68bounds_fits@}
 
