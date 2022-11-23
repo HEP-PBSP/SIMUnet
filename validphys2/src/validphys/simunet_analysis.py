@@ -8,7 +8,9 @@ import logging
 
 import numpy as np
 import numpy.linalg as la
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
 import pandas as pd
@@ -654,6 +656,118 @@ def bsm_facs_95bounds_fits(fits):
         fits: NSList of FitSpec 
     """ 
     return bsm_facs_bounds_fits(fits, n_sigma=2)
+
+@figuregen
+def plot_bsm_facs_bounds(fits):
+    """
+    Figure generator to plot the bounds of
+    the BSM coefficients fitted.
+    Paramaters
+    ----------
+        fits: NSList of FitSpec 
+        n_sigma: number
+    The plot contains information about the mean
+    and standard deviation of the BSM coefficients in the fit, 
+    as well as showing the confidence levels by 
+    computing mean ± 2*std.
+    """ 
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators and reorder
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+
+    # store the relevant values
+    bounds_dict = {}
+    best_fits_dict ={} 
+
+    for fit in fits:
+        bounds = []
+        best_fits = []
+        for op in all_ops:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                mean =  values.mean()
+                std = values.std()
+                cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
+                # best-fit value
+                best_fits.append(mean)
+                # append bounds
+                bounds.append([cl_lower, cl_upper])
+            else:
+                # if the operator is not in the fit, then assume SM
+                best_fits.append(0.0)
+                bounds.append([0.0, 0.0])
+
+        bounds_dict[fit.name] = bounds
+        best_fits_dict[fit.name] = best_fits
+
+    # plot parameters
+    scales= ['linear', 'symlog']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+
+    for scale in scales:
+        # initialise plots
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+
+        for fit in fits:
+            bounds = bounds_dict[fit.name]
+            best_fits = best_fits_dict[fit.name]
+            x_coords = [i - 0.1 + 0.2*fits.index(fit) for i in range(len(all_ops))] 
+            bounds_min = [bound[0] for bound in bounds]
+            bounds_max= [bound[1] for bound in bounds]
+            ax.scatter(x_coords, best_fits, color=colour_key[fits.index(fit)])
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + fit.name,
+            color=colour_key[fits.index(fit)], lw=2.0)
+
+        # set x positions for labels and labels
+        ax.set_xticks(np.arange(len(all_ops)))
+        ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
+
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
+
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
+
+        # final formatting
+        ax.legend()
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
+
+        # frames on all sides
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+
+        yield fig
 
 _read_pdf_cfactors = collect("read_bsm_facs", ("pdffit",))
 
