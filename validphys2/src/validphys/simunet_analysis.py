@@ -744,7 +744,7 @@ def bsm_facs_bounds_plot(fits):
             ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
             ax.yaxis.get_major_formatter().set_scientific(False)
 
-            y_values = [-10, -1, -0.1, 0.0, 0.1, 1, 10] 
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
             ax.set_yticks(y_values)
 
             # get rid of scientific notation in y axis and
