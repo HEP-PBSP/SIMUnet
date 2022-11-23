@@ -658,7 +658,7 @@ def bsm_facs_95bounds_fits(fits):
     return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 @figuregen
-def bsm_facs_bounds_plot(fits):
+def plot_bsm_facs_bounds(fits):
     """
     Figure generator to plot the bounds of
     the BSM coefficients fitted.
