@@ -18,6 +18,7 @@ def n3fit_checks_action(
     theoryid,
     basis,
     fitbasis,
+    fixed_observables=None,
     sum_rules=True,
     parameters,
     save=None,

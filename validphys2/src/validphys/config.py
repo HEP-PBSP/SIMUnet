@@ -15,6 +15,8 @@ from importlib.resources import read_text, contents
 from collections import ChainMap, defaultdict
 from collections.abc import Mapping, Sequence
 
+import validobj
+
 from reportengine import configparser
 from reportengine.environment import Environment, EnvironmentError_
 from reportengine.configparser import (
@@ -36,6 +38,7 @@ from validphys.core import (
     MatchedCuts,
     SimilarCuts,
     ThCovMatSpec,
+    FixedObservableInput
 )
 from validphys.fitdata import fitted_replica_indexes, num_fitted_replicas
 from validphys.loader import (
@@ -52,6 +55,7 @@ from validphys.gridvalues import LUMI_CHANNELS
 from validphys.paramfits.config import ParamfitsConfig
 
 from validphys.plotoptions import get_info
+from validphys import bsmnames
 
 import validphys.scalevariations
 
@@ -516,61 +520,15 @@ class CoreConfig(configparser.Config):
         bsm_sector = dataset.get("bsm_sector")
         bsm_order = dataset.get("bsm_order")
 
-        if bsm_fac_data is not None:
-            if bsm_order is not None :
-                new_bsm_fac_data_names = []
-                # Now go through all operators, and see which are in the appropriate sector.
-                for op in bsm_fac_data_names:
-                    if op in bsm_sector_data[bsm_sector]:
-                        if bsm_order == "LO_QUAD":
-                            new_bsm_fac_data_names += ["LO_LIN_" + op]
-                        elif bsm_order == "NLO_QUAD":
-                            new_bsm_fac_data_names += ["NLO_LIN_" + op]
-                        else:
-                            new_bsm_fac_data_names += [bsm_order + "_" + op]
-                    else:
-                        new_bsm_fac_data_names += ["None_" + op]
+        bsm_data = bsmnames.get_bsm_data(
+            bsm_sector,
+            bsm_order,
+            bsm_fac_data,
+            bsm_sector_data,
+            bsm_fac_data_names,
+            n_bsm_fac_data,
+        )
 
-                # This takes care of linear. Now need to do the same for quadratic, if it's 
-                # switched on...
-
-                if bsm_order in ["LO_QUAD", "NLO_QUAD"]:
-                    # Some care needed here...
-                    new_bsm_fac_quad_names = pd.DataFrame(index=range(n_bsm_fac_data), columns=range(n_bsm_fac_data))
-
-                    for i in range(n_bsm_fac_data):
-                        for j in range(n_bsm_fac_data):
-                            if bsm_fac_data_names[i] in bsm_sector_data[bsm_sector]:
-                                if bsm_fac_data_names[j] in bsm_sector_data[bsm_sector]:
-                                    if i == j:
-                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i]
-                                    else:
-                                         new_bsm_fac_quad_names.iloc[i,j] = bsm_order + "_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
-                                         new_bsm_fac_quad_names.iloc[j,i] = bsm_order + "_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
-                                else:
-                                    if i == j:
-                                         new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]
-                                    else:
-                                        # Ignore contribution entirely
-                                        new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]
-                                        new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[j] + "*" + bsm_fac_data_names[i]
-                            else:
-                                if i == j:
-                                    new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]
-                                else:
-                                    new_bsm_fac_quad_names.iloc[i,j] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[j]
-                                    new_bsm_fac_quad_names.iloc[j,i] = "None_" + bsm_fac_data_names[i]+bsm_fac_data_names[i]
-                    new_bsm_fac_quad_names = new_bsm_fac_quad_names.values.tolist()         
-                else:
-                    new_bsm_fac_quad_names = None
-
-            else:
-                new_bsm_fac_data_names = None
-                new_bsm_fac_quad_names = None
-
-        else:
-            new_bsm_fac_data_names = None
-            new_bsm_fac_quad_names = None
 
         return DataSetInput(
             name=name,
@@ -579,8 +537,7 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
-            bsm_fac_data_names=new_bsm_fac_data_names,
-            bsm_fac_quad_names=new_bsm_fac_quad_names,
+            **bsm_data
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -1484,6 +1441,7 @@ class CoreConfig(configparser.Config):
     def produce_data(
         self,
         data_input,
+        fixed_observable_inputs=None,
         *,
         group_name="data",
     ):
@@ -1495,7 +1453,29 @@ class CoreConfig(configparser.Config):
             with self.set_context(ns=self._curr_ns.new_child({"dataset_input": dsinp})):
                 datasets.append(self.parse_from_(None, "dataset", write=False)[1])
 
-        return DataGroupSpec(name=group_name, datasets=datasets, dsinputs=data_input)
+        if fixed_observable_inputs is None:
+            fixed_observable_inputs = []
+
+
+        fixed_observables = []
+        for fo in fixed_observable_inputs:
+            with self.set_context(
+                ns=self._curr_ns.new_child({"fixed_observable_input": fo})
+            ):
+                fixed_observables.append(
+                    self.parse_from_(None, "fixed_observable", write=False)[1]
+                )
+
+        return DataGroupSpec(
+            name=group_name,
+            datasets=datasets,
+            dsinputs=data_input,
+            fixed_observables=fixed_observables,
+            foinputs=fixed_observable_inputs,
+        )
+
+    def produce_fixed_inputs_from_data(self, data):
+        return data.iterfixed()
 
     def _parse_data_input_from_(
         self,
@@ -1617,13 +1597,34 @@ class CoreConfig(configparser.Config):
 
 
     def produce_group_dataset_inputs_by_metadata(
-        self, data_input, processed_metadata_group,
+        self,
+        data_input,
+        processed_metadata_group,
+        fixed_observable_inputs=None,
     ):
         """Take the data and the processed_metadata_group key and attempt
         to group the data, returns a list where each element specifies the data_input
         for a single group and the group_name
         """
-        res = defaultdict(list)
+        if fixed_observable_inputs is None:
+            fixed_observable_inputs = []
+        res = defaultdict(lambda: defaultdict(list))
+
+        def _get_info_group(cd):
+           try:
+               metadata = get_info(cd)
+               return str(getattr(metadata, processed_metadata_group))
+           except AttributeError as e:
+               raise ConfigError(
+                   f"Unable to find key: {processed_metadata_group} in "
+                   f"metadata for {dsinput.name}. Ensure the PLOTTING file "
+                   "for this dataset contains the key.",
+                   bad_item=processed_metadata_group,
+                   alternatives=metadata.__dict__,
+               ) from e
+
+
+
         for dsinput in data_input:
             # special case of custom group, take the grouping from the dataset input
             if processed_metadata_group == "custom_group":
@@ -1631,21 +1632,25 @@ class CoreConfig(configparser.Config):
             # otherwise try and take the key from the metadata.
             else:
                 cd = self.produce_commondata(dataset_input=dsinput)
-                try:
-                    metadata = get_info(cd)
-                    group_name = str(getattr(metadata, processed_metadata_group))
-                except AttributeError as e:
-                    raise ConfigError(
-                        f"Unable to find key: {processed_metadata_group} in "
-                        f"metadata for {dsinput.name}. Ensure the PLOTTING file "
-                        "for this dataset contains the key.",
-                        bad_item=processed_metadata_group,
-                        alternatives=metadata.__dict__,
-                    ) from e
+                group_name = _get_info_group(cd)
             # in both cases we cast group name to str explicitly.
-            res[group_name].append(dsinput)
+            res[group_name]["data"].append(dsinput)
+
+        for fo in fixed_observable_inputs:
+            if processed_metadata_group == "custom_group":
+                group_name = fo.custom_group
+            else:
+                cd = self.loader.check_commondata(fo.dataset)
+                group_name = _get_info_group(cd)
+
+            res[group_name]["fixed"].append(fo)
+
         return [
-            {"data_input": NSList(group, nskey="dataset_input"), "group_name": name}
+            {
+                "data_input": NSList(group["data"], nskey="dataset_input"),
+                "fixed_observable_inputs": NSList(group["fixed"], nskey="fixed_observable_input"),
+                "group_name": name,
+            }
             for name, group in res.items()
         ]
 
@@ -1664,11 +1669,23 @@ class CoreConfig(configparser.Config):
             return "original"
         return None
 
-    def produce_group_dataset_inputs_by_experiment(self, data_input):
-        return self.produce_group_dataset_inputs_by_metadata(data_input, "experiment")
+    def produce_group_dataset_inputs_by_experiment(
+        self, data_input, fixed_observable_inputs=None
+    ):
+        return self.produce_group_dataset_inputs_by_metadata(
+            data_input,
+            processed_metadata_group="experiment",
+            fixed_observable_inputs=fixed_observable_inputs,
+        )
 
-    def produce_group_dataset_inputs_by_process(self, data_input):
-        return self.produce_group_dataset_inputs_by_metadata(data_input, "nnpdf31_process")
+    def produce_group_dataset_inputs_by_process(
+        self, data_input, fixed_observable_inputs=None
+    ):
+        return self.produce_group_dataset_inputs_by_metadata(
+            data_input,
+            processed_metadata_group="nnpdf31_process",
+            fixed_observable_inputs=fixed_observable_inputs,
+        )
 
     def produce_scale_variation_theories(self, theoryid, point_prescription):
         """Produces a list of theoryids given a theoryid at central scales and a point
@@ -1785,6 +1802,73 @@ class CoreConfig(configparser.Config):
             return validphys.results.total_phi_data_from_experiments
         return validphys.results.dataset_inputs_phi_data
 
+    @element_of("fixed_observable_inputs")
+    def parse_fixed_observable_input(self, obs:dict):
+        try:
+            return validobj.parse_input(obs, FixedObservableInput)
+        except validobj.ValidationError as e:
+            raise ConfigError(e) from e
+
+    def produce_fixed_observable_input_commondata(self, fixed_observable_input):
+        return self.loader.check_commondata(fixed_observable_input.name)
+
+    def produce_fixed_observable(
+        self,
+        fixed_observable_input,
+        theoryid,
+        bsm_fac_data=None,
+        bsm_sector_data=None,
+        bsm_fac_data_names=None,
+        n_bsm_fac_data=None,
+    ):
+
+        bsm_sector = fixed_observable_input.bsm_sector
+        bsm_order = fixed_observable_input.bsm_order
+
+        bsm_data = bsmnames.get_bsm_data(
+            bsm_sector,
+            bsm_order,
+            bsm_fac_data,
+            bsm_sector_data,
+            bsm_fac_data_names,
+            n_bsm_fac_data,
+        )
+
+
+        try:
+            return self.loader.check_fixed_observable(
+                fixed_observable_input, theoryid, **bsm_data
+            )
+        except LoaderError as e:
+            raise ConfigError(
+                f"Could not process fixed observable {fixed_observable_input}: {e}"
+            ) from e
+
+    def produce_fixed_observables(
+        self,
+        fixed_observable_inputs,
+        theoryid,
+        bsm_fac_data=None,
+        bsm_sector_data=None,
+        bsm_fac_data_names=None,
+        n_bsm_fac_data=None,
+    ):
+        if fixed_observable_inputs is None:
+            fixed_observable_inputs = []
+        return NSList(
+            [
+                self.produce_fixed_observable(
+                    f,
+                    theoryid.id,
+                    bsm_fac_data=bsm_fac_data,
+                    bsm_sector_data=bsm_sector_data,
+                    bsm_fac_data_names=bsm_fac_data_names,
+                    n_bsm_fac_data=n_bsm_fac_data,
+                )
+                for f in fixed_observable_inputs
+            ],
+            nskey="fixed_observable",
+        )
 
 
 class Config(report.Config, CoreConfig, ParamfitsConfig):

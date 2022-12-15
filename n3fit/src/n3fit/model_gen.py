@@ -9,19 +9,21 @@
 
 
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib.util import spec_from_loader
 import numpy as np
+import tensorflow as tf
+
+from validphys import bsmnames
+
 from n3fit.msr import msr_impose
 from n3fit.layers import DIS, DY, ObsRotation, losses
 from n3fit.layers import Preprocessing, FkRotation, FlavourToEvolution
-
 from n3fit.backends import MetaModel, Input
 from n3fit.backends import operations as op
 from n3fit.backends import MetaLayer, Lambda
 from n3fit.backends import base_layer_selector, regularizer_selector
 from n3fit.layers.CombineCfac import CombineCfacLayer
-import tensorflow as tf
 
 import logging
 log = logging.getLogger(__name__)
@@ -49,18 +51,53 @@ class ObservableWrapper:
     multiplier: float = 1.0
     integrability: bool = False
     positivity: bool = False
+    fixed: list = field(default_factory=list)
     data: np.array = None
     spec_dict: dict = None
     rotation: ObsRotation = None  # only used for diagonal covmat
     split: str = None
     post_observable: CombineCfacLayer = None
 
+
+    def make_fixed_observable_inputs(self):
+        """Generate a dictionary with values corresponding to the predictions
+        for the fixed observables. Use the values to call the model.
+        """
+        # Note: Even though the inputs are constant, we still need to generate
+        # them in one step and pass them to the model in another. See
+        #
+        # https://github.com/keras-team/keras/issues/11912
+        #
+        # Also we need the raw tensorflow tensor because there is no way to get
+        # it from the Keras wrapper.
+        res = {}
+        for fo in self.fixed:
+            inp = tf.constant(fo.prediction.central_value.reshape((1, 1, -1)))
+            kinp = tf.keras.Input(tensor=inp)
+            res[fo.commondata.setname] = (kinp, inp)
+        return res
+
+    def _all_data(self):
+        """Concatenate experimental data from datasets and fixed observables"""
+        return np.concatenate(
+            [
+                np.atleast_2d(self.data),
+                *[np.atleast_2d(fo.commondata.central_values) for fo in self.fixed],
+            ],
+            axis=1,
+        )
+
+
     def _generate_loss(self, mask=None):
         """Generates the corresponding loss function depending on the values the wrapper
         was initialized with"""
         if self.invcovmat is not None:
             loss = losses.LossInvcovmat(
-                self.invcovmat, self.data, mask, covmat=self.covmat, name=self.name
+                self.invcovmat,
+                self._all_data(),
+                mask,
+                covmat=self.covmat,
+                name=self.name,
             )
         elif self.positivity:
             loss = losses.LossPositivity(name=self.name, c=self.multiplier)
@@ -68,7 +105,8 @@ class ObservableWrapper:
             loss = losses.LossIntegrability(name=self.name, c=self.multiplier)
         return loss
 
-    def _generate_experimental_layer(self, pdf):
+
+    def _generate_experimental_layer(self, pdf, fixed_inputs):
         """Generates the experimental layer from the PDF"""
         # First split the layer into the different datasets (if needed!)
         if len(self.dataset_xsizes) > 1:
@@ -84,7 +122,9 @@ class ObservableWrapper:
         # Every obs gets its share of the split
         output_layers = [obs(p_pdf) for p_pdf, obs in zip(split_pdf, self.observables)]
 
-        for idx, (dataset_dict, output_layer) in enumerate(zip(self.spec_dict['datasets'], output_layers)):
+        for idx, (dataset_dict, output_layer) in enumerate(
+            zip(self.spec_dict['datasets'], output_layers)
+        ):
             # Use get here to prevent having to worry about POSDATSETS
             bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
             bsm_fac_quad_names_CF = dataset_dict.get('bsm_fac_quad_names_CF')
@@ -92,46 +132,88 @@ class ObservableWrapper:
             bsm_fac_quad_names = dataset_dict.get('bsm_fac_quad_names')
 
             # It's useful to flatten the list of quadratic names first
-            if bsm_fac_quad_names_CF is not None:
-                flat_bsm_fac_quad_names = []
-                for i in range(len(bsm_fac_quad_names)):
-                    for j in range(len(bsm_fac_quad_names)):
-                        flat_bsm_fac_quad_names += [bsm_fac_quad_names[i][j]]
 
             if bsm_fac_data_names_CF is not None:
-                coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+
+                # coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+                coefficients = {
+                    bsmnames.linear_datum_to_op(k): v.central_value
+                    for k, v in bsm_fac_data_names_CF.items()
+                }
+
                 if bsm_fac_quad_names_CF is not None:
-                    quad_coefficients = np.array([bsm_fac_quad_names_CF[i].central_value for i in flat_bsm_fac_quad_names])
+                    quad_coefficients = {
+                        bsmnames.linear_datum_to_op(k): v.central_value
+                        for k, v in bsm_fac_quad_names_CF.items()
+                    }
                 else:
-                    nops, ndat = coefficients.shape
-                    quad_coefficients = np.zeros((nops**2, ndat))
+                    ndat = dataset_dict["ndata"]
+                    quad_coefficients = {
+                        name: np.zeros(ndat)
+                        for name in self.post_observable.quad_names
+                    }
+
                 if self.split == 'ex':
                     cfacs = coefficients
                     quad_cfacs = quad_coefficients
                 elif self.split == 'tr':
-                    cfacs = coefficients[:, dataset_dict['ds_tr_mask']]
-                    quad_cfacs = quad_coefficients[:, dataset_dict['ds_tr_mask']]
+                    cfacs = {
+                        k: v[dataset_dict["ds_tr_mask"]]
+                        for k, v in coefficients.items()
+                    }
+                    quad_cfacs = {
+                        k: v[dataset_dict["ds_tr_mask"]]
+                        for k, v in quad_coefficients.items()
+                    }
                 elif self.split == 'vl':
-                    cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
-                    quad_cfacs = quad_coefficients[:, ~dataset_dict['ds_tr_mask']]
-                log.info(f"Applying combination layer")
+                    # cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
+                    cfacs = {
+                        k: v[~dataset_dict["ds_tr_mask"]]
+                        for k, v in coefficients.items()
+                    }
+                    quad_cfacs = {
+                        k: v[~dataset_dict["ds_tr_mask"]]
+                        for k, v in quad_coefficients.items()
+                    }
+                log.info("Applying combination layer")
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
-                    bsm_factor_values=tf.constant(cfacs, dtype='float32'),
-                    quad_bsm_factor_values=tf.constant(quad_cfacs, dtype='float32')
+                    linear_values=cfacs,
+                    quad_values=quad_cfacs,
                 )
 
+        for fo, inp in zip(self.fixed, fixed_inputs):
+            linear = {
+                bsmnames.linear_datum_to_op(k): v.central_value
+                for k, v in fo.linear_bsm.items()
+            }
+            quad = {bsmnames.linear_datum_to_op(k): v.central_value for k, v in fo.quad_bsm.items()}
 
-        # Concatenate all datasets (so that experiments are one single entity)        
+            # NOTE: Generating the input like
+            #
+            # inp = tf.keras.Input(tensor=tf.constant(fo.prediction.central_value))
+            #
+            # doesn't work becuse it needs to be seen by the model instance (despite being constant). See
+            # https://github.com/keras-team/keras/issues/11912
+            output_layers.append(
+                self.post_observable(
+                    inputs=inp,
+                    linear_values=linear,
+                    quad_values=quad,
+                )
+            )
+
+        # Concatenate all datasets (so that experiments are one single entity)
         ret = op.concatenate(output_layers, axis=2)
+
         if self.rotation is not None:
             ret = self.rotation(ret)
         return ret
 
-    def __call__(self, pdf_layer, mask=None):
+    def __call__(self, pdf_layer, fixed_inputs, mask=None):
         loss_f = self._generate_loss(mask)
-        experiment_prediction = self._generate_experimental_layer(pdf_layer)
+        experiment_prediction = self._generate_experimental_layer(pdf_layer, fixed_inputs)
         return loss_f(experiment_prediction)
 
 
@@ -287,6 +369,7 @@ def observable_generator(
         obsrot_tr = None
         obsrot_vl = None
 
+
     out_tr = ObservableWrapper(
         spec_name,
         model_obs_tr,
@@ -296,7 +379,8 @@ def observable_generator(
         rotation=obsrot_tr,
         spec_dict=spec_dict,
         split='tr',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed"],
     )
     out_vl = ObservableWrapper(
         f"{spec_name}_val",
@@ -307,7 +391,8 @@ def observable_generator(
         rotation=obsrot_vl,
         spec_dict=spec_dict,
         split='vl',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed_vl"],
     )
     out_exp = ObservableWrapper(
         f"{spec_name}_exp",
@@ -319,7 +404,8 @@ def observable_generator(
         rotation=None,
         spec_dict=spec_dict,
         split='ex',
-        post_observable=post_observable
+        post_observable=post_observable,
+        fixed=spec_dict["fixed_true"],
     )
 
     layer_info = {
@@ -595,10 +681,10 @@ def pdfNN_layer_generator(
         # create a x --> (x, logx) layer to preppend to everything
         process_input = Lambda(lambda x: op.concatenate([x, op.op_log(x)], axis=-1))
 
-    model_input = [placeholder_input]
+    model_input = {"pdf_input": placeholder_input}
     if subtract_one:
         layer_x_eq_1 = op.numpy_to_input(np.array(input_x_eq_1).reshape(1, 1))
-        model_input.append(layer_x_eq_1)
+        model_input["layer_x_eq_1"] = layer_x_eq_1
 
     # Evolution layer
     layer_evln = FkRotation(input_shape=(last_layer_nodes,), output_dim=out)
@@ -609,7 +695,7 @@ def pdfNN_layer_generator(
     # Normalization and sum rules
     if impose_sumrule:
         sumrule_layer, integrator_input = msr_impose(mode=impose_sumrule, scaler=scaler)
-        model_input.append(integrator_input)
+        model_input["integrator_input"] = integrator_input
     else:
         sumrule_layer = lambda x: x
 

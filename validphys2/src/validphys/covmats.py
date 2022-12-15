@@ -136,6 +136,8 @@ def covmat_from_systematics(
 def dataset_inputs_covmat_from_systematics(
     dataset_inputs_loaded_cd_with_cuts,
     data_input,
+    fixed_observables_exp_data,
+    fixed_observable_inputs,
     use_weights_in_covmat=True,
     norm_threshold=None,
     _list_of_central_values=None
@@ -200,9 +202,11 @@ def dataset_inputs_covmat_from_systematics(
         # want to just pass None to systematic_errors method
         _list_of_central_values = [None] * len(dataset_inputs_loaded_cd_with_cuts)
 
+    _list_of_central_values += [None] * len(fixed_observables_exp_data)
+
     for cd, dsinp, central_values in zip(
-        dataset_inputs_loaded_cd_with_cuts,
-        data_input,
+        (*dataset_inputs_loaded_cd_with_cuts, *fixed_observables_exp_data),
+        (*data_input, *fixed_observable_inputs),
         _list_of_central_values
     ):
         sys_errors = cd.systematic_errors(central_values)
@@ -308,6 +312,8 @@ dataset_inputs_t0_predictions = collect("dataset_t0_predictions", ("data",))
 
 def dataset_inputs_t0_covmat_from_systematics(
     dataset_inputs_loaded_cd_with_cuts,
+    fixed_observables_exp_data,
+    fixed_observable_inputs,
     *,
     data_input,
     use_weights_in_covmat=True,
@@ -339,7 +345,9 @@ def dataset_inputs_t0_covmat_from_systematics(
     return dataset_inputs_covmat_from_systematics(
         dataset_inputs_loaded_cd_with_cuts,
         data_input,
-        use_weights_in_covmat,
+        fixed_observables_exp_data,
+        fixed_observable_inputs,
+        use_weights_in_covmat=use_weights_in_covmat,
         norm_threshold=norm_threshold,
         _list_of_central_values=dataset_inputs_t0_predictions
     )

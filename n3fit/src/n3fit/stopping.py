@@ -596,7 +596,7 @@ class Stopping:
 
         if self.combiner is not None:
             weights = self.combiner.get_weights() 
-            scales = self.combiner.bsm_fac_data_scales
+            scales = self.combiner.scales
             # display the effective BSM coefficient
             # and not just the weight
             weights = weights[0]

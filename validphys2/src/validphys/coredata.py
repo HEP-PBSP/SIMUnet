@@ -5,6 +5,8 @@ wrappers.
 
 """
 import dataclasses
+from typing import Dict
+
 import numpy as np
 import pandas as pd
 
@@ -118,6 +120,18 @@ class CFactorData:
     central_value: np.array
     uncertainty: np.array
 
+    def with_cuts(self, cuts):
+        if hasattr(cuts, 'load'):
+            cuts = cuts.load()
+        if cuts is None:
+            return self
+        return dataclasses.replace(
+            self,
+            central_value=self.central_value[cuts],
+            uncertainty=self.uncertainty[cuts],
+        )
+
+
 
 @dataclasses.dataclass(eq=False)
 class CommonData:
@@ -194,6 +208,9 @@ class CommonData:
         if cuts is None:
             return self
 
+        # Convert boolean mask to indices
+        if cuts.dtype == bool:
+            cuts = np.arange(self.ndata)[cuts]
         # We must shift the cuts up by 1 since a cut of 0 implies the first data point
         # while commondata indexing starts at 1.
         cuts = list(map(lambda x: x + 1, cuts))
@@ -203,6 +220,7 @@ class CommonData:
         return dataclasses.replace(
             self, ndata=newndata, commondata_table=new_commondata_table
         )
+
 
     @property
     def central_values(self):
@@ -276,3 +294,61 @@ class CommonData:
             self.multiplicative_errors * central_values[:, np.newaxis] / 100
         )
         return pd.concat((self.additive_errors, converted_mult_errors), axis=1)
+
+    def with_central_value(self, cv):
+        tb = self.commondata_table.copy()
+        tb["data"] = cv
+        return dataclasses.replace(self, commondata_table=tb)
+
+@dataclasses.dataclass(eq=False)
+class FixedObservableData:
+    """Container for a loaded fixed observable"""
+    commondata: CommonData
+    prediction: CFactorData
+    linear_bsm: Dict[str, CFactorData]
+    quad_bsm: Dict[str, CFactorData]
+
+    @property
+    def ndata(self):
+        """Number of data points in the observable"""
+        return self.commondata.ndata
+
+    def with_central_value(self, cv):
+        """Replace the experimental central values with the array ``cv``"""
+        if len(cv) != self.ndata:
+            raise ValueError("Incompatible dimensions")
+        new_cd = self.commondata.with_central_value(cv)
+        return dataclasses.replace(self, commondata=new_cd)
+
+    def split(self, trmask):
+        """Split the set into two based on the boolean mask ``trmask``."""
+        vlmask = ~trmask
+        tr = self.__class__(
+            commondata=self.commondata.with_cuts(trmask),
+            prediction=self.prediction.with_cuts(trmask),
+            linear_bsm={k: v.with_cuts(trmask) for k, v in self.linear_bsm.items()},
+            quad_bsm={k: v.with_cuts(trmask) for k, v in self.quad_bsm.items()},
+        )
+        vl = self.__class__(
+            commondata=self.commondata.with_cuts(vlmask),
+            prediction=self.prediction.with_cuts(vlmask),
+            linear_bsm={k: v.with_cuts(vlmask) for k, v in self.linear_bsm.items()},
+            quad_bsm={k: v.with_cuts(vlmask) for k, v in self.quad_bsm.items()},
+        )
+        return tr, vl
+
+    @classmethod
+    def from_spec(cls, spec):
+        """Construct an object from a
+        :py:class:`validphys.core.FixedObservableSpec` instance."""
+        linear, quad = spec.load_bsm()
+        if linear is None:
+            linear = {}
+        if quad is None:
+            quad = {}
+        return cls(
+            commondata=spec.load_exp(),
+            prediction=spec.load_pred(),
+            linear_bsm=linear,
+            quad_bsm=quad,
+        )

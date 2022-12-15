@@ -53,32 +53,6 @@ def _default_loss(y_true, y_pred): # pylint: disable=unused-argument
     return op.sum(y_pred)
 
 
-def _fill_placeholders(original_input, new_input=None):
-    """
-    Fills the placeholders of the original input with a new set of input
-
-    Parameters
-    ----------
-        original_input: dictionary
-            dictionary of input layers, can contain None
-        new_input: list or dictionary
-            list or dictionary of layers to substitute the None with
-    """
-    if new_input is None:
-        return original_input
-    x = {}
-    i = 0
-    for key, value in original_input.items():
-        if value is None:
-            try:
-                x[key] = new_input[key]
-            except TypeError:
-                x[key] = new_input[i]
-                i += 1
-        else:
-            x[key] = value
-    return x
-
 
 class MetaModel(Model):
     """
@@ -103,71 +77,54 @@ class MetaModel(Model):
 
     accepted_optimizers = optimizers
 
-    def __init__(self, input_tensors, output_tensors, scaler=None, **kwargs):
+    def __init__(self, input_tensors, output_tensors, scaler=None, input_values=None, **kwargs):
         self.has_dataset = False
+        self.required_slots = set()
 
-        input_list = input_tensors
-        output_list = output_tensors
+        #input_list = input_tensors
+        #output_list = output_tensors
 
-        if isinstance(input_list, dict):
-            # if this is a dictionary, convert it to a list for now
-            input_list = input_tensors.values()
-        elif not isinstance(input_list, list):
-            # if it is not a dict but also not a list, make it into a 1-element list and pray
-            input_list = [input_list]
-
-        if isinstance(output_list, dict):
-            # if this is a dictionary, convert it to a list for now
-            output_list = output_tensors.values()
-        elif not isinstance(output_list, list):
-            # if it is not a dict but also not a list, make it into a 1-element list and pray
-            output_list = [output_list]
-
-        # Note: there used to be two possible options when creating a model:
-        # - Give placeholder tensors (for which the content will be given at run time)
-        # - Give tensors with content* (for which the content is stored with the model
-        # *this option was dropped at some point by TF, the code below keeps this behaviour
-        # We will store within the model the following quantities:
-        #   -> x_in: arrays containing the x-input to the model
-        #   -> tensors_in: when the x-input is known at compile time, we store a reference to the tensor
-        # We pass TensorFlow a dictionary {k: tensor} containing placeholders which will be automatically filled
-        # whenever x_in/tensor_in is known at compile time
+        if input_values is None:
+            input_values = {}
 
         x_in = {}
-        tensors_in = {}
-        input_dict = {}
-        for input_tensor in input_list:
-            # If the input contains a tensor_content, store it to use at predict/fit/eval times
-            # otherwise, put a placeholder None as it will come from the outside
-            name = input_tensor.name.rsplit(":", 1)[0]
-            input_dict[name] = input_tensor
-            try:
-                x_in[name] = op.numpy_to_tensor(input_tensor.tensor_content)
-                tensors_in[name] = input_tensor
-            except AttributeError:
-                x_in[name] = None
-                tensors_in[name] = None
-
-        super().__init__(input_dict, output_list, **kwargs)
+        for k, v in input_tensors.items():
+            if k in input_values:
+                x_in[k] = input_values[k]
+            elif hasattr(v, "tensor_content"):
+                x_in[k] = v.tensor_content
+            else:
+                self.required_slots.add(k)
+        self.tensors_in = input_tensors
+        super().__init__(input_tensors, output_tensors, **kwargs)
 
         self.x_in = x_in
-        self.tensors_in = tensors_in
 
         self.target_tensors = None
         self.compute_losses_function = None
         self._scaler = scaler
 
+    @tf.autograph.experimental.do_not_convert
     def _parse_input(self, extra_input=None):
         """Returns the input data the model was compiled with.
         Introduces the extra_input in the places asigned to the placeholders.
 
         If the model was generated with a scaler, the input will be scaled accordingly
         """
-        if isinstance(extra_input, dict) and self._scaler is not None:
+        if extra_input is None:
+            if self.required_slots:
+                raise ValueError(
+                    f"The following inputs must be provided: {self.required_slots}"
+                )
+            return self.x_in
+
+        if diff := (self.required_slots - extra_input.keys()):
+            raise ValueError(f"The following inputs must be provided {diff}")
+
+        if self._scaler is not None:
             extra_input = {k: self._scaler(i) for k, i in extra_input.items()}
-        elif isinstance(extra_input, (tuple, list)) and self._scaler is not None:
-            extra_input = [self._scaler(i) for i in extra_input]
-        return _fill_placeholders(self.x_in, extra_input)
+
+        return {**self.x_in, **extra_input}
 
     def perform_fit(self, x=None, y=None, epochs=1, **kwargs):
         """
@@ -187,10 +144,10 @@ class MetaModel(Model):
             loss_dict: dict
                 a dictionary with all partial losses of the model
         """
-        x = self._parse_input(x)
+        params = self._parse_input(x)
         if y is None:
             y = self.target_tensors
-        history = super().fit(x=x, y=y, epochs=epochs, **kwargs)
+        history = super().fit(x=params, y=y, epochs=epochs, **kwargs)
         loss_dict = history.history
         return loss_dict
 
@@ -349,7 +306,7 @@ class MetaModel(Model):
 
     def apply_as_layer(self, x):
         """ Apply the model as a layer """
-        all_input = _fill_placeholders(self.tensors_in, x)
+        all_input = {**self.tensors_in, **x}
         return all_input, super().__call__(all_input)
 
     def get_layer_re(self, regex):
