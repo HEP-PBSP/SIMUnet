@@ -59,6 +59,18 @@ def reorder_cols(cols):
     return sorted(cols, key=BSM_FAC_DISPLAY.index)
 
 def format_residuals(residuals):
+    """
+    Makes a list of intervals to display
+    in the pulls. 
+    Parameters
+    ----------
+        residuals: list[float]
+            List of mean/std for every BSM factor
+    Returns
+    -------
+        new_residual: list[list]
+            List of the intervals to display
+    """
     new_residuals = []
     for residual in residuals:
         if residual >= 0:
@@ -837,7 +849,7 @@ def plot_bsm_facs_68res(fits):
         x_coords = [i - 0.1 + 0.2*fits.index(fit) for i in range(len(all_ops))] 
         residuals_min = [residual[0] for residual in ordered_residuals]
         residuals_max = [residual[1] for residual in ordered_residuals]
-        ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label='Residuals (68%) ' + fit.name,
+        ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label=fit.name,
         color=colour_key[fits.index(fit)], lw=4.0)
 
     # set x positions for labels and labels
