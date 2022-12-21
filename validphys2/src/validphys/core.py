@@ -923,8 +923,9 @@ class FixedObservableSpec:
 
     @property
     def bsm_fac_quad_names_CF(self):
-        return dict(self.bsm_fac_quad_names_CF_data)
-
+        if self.bsm_fac_quad_names_CF_data is not None:
+            return dict(self.bsm_fac_quad_names_CF_data)
+        return None
 
     # Bogus cuts to make this more compatible with the usual data
     @property
