@@ -983,9 +983,18 @@ class FixedObservableSpec:
         )
 
     def load_as_dataspec(self):
-        cd = self.commondata.load()
+        super_dodgy_path = str(self.pred_path)
+        res = super_dodgy_path.split("/")
+        res[-2] = 'fastkernel' 
+        # This seems like an absolutely terrible idea, but oh well, never mind
+        res[-1] = 'FK_HERACOMBNCEM.dat'
 
-        super_dodgy_path = '/home/jmm232/rds/hpc-work/miniconda3/envs/simunet-dev/share/NNPDF/data/theory_200/fastkernel/FK_HERACOMBNCEM.dat' 
+        super_dodgy_path = ""
+
+        for i in range(len(res)-1):
+            super_dodgy_path += "/" + res[i+1]
+
+        cd = self.commondata.load()
 
         fake_fkspec = FKTableSpec(super_dodgy_path, [])
         fktable = fake_fkspec.load()
