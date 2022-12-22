@@ -1103,9 +1103,6 @@ def fits_chi2_table(
     the PLOTTING info file, computed with the theory corresponding to the fit. Dataset that are not
     included in some fit appear as `NaN`
     """
-    
-    print(fits_datasets_chi2_table)
-
     lvs = fits_groups_chi2_table.index
     # The explicit call to list is because pandas gets confused otherwise
     expanded_index = pd.MultiIndex.from_product((list(lvs), ["Total"]))
