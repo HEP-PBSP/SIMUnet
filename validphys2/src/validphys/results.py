@@ -1064,8 +1064,6 @@ def fits_datasets_chi2_table(
         df.columns = pd.MultiIndex.from_product(([label], cols))
         dfs.append(df)
 
-    print(dfs)
-
     return pd.concat(dfs, axis=1)
 
 
