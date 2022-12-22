@@ -25,7 +25,7 @@ from validphys.checks import (
     check_two_dataspecs,
 )
 
-from validphys.core import DataSetSpec, PDF, DataGroupSpec, Stats
+from validphys.core import DataSetSpec, PDF, DataGroupSpec, Stats, FixedObservableSpec
 from validphys.calcutils import (
     all_chi2,
     central_chi2,
@@ -136,12 +136,21 @@ class ThPredictionsResult(StatsResult):
     def from_convolution(cls, pdf, dataset, bsm_factor):
         # This should work for both single dataset and whole groups
         try:
-            datasets = dataset.datasets
+            datasets = dataset.datasets + dataset.fixed_observables
         except AttributeError:
             datasets = (dataset,)
 
         try:
-            th_predictions = pd.concat([predictions(d, pdf) for d in datasets])
+            preds = []
+            for d in datasets:
+                if isinstance(d, DataSetSpec):
+                    preds += [predictions(d, pdf)]
+                elif isinstance(d, FixedObservableSpec):
+                    pdf_indep_preds = pd.DataFrame(d.load_pred().central_value.T)
+                    df = pd.concat(len(pdf)*[pdf_indep_preds], axis=1)
+                    df.columns = [i for i in range(len(pdf))]
+                    preds += [df]
+            th_predictions = pd.concat(preds)
         except PredictionsRequireCutsError as e:
             raise PredictionsRequireCutsError(
                 "Predictions from FKTables always require cuts, "
@@ -316,7 +325,7 @@ def dataset_inputs_bsm_factor(data, pdf, read_bsm_facs):
     but for a list of dataset inputs.
     """
     res =  np.concatenate(
-        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets]
+        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets + data.fixed_observables]
     )
     return res
 
@@ -933,7 +942,6 @@ groups_datasets_chi2_data = collect(
     "each_dataset_chi2", ("group_dataset_inputs_by_metadata",)
 )
 fits_datasets_chi2_data = collect("groups_datasets_chi2_data", ("fits", "fitcontext"))
-
 
 @table
 def fits_datasets_chi2_table(

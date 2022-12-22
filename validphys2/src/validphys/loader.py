@@ -760,6 +760,7 @@ class Loader(LoaderBase):
             bsm_fac_quad_names_CF_data=bsm_fac_quad_names_CF,
             bsm_fac_quad_names=bsm_fac_quad_names,
             bsm_fac_data_names=bsm_fac_data_names,
+            thspec=theoryid,
         )
 
 

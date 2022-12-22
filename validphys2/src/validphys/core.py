@@ -606,12 +606,19 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
         for dataset in self.datasets:
             loaded_data = dataset.load()
             sets.append(loaded_data)
+
+        for dataset in self.fixed_observables:
+            loaded_data = dataset.load_as_dataspec()
+            sets.append(loaded_data)
+
         return Experiment(sets, self.name)
 
     @property
     def thspec(self):
         #TODO: Is this good enough? Should we explicitly pass the theory
-        return self.datasets[0].thspec
+        if len(self.datasets) != 0:
+            return self.datasets[0].thspec
+        return self.fixed_observables[0].thspec
 
     def __str__(self):
         return self.name
@@ -908,6 +915,7 @@ class FixedObservableSpec:
     name: str
     commondata: CommonDataSpec
     pred_path: Path
+    thspec: int
     weight: float = 1.0
     frac: float = 1
     # Note: This is not a dict as we want it to be hashable
@@ -974,6 +982,19 @@ class FixedObservableSpec:
             self._load_bsm_values(self.bsm_fac_quad_names_CF),
         )
 
+    def load_as_dataspec(self):
+        cd = self.commondata.load()
+
+        super_dodgy_path = '/home/jmm232/rds/hpc-work/miniconda3/envs/simunet-dev/share/NNPDF/data/theory_200/fastkernel/FK_HERACOMBNCEM.dat' 
+
+        fake_fkspec = FKTableSpec(super_dodgy_path, [])
+        fktable = fake_fkspec.load()
+        fktable.thisown = 0
+
+        fake_fk = FKSet(FKSet.parseOperator('NULL'), [fktable])
+
+        data = DataSet(cd, fake_fk, self.weight)
+        return data
 
     def load(self):
         from validphys.coredata import FixedObservableData
