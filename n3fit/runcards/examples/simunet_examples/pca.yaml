@@ -122,6 +122,8 @@ theoryid: 200
 use_cuts: internal
 
 template_text: |
+  # Normalised Fisher information by sector
+  {@fisher_information_by_sector@}
   # Fisher information matrix
   {@fisher_information_matrix@}
   # Principal component eigenvalues

@@ -824,19 +824,101 @@ Principal component analysis
 l = Loader()
 @table
 def fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
-    """Obtains the Fisher information matrix for the BSM parameters
+    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names)
+
+@table
+def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
+    """Obtains the Fisher information matrices for each of the BSM sectors.
+    """
+    
+    # First, get the names of the BSM sectors.
+
+    bsm_dataset_inputs_sectors = {} 
+    bsm_fixed_observables_sectors = {}
+
+    for dataset in dataset_inputs:
+        if dataset.bsm_sector in bsm_dataset_inputs_sectors.keys():
+            bsm_dataset_inputs_sectors[dataset.bsm_sector] += [dataset]
+        else:
+            bsm_dataset_inputs_sectors[dataset.bsm_sector] = [dataset]
+    
+    for fo in fixed_observables:
+        if fo.bsm_sector in bsm_fixed_observables_sectors.keys():
+            bsm_fixed_observables_sectors[fo.bsm_sector] += [fo]
+        else:
+            bsm_fixed_observables_sectors[fo.bsm_sector] = [fo]
+
+    all_sectors = list(bsm_dataset_inputs_sectors.keys()) + list(bsm_fixed_observables_sectors.keys())
+    fisher_by_sector = []
+
+    for sec in all_sectors:
+        if sec in bsm_dataset_inputs_sectors.keys():
+            datasets = bsm_dataset_inputs_sectors[sec]
+            dataset_names = [ds.name for ds in datasets]
+        else:
+            datasets = None
+            dataset_names = []
+        if sec in bsm_fixed_observables_sectors.keys():
+            fos = bsm_fixed_observables_sectors[sec]
+            fo_names = [fo.name for fo in fos]
+        else:
+            fos = None
+            fo_names = []
+
+        ds_and_fo_names = dataset_names + fo_names
+
+        # Take correct submatrix of groups_covmat
+        reduced_covmats = []
+        for name in ds_and_fo_names:
+            reduced_covmats += [groups_covmat.xs(name, axis=1, level=1, drop_level=False)]
+        
+        reduced_covmat = pd.concat(reduced_covmats, axis=1)
+
+        reduced_covmats = []
+        for name in ds_and_fo_names:
+            reduced_covmats += [reduced_covmat.T.xs(name, axis=1, level=1, drop_level=False)]
+
+        reduced_covmat = pd.concat(reduced_covmats, axis=1)
+
+        # Hence construct the Fisher matrices
+        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, bsm_fac_data_names)]
+
+    # Now go through the matrices one-by-one, and take the diagonal
+    fisher_diags_by_sector = []
+
+    for matrix in fisher_by_sector:
+        diagonal = np.diagonal(matrix.to_numpy())
+        fisher_diags_by_sector += [diagonal.tolist()] 
+
+    # Rescale array
+    array = np.array(fisher_diags_by_sector).T
+    sums = np.sum(array, axis=1)
+    rows, columns = array.shape
+    for i in range(rows):
+        array[i,:] = array[i,:] / sums[i]*100
+
+    df = pd.DataFrame(array, columns=all_sectors, index=bsm_fac_data_names)
+    
+    return df
+
+def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
+    """Computes a Fisher information matrix.
     """
     bsm_factors = []
-    for dataset in dataset_inputs:
-        ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
-        bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
-        coefficients = np.array([i.central_value for i in bsm_fac.values()])
-        bsm_factors += [coefficients] 
+    if dataset_inputs is not None:
+        for dataset in dataset_inputs:
+            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
+            bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
+            coefficients = np.array([i.central_value for i in bsm_fac.values()])
+            bsm_factors += [coefficients] 
 
-    for fo in fixed_observables:
-        bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
-        coefficients = np.array([i.central_value for i in bsm_fac.values()])
-        bsm_factors += [coefficients] 
+    if fixed_observables is not None:
+        for fo in fixed_observables:
+            bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
+            coefficients = np.array([i.central_value for i in bsm_fac.values()])
+            bsm_factors += [coefficients] 
 
     # Make bsm_factors into a nice numpy array. 
     bsm_factors = np.concatenate(bsm_factors, axis=1).T
@@ -871,4 +953,3 @@ def principal_component_vectors(fisher_information_matrix, bsm_fac_data_names):
     _, _, vectors = np.linalg.svd(fisher)
     vectors = pd.DataFrame(vectors, columns=bsm_fac_data_names)
     return vectors
-
