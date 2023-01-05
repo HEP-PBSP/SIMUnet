@@ -33,8 +33,6 @@ from validphys.pdfbases import PDG_PARTONS
 from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
 
-import scipy.linalg as scla
-
 log = logging.getLogger(__name__)
 
 
