@@ -30,6 +30,11 @@ from validphys.fitdata import read_bsm_facs
 from validphys.plotutils import grey_centre_cmap
 from validphys.pdfbases import PDG_PARTONS
 
+from validphys.loader import Loader
+from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+
+import scipy.linalg as scla
+
 log = logging.getLogger(__name__)
 
 
@@ -812,3 +817,58 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
         scaled_replicas += (read_pdf_cfactors.values**2) * quad_cfac_df.values[:, np.newaxis]
 
     return 1 + np.sum(scaled_replicas, axis=2)
+
+"""
+Principal component analysis
+"""
+l = Loader()
+@table
+def fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
+    """Obtains the Fisher information matrix for the BSM parameters
+    """
+    bsm_factors = []
+    for dataset in dataset_inputs:
+        ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
+        bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
+        coefficients = np.array([i.central_value for i in bsm_fac.values()])
+        bsm_factors += [coefficients] 
+
+    for fo in fixed_observables:
+        bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
+        coefficients = np.array([i.central_value for i in bsm_fac.values()])
+        bsm_factors += [coefficients] 
+
+    # Make bsm_factors into a nice numpy array. 
+    bsm_factors = np.concatenate(bsm_factors, axis=1).T
+
+    # The rows are the data, the columns are the operator
+    cov = groups_covmat.to_numpy()
+    inv_cov = np.linalg.inv(cov)
+    fisher = bsm_factors.T @ inv_cov @ bsm_factors
+
+    fisher = pd.DataFrame(fisher, index=bsm_fac_data_names)
+    fisher = fisher.T
+    fisher.index = bsm_fac_data_names
+
+    return fisher
+
+@table
+def principal_component_values(fisher_information_matrix):
+    """Returns the eigenvalues corresponding to the various principal directions
+    """
+    fisher = fisher_information_matrix.to_numpy()
+    fisher = fisher - fisher.mean(axis=0)
+    _, values, _ = np.linalg.svd(fisher)
+    values = pd.DataFrame(values)
+    return values
+
+@table
+def principal_component_vectors(fisher_information_matrix, bsm_fac_data_names):
+    """Performs a principal component analysis to obtain the flat directions
+    """
+    fisher = fisher_information_matrix.to_numpy()
+    fisher = fisher - fisher.mean(axis=0)
+    _, _, vectors = np.linalg.svd(fisher)
+    vectors = pd.DataFrame(vectors, columns=bsm_fac_data_names)
+    return vectors
+
