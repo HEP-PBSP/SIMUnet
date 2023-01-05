@@ -848,7 +848,10 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         else:
             bsm_fixed_observables_sectors[fo.bsm_sector] = [fo]
 
-    all_sectors = list(bsm_dataset_inputs_sectors.keys()) + list(bsm_fixed_observables_sectors.keys())
+    all_sectors_duplicates = list(bsm_dataset_inputs_sectors.keys()) + list(bsm_fixed_observables_sectors.keys())
+    all_sectors = []
+    [all_sectors.append(x) for x in all_sectors_duplicates if x not in all_sectors]
+
     fisher_by_sector = []
 
     for sec in all_sectors:
@@ -909,13 +912,14 @@ def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theory
         for dataset in dataset_inputs:
             ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
             bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
-            coefficients = np.array([i.central_value for i in bsm_fac.values()])
+            coefficients = ds.load().get_cv() * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
     if fixed_observables is not None:
         for fo in fixed_observables:
+            cvs = fo.load_exp().central_values.to_numpy()
             bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
-            coefficients = np.array([i.central_value for i in bsm_fac.values()])
+            coefficients = cvs * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
     # Make bsm_factors into a nice numpy array. 
