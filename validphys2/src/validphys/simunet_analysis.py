@@ -377,8 +377,19 @@ def bsm_facs_bounds(read_bsm_facs):
     
     return df
 
+@table
+def tabulate_bsm_corr(fit, read_bsm_facs):
+    """Same as plot_bsm_corr, but table rather than plot.
+    """
+    bsm_facs_df = read_bsm_facs
+    bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    corr_mat = bsm_facs_df.corr()
+    round(corr_mat, 1)
+
+    return corr_mat
+
 @figure
-def plot_bsm_corr(fit, read_bsm_facs):
+def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     """
     Correlation matrix to summarise information about
     the BSM coefficient results.
@@ -398,11 +409,8 @@ def plot_bsm_corr(fit, read_bsm_facs):
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
-    # retain only important correlations
-    corr_mat[(np.abs(corr_mat) < 0.5)] = np.nan
-
     # create colourmap with gret in the centre for colourbar
-    new_cmap = grey_centre_cmap()
+    new_cmap = grey_centre_cmap(frac=corr_threshold)
 
     # formatting
     ax.xaxis.tick_top() # x axis on top
