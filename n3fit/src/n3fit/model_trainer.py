@@ -137,6 +137,7 @@ class ModelTrainer:
         bsm_fac_data_scales=None,
         bsm_fac_quad_scales=None,
         bsm_fac_initialisations=None,
+        bsm_initialisation_seed=0,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -201,6 +202,7 @@ class ModelTrainer:
         self.bsm_fac_quad_names = bsm_fac_quad_names
         self.bsm_fac_quad_scales = bsm_fac_quad_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
+        self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
         self.replicas = replicas
 
@@ -527,6 +529,7 @@ class ModelTrainer:
                 name for sublist in self.bsm_fac_quad_names for name in sublist
             ],
             initialisations=self.bsm_fac_initialisations,
+            initialisation_seed=self.bsm_initialisation_seed,
         )
 
         log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")

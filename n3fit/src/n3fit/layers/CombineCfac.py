@@ -8,7 +8,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet.
     """
 
-    def __init__(self, scales, linear_names, quad_names, initialisations):
+    def __init__(self, scales, linear_names, quad_names, initialisations, initialisation_seed):
         """
         Parameters
         ----------
@@ -34,10 +34,12 @@ class CombineCfacLayer(Layer):
             if i['type'] == 'constant':
                 initial_values += [tf.constant(i['value'], dtype='float32', shape=(1,))]
             elif i['type'] == 'uniform':
-                initial_values += [tf.random_uniform_initializer(minval=i['minval'], maxval=i['maxval'], seed=i['seed'])(shape=(1,))]
+                initial_values += [tf.random_uniform_initializer(minval=i['minval'], maxval=i['maxval'], seed=initialisation_seed)(shape=(1,))]
             elif i['type'] == 'gaussian':
-                tf.random.set_seed(i['seed'])
+                tf.random.set_seed(initialisation_seed)
                 initial_values += [tf.random.normal([1], i['mean'], i['std_dev'], tf.float32)]
+            else:
+                raise RuntimeError("Invalid initialisation: choose form constant, uniform or Gaussian.")
 
         initial_values = tf.concat(initial_values, 0)
 

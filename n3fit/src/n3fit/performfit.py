@@ -45,6 +45,7 @@ def performfit(
     parallel_models=False, 
     bsm_fac_data_names=None,
     bsm_fac_quad_names=None,
+    bsm_initialisation_seed=0,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -210,6 +211,7 @@ def performfit(
             bsm_fac_data_scales=bsm_fac_data_scales,
             bsm_fac_quad_scales=bsm_fac_quad_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
+            bsm_initialisation_seed=bsm_initialisation_seed,
         )
 
         # This is just to give a descriptive name to the fit function
