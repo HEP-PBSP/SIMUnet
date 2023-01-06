@@ -421,6 +421,17 @@ class CoreConfig(configparser.Config):
             return len(bsm_fac_data)
         return 0
 
+    def produce_bsm_fac_initialisations(self, bsm_fac_data=None):
+        """Produces the list of initialisation settings for each of
+        the BSM coefficients entering into the fit.
+        """
+        if bsm_fac_data is not None:
+            bsm_fac_initialisations = []
+            for entry in bsm_fac_data:
+                bsm_fac_initialisations += [entry['initialisation']]
+            return bsm_fac_initialisations
+        return []
+
     def produce_bsm_fac_data_names(self, bsm_fac_data=None):
         """
         Produces the list of the names of the

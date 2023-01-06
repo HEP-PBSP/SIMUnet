@@ -28,6 +28,7 @@ def performfit(
     fitbasis,
     bsm_fac_data_scales,
     bsm_fac_quad_scales,
+    bsm_fac_initialisations,
     fixed_pdf_fit=False,
     sum_rules=True,
     parameters,
@@ -208,6 +209,7 @@ def performfit(
             bsm_fac_quad_names=bsm_fac_quad_names,
             bsm_fac_data_scales=bsm_fac_data_scales,
             bsm_fac_quad_scales=bsm_fac_quad_scales,
+            bsm_fac_initialisations=bsm_fac_initialisations,
         )
 
         # This is just to give a descriptive name to the fit function

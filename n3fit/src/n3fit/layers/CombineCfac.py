@@ -8,7 +8,7 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet.
     """
 
-    def __init__(self, scales, linear_names, quad_names):
+    def __init__(self, scales, linear_names, quad_names, initialisations):
         """
         Parameters
         ----------
@@ -18,6 +18,8 @@ class CombineCfacLayer(Layer):
                 A list of names for the operators
             quad_names: list[str]
                 A list of names for the quadtaric contributions.
+            initialisations: list[dict]
+                A list of dictionaries containing all the initialisation info.
         """
         # Initialise a Layer instance
         if len(scales) != len(linear_names):
@@ -26,8 +28,21 @@ class CombineCfacLayer(Layer):
             raise ValueError("There must be len(linear_names)**2 quad_names")
         super().__init__()
 
+        # At this point, create a tf object with the correct random initialisation.
+        initial_values = []
+        for i in initialisations:
+            if i['type'] == 'constant':
+                initial_values += [tf.constant(i['value'], dtype='float32', shape=(1,))]
+            elif i['type'] == 'uniform':
+                initial_values += [tf.random_uniform_initializer(minval=i['minval'], maxval=i['maxval'], seed=i['seed'])(shape=(1,))]
+            elif i['type'] == 'gaussian':
+                tf.random.set_seed(i['seed'])
+                initial_values += [tf.random.normal([1], i['mean'], i['std_dev'], tf.float32)]
+
+        initial_values = tf.concat(initial_values, 0)
+
         self.w = tf.Variable(
-            initial_value=tf.zeros(shape=(len(scales),), dtype="float32"),
+            initial_value=initial_values,
             trainable=True,
         )
         self.scales = np.array(scales, dtype=np.float32)
