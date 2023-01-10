@@ -530,6 +530,7 @@ class ModelTrainer:
             ],
             initialisations=self.bsm_fac_initialisations,
             initialisation_seed=self.bsm_initialisation_seed,
+            replica_number=self.replicas[0],
         )
 
         log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")
