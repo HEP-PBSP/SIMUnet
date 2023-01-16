@@ -212,8 +212,12 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
     """
     op_1, op_2 = pair
     bsm_facs_df = read_bsm_facs
-    bsm_facs_df = bsm_facs_df[[op_1, op_2]]
-    labels = bsm_facs_df.columns
+    if op_1 != op_2:
+        bsm_facs_df = bsm_facs_df[[op_1, op_2]]
+        labels = bsm_facs_df.columns
+    else:
+        bsm_facs_df = bsm_facs_df[[op_1]]
+        labels = [bsm_facs_df.columns]*2
 
     chi2 = [info.chi2 for info in replica_data]
 
@@ -223,9 +227,14 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
 
     chi2 = [info.chi2 for info in replica_data]
 
-    scatter_plot = ax.scatter(
-        bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2, s=40
-    )
+    if op_1 != op_2:
+        scatter_plot = ax.scatter(
+            bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2, s=40
+        )
+    else:
+        scatter_plot = ax.scatter(
+            bsm_facs_df.values, bsm_facs_df.values, c=chi2, s=40
+        )
 
     # create new axes to the bottom of the scatter plot
     # for the colourbar 
@@ -248,7 +257,10 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
 
     # populate the histograms
     ax_histx.hist(bsm_facs_df.iloc[:, 0])
-    ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+    if op_1 != op_2:
+        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+    else:
+        ax_histy.hist(bsm_facs_df.iloc[:, 0], orientation='horizontal')
 
     ax_histx.grid(False)
     ax_histy.grid(False)
@@ -387,6 +399,15 @@ def tabulate_bsm_corr(fit, read_bsm_facs):
     round(corr_mat, 1)
 
     return corr_mat
+
+@figure
+def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, op1, op2):
+    """
+    Auxiliary function to plot 2D plots
+    of pair of operators in a N-dimensional fits
+    with BSM factors
+    """
+    return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, (op1, op2))
 
 @figure
 def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
