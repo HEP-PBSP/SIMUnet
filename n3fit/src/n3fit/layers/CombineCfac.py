@@ -3,6 +3,8 @@ from tensorflow.keras.layers import Layer
 
 import numpy as np
 
+from validphys import initialisation_specs
+
 class CombineCfacLayer(Layer):
     """
     Creates the combination layer of SIMUnet.
@@ -31,13 +33,13 @@ class CombineCfacLayer(Layer):
         # At this point, create a tf object with the correct random initialisation.
         initial_values = []
         for i in initialisations:
-            if i['type'] == 'constant':
-                initial_values += [tf.constant(i['value'], dtype='float32', shape=(1,))]
-            elif i['type'] == 'uniform':
-                initial_values += [tf.random_uniform_initializer(minval=i['minval'], maxval=i['maxval'], seed=initialisation_seed + replica_number)(shape=(1,))]
-            elif i['type'] == 'gaussian':
+            if isinstance(i, initialisation_specs.ConstantInitialisation):
+                initial_values += [tf.constant(i.value, dtype='float32', shape=(1,))]
+            elif isinstance(i, initialisation_specs.UniformInitialisation):
+                initial_values += [tf.random_uniform_initialiser(minval=i.minval, maxval=i.maxval, seed=initialisation_seed + replica_number)(shape=(1,))]
+            elif isinstance(i, initialisation_specs.GaussianInitialisation):
                 tf.random.set_seed(initialisation_seed + replica_number)
-                initial_values += [tf.random.normal([1], i['mean'], i['std_dev'], tf.float32)]
+                initial_values += [tf.random.normal([1], i.mean, i.std, tf.float32)]
             else:
                 raise RuntimeError("Invalid initialisation: choose form constant, uniform or Gaussian.")
 

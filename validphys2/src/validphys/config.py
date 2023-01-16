@@ -425,12 +425,23 @@ class CoreConfig(configparser.Config):
         """Produces the list of initialisation settings for each of
         the BSM coefficients entering into the fit.
         """
-        if bsm_fac_data is not None:
-            bsm_fac_initialisations = []
-            for entry in bsm_fac_data:
-                bsm_fac_initialisations += [entry['initialisation']]
-            return bsm_fac_initialisations
-        return []
+        from validphys.initialisation_specs import Initialisation
+
+        if bsm_fac_data is None:
+            return []
+
+        bsm_fac_initialisations = []
+        for entry in bsm_fac_data:
+            if not (init_dict := entry.get("initialisation")):
+                raise ConfigError(
+                    f"bsm_fac_data entry '{entry}' must containt a valid 'initialisation' key"
+                )
+            try:
+                init = validobj.parse_input(init_dict, Initialisation)
+            except validobj.ValidationError as e:
+                raise ConfigError(e) from e
+            bsm_fac_initialisations.append(init)
+        return bsm_fac_initialisations
 
     def produce_bsm_fac_data_names(self, bsm_fac_data=None):
         """
@@ -442,7 +453,7 @@ class CoreConfig(configparser.Config):
             for entry in bsm_fac_data:
                 bsm_fac_data_names += [entry['name']]
             return bsm_fac_data_names
-        return [] 
+        return []
 
     def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
         """Produces a list of names of the quadratics that could be included in the fit, regardless
