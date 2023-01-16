@@ -33,6 +33,8 @@ from validphys.pdfbases import PDG_PARTONS
 from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
 
+from validphys.convolution import central_predictions
+
 log = logging.getLogger(__name__)
 
 
@@ -820,14 +822,15 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
 Principal component analysis
 """
 l = Loader()
-@table
-def fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
-    """Obtains the full Fisher information matrix for the BSM parameters.
-    """
-    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names)
 
 @table
-def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
+def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf)
+
+@table
+def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
     """Obtains the Fisher information matrices for each of the BSM sectors.
     """
     
@@ -884,7 +887,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         reduced_covmat = pd.concat(reduced_covmats, axis=1)
 
         # Hence construct the Fisher matrices
-        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, bsm_fac_data_names)]
+        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, bsm_fac_data_names, pdf)]
 
     # Now go through the matrices one-by-one, and take the diagonal
     fisher_diags_by_sector = []
@@ -904,7 +907,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
     
     return df
 
-def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names):
+def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
     """Computes a Fisher information matrix.
     """
     bsm_factors = []
@@ -912,12 +915,13 @@ def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theory
         for dataset in dataset_inputs:
             ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
             bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
-            coefficients = ds.load().get_cv() * np.array([i.central_value for i in bsm_fac.values()])
+            central_sm = central_predictions(ds, pdf)
+            coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
     if fixed_observables is not None:
         for fo in fixed_observables:
-            cvs = fo.load_exp().central_values.to_numpy()
+            cvs = fo.load_pred().central_value
             bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
             coefficients = cvs * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 

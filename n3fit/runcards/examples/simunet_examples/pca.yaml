@@ -3,32 +3,34 @@ meta:
   author: James Moore
   keywords: [simunet]
 
+pdf: 221103-jmm-no_top_iterated
+
 dataset_inputs:
-- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: CMSTTBARTOT5TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}  
-- {dataset: CMSTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMSTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: CMSTOPDIFF8TEVTTRAPNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: CMSTTBARTOT13TEV, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"} 
-- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: ATLAS_TTBAR_13TEV_ASY_2022, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: CMS_TTBAR_13TEV_ASY, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
-- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "ttbar", bsm_order: "NLO_LIN"}
+- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTTBARTOT5TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}  
+- {dataset: CMSTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMSTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTOPDIFF8TEVTTRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTTBARTOT13TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_TTBAR_13TEV_ASY_2022, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
 - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, bsm_sector: "ttz", bsm_order: "LO_LIN"}
 - {dataset: ATLAS_TTBARZ_13TEV_TOTAL, cfac: [QCD], bsm_sector: "ttz", bsm_order: "LO_LIN"}
 - {dataset: ATLAS_TTBARZ_13TEV_PTZNORM, bsm_sector: "ttz", bsm_order: "LO_LIN"}
@@ -107,7 +109,9 @@ bsm_fac_data:
 - {name: 'Ott1', scale: 1}
 
 bsm_sector_data:
-- {name: "ttbar", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "ttbar_total", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "ttbar_dist", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "asy", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
 - {name: "ttz", operators: ['OtG', 'Opt', 'OtZ', 'O3pQ3', 'OpQM', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
 - {name: "ttw", operators: ['OtG', 'O1qt', 'O8qt', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
 - {name: "tz", operators: ['Opt', 'OtZ', 'OtW', 'O3pQ3', 'OpQM', 'O13qq', 'O83qq']}
