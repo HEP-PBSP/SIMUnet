@@ -1,0 +1,28 @@
+meta:
+  title: 2D BSM plots
+  author: Lazy Person
+  keywords: [simunet, plots, validphys]
+
+fit: 230113-lm-ttbar-fixedpdf-nlo-lin
+
+use_cuts: fromfit
+
+bsm_fac_data:
+- {name: "OtG"}
+- {name: "O1qd"}
+
+bsm_2d_report:
+  meta: Null
+  template_text: |
+   % 2D plot of {@name@}
+   # 2D plot
+   {@plot_2d_bsm_facs_pair@}
+
+template_text: |
+ # 2D plots of BSM factors
+ {@with bsm_fac_quad_names_dict@}
+ [2D plot of {@name@}]({@bsm_2d_report report@})
+ {@endwith@}
+
+actions_:
+  - report(main=True)
