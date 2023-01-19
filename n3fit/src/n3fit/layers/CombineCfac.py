@@ -36,10 +36,10 @@ class CombineCfacLayer(Layer):
             if isinstance(i, initialisation_specs.ConstantInitialisation):
                 initial_values += [tf.constant(i.value, dtype='float32', shape=(1,))]
             elif isinstance(i, initialisation_specs.UniformInitialisation):
-                initial_values += [tf.random_uniform_initialiser(minval=i.minval, maxval=i.maxval, seed=initialisation_seed + replica_number)(shape=(1,))]
+                initial_values += [tf.random_uniform_initializer(minval=i.minval, maxval=i.maxval, seed=initialisation_seed + replica_number)(shape=(1,))]
             elif isinstance(i, initialisation_specs.GaussianInitialisation):
                 tf.random.set_seed(initialisation_seed + replica_number)
-                initial_values += [tf.random.normal([1], i.mean, i.std, tf.float32)]
+                initial_values += [tf.random.normal([1], i.mean, i.std_dev, tf.float32)]
             else:
                 raise RuntimeError("Invalid initialisation: choose form constant, uniform or Gaussian.")
 
