@@ -173,6 +173,13 @@ class CoreConfig(configparser.Config):
             raise ConfigError(str(e))
         return pdf
 
+    def parse_load_weights_from_fit(self, name: str):
+        """A fit in the results folder, containing at least a valid filter result."""
+        try:
+            return self.loader.check_fit(name)
+        except LoadFailedError as e:
+            raise ConfigError(str(e), name, self.loader.available_fits)
+
     @element_of("theoryids")
     @_id_with_label
     def parse_theoryid(self, theoryID: (str, int)):

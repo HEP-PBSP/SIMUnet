@@ -915,7 +915,7 @@ class ModelTrainer:
                 log.info("Using weights from fit: " + str(self.model_file))
                 idx = 0
                 for pdf_model in pdf_models:
-                    weights_path = l.resultspath / self.model_file / 'nnfit' / ('replica_%s' % self.replicas[idx]) / 'weights.h5'
+                    weights_path = l.resultspath / self.model_file.name / 'nnfit' / ('replica_%s' % self.replicas[idx]) / 'weights.h5'
                     log.info("Loading weights from path: " + str(weights_path))
                     pdf_model.load_weights(weights_path)
                     idx += 1

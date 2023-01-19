@@ -220,7 +220,7 @@ def positivity_reader(pos_spec):
 
     dict_out = {
         "datasets": pos_sets,
-        "trmask": np.ones(ndata, dtype=np.bool),
+        "trmask": np.ones(ndata, dtype=bool),
         "name": pos_spec.name,
         "expdata": np.zeros((1, ndata)),
         "ndata": ndata,
