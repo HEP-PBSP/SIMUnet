@@ -8,11 +8,12 @@ The script:
 """
 
 import argparse
-import os
 import pathlib
 import sys
 import logging
 import prompt_toolkit
+
+import shutil
 
 from reportengine import colors
 from reportengine.compat import yaml
@@ -33,11 +34,6 @@ def process_args():
 
 
 def main():
-    # Logger for writing to screen
-    log = logging.getLogger()
-    log.setLevel(logging.INFO)
-    log.addHandler(colors.ColorHandler())
-
     args = process_args()
 
     input_fit = args.fixed_simunet_fit
@@ -50,39 +46,11 @@ def main():
     l = Loader()
     fixed_fit_dir = l.resultspath / fixed_fit
 
-    os.system('mkdir tmp')
-    os.system('cp -r ' + str(fixed_fit_dir) + ' ' + 'tmp/.')
-    os.system('vp-fitrename tmp/' + str(fixed_fit) + ' ' + str(input_fit))
-    # Remove existing postfit folder
-    os.system('rm -r tmp/' + str(input_fit) + '/postfit'  )
+    for i in range(int(args.num_reps)):
+        shutil.copy(fixed_fit_dir / 'nnfit' / ('replica_' + str(i+1)) / (fixed_fit + '.dat'), input_dir / 'nnfit' / ('replica_' + str(i+1)) / (input_fit + '.dat') )
 
-    # Remove any replicas which are beyond the replicas we care about
-    rep_names = os.listdir('tmp/' + str(input_fit) + '/nnfit')
-    rep_numbers = [x[8:] for x in rep_names]    
-    rep_numbers = [int(x) for x in rep_numbers if x[-5:] != '.info' and x != '']
-    num_fixed_reps = max(rep_numbers)
-
-    num_reps = int(args.num_reps)
-
-    for i in range(num_fixed_reps):
-        if i+1 > num_reps:
-            os.system('rm -r tmp/' + str(input_fit) + '/nnfit/replica_' + str(i+1))
-
-    for i in range(num_reps):
-        if not os.path.exists(str(input_fit) + '/nnfit/replica_' + str(i+1)):
-            os.system('rm -r tmp')
-            log.error("Too many replicas requested.")
-            sys.exit(1)
-
-        os.system('cp ' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/bsm_fac.csv ' + 'tmp/' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/.')
-        os.system('cp ' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/chi2exps.log ' + 'tmp/' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/.')
-        os.system('cp ' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/' + str(input_fit) + '.json ' + 'tmp/' + str(input_fit) + '/nnfit/replica_' + str(i+1) + '/.')
-
-    # The fake fit is now completely prepared. Remove the original and copy the fake to the
-    # current directory.
-    os.system('rm -r ' + str(input_fit))
-    os.system('cp -r tmp/' + str(input_fit) + ' .')
-    os.system('rm -r tmp')
+    # Copy the info file too
+    shutil.copy(fixed_fit_dir / 'nnfit' / (fixed_fit + '.info'), input_dir / 'nnfit' / (input_fit + '.info'))
 
 if __name__ == "__main__":
     main()
