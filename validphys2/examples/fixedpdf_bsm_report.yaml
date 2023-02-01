@@ -2,14 +2,23 @@ meta:
   title: BSM results
   author: LM
   keywords: [simunet, plots, validphys]
+
 fit: 230127-lm-ttbar-fixedpdf-nlo-lin
+
 fits: 
   - 230127-lm-ttbar-fixedpdf-nlo-lin
 
 use_cuts: fromfit
+
 pdfs:
  - {id: “230127-lm-ttbar-fixedpdf-nlo-lin”, label: “230127-lm-ttbar-fixedpdf-nlo-lin”}
 
+Q: 100
+
+flavours:
+ - 2 # up
+ - 21 # gluon
+ 
 template_text: |
  # Histograms of BSM factors
  {@plot_nd_bsm_facs@}
