@@ -10,7 +10,15 @@ class CombineCfacLayer(Layer):
     Creates the combination layer of SIMUnet.
     """
 
-    def __init__(self, scales, linear_names, quad_names, initialisations, initialisation_seed, replica_number):
+    def __init__(
+        self,
+        scales,
+        linear_names,
+        quad_names,
+        initialisations,
+        initialisation_seed,
+        replica_number,
+    ):
         """
         Parameters
         ----------
@@ -26,22 +34,32 @@ class CombineCfacLayer(Layer):
         # Initialise a Layer instance
         if len(scales) != len(linear_names):
             raise ValueError("Scales and linear_names must have the same length")
-        if len(linear_names)**2 != len(quad_names):
+        if len(linear_names) ** 2 != len(quad_names):
             raise ValueError("There must be len(linear_names)**2 quad_names")
         super().__init__()
 
         # At this point, create a tf object with the correct random initialisation.
         initial_values = []
-        for i in initialisations:
-            if isinstance(i, initialisation_specs.ConstantInitialisation):
-                initial_values += [tf.constant(i.value, dtype='float32', shape=(1,))]
-            elif isinstance(i, initialisation_specs.UniformInitialisation):
-                initial_values += [tf.random_uniform_initializer(minval=i.minval, maxval=i.maxval, seed=initialisation_seed + replica_number)(shape=(1,))]
-            elif isinstance(i, initialisation_specs.GaussianInitialisation):
-                tf.random.set_seed(initialisation_seed + replica_number)
-                initial_values += [tf.random.normal([1], i.mean, i.std_dev, tf.float32)]
+        assert len(initialisations) == len(linear_names)
+        for ini, name in zip(initialisations, linear_names):
+            seed = np.int32((initialisation_seed + replica_number) ^ hash(name))
+
+            if isinstance(ini, initialisation_specs.ConstantInitialisation):
+                val = tf.constant(ini.value, dtype='float32', shape=(1,))
+            elif isinstance(ini, initialisation_specs.UniformInitialisation):
+                val = tf.random_uniform_initializer(
+                    minval=ini.minval,
+                    maxval=ini.maxval,
+                    seed=seed,
+                )(shape=(1,))
+            elif isinstance(ini, initialisation_specs.GaussianInitialisation):
+                tf.random.set_seed(seed)
+                val = tf.random.normal([1], ini.mean, ini.std_dev, tf.float32)
             else:
-                raise RuntimeError("Invalid initialisation: choose form constant, uniform or Gaussian.")
+                raise RuntimeError(
+                    "Invalid initialisation: choose form constant, uniform or Gaussian."
+                )
+            initial_values.append(val)
 
         initial_values = tf.concat(initial_values, 0)
 
