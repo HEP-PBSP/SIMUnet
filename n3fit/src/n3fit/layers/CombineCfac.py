@@ -61,12 +61,18 @@ class CombineCfacLayer(Layer):
                 )
             initial_values.append(val)
 
-        initial_values = tf.concat(initial_values, 0)
+        if len(initial_values) > 0:
+            initial_values = tf.concat(initial_values, 0)
 
-        self.w = tf.Variable(
-            initial_value=initial_values,
-            trainable=True,
-        )
+            self.w = tf.Variable(
+                initial_value=initial_values,
+                trainable=True,
+            )
+        else:
+            self.w = tf.Variable(
+                initial_value=tf.zeros(shape=(len(initial_values),), dtype="float32"),
+                trainable=True,
+            )
         self.scales = np.array(scales, dtype=np.float32)
         self.linear_names = linear_names
         self.quad_names = quad_names
