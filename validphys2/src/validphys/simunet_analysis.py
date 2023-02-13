@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
+from matplotlib.ticker import MultipleLocator
+import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
@@ -828,6 +830,53 @@ def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, t
     """Obtains the full Fisher information matrix for the BSM parameters.
     """
     return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf)
+
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+
+@figure
+def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to_latex, bsm_sectors_to_latex):
+    """Produces a nice plot from the table fisher_information_by_sector.
+    """
+    f = fisher_information_by_sector
+
+    coeff_names = [bsm_names_to_latex[x] for x in f.index]
+    sector_names = [bsm_sectors_to_latex[x] for x in f.columns]
+
+    ncoeff, ndata = f.shape
+
+    fig, ax = plt.subplots(figsize=(15,5))
+    ax.set_xlim([-1.5,ncoeff-1.5])
+    ax.set_ylim([-1.5,ndata-1.5])
+    ax.xaxis.set_major_locator(MultipleLocator(1.))
+    ax.yaxis.set_major_locator(MultipleLocator(1.))
+
+    old_cmap =  plt.get_cmap('YlGnBu')
+    new_cmap  = truncate_colormap(old_cmap, minval=0.0, maxval=0.65)
+
+    ax = sns.heatmap(f.T,vmin=0.0, vmax=100.0,cmap=new_cmap,cbar=False);
+
+    ax.set_xticklabels(coeff_names, rotation=0., va='top', ha='center', fontsize=14)
+    ax.set_yticklabels(sector_names, rotation=0., va='center', ha='right', fontsize=14)
+
+    for y,val in enumerate(f.index):
+        ax.plot([y, y],[-1.5, ndata+1], ls='solid', c='lightgray', lw=0.8)
+
+    fisher_rounded = np.round(f.to_numpy(),0)
+
+    #Plot numbers
+    nrow, ncol = np.shape(f.T)
+    for i in range(nrow):
+        for j in range(ncol):
+            if fisher_rounded.T[i,j]!=0:
+                plt.text(x=j+0.15, y=i+0.6, s=str(fisher_rounded.T[i,j]),fontsize=10)
+
+    plt.tight_layout()
+
+    return fig
 
 @table
 def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):

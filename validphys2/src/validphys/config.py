@@ -413,6 +413,15 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
+    def produce_bsm_names_to_latex(self, bsm_fac_data=None):
+        if bsm_fac_data is None:
+            return None
+        else:
+            bsm_names_to_latex = {}
+            for entry in bsm_fac_data:
+                bsm_names_to_latex[entry['name']] = entry['latex']
+            return bsm_names_to_latex
+
     def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.
