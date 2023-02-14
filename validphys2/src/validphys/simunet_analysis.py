@@ -128,7 +128,7 @@ def plot_nd_bsm_facs_fits(fits):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                ax.hist(bsm_facs_df.get([op]).values, alpha=0.5, label=fit.name)
+                ax.hist(bsm_facs_df.get([op]).values, alpha=0.5, label=fit.label)
                 ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
                 ax.set_title(f"Distribution for {op} coefficient")
                 ax.set_ylabel("Count")
@@ -363,7 +363,7 @@ def plot_tr_val_epoch(fit, replica_paths):
     ax.plot(val_chi2.index, val_chi2, label=r'Validation $\chi^2$')
     ax.legend()
     ax.grid(True)
-    ax.set_title(fit.name)
+    ax.set_title(fit.label)
     ax.set_xlabel('Epoch')
     ax.set_ylabel(r'$\chi^2$', rotation='horizontal', labelpad=10.0)
 
@@ -457,7 +457,7 @@ def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     # formatting
     ax.xaxis.tick_top() # x axis on top
     ax.xaxis.set_label_position('top')
-    ax.set_title(fit.name, fontsize=20, pad=20)
+    ax.set_title(fit.label, fontsize=20, pad=20)
 
     # create heatmap
     ax = sns.heatmap(corr_mat,
@@ -590,7 +590,7 @@ def plot_2d_bsm_facs_fits(fits):
             # display the result in the figure only if the fit has the two operators in the pair
             if bsm_facs_df.get([op_1]) is not None and bsm_facs_df.get([op_2]) is not None:
                 ax.scatter(
-                    bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.name, alpha=0.5, s=40
+                    bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.label, alpha=0.5, s=40
                 )
                 # populate the histograms
                 ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5)
@@ -607,7 +607,7 @@ def plot_2d_bsm_facs_fits(fits):
         yield fig
 
 @table
-def bsm_facs_bounds_fits(fits, n_sigma):
+def bsm_facs_bounds_fits(fits, n_sigma=2):
     """
     Table generator to summarise information about
     the BSM coefficient results.
@@ -628,7 +628,7 @@ def bsm_facs_bounds_fits(fits, n_sigma):
         all_ops.extend(bsm_fac_ops)
     all_ops = list(dict.fromkeys(all_ops))
 
-    fit_names =  [fit.name for fit in fits]
+    fit_names =  [fit.label for fit in fits]
     extra_metrics = ['Best-fit shift', 'Broadening']
     # include extra metrics in columns
     fit_names.extend(extra_metrics)
@@ -650,14 +650,14 @@ def bsm_facs_bounds_fits(fits, n_sigma):
                 cl_lower, cl_upper = (mean - n_sigma * std, mean + n_sigma * std)
                 lower_dis = format_number(cl_lower, digits=2)
                 upper_dis = format_number(cl_upper, digits=2)
-                df[fit.name].loc[op] = f"({lower_dis}, {upper_dis})"
+                df[fit.label].loc[op] = f"({lower_dis}, {upper_dis})"
                 # best-fit value
                 best_fits.append(mean)
                 # calculate bound length
                 length = cl_upper - cl_lower
                 bound_lengths.append(length)
             else:
-                df[fit.name].loc[op] = 'Not in fit'
+                df[fit.label].loc[op] = 'Not in fit'
                 # if the operator is not in the fit, then assume SM
                 # for best-fit value
                 best_fits.append(0.0)
@@ -755,8 +755,8 @@ def plot_bsm_facs_bounds(fits):
                 best_fits.append(0.0)
                 bounds.append([0.0, 0.0])
 
-        bounds_dict[fit.name] = bounds
-        best_fits_dict[fit.name] = best_fits
+        bounds_dict[fit.label] = bounds
+        best_fits_dict[fit.label] = best_fits
 
     # plot parameters
     scales= ['linear', 'symlog']
@@ -770,13 +770,13 @@ def plot_bsm_facs_bounds(fits):
         ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
 
         for fit in fits:
-            bounds = bounds_dict[fit.name]
-            best_fits = best_fits_dict[fit.name]
+            bounds = bounds_dict[fit.label]
+            best_fits = best_fits_dict[fit.label]
             x_coords = [i - 0.1 + 0.2*fits.index(fit) for i in range(len(all_ops))] 
             bounds_min = [bound[0] for bound in bounds]
             bounds_max= [bound[1] for bound in bounds]
             ax.scatter(x_coords, best_fits, color=colour_key[fits.index(fit)])
-            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + fit.name,
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + fit.label,
             color=colour_key[fits.index(fit)], lw=2.0)
 
         # set x positions for labels and labels
@@ -857,7 +857,7 @@ def plot_bsm_facs_68res(fits):
                 # if the operator is not in the fit, then assume SM
                 residuals.append(0.0)
 
-        residuals_dict[fit.name] = residuals
+        residuals_dict[fit.label] = residuals
 
     # plotting specs
     colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
@@ -873,12 +873,12 @@ def plot_bsm_facs_68res(fits):
     ax.axhline(y=-1.0, color='k', linestyle='--', alpha=0.3)
 
     for fit in fits:
-        residuals = residuals_dict[fit.name]
+        residuals = residuals_dict[fit.label]
         ordered_residuals = format_residuals(residuals)
         x_coords = [i - 0.1 + 0.2*fits.index(fit) for i in range(len(all_ops))] 
         residuals_min = [residual[0] for residual in ordered_residuals]
         residuals_max = [residual[1] for residual in ordered_residuals]
-        ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label=fit.name,
+        ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label=fit.label,
         color=colour_key[fits.index(fit)], lw=4.0)
 
     # set x positions for labels and labels
