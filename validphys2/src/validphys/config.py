@@ -422,6 +422,15 @@ class CoreConfig(configparser.Config):
                 bsm_names_to_latex[entry['name']] = entry['latex']
             return bsm_names_to_latex
 
+    def produce_bsm_names_to_plot_scales(self, bsm_fac_data=None):
+        if bsm_fac_data is None:
+            return None
+        else:
+           bsm_names_to_plot_scales = {}
+           for entry in bsm_fac_data:
+               bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
+           return bsm_names_to_plot_scales
+
     def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.

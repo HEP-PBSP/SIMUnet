@@ -667,7 +667,7 @@ def bsm_facs_95bounds_fits(fits):
     return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 @figuregen
-def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
+def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales):
     """
     Figure generator to compare bounds obtained with simunet with
     bounds obtained by smefit.
@@ -701,7 +701,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                values = bsm_facs_df[op]
+                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
                 mean =  values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
@@ -721,8 +721,8 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
     bounds = []
     best_fits = []
     for op in all_ops:
-        best_fits += [smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
-        bounds += [[smefit_reference[x]['lower_bound'], smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+        best_fits += [bsm_names_to_plot_scales[op]*smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+        bounds += [[bsm_names_to_plot_scales[op]*smefit_reference[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
 
     bounds_dict['SMEFiT'] = bounds
     best_fits_dict['SMEFiT'] = best_fits
@@ -754,7 +754,13 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
 
         # set x positions for labels and labels
         ax.set_xticks(np.arange(len(all_ops)))
-        ax.set_xticklabels([bsm_names_to_latex[op] for op in all_ops], rotation='vertical', fontsize=10)
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
         # set y labels
         ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
@@ -786,15 +792,15 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
 
         # Load image and add it to the plot
         file_name = "logo_black.png"
-        logo = image.imread(file_name)
+        #logo = image.imread(file_name)
 
         #The OffsetBox is a simple container artist.
         #The child artists are meant to be drawn at a relative position to its #parent.
-        imagebox = OffsetImage(logo, zoom = 0.15)
+        #imagebox = OffsetImage(logo, zoom = 0.15)
 
         #Container for the imagebox referring to a specific position *xy*.
-        ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
-        ax.add_artist(ab)
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
 
         # frames on all sides
         ax.spines['top'].set_visible(True)
