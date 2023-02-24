@@ -14,6 +14,8 @@ import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
 from matplotlib.ticker import MultipleLocator
+import matplotlib.image as image
+from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
 import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
@@ -663,6 +665,144 @@ def bsm_facs_95bounds_fits(fits):
         fits: NSList of FitSpec 
     """ 
     return bsm_facs_bounds_fits(fits, n_sigma=2)
+
+@figuregen
+def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference):
+    """
+    Figure generator to compare bounds obtained with simunet with
+    bounds obtained by smefit.
+    Paramaters
+    ----------
+        fits: NSList of FitSpec 
+        n_sigma: number
+    The plot contains information about the mean
+    and standard deviation of the BSM coefficients in the fit, 
+    as well as showing the confidence levels by 
+    computing mean ± 2*std.
+    """ 
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators and reorder
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+
+    # store the relevant values
+    bounds_dict = {}
+    best_fits_dict ={} 
+
+    for fit in fits:
+        bounds = []
+        best_fits = []
+        for op in all_ops:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                mean =  values.mean()
+                std = values.std()
+                cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
+                # best-fit value
+                best_fits.append(mean)
+                # append bounds
+                bounds.append([cl_lower, cl_upper])
+            else:
+                # if the operator is not in the fit, then assume SM
+                best_fits.append(0.0)
+                bounds.append([0.0, 0.0])
+
+        bounds_dict[fit.label] = bounds
+        best_fits_dict[fit.label] = best_fits
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds = []
+    best_fits = []
+    for op in all_ops:
+        best_fits += [smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+        bounds += [[smefit_reference[x]['lower_bound'], smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+
+    bounds_dict['SMEFiT'] = bounds
+    best_fits_dict['SMEFiT'] = best_fits
+
+    # plot parameters
+    scales= ['linear', 'symlog']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+
+    for scale in scales:
+        # initialise plots
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+
+        labels = [fit.label for fit in fits] + ['SMEFiT']
+
+        idx = 0
+        for label in labels:
+            bounds = bounds_dict[label]
+            best_fits = best_fits_dict[label]
+            x_coords = [i - 0.1 + 0.2*idx for i in range(len(all_ops))] 
+            bounds_min = [bound[0] for bound in bounds]
+            bounds_max= [bound[1] for bound in bounds]
+            ax.scatter(x_coords, best_fits, color=colour_key[idx])
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + label,
+            color=colour_key[idx], lw=2.0)
+            idx += 1
+
+        # set x positions for labels and labels
+        ax.set_xticks(np.arange(len(all_ops)))
+        ax.set_xticklabels([bsm_names_to_latex[op] for op in all_ops], rotation='vertical', fontsize=10)
+
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
+
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
+
+        # final formatting
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
+
+        # Load image and add it to the plot
+        file_name = "logo_black.png"
+        logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        ax.add_artist(ab)
+
+        # frames on all sides
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+
+        yield fig
 
 @figuregen
 def plot_bsm_facs_bounds(fits):

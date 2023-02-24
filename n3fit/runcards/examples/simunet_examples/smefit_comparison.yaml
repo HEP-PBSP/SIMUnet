@@ -1,0 +1,63 @@
+meta:
+  title: SMEFiT comparison test
+  author: James Moore
+  keywords: [simunet]
+
+fits:
+ - 230204-lm-alltop-fixedpdf-nlo-lin 
+
+bsm_fac_data:
+- {name: 'OtG', scale: 1, latex: '$c_{tG}$'}
+- {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$'}
+- {name: 'OtZ', scale: 1, latex: '$c_{tZ}$'}
+- {name: 'OtW', scale: 1, latex: '$c_{tW}$'}
+- {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$'}
+- {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$'}
+- {name: 'O1qd', scale: 1, latex: '$c_{qd}^{1}$'}
+- {name: 'O1qu', scale: 1, latex: '$c_{qu}^{1}$'}
+- {name: 'O1dt', scale: 1, latex: '$c_{dt}^{1}$'} 
+- {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$'} 
+- {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$'} 
+- {name: 'O11qq', scale: 1, latex: '$c_{qq}^{1,1}$'} 
+- {name: 'O13qq', scale: 1, latex: '$c_{qq}^{1,3}$'} 
+- {name: 'O8qd', scale: 1, latex: '$c_{qd}^{8}$'}
+- {name: 'O8qu', scale: 1, latex: '$c_{qu}^{8}$'}
+- {name: 'O8dt', scale: 1, latex: '$c_{dt}^{8}$'} 
+- {name: 'O8qt', scale: 1, latex: '$c_{qt}^{8}$'} 
+- {name: 'O8ut', scale: 1, latex: '$c_{ut}^{8}$'} 
+- {name: 'O81qq', scale: 1, latex: '$c_{qq}^{8,1}$'} 
+- {name: 'O83qq', scale: 1, latex: '$c_{qq}^{8,3}$'}
+- {name: 'OQt8', scale: 1, latex: '$c_{Qt}^{8}$'}
+- {name: 'OQQ1', scale: 1, latex: '$c_{QQ}^{1}$'}
+- {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$'}
+- {name: 'OQt1', scale: 1, latex: '$c_{Qt}^{1}$'}
+- {name: 'Ott1', scale: 1, latex: '$c_{tt}^{1}$'}
+
+smefit_reference:
+- {name: 'OtG', best: 0.139, lower_bound: -0.128, upper_bound: 0.407}
+- {name: 'Opt', best: 6.879, lower_bound: -4.033, upper_bound: 17.458}
+- {name: 'OtZ', best: -4.706, lower_bound: -13.995, upper_bound: 4.526}
+- {name: 'OtW', best: -0.089, lower_bound: -0.3, upper_bound: 0.122}
+- {name: 'O3pQ3', best: -0.168, lower_bound: -1.09, upper_bound: 0.757}
+- {name: 'OpQM', best: 4.334, lower_bound: -2.24, upper_bound: 10.88}
+- {name: 'O1qd', best: 11.574, lower_bound: -6.25, upper_bound: 29.17}
+- {name: 'O1qu', best: -3.877, lower_bound: -12.007, upper_bound: 4.425}
+- {name: 'O1dt', best: -8.602, lower_bound: -26.372, upper_bound: 8.96}
+- {name: 'O1qt', best: -1.906, lower_bound: -10.519, upper_bound: 6.811}
+- {name: 'O1ut', best: 2.297, lower_bound: -12.177, upper_bound: 16.449}
+- {name: 'O11qq', best: 4.081, lower_bound: -4.167, upper_bound: 12.386}
+- {name: 'O13qq', best: 0.064, lower_bound: -0.164, upper_bound: 0.283}
+- {name: 'O8qd', best: -3.638, lower_bound: -20.48, upper_bound: 13.12}
+- {name: 'O8qu', best: -0.745, lower_bound: -12.999, upper_bound: 11.557}
+- {name: 'O8dt', best: 2.843, lower_bound: -11.682, upper_bound: 17.199}
+- {name: 'O8qt', best: 0.659, lower_bound: -3.338, upper_bound: 4.755}
+- {name: 'O8ut', best: -4.84, lower_bound: -12.539, upper_bound: 2.76} 
+- {name: 'O81qq', best: 0.734, lower_bound: -2.705, upper_bound: 4.188} 
+- {name: 'O83qq', best: 1.894, lower_bound: -3.286, upper_bound: 6.992}
+
+template_text: |
+  # SMEFiT comparison
+  {@plot_smefit_comparison@}
+
+actions_:
+  - report(main=True)
