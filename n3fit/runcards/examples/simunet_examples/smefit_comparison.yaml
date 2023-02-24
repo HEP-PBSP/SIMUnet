@@ -4,7 +4,7 @@ meta:
   keywords: [simunet]
 
 fits:
- - 230204-lm-alltop-fixedpdf-nlo-lin 
+ - {id: 230204-lm-alltop-fixedpdf-nlo-lin, label: 'SIMUnet, new dataset'} 
 
 bsm_fac_data:
 - {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 10}
@@ -32,6 +32,8 @@ bsm_fac_data:
 - {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$', plot_scale: 1}
 - {name: 'OQt1', scale: 1, latex: '$c_{Qt}^{1}$', plot_scale: 1}
 - {name: 'Ott1', scale: 1, latex: '$c_{tt}^{1}$', plot_scale: 1}
+
+smefit_label: 'SMEFiT, old dataset'
 
 smefit_reference:
 - {name: 'OtG', best: 0.139, lower_bound: -0.128, upper_bound: 0.407}

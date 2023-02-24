@@ -36,11 +36,13 @@ from validphys.pdfbases import PDG_PARTONS
 
 from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+from validphys.loader import _get_nnpdf_profile
 
 from validphys.convolution import central_predictions
 
 log = logging.getLogger(__name__)
 
+l = Loader()
 
 """
 Format routines
@@ -667,7 +669,7 @@ def bsm_facs_95bounds_fits(fits):
     return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 @figuregen
-def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales):
+def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
     """
     Figure generator to compare bounds obtained with simunet with
     bounds obtained by smefit.
@@ -724,8 +726,8 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         best_fits += [bsm_names_to_plot_scales[op]*smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
         bounds += [[bsm_names_to_plot_scales[op]*smefit_reference[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
 
-    bounds_dict['SMEFiT'] = bounds
-    best_fits_dict['SMEFiT'] = best_fits
+    bounds_dict[smefit_label] = bounds
+    best_fits_dict[smefit_label] = best_fits
 
     # plot parameters
     scales= ['linear', 'symlog']
@@ -738,7 +740,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         # line for SM prediction
         ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
 
-        labels = [fit.label for fit in fits] + ['SMEFiT']
+        labels = [fit.label for fit in fits] + [smefit_label]
 
         idx = 0
         for label in labels:
@@ -791,7 +793,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         ax.set_adjustable("datalim")
 
         # Load image and add it to the plot
-        file_name = "logo_black.png"
+        #file_name = "logo_black.png"
         #logo = image.imread(file_name)
 
         #The OffsetBox is a simple container artist.
@@ -969,7 +971,6 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
 """
 Principal component analysis
 """
-l = Loader()
 
 @table
 def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
