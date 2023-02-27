@@ -669,6 +669,127 @@ def bsm_facs_95bounds_fits(fits):
     return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 @figuregen
+def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
+    """Compares two SMEFiT fits.
+    """
+    # extract all operators in the SMEFiT fits
+    all_ops = []
+    for fit in [smefit_reference_1, smefit_reference_2]:
+        ops_list = []
+        for entry in fit:
+            ops_list += [entry['name']]
+        all_ops.append(ops_list)
+    # Remove repeated operators and reorder
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+
+    # store the relevant values
+    bounds_dict = {}
+    best_fits_dict ={} 
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds_1 = []
+    best_fits_1 = []
+    for op in all_ops:
+        best_fits_1 += [bsm_names_to_plot_scales[op]*smefit_reference_1[x]['best'] for x in range(len(smefit_reference_1)) if smefit_reference_1[x]['name'] == op]
+        bounds_1 += [[bsm_names_to_plot_scales[op]*smefit_reference_1[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference_1[x]['upper_bound']] for x in range(len(smefit_reference_1)) if smefit_reference_1[x]['name'] == op]
+
+    bounds_dict[smefit_labels[0]] = bounds_1
+    best_fits_dict[smefit_labels[0]] = best_fits_1
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds_2 = []
+    best_fits_2 = []
+    for op in all_ops:
+        best_fits_2 += [bsm_names_to_plot_scales[op]*smefit_reference_2[x]['best'] for x in range(len(smefit_reference_2)) if smefit_reference_2[x]['name'] == op]
+        bounds_2 += [[bsm_names_to_plot_scales[op]*smefit_reference_2[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference_2[x]['upper_bound']] for x in range(len(smefit_reference_2)) if smefit_reference_2[x]['name'] == op]
+
+    bounds_dict[smefit_labels[1]] = bounds_2
+    best_fits_dict[smefit_labels[1]] = best_fits_2
+
+    # plot parameters
+    scales= ['linear', 'symlog']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+
+    for scale in scales:
+        # initialise plots
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+
+        labels = smefit_labels
+
+        idx = 0
+        for label in labels:
+            bounds = bounds_dict[label]
+            best_fits = best_fits_dict[label]
+            x_coords = [i - 0.1 + 0.2*idx for i in range(len(all_ops))] 
+            bounds_min = [bound[0] for bound in bounds]
+            bounds_max= [bound[1] for bound in bounds]
+            ax.scatter(x_coords, best_fits, color=colour_key[idx])
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + label,
+            color=colour_key[idx], lw=2.0)
+            idx += 1
+
+        # set x positions for labels and labels
+        ax.set_xticks(np.arange(len(all_ops)))
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
+
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
+
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
+
+        # final formatting
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
+
+        # Load image and add it to the plot
+        #file_name = "logo_black.png"
+        #logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        #imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
+
+        # frames on all sides
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+
+        yield fig
+
+@figuregen
 def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
     """
     Figure generator to compare bounds obtained with simunet with
