@@ -7,26 +7,26 @@ fits:
  - 230204-lm-alltop-fixedpdf-nlo-lin 
 
 bsm_fac_data:
-- {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 10}
+- {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 100}
 - {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$', plot_scale: 1}
 - {name: 'OtZ', scale: 1, latex: '$c_{tZ}$', plot_scale: 1}
-- {name: 'OtW', scale: 1, latex: '$c_{tW}$', plot_scale: 1}
-- {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$', plot_scale: 1}
+- {name: 'OtW', scale: 1, latex: '$c_{tW}$', plot_scale: 100}
+- {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$', plot_scale: 10}
 - {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$', plot_scale: 1}
-- {name: 'O1qd', scale: 1, latex: '$c_{qd}^{1}$', plot_scale: 1}
-- {name: 'O1qu', scale: 1, latex: '$c_{qu}^{1}$', plot_scale: 1}
+- {name: 'O1qd', scale: 1, latex: '$c_{Qd}^{1}$', plot_scale: 1}
+- {name: 'O1qu', scale: 1, latex: '$c_{Qu}^{1}$', plot_scale: 1}
 - {name: 'O1dt', scale: 1, latex: '$c_{dt}^{1}$', plot_scale: 1} 
 - {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$', plot_scale: 1} 
 - {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$', plot_scale: 1} 
-- {name: 'O11qq', scale: 1, latex: '$c_{qq}^{1,1}$', plot_scale: 1} 
-- {name: 'O13qq', scale: 1, latex: '$c_{qq}^{1,3}$', plot_scale: 1} 
-- {name: 'O8qd', scale: 1, latex: '$c_{qd}^{8}$', plot_scale: 1}
-- {name: 'O8qu', scale: 1, latex: '$c_{qu}^{8}$', plot_scale: 1}
+- {name: 'O11qq', scale: 1, latex: '$c_{Qq}^{1,1}$', plot_scale: 1} 
+- {name: 'O13qq', scale: 1, latex: '$c_{Qq}^{1,3}$', plot_scale: 100} 
+- {name: 'O8qd', scale: 1, latex: '$c_{Qd}^{8}$', plot_scale: 1}
+- {name: 'O8qu', scale: 1, latex: '$c_{Qu}^{8}$', plot_scale: 1}
 - {name: 'O8dt', scale: 1, latex: '$c_{dt}^{8}$', plot_scale: 1} 
 - {name: 'O8qt', scale: 1, latex: '$c_{qt}^{8}$', plot_scale: 1} 
 - {name: 'O8ut', scale: 1, latex: '$c_{ut}^{8}$', plot_scale: 1} 
-- {name: 'O81qq', scale: 1, latex: '$c_{qq}^{8,1}$', plot_scale: 1} 
-- {name: 'O83qq', scale: 1, latex: '$c_{qq}^{8,3}$', plot_scale: 1}
+- {name: 'O81qq', scale: 1, latex: '$c_{Qq}^{8,1}$', plot_scale: 1} 
+- {name: 'O83qq', scale: 1, latex: '$c_{Qq}^{8,3}$', plot_scale: 1}
 - {name: 'OQt8', scale: 1, latex: '$c_{Qt}^{8}$', plot_scale: 1}
 - {name: 'OQQ1', scale: 1, latex: '$c_{QQ}^{1}$', plot_scale: 1}
 - {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$', plot_scale: 1}
