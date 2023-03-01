@@ -355,9 +355,11 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     fit_bsm_fac_df = pd.DataFrame(
         {k: v.central_value for k, v in parsed_bsm_facs.items()}
     )
+
+    if not read_bsm_facs.empty:
+        scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
+        _, nops = read_bsm_facs.shape
     
-    scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
-    _, nops = read_bsm_facs.shape
     if parsed_bsm_quad_facs is not None:
         # We must also apply quadratic C-factors
         quad_bsm_fac_df = pd.DataFrame(
@@ -377,7 +379,14 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
                         new_op_contribution[a,:,0] = op_products[:]*op_values[a]
                     np.append(scaled_replicas, new_op_contribution, axis=2)               
 
-    replica_result = 1 + np.sum(scaled_replicas, axis=2)
+    if not read_bsm_facs.empty:
+        replica_result = 1 + np.sum(scaled_replicas, axis=2)
+    else:
+        if not isinstance(dataset, FixedObservableSpec):
+            replica_result = np.ones((len(dataset.load().get_cv()), len(pdf)-1))
+        else:
+            replica_result = np.ones((len(dataset.load().prediction.central_value), len(pdf)-1))
+
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
     return result
@@ -1069,6 +1078,13 @@ def fits_datasets_chi2_table(
 
 dataspecs_datasets_chi2_data = collect("groups_datasets_chi2_data", ("dataspecs",))
 
+groups_datasets_chi2_data = collect(
+    "each_dataset_chi2", ("group_dataset_inputs_by_metadata",)
+)
+groups_fixed_observable_chi2_data = collect(
+    "each_fixed_observable_chi2", ("group_dataset_inputs_by_metadata",)
+)
+dataspecs_fixed_observables_chi2_data = collect("groups_fixed_observable_chi2_data", ("dataspecs",))
 
 @table
 @check_speclabels_different
@@ -1076,13 +1092,18 @@ def dataspecs_datasets_chi2_table(
     dataspecs_speclabel,
     dataspecs_groups,
     dataspecs_datasets_chi2_data,
+    dataspecs_fixed_observables_chi2_data,
     per_point_data: bool = True,
 ):
     """Same as fits_datasets_chi2_table but for arbitrary dataspecs."""
+
+    print(dataspecs_fixed_observables_chi2_data)
+
     return fits_datasets_chi2_table(
         dataspecs_speclabel,
         dataspecs_groups,
         dataspecs_datasets_chi2_data,
+        dataspecs_fixed_observables_chi2_data,
         per_point_data=per_point_data,
     )
 
