@@ -173,6 +173,13 @@ class CoreConfig(configparser.Config):
             raise ConfigError(str(e))
         return pdf
 
+    def parse_load_weights_from_fit(self, name: str):
+        """A fit in the results folder, containing at least a valid filter result."""
+        try:
+            return self.loader.check_fit(name)
+        except LoadFailedError as e:
+            raise ConfigError(str(e), name, self.loader.available_fits)
+
     @element_of("theoryids")
     @_id_with_label
     def parse_theoryid(self, theoryID: (str, int)):
@@ -439,6 +446,28 @@ class CoreConfig(configparser.Config):
             return len(bsm_fac_data)
         return 0
 
+    def produce_bsm_fac_initialisations(self, bsm_fac_data=None):
+        """Produces the list of initialisation settings for each of
+        the BSM coefficients entering into the fit.
+        """
+        from validphys.initialisation_specs import Initialisation
+
+        if bsm_fac_data is None:
+            return []
+
+        bsm_fac_initialisations = []
+        for entry in bsm_fac_data:
+            if not (init_dict := entry.get("initialisation")):
+                raise ConfigError(
+                    f"bsm_fac_data entry '{entry}' must containt a valid 'initialisation' key"
+                )
+            try:
+                init = validobj.parse_input(init_dict, Initialisation)
+            except validobj.ValidationError as e:
+                raise ConfigError(e) from e
+            bsm_fac_initialisations.append(init)
+        return bsm_fac_initialisations
+
     def produce_bsm_fac_data_names(self, bsm_fac_data=None):
         """
         Produces the list of the names of the
@@ -449,7 +478,7 @@ class CoreConfig(configparser.Config):
             for entry in bsm_fac_data:
                 bsm_fac_data_names += [entry['name']]
             return bsm_fac_data_names
-        return [] 
+        return []
 
     def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
         """Produces a list of names of the quadratics that could be included in the fit, regardless
@@ -468,6 +497,22 @@ class CoreConfig(configparser.Config):
                 bsm_fac_quad_names += [current_quad_names]
             return bsm_fac_quad_names
         return []
+
+    def produce_bsm_fac_quad_names_dict(self, bsm_fac_data_names):
+        """For use in the correlation plots.
+        """
+        if not bsm_fac_data_names:
+            return []
+        bsm_fac_quad_names = []
+        for i in range(len(bsm_fac_data_names)):
+            current_quad_names = []
+            for j in range(len(bsm_fac_data_names)):
+                if j < i:
+                    current_quad_names += [{'name': bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j], 'op1': bsm_fac_data_names[i], 'op2': bsm_fac_data_names[j]}]
+            bsm_fac_quad_names += [current_quad_names]
+        # Flatten the list
+        flat_list = [item for sublist in bsm_fac_quad_names for item in sublist]
+        return flat_list
 
     def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
