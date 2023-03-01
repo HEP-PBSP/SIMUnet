@@ -106,7 +106,7 @@ def plot_nd_bsm_facs(read_bsm_facs):
         yield fig
 
 @figuregen
-def plot_nd_bsm_facs_fits(fits):
+def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, same_bins=False, n_bins=10):
     """
     Compare histograms of BSM factors between different fits 
     in SIMUnet
@@ -119,20 +119,41 @@ def plot_nd_bsm_facs_fits(fits):
         bsm_fac_ops = bsm_facs_df.columns.tolist()
         all_ops.append(bsm_fac_ops)
     # Remove repeated operators
-    all_ops = {o for fit_ops in all_ops for o in fit_ops} 
-    
+    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+
+    # If same_bins=True, create binnings
+    if same_bins:
+        min_bins = pd.Series(dict(zip(list(all_ops), np.full(len(all_ops), np.inf))))
+        max_bins = pd.Series(dict(zip(list(all_ops), np.full(len(all_ops), -np.inf))))
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            min_df = bsm_facs_df.min()
+            max_df = bsm_facs_df.max()
+
+            min_bins = pd.concat([min_bins, min_df], axis=1).min(axis=1)
+            max_bins = pd.concat([max_bins, max_df], axis=1).max(axis=1)
+
     # plot all operators 
     for op in all_ops:
         fig, ax = plt.subplots()
         for fit in fits:
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
+
+            if same_bins:
+                bins = np.linspace(min_bins.loc[op], max_bins.loc[op], n_bins)
+            else:
+                bins = n_bins
+
             if bsm_facs_df.get([op]) is not None:
-                ax.hist(bsm_facs_df.get([op]).values, alpha=0.5, label=fit.label)
+                ax.hist(bsm_facs_df.get([op]).values, bins=bins, density=True, alpha=0.5, label=fit.label)
                 ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-                ax.set_title(f"Distribution for {op} coefficient")
-                ax.set_ylabel("Count")
-                ax.set_xlabel(op)
+                ax.set_ylabel("Prob. density", fontsize=14)
+                if bsm_names_to_latex is None:
+                    ax.set_xlabel(op, fontsize=14)
+                else:
+                    ax.set_xlabel(bsm_names_to_latex[op], fontsize=16)
                 ax.legend()
                 ax.grid(False)
         yield fig
