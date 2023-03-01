@@ -88,8 +88,8 @@ bsm_fac_data:
 - {name: 'OtW', scale: 1, latex: '$c_{tW}$'}
 - {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$'}
 - {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$'}
-- {name: 'O1qd', scale: 1, latex: '$c_{qd}^{1}$'}
-- {name: 'O1qu', scale: 1, latex: '$c_{qu}^{1}$'}
+- {name: 'O1qd', scale: 1, latex: '$c_{Qd}^{1}$'}
+- {name: 'O1qu', scale: 1, latex: '$c_{Qu}^{1}$'}
 - {name: 'O1dt', scale: 1, latex: '$c_{dt}^{1}$'} 
 - {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$'} 
 - {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$'} 
