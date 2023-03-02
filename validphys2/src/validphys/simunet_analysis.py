@@ -106,12 +106,14 @@ def plot_nd_bsm_facs(read_bsm_facs):
         yield fig
 
 @figuregen
-def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, same_bins=False, n_bins=10):
+def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_bins):
     """
     Compare histograms of BSM factors between different fits 
     in SIMUnet
     """
     # extract all operators in the fits
+    same_bins = posterior_bins["same_bins"]
+    n_bins = posterior_bins["n_bins"]
     all_ops = []
     for fit in fits:
         paths = replica_paths(fit)
