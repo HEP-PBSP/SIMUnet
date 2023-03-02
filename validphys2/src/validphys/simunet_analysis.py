@@ -660,7 +660,7 @@ def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
     # get all pairs
     pairs = itertools.combinations(all_ops, 2)
     # plot all pairs of operators
-    for pair in list(pairs)[:1]:
+    for pair in pairs:
         op_1, op_2 = pair
         # use this size to keep them sqaure
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
