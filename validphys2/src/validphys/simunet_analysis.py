@@ -984,7 +984,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         yield fig
 
 @figuregen
-def plot_bsm_facs_bounds(fits):
+def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
     Figure generator to plot the bounds of
     the BSM coefficients fitted.
@@ -1018,8 +1018,8 @@ def plot_bsm_facs_bounds(fits):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                values = bsm_facs_df[op]
-                mean =  values.mean()
+                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                mean = values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
                 # best-fit value
@@ -1035,7 +1035,7 @@ def plot_bsm_facs_bounds(fits):
         best_fits_dict[fit.label] = best_fits
 
     # plot parameters
-    scales= ['linear', 'symlog']
+    scales = ['linear', 'symlog']
     colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
 
     for scale in scales:
@@ -1057,7 +1057,13 @@ def plot_bsm_facs_bounds(fits):
 
         # set x positions for labels and labels
         ax.set_xticks(np.arange(len(all_ops)))
-        ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
         # set y labels
         ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
@@ -1082,7 +1088,7 @@ def plot_bsm_facs_bounds(fits):
             ax.set_yscale(scale)
 
         # final formatting
-        ax.legend()
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
         ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
