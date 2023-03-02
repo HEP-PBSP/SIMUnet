@@ -438,14 +438,6 @@ class CoreConfig(configparser.Config):
                 bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
             return bsm_names_to_plot_scales
 
-    def produce_posterior_bins(self, posterior_plots_settings=None):
-        if posterior_plots_settings is None:
-            return {"same_bins": False, "n_bins": 10}
-        else:
-            posterior_bins = {"same_bins": posterior_plots_settings["same_bins"],
-                              "n_bins": posterior_plots_settings["n_bins"]}
-            return posterior_bins
-
     def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
         Produces the number of BSM coefficients to include in the fit.

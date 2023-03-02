@@ -106,14 +106,24 @@ def plot_nd_bsm_facs(read_bsm_facs):
         yield fig
 
 @figuregen
-def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_bins):
+def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=None):
     """
     Compare histograms of BSM factors between different fits 
     in SIMUnet
     """
+    # extract settings
+    if posterior_plots_settings is None:
+        same_bins = False
+        n_bins = 10
+        rangex = None
+        rangey = None
+    else:
+        same_bins = posterior_plots_settings["same_bins"]
+        n_bins = posterior_plots_settings["n_bins"]
+        rangex = posterior_plots_settings["rangex"]
+        rangey = posterior_plots_settings["rangey"]
+
     # extract all operators in the fits
-    same_bins = posterior_bins["same_bins"]
-    n_bins = posterior_bins["n_bins"]
     all_ops = []
     for fit in fits:
         paths = replica_paths(fit)
@@ -155,9 +165,12 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_bins):
                 if bsm_names_to_latex is None:
                     ax.set_xlabel(op, fontsize=14)
                 else:
-                    ax.set_xlabel(bsm_names_to_latex[op], fontsize=16)
+                    ax.set_xlabel(bsm_names_to_latex[op] + "$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
                 ax.legend()
                 ax.grid(False)
+                if rangex is not None:
+                    ax.set_xlim(rangex)
+                    ax.set_ylim(rangey)
         yield fig
 
 @figuregen
