@@ -1102,7 +1102,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
         yield fig
 
 @figuregen
-def plot_bsm_facs_68res(fits):
+def plot_bsm_facs_68res(fits, bsm_names_to_latex):
     """
     Figure generator to plot the 68% residuals
     pulls of the BSM coefficients
@@ -1131,7 +1131,7 @@ def plot_bsm_facs_68res(fits):
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
                 values = bsm_facs_df[op]
-                mean =  values.mean()
+                mean = values.mean()
                 std = values.std()
                 # append residual 
                 residuals.append(mean / std)
@@ -1161,11 +1161,14 @@ def plot_bsm_facs_68res(fits):
         residuals_min = [residual[0] for residual in ordered_residuals]
         residuals_max = [residual[1] for residual in ordered_residuals]
         ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label=fit.label,
-        color=colour_key[fits.index(fit)], lw=4.0)
+                  color=colour_key[fits.index(fit)], lw=4.0)
 
     # set x positions for labels and labels
     ax.set_xticks(np.arange(len(all_ops)))
-    ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
+    bsm_latex_names = []
+    for op in all_ops:
+        bsm_latex_names += [bsm_names_to_latex[op]]
+    ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
     # set y scale
     ax.set_yscale('linear')
@@ -1174,7 +1177,7 @@ def plot_bsm_facs_68res(fits):
     ax.set_ylabel(r'Residuals (68%)', fontsize=10)
 
     # final formatting
-    ax.legend()
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
     ax.grid(True)
     ax.set_axisbelow(True)
     ax.set_adjustable("datalim")
