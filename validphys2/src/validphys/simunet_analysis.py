@@ -442,7 +442,7 @@ def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, op1, op2):
     return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, (op1, op2))
 
 @figure
-def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
+def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     """
     Correlation matrix to summarise information about
     the BSM coefficient results.
@@ -459,6 +459,7 @@ def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
