@@ -236,7 +236,7 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
     return fig
 
-def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
+def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pair):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
@@ -288,24 +288,24 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
     ax_histy.yaxis.set_tick_params(labelleft=False)
 
     # populate the histograms
-    ax_histx.hist(bsm_facs_df.iloc[:, 0])
+    ax_histx.hist(bsm_facs_df.iloc[:, 0], density=True)
     if op_1 != op_2:
-        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal', density=True)
     else:
-        ax_histy.hist(bsm_facs_df.iloc[:, 0], orientation='horizontal')
+        ax_histy.hist(bsm_facs_df.iloc[:, 0], orientation='horizontal', density=True)
 
     ax_histx.grid(False)
     ax_histy.grid(False)
 
-    ax.set_xlabel(labels[0], fontsize=15)
-    ax.set_ylabel(labels[1], fontsize=15)
+    ax.set_xlabel(bsm_names_to_latex[labels[0]], fontsize=15)
+    ax.set_ylabel(bsm_names_to_latex[labels[1]], fontsize=15)
 
     ax.set_axisbelow(True)
 
     return fig
 
 @figuregen
-def plot_bsm_2d_combs(read_bsm_facs, replica_data):
+def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
     """
     Plot two dimensional distributions for all pairs
     of BSM coefficients in a fit
@@ -319,8 +319,8 @@ def plot_bsm_2d_combs(read_bsm_facs, replica_data):
 
     combs = itertools.combinations(labels, 2)
     for comb in combs:
-        fig = _select_plot_2d_bsm_facs(bsm_facs_df, replica_data, pair=comb)
-        yield fig 
+        fig = _select_plot_2d_bsm_facs(bsm_facs_df, replica_data, bsm_names_to_latex, pair=comb)
+        yield fig
 
 @figure
 def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
@@ -433,13 +433,13 @@ def tabulate_bsm_corr(fit, read_bsm_facs):
     return corr_mat
 
 @figure
-def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, op1, op2):
+def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, bsm_names_to_latex, op1, op2):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
     with BSM factors
     """
-    return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, (op1, op2))
+    return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, (op1, op2))
 
 @figure
 def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
