@@ -149,7 +149,7 @@ def plot_nd_bsm_facs_fits(fits):
         yield fig
 
 @figuregen
-def plot_kde_bsm_facs(read_bsm_facs):
+def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
     """
     Plots the kernel estimation density for a distribution
     of BSM coefficients. 
@@ -157,7 +157,7 @@ def plot_kde_bsm_facs(read_bsm_facs):
     ----------
         read_bsm_facs: pd.DataFrame
     """
-    for label, column in read_bsm_facs.iteritems():
+    for label, column in read_bsm_facs.items():
         # Initialise Axes instance
         fig, ax = plt.subplots()
         # populate the Axes with the KDE
@@ -165,9 +165,9 @@ def plot_kde_bsm_facs(read_bsm_facs):
 
         # Format of the plot
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.set_title(f"KDE for {label} coefficient")
-        ax.set_ylabel("Density")
-        ax.set_xlabel(label)
+        ax.set_title(f"KDE for {bsm_names_to_latex[label]} coefficient")
+        ax.set_ylabel("Prob. density", fontsize=14)
+        ax.set_xlabel(bsm_names_to_latex[label], fontsize=14)
         ax.grid(True)
 
         yield fig
