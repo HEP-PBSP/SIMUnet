@@ -167,7 +167,7 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
         ax.set_title(f"KDE for {bsm_names_to_latex[label]} coefficient")
         ax.set_ylabel("Prob. density", fontsize=14)
-        ax.set_xlabel(bsm_names_to_latex[label], fontsize=14)
+        ax.set_xlabel(bsm_names_to_latex[label] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.grid(True)
 
         yield fig
@@ -297,8 +297,8 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
     ax_histx.grid(False)
     ax_histy.grid(False)
 
-    ax.set_xlabel(bsm_names_to_latex[labels[0]], fontsize=15)
-    ax.set_ylabel(bsm_names_to_latex[labels[1]], fontsize=15)
+    ax.set_xlabel(bsm_names_to_latex[labels[0]] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=15)
+    ax.set_ylabel(bsm_names_to_latex[labels[1]] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=15)
 
     ax.set_axisbelow(True)
 
@@ -419,8 +419,6 @@ def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     df['95% CL bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
     df['Mean'] = means_disp
     df['Std'] = stds_disp
-
-    print(df)
     
     return df
 
