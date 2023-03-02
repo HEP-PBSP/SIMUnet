@@ -1,0 +1,48 @@
+meta:
+  title: Comparison between fixed pdf fits
+  author: Luca Mantani
+  keywords: [simunet]
+
+fits: 
+  - {id: 230204-lm-alltop-nlo-lin, label: "Full data, Simultaneous"}
+
+# Posterior distribution binnings
+posterior_plots_settings:
+  same_bins: True
+  n_bins: 15
+  rangex: [-0.5, 0.6]
+  rangey: [0, 5]
+
+bsm_fac_data:
+- {name: 'OtG', scale: 1, latex: '$c_{tG}$'}
+- {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$'}
+- {name: 'OtZ', scale: 1, latex: '$c_{tZ}$'}
+- {name: 'OtW', scale: 1, latex: '$c_{tW}$'}
+- {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$'}
+- {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$'}
+- {name: 'O1qd', scale: 1, latex: '$c_{Qd}^{1}$'}
+- {name: 'O1qu', scale: 1, latex: '$c_{Qu}^{1}$'}
+- {name: 'O1dt', scale: 1, latex: '$c_{dt}^{1}$'} 
+- {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$'} 
+- {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$'} 
+- {name: 'O11qq', scale: 1, latex: '$c_{Qq}^{1,1}$'} 
+- {name: 'O13qq', scale: 1, latex: '$c_{Qq}^{1,3}$'} 
+- {name: 'O8qd', scale: 1, latex: '$c_{Qd}^{8}$'}
+- {name: 'O8qu', scale: 1, latex: '$c_{Qu}^{8}$'}
+- {name: 'O8dt', scale: 1, latex: '$c_{dt}^{8}$'} 
+- {name: 'O8qt', scale: 1, latex: '$c_{qt}^{8}$'} 
+- {name: 'O8ut', scale: 1, latex: '$c_{ut}^{8}$'} 
+- {name: 'O81qq', scale: 1, latex: '$c_{Qq}^{8,1}$'} 
+- {name: 'O83qq', scale: 1, latex: '$c_{Qq}^{8,3}$'}
+- {name: 'OQt8', scale: 1, latex: '$c_{Qt}^{8}$'}
+- {name: 'OQQ1', scale: 1, latex: '$c_{QQ}^{1}$'}
+- {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$'}
+- {name: 'OQt1', scale: 1, latex: '$c_{Qt}^{1}$'}
+- {name: 'Ott1', scale: 1, latex: '$c_{tt}^{1}$'}
+
+template_text: |
+  # Comparison histograms of BSM factors
+  {@plot_nd_bsm_facs_fits@}
+
+actions_:
+  - report(main=True)
