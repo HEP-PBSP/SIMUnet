@@ -381,7 +381,7 @@ def plot_tr_val_epoch(fit, replica_paths):
     yield fig
 
 @table
-def bsm_facs_bounds(read_bsm_facs):
+def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     """
     Table generator to summarise information about
     the BSM coefficient results.
@@ -414,10 +414,13 @@ def bsm_facs_bounds(read_bsm_facs):
     
     # fill the dataframe
     df = pd.DataFrame(index=bsm_facs_df.columns)
+    df.index = [bsm_names_to_latex[i] for i in df.index]
     df['68% CL bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
     df['95% CL bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
     df['Mean'] = means_disp
     df['Std'] = stds_disp
+
+    print(df)
     
     return df
 
