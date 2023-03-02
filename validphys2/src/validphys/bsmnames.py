@@ -114,6 +114,7 @@ def get_bsm_data(
     return {
         "bsm_fac_data_names": new_bsm_fac_data_names,
         "bsm_fac_quad_names": new_bsm_fac_quad_names,
+        "bsm_sector": bsm_sector,
     }
 
 def get_bsm_coefs(ds):

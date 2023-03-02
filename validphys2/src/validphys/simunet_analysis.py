@@ -13,6 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
+from matplotlib.ticker import MultipleLocator
+import matplotlib.image as image
+from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
+import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
@@ -30,8 +34,15 @@ from validphys.fitdata import read_bsm_facs
 from validphys.plotutils import grey_centre_cmap
 from validphys.pdfbases import PDG_PARTONS
 
+from validphys.loader import Loader
+from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+from validphys.loader import _get_nnpdf_profile
+
+from validphys.convolution import central_predictions
+
 log = logging.getLogger(__name__)
 
+l = Loader()
 
 """
 Format routines
@@ -744,6 +755,271 @@ def bsm_facs_95bounds_fits(fits):
     return bsm_facs_bounds_fits(fits, n_sigma=2)
 
 @figuregen
+def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
+    """Compares two SMEFiT fits.
+    """
+    # extract all operators in the SMEFiT fits
+    all_ops = []
+    for fit in [smefit_reference_1, smefit_reference_2]:
+        ops_list = []
+        for entry in fit:
+            ops_list += [entry['name']]
+        all_ops.append(ops_list)
+    # Remove repeated operators and reorder
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+
+    # store the relevant values
+    bounds_dict = {}
+    best_fits_dict ={} 
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds_1 = []
+    best_fits_1 = []
+    for op in all_ops:
+        best_fits_1 += [bsm_names_to_plot_scales[op]*smefit_reference_1[x]['best'] for x in range(len(smefit_reference_1)) if smefit_reference_1[x]['name'] == op]
+        bounds_1 += [[bsm_names_to_plot_scales[op]*smefit_reference_1[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference_1[x]['upper_bound']] for x in range(len(smefit_reference_1)) if smefit_reference_1[x]['name'] == op]
+
+    bounds_dict[smefit_labels[0]] = bounds_1
+    best_fits_dict[smefit_labels[0]] = best_fits_1
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds_2 = []
+    best_fits_2 = []
+    for op in all_ops:
+        best_fits_2 += [bsm_names_to_plot_scales[op]*smefit_reference_2[x]['best'] for x in range(len(smefit_reference_2)) if smefit_reference_2[x]['name'] == op]
+        bounds_2 += [[bsm_names_to_plot_scales[op]*smefit_reference_2[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference_2[x]['upper_bound']] for x in range(len(smefit_reference_2)) if smefit_reference_2[x]['name'] == op]
+
+    bounds_dict[smefit_labels[1]] = bounds_2
+    best_fits_dict[smefit_labels[1]] = best_fits_2
+
+    # plot parameters
+    scales= ['linear', 'symlog']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+
+    for scale in scales:
+        # initialise plots
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+
+        labels = smefit_labels
+
+        idx = 0
+        for label in labels:
+            bounds = bounds_dict[label]
+            best_fits = best_fits_dict[label]
+            x_coords = [i - 0.1 + 0.2*idx for i in range(len(all_ops))] 
+            bounds_min = [bound[0] for bound in bounds]
+            bounds_max= [bound[1] for bound in bounds]
+            ax.scatter(x_coords, best_fits, color=colour_key[idx])
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + label,
+            color=colour_key[idx], lw=2.0)
+            idx += 1
+
+        # set x positions for labels and labels
+        ax.set_xticks(np.arange(len(all_ops)))
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
+
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
+
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
+
+        # final formatting
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
+
+        # Load image and add it to the plot
+        #file_name = "logo_black.png"
+        #logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        #imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
+
+        # frames on all sides
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+
+        yield fig
+
+@figuregen
+def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
+    """
+    Figure generator to compare bounds obtained with simunet with
+    bounds obtained by smefit.
+    Paramaters
+    ----------
+        fits: NSList of FitSpec 
+        n_sigma: number
+    The plot contains information about the mean
+    and standard deviation of the BSM coefficients in the fit, 
+    as well as showing the confidence levels by 
+    computing mean ± 2*std.
+    """ 
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators and reorder
+    all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+
+    # store the relevant values
+    bounds_dict = {}
+    best_fits_dict ={} 
+
+    for fit in fits:
+        bounds = []
+        best_fits = []
+        for op in all_ops:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                mean =  values.mean()
+                std = values.std()
+                cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
+                # best-fit value
+                best_fits.append(mean)
+                # append bounds
+                bounds.append([cl_lower, cl_upper])
+            else:
+                # if the operator is not in the fit, then assume SM
+                best_fits.append(0.0)
+                bounds.append([0.0, 0.0])
+
+        bounds_dict[fit.label] = bounds
+        best_fits_dict[fit.label] = best_fits
+
+    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    bounds = []
+    best_fits = []
+    for op in all_ops:
+        best_fits += [bsm_names_to_plot_scales[op]*smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+        bounds += [[bsm_names_to_plot_scales[op]*smefit_reference[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
+
+    bounds_dict[smefit_label] = bounds
+    best_fits_dict[smefit_label] = best_fits
+
+    # plot parameters
+    scales= ['linear', 'symlog']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+
+    for scale in scales:
+        # initialise plots
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+        # line for SM prediction
+        ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+
+        labels = [fit.label for fit in fits] + [smefit_label]
+
+        idx = 0
+        for label in labels:
+            bounds = bounds_dict[label]
+            best_fits = best_fits_dict[label]
+            x_coords = [i - 0.1 + 0.2*idx for i in range(len(all_ops))] 
+            bounds_min = [bound[0] for bound in bounds]
+            bounds_max= [bound[1] for bound in bounds]
+            ax.scatter(x_coords, best_fits, color=colour_key[idx])
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + label,
+            color=colour_key[idx], lw=2.0)
+            idx += 1
+
+        # set x positions for labels and labels
+        ax.set_xticks(np.arange(len(all_ops)))
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
+
+        # set y labels
+        ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
+
+        # treatment of the symmetric log scale
+        if scale == 'symlog':
+            ax.set_yscale(scale, linthresh=0.1)
+
+            # turn off scientific notation
+            ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+            ax.yaxis.get_major_formatter().set_scientific(False)
+
+            y_values = [-100, -10, -1, -0.1, 0.0, 0.1, 1, 10, 100] 
+            ax.set_yticks(y_values)
+
+            # get rid of scientific notation in y axis and
+            # get rid of '.0' for floats bigger than 1
+            ax.get_yaxis().set_major_formatter(mpl.ticker.FuncFormatter(lambda x, p: format(int(x), ',') if abs(x) >= 1 else x))
+
+        # treatment of linear scale
+        else:
+            ax.set_yscale(scale)
+
+        # final formatting
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
+
+        # Load image and add it to the plot
+        #file_name = "logo_black.png"
+        #logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        #imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
+
+        # frames on all sides
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+        ax.spines['bottom'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+
+        yield fig
+
+@figuregen
 def plot_bsm_facs_bounds(fits):
     """
     Figure generator to plot the bounds of
@@ -982,3 +1258,191 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
         scaled_replicas += (read_pdf_cfactors.values**2) * quad_cfac_df.values[:, np.newaxis]
 
     return 1 + np.sum(scaled_replicas, axis=2)
+
+"""
+Principal component analysis
+"""
+
+@table
+def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf)
+
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+
+@figure
+def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to_latex, bsm_sectors_to_latex):
+    """Produces a nice plot from the table fisher_information_by_sector.
+    """
+    f = fisher_information_by_sector
+
+    coeff_names = [bsm_names_to_latex[x] for x in f.index]
+    sector_names = [bsm_sectors_to_latex[x] for x in f.columns]
+
+    ncoeff, ndata = f.shape
+
+    fig, ax = plt.subplots(figsize=(15,5))
+    ax.set_xlim([-1.5,ncoeff-1.5])
+    ax.set_ylim([-1.5,ndata-1.5])
+    ax.xaxis.set_major_locator(MultipleLocator(1.))
+    ax.yaxis.set_major_locator(MultipleLocator(1.))
+
+    old_cmap =  plt.get_cmap('YlGnBu')
+    new_cmap  = truncate_colormap(old_cmap, minval=0.0, maxval=0.65)
+
+    ax = sns.heatmap(f.T,vmin=0.0, vmax=100.0,cmap=new_cmap,cbar=False);
+
+    ax.set_xticklabels(coeff_names, rotation=0., va='top', ha='center', fontsize=14)
+    ax.set_yticklabels(sector_names, rotation=0., va='center', ha='right', fontsize=14)
+
+    for y,val in enumerate(f.index):
+        ax.plot([y, y],[-1.5, ndata+1], ls='solid', c='lightgray', lw=0.8)
+
+    fisher_rounded = np.round(f.to_numpy(),0)
+
+    #Plot numbers
+    nrow, ncol = np.shape(f.T)
+    for i in range(nrow):
+        for j in range(ncol):
+            if fisher_rounded.T[i,j]!=0:
+                plt.text(x=j+0.15, y=i+0.6, s=str(fisher_rounded.T[i,j]),fontsize=10)
+
+    plt.tight_layout()
+
+    return fig
+
+@table
+def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+    """Obtains the Fisher information matrices for each of the BSM sectors.
+    """
+    
+    # First, get the names of the BSM sectors.
+
+    bsm_dataset_inputs_sectors = {} 
+    bsm_fixed_observables_sectors = {}
+
+    for dataset in dataset_inputs:
+        if dataset.bsm_sector in bsm_dataset_inputs_sectors.keys():
+            bsm_dataset_inputs_sectors[dataset.bsm_sector] += [dataset]
+        else:
+            bsm_dataset_inputs_sectors[dataset.bsm_sector] = [dataset]
+    
+    for fo in fixed_observables:
+        if fo.bsm_sector in bsm_fixed_observables_sectors.keys():
+            bsm_fixed_observables_sectors[fo.bsm_sector] += [fo]
+        else:
+            bsm_fixed_observables_sectors[fo.bsm_sector] = [fo]
+
+    all_sectors_duplicates = list(bsm_dataset_inputs_sectors.keys()) + list(bsm_fixed_observables_sectors.keys())
+    all_sectors = []
+    [all_sectors.append(x) for x in all_sectors_duplicates if x not in all_sectors]
+
+    fisher_by_sector = []
+
+    for sec in all_sectors:
+        if sec in bsm_dataset_inputs_sectors.keys():
+            datasets = bsm_dataset_inputs_sectors[sec]
+            dataset_names = [ds.name for ds in datasets]
+        else:
+            datasets = None
+            dataset_names = []
+        if sec in bsm_fixed_observables_sectors.keys():
+            fos = bsm_fixed_observables_sectors[sec]
+            fo_names = [fo.name for fo in fos]
+        else:
+            fos = None
+            fo_names = []
+
+        ds_and_fo_names = dataset_names + fo_names
+
+        # Take correct submatrix of groups_covmat
+        reduced_covmats = []
+        for name in ds_and_fo_names:
+            reduced_covmats += [groups_covmat.xs(name, axis=1, level=1, drop_level=False)]
+        
+        reduced_covmat = pd.concat(reduced_covmats, axis=1)
+
+        reduced_covmats = []
+        for name in ds_and_fo_names:
+            reduced_covmats += [reduced_covmat.T.xs(name, axis=1, level=1, drop_level=False)]
+
+        reduced_covmat = pd.concat(reduced_covmats, axis=1)
+
+        # Hence construct the Fisher matrices
+        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, bsm_fac_data_names, pdf)]
+
+    # Now go through the matrices one-by-one, and take the diagonal
+    fisher_diags_by_sector = []
+
+    for matrix in fisher_by_sector:
+        diagonal = np.diagonal(matrix.to_numpy())
+        fisher_diags_by_sector += [diagonal.tolist()] 
+
+    # Rescale array
+    array = np.array(fisher_diags_by_sector).T
+    sums = np.sum(array, axis=1)
+    rows, columns = array.shape
+    for i in range(rows):
+        array[i,:] = array[i,:] / sums[i]*100
+
+    df = pd.DataFrame(array, columns=all_sectors, index=bsm_fac_data_names)
+    
+    return df
+
+def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+    """Computes a Fisher information matrix.
+    """
+    bsm_factors = []
+    if dataset_inputs is not None:
+        for dataset in dataset_inputs:
+            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
+            bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
+            central_sm = central_predictions(ds, pdf)
+            coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
+            bsm_factors += [coefficients] 
+
+    if fixed_observables is not None:
+        for fo in fixed_observables:
+            cvs = fo.load_pred().central_value
+            bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
+            coefficients = cvs * np.array([i.central_value for i in bsm_fac.values()])
+            bsm_factors += [coefficients] 
+
+    # Make bsm_factors into a nice numpy array. 
+    bsm_factors = np.concatenate(bsm_factors, axis=1).T
+
+    # The rows are the data, the columns are the operator
+    cov = groups_covmat.to_numpy()
+    inv_cov = np.linalg.inv(cov)
+    fisher = bsm_factors.T @ inv_cov @ bsm_factors
+
+    fisher = pd.DataFrame(fisher, index=bsm_fac_data_names)
+    fisher = fisher.T
+    fisher.index = bsm_fac_data_names
+
+    return fisher
+
+@table
+def principal_component_values(fisher_information_matrix):
+    """Returns the eigenvalues corresponding to the various principal directions
+    """
+    fisher = fisher_information_matrix.to_numpy()
+    fisher = fisher - fisher.mean(axis=0)
+    _, values, _ = np.linalg.svd(fisher)
+    values = pd.DataFrame(values)
+    return values
+
+@table
+def principal_component_vectors(fisher_information_matrix, bsm_fac_data_names):
+    """Performs a principal component analysis to obtain the flat directions
+    """
+    fisher = fisher_information_matrix.to_numpy()
+    fisher = fisher - fisher.mean(axis=0)
+    _, _, vectors = np.linalg.svd(fisher)
+    vectors = pd.DataFrame(vectors, columns=bsm_fac_data_names)
+    return vectors
