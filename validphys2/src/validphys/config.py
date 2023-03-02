@@ -433,10 +433,10 @@ class CoreConfig(configparser.Config):
         if bsm_fac_data is None:
             return None
         else:
-           bsm_names_to_plot_scales = {}
-           for entry in bsm_fac_data:
-               bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
-           return bsm_names_to_plot_scales
+            bsm_names_to_plot_scales = {}
+            for entry in bsm_fac_data:
+                bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
+            return bsm_names_to_plot_scales
 
     def produce_n_bsm_fac_data(self, bsm_fac_data=None):
         """
