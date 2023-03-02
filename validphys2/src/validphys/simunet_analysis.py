@@ -477,8 +477,7 @@ def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     return fig
 
 @figuregen
-def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
-    from validphys.pdfgrids import xplotting_grid
+def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, xplotting_grid, Q, bsm_names_to_latex):
     # read dataframe
     bsm_facs_df = read_bsm_facs
     # reorder BSM facs
@@ -486,7 +485,8 @@ def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
     # get PDF
     pdf = fitpdf['pdf']
     # get xplotting_grid
-    x_grid_obj = xplotting_grid(pdf, Q)
+    # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
+    x_grid_obj = xplotting_grid
 
     for bsm_fac in bsm_facs_df.columns:
         # get the values of the BSM factors
@@ -498,24 +498,29 @@ def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
         scale = x_grid_obj.scale
         # get grid values
         gv = x_grid_obj.grid_values.error_members()
-        for flavour in flavours:
-            flavour_label = PDG_PARTONS[flavour]
+        for flavour in x_grid_obj.flavours:
+            flavour_label = flavour
             index = tuple(x_grid_obj.flavours).index(flavour)
             parton_grids = gv[:, index, ...]
             # calculate correlation
             num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
             den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
             corr = num / den
-            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_fac + f') {pdf.label}')
+            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_names_to_latex[bsm_fac] + f') {pdf.label}')
         ax.set_xscale(scale)
         ax.set_xlabel(r'$x$')
-        ax.set_title(f'Correlation {bsm_fac} - PDFs ' + f'(Q = {Q} GeV)')
-        ax.legend()
+        ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
+
+        ax.set_ylim(-0.30, 0.30)
+        
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
         yield fig
 
 @figuregen
-def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
-    from validphys.pdfgrids import xplotting_grid
+def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -537,7 +542,7 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
             # get PDF
             pdf = pdfs[fits.index(fit)]
             # get x_object
-            x_grid_obj = xplotting_grid(pdf, Q) 
+            x_grid_obj = xplotting_grid 
             if bsm_facs_df.get([bsm_fac]) is not None:
                 bsm_fac_vals = bsm_facs_df[bsm_fac].values
                 # Define xgrid and scale
@@ -545,19 +550,23 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
                 scale = x_grid_obj.scale
                 # get grid values
                 gv = x_grid_obj.grid_values.error_members()
-                for flavour in flavours:
-                    flavour_label = PDG_PARTONS[flavour]
+                for flavour in x_grid_obj.flavours:
+                    flavour_label = flavour
                     index = tuple(x_grid_obj.flavours).index(flavour)
                     parton_grids = gv[:, index, ...]
                     # calculate correlation
                     num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
                     den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
                     corr = num / den
-                    ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_fac + f') {pdf.label}')
+                    ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_names_to_latex[bsm_fac] + f') {pdf.label}')
                 ax.set_xscale(scale)
                 ax.set_xlabel(r'$x$')
-                ax.set_title(f'Correlation {bsm_fac} - PDFs ' + f'(Q = {Q} GeV)')
-                ax.legend()
+                ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
+                
+                ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
+                ax.grid(True)
+                ax.set_axisbelow(True)
+                ax.set_adjustable("datalim")
         yield fig
 
 @figuregen
