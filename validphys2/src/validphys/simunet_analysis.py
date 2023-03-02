@@ -95,24 +95,46 @@ def format_residuals(residuals):
 """
 
 @figuregen
-def plot_nd_bsm_facs(read_bsm_facs):
+def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings=None):
     """Plot a histogram for each BSM coefficient.
     The nd is used for n-dimensional, if two BSM facs 
     are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
     """
-    for label, column in read_bsm_facs.iteritems():
+    # extract settings
+    if posterior_plots_settings is None:
+        n_bins = 10
+        rangex = None
+        rangey = None
+    else:
+        try:
+            n_bins = posterior_plots_settings["n_bins"]
+        except KeyError:
+            n_bins = 10
+        try:
+            rangex = posterior_plots_settings["rangex"]
+        except KeyError:
+            rangex = None
+        try:
+            rangey = posterior_plots_settings["rangey"]
+        except KeyError:
+            rangey = None
+
+    for label, column in read_bsm_facs.items():
         # TODO: surely there is a better way
-        if label == 'Cb':
-            label = r"$\mathbf{C}_{33}^{D\mu}$"
         fig, ax = plt.subplots()
 
-        ax.hist(column.values)
+        ax.hist(column.values, density=True, bins=n_bins)
 
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.set_title(f"Distribution for {label} coefficient")
-        ax.set_ylabel("Count")
-        ax.set_xlabel(label)
+        ax.set_title(f"Distribution for {bsm_names_to_latex[label]} coefficient")
+        ax.set_ylabel("Prob. density", fontsize=14)
+        ax.set_xlabel(bsm_names_to_latex[label] + r"$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
         ax.grid(False)
+
+        if rangex is not None:
+            ax.set_xlim(rangex)
+        if rangey is not None:
+            ax.set_ylim(rangey)
 
         yield fig
 
@@ -129,10 +151,22 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
         rangex = None
         rangey = None
     else:
-        same_bins = posterior_plots_settings["same_bins"]
-        n_bins = posterior_plots_settings["n_bins"]
-        rangex = posterior_plots_settings["rangex"]
-        rangey = posterior_plots_settings["rangey"]
+        try:
+            same_bins = posterior_plots_settings["same_bins"]
+        except KeyError:
+            same_bins = False
+        try:
+            n_bins = posterior_plots_settings["n_bins"]
+        except KeyError:
+            n_bins = 10
+        try:
+            rangex = posterior_plots_settings["rangex"]
+        except KeyError:
+            rangex = None
+        try:
+            rangey = posterior_plots_settings["rangey"]
+        except KeyError:
+            rangey = None
 
     # extract all operators in the fits
     all_ops = []
@@ -176,16 +210,17 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
                 if bsm_names_to_latex is None:
                     ax.set_xlabel(op, fontsize=14)
                 else:
-                    ax.set_xlabel(bsm_names_to_latex[op] + "$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
+                    ax.set_xlabel(bsm_names_to_latex[op] + r"$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
                 ax.legend()
                 ax.grid(False)
                 if rangex is not None:
                     ax.set_xlim(rangex)
+                if rangey is not None:
                     ax.set_ylim(rangey)
         yield fig
 
 @figuregen
-def plot_kde_bsm_facs(read_bsm_facs):
+def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
     """
     Plots the kernel estimation density for a distribution
     of BSM coefficients. 
@@ -193,7 +228,7 @@ def plot_kde_bsm_facs(read_bsm_facs):
     ----------
         read_bsm_facs: pd.DataFrame
     """
-    for label, column in read_bsm_facs.iteritems():
+    for label, column in read_bsm_facs.items():
         # Initialise Axes instance
         fig, ax = plt.subplots()
         # populate the Axes with the KDE
@@ -201,9 +236,9 @@ def plot_kde_bsm_facs(read_bsm_facs):
 
         # Format of the plot
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.set_title(f"KDE for {label} coefficient")
-        ax.set_ylabel("Density")
-        ax.set_xlabel(label)
+        ax.set_title(f"KDE for {bsm_names_to_latex[label]} coefficient")
+        ax.set_ylabel("Prob. density", fontsize=14)
+        ax.set_xlabel(bsm_names_to_latex[label] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.grid(True)
 
         yield fig
@@ -272,7 +307,7 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
     return fig
 
-def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
+def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pair):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
@@ -324,24 +359,24 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, pair):
     ax_histy.yaxis.set_tick_params(labelleft=False)
 
     # populate the histograms
-    ax_histx.hist(bsm_facs_df.iloc[:, 0])
+    ax_histx.hist(bsm_facs_df.iloc[:, 0], density=True)
     if op_1 != op_2:
-        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal')
+        ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal', density=True)
     else:
-        ax_histy.hist(bsm_facs_df.iloc[:, 0], orientation='horizontal')
+        ax_histy.hist(bsm_facs_df.iloc[:, 0], orientation='horizontal', density=True)
 
     ax_histx.grid(False)
     ax_histy.grid(False)
 
-    ax.set_xlabel(labels[0], fontsize=15)
-    ax.set_ylabel(labels[1], fontsize=15)
+    ax.set_xlabel(bsm_names_to_latex[labels[0]] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=15)
+    ax.set_ylabel(bsm_names_to_latex[labels[1]] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=15)
 
     ax.set_axisbelow(True)
 
     return fig
 
 @figuregen
-def plot_bsm_2d_combs(read_bsm_facs, replica_data):
+def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
     """
     Plot two dimensional distributions for all pairs
     of BSM coefficients in a fit
@@ -355,8 +390,8 @@ def plot_bsm_2d_combs(read_bsm_facs, replica_data):
 
     combs = itertools.combinations(labels, 2)
     for comb in combs:
-        fig = _select_plot_2d_bsm_facs(bsm_facs_df, replica_data, pair=comb)
-        yield fig 
+        fig = _select_plot_2d_bsm_facs(bsm_facs_df, replica_data, bsm_names_to_latex, pair=comb)
+        yield fig
 
 @figure
 def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
@@ -417,7 +452,7 @@ def plot_tr_val_epoch(fit, replica_paths):
     yield fig
 
 @table
-def bsm_facs_bounds(read_bsm_facs):
+def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     """
     Table generator to summarise information about
     the BSM coefficient results.
@@ -450,6 +485,7 @@ def bsm_facs_bounds(read_bsm_facs):
     
     # fill the dataframe
     df = pd.DataFrame(index=bsm_facs_df.columns)
+    df.index = [bsm_names_to_latex[i] for i in df.index]
     df['68% CL bounds'] = list(zip(cl68_lower_disp, cl68_upper_disp))
     df['95% CL bounds'] = list(zip(cl95_lower_disp, cl95_upper_disp))
     df['Mean'] = means_disp
@@ -469,16 +505,16 @@ def tabulate_bsm_corr(fit, read_bsm_facs):
     return corr_mat
 
 @figure
-def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, op1, op2):
+def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, bsm_names_to_latex, op1, op2):
     """
     Auxiliary function to plot 2D plots
     of pair of operators in a N-dimensional fits
     with BSM factors
     """
-    return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, (op1, op2))
+    return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, (op1, op2))
 
 @figure
-def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
+def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     """
     Correlation matrix to summarise information about
     the BSM coefficient results.
@@ -495,6 +531,7 @@ def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
@@ -513,8 +550,7 @@ def plot_bsm_corr(fit, read_bsm_facs, corr_threshold=0.5):
     return fig
 
 @figuregen
-def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
-    from validphys.pdfgrids import xplotting_grid
+def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, xplotting_grid, Q, bsm_names_to_latex):
     # read dataframe
     bsm_facs_df = read_bsm_facs
     # reorder BSM facs
@@ -522,7 +558,8 @@ def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
     # get PDF
     pdf = fitpdf['pdf']
     # get xplotting_grid
-    x_grid_obj = xplotting_grid(pdf, Q)
+    # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
+    x_grid_obj = xplotting_grid
 
     for bsm_fac in bsm_facs_df.columns:
         # get the values of the BSM factors
@@ -534,24 +571,29 @@ def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, flavours, Q):
         scale = x_grid_obj.scale
         # get grid values
         gv = x_grid_obj.grid_values.error_members()
-        for flavour in flavours:
-            flavour_label = PDG_PARTONS[flavour]
+        for flavour in x_grid_obj.flavours:
+            flavour_label = flavour
             index = tuple(x_grid_obj.flavours).index(flavour)
             parton_grids = gv[:, index, ...]
             # calculate correlation
             num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
             den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
             corr = num / den
-            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_fac + f') {pdf.label}')
+            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_names_to_latex[bsm_fac] + f') {pdf.label}')
         ax.set_xscale(scale)
         ax.set_xlabel(r'$x$')
-        ax.set_title(f'Correlation {bsm_fac} - PDFs ' + f'(Q = {Q} GeV)')
-        ax.legend()
+        ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
+
+        ax.set_ylim(-0.30, 0.30)
+        
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
+        ax.grid(True)
+        ax.set_axisbelow(True)
+        ax.set_adjustable("datalim")
         yield fig
 
 @figuregen
-def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
-    from validphys.pdfgrids import xplotting_grid
+def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -573,7 +615,7 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
             # get PDF
             pdf = pdfs[fits.index(fit)]
             # get x_object
-            x_grid_obj = xplotting_grid(pdf, Q) 
+            x_grid_obj = xplotting_grid 
             if bsm_facs_df.get([bsm_fac]) is not None:
                 bsm_fac_vals = bsm_facs_df[bsm_fac].values
                 # Define xgrid and scale
@@ -581,23 +623,27 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, flavours, Q):
                 scale = x_grid_obj.scale
                 # get grid values
                 gv = x_grid_obj.grid_values.error_members()
-                for flavour in flavours:
-                    flavour_label = PDG_PARTONS[flavour]
+                for flavour in x_grid_obj.flavours:
+                    flavour_label = flavour
                     index = tuple(x_grid_obj.flavours).index(flavour)
                     parton_grids = gv[:, index, ...]
                     # calculate correlation
                     num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
                     den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
                     corr = num / den
-                    ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_fac + f') {pdf.label}')
+                    ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_names_to_latex[bsm_fac] + f') {pdf.label}')
                 ax.set_xscale(scale)
                 ax.set_xlabel(r'$x$')
-                ax.set_title(f'Correlation {bsm_fac} - PDFs ' + f'(Q = {Q} GeV)')
-                ax.legend()
+                ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
+                
+                ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
+                ax.grid(True)
+                ax.set_axisbelow(True)
+                ax.set_adjustable("datalim")
         yield fig
 
 @figuregen
-def plot_2d_bsm_facs_fits(fits):
+def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
     """
     Compare histograms of BSM factors between different fits
     in SIMUnet
@@ -640,21 +686,21 @@ def plot_2d_bsm_facs_fits(fits):
                     bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.label, alpha=0.5, s=40
                 )
                 # populate the histograms
-                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5)
-                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5)
+                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5, density=True)
+                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5, density=True)
 
         ax_histx.grid(False)
         ax_histy.grid(False)
 
-        ax.set_xlabel(op_1)
-        ax.set_ylabel(op_2)
+        ax.set_xlabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
+        ax.set_ylabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.legend()
         ax.set_axisbelow(True)
 
         yield fig
 
 @table
-def bsm_facs_bounds_fits(fits, n_sigma=2):
+def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
     """
     Table generator to summarise information about
     the BSM coefficient results.
@@ -729,11 +775,12 @@ def bsm_facs_bounds_fits(fits, n_sigma=2):
     df.columns[1]: '(Reference) ' + df.columns[1]}
 
     df = df.rename(columns=mapping)
+    df.index = [bsm_names_to_latex[i] for i in df.index]
 
     return df
 
 @table
-def bsm_facs_68bounds_fits(fits):
+def bsm_facs_68bounds_fits(fits, bsm_names_to_latex,):
     """
     Table generator to obtain the 68% CL
     for BSM factors while comparing fits.
@@ -741,10 +788,10 @@ def bsm_facs_68bounds_fits(fits):
     ----------
         fits: NSList of FitSpec 
     """ 
-    return bsm_facs_bounds_fits(fits, n_sigma=1)
+    return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=1)
 
 @table
-def bsm_facs_95bounds_fits(fits):
+def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
     Table generator to obtain the 95% CL
     for BSM factors while comparing fits.
@@ -752,7 +799,7 @@ def bsm_facs_95bounds_fits(fits):
     ----------
         fits: NSList of FitSpec 
     """ 
-    return bsm_facs_bounds_fits(fits, n_sigma=2)
+    return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
@@ -1020,7 +1067,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         yield fig
 
 @figuregen
-def plot_bsm_facs_bounds(fits):
+def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
     Figure generator to plot the bounds of
     the BSM coefficients fitted.
@@ -1054,8 +1101,8 @@ def plot_bsm_facs_bounds(fits):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                values = bsm_facs_df[op]
-                mean =  values.mean()
+                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                mean = values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
                 # best-fit value
@@ -1071,7 +1118,7 @@ def plot_bsm_facs_bounds(fits):
         best_fits_dict[fit.label] = best_fits
 
     # plot parameters
-    scales= ['linear', 'symlog']
+    scales = ['linear', 'symlog']
     colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
 
     for scale in scales:
@@ -1093,7 +1140,13 @@ def plot_bsm_facs_bounds(fits):
 
         # set x positions for labels and labels
         ax.set_xticks(np.arange(len(all_ops)))
-        ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
+        bsm_latex_names = []
+        for op in all_ops:
+            if bsm_names_to_plot_scales[op] != 1:
+                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+            else:
+                bsm_latex_names += [bsm_names_to_latex[op]]
+        ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
         # set y labels
         ax.set_ylabel(r'$c_i / \Lambda^2 \ \ [ \operatorname{TeV}^{-2} ] $', fontsize=10)
@@ -1118,7 +1171,7 @@ def plot_bsm_facs_bounds(fits):
             ax.set_yscale(scale)
 
         # final formatting
-        ax.legend()
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
         ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
@@ -1132,7 +1185,7 @@ def plot_bsm_facs_bounds(fits):
         yield fig
 
 @figuregen
-def plot_bsm_facs_68res(fits):
+def plot_bsm_facs_68res(fits, bsm_names_to_latex):
     """
     Figure generator to plot the 68% residuals
     pulls of the BSM coefficients
@@ -1161,7 +1214,7 @@ def plot_bsm_facs_68res(fits):
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
                 values = bsm_facs_df[op]
-                mean =  values.mean()
+                mean = values.mean()
                 std = values.std()
                 # append residual 
                 residuals.append(mean / std)
@@ -1191,11 +1244,14 @@ def plot_bsm_facs_68res(fits):
         residuals_min = [residual[0] for residual in ordered_residuals]
         residuals_max = [residual[1] for residual in ordered_residuals]
         ax.vlines(x=x_coords, ymin=residuals_min, ymax=residuals_max, label=fit.label,
-        color=colour_key[fits.index(fit)], lw=4.0)
+                  color=colour_key[fits.index(fit)], lw=4.0)
 
     # set x positions for labels and labels
     ax.set_xticks(np.arange(len(all_ops)))
-    ax.set_xticklabels(all_ops, rotation='vertical', fontsize=10)
+    bsm_latex_names = []
+    for op in all_ops:
+        bsm_latex_names += [bsm_names_to_latex[op]]
+    ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
     # set y scale
     ax.set_yscale('linear')
@@ -1204,7 +1260,7 @@ def plot_bsm_facs_68res(fits):
     ax.set_ylabel(r'Residuals (68%)', fontsize=10)
 
     # final formatting
-    ax.legend()
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
     ax.grid(True)
     ax.set_axisbelow(True)
     ax.set_adjustable("datalim")
