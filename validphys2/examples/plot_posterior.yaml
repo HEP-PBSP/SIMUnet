@@ -10,6 +10,8 @@ fits:
 posterior_plots_settings:
   same_bins: True
   n_bins: 15
+  rangex: [-0.5, 0.6]
+  rangey: [0, 5]
 
 bsm_fac_data:
 - {name: 'OtG', scale: 1, latex: '$c_{tG}$'}
