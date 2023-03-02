@@ -572,7 +572,7 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
         yield fig
 
 @figuregen
-def plot_2d_bsm_facs_fits(fits):
+def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
     """
     Compare histograms of BSM factors between different fits
     in SIMUnet
@@ -589,7 +589,7 @@ def plot_2d_bsm_facs_fits(fits):
     # get all pairs
     pairs = itertools.combinations(all_ops, 2)
     # plot all pairs of operators
-    for pair in pairs:
+    for pair in list(pairs)[:1]:
         op_1, op_2 = pair
         # use this size to keep them sqaure
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
@@ -615,21 +615,21 @@ def plot_2d_bsm_facs_fits(fits):
                     bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.label, alpha=0.5, s=40
                 )
                 # populate the histograms
-                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5)
-                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5)
+                ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5, density=True)
+                ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5, density=True)
 
         ax_histx.grid(False)
         ax_histy.grid(False)
 
-        ax.set_xlabel(op_1)
-        ax.set_ylabel(op_2)
+        ax.set_xlabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
+        ax.set_ylabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.legend()
         ax.set_axisbelow(True)
 
         yield fig
 
 @table
-def bsm_facs_bounds_fits(fits, n_sigma=2):
+def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
     """
     Table generator to summarise information about
     the BSM coefficient results.
@@ -704,11 +704,12 @@ def bsm_facs_bounds_fits(fits, n_sigma=2):
     df.columns[1]: '(Reference) ' + df.columns[1]}
 
     df = df.rename(columns=mapping)
+    df.index = [bsm_names_to_latex[i] for i in df.index]
 
     return df
 
 @table
-def bsm_facs_68bounds_fits(fits):
+def bsm_facs_68bounds_fits(fits, bsm_names_to_latex,):
     """
     Table generator to obtain the 68% CL
     for BSM factors while comparing fits.
@@ -716,10 +717,10 @@ def bsm_facs_68bounds_fits(fits):
     ----------
         fits: NSList of FitSpec 
     """ 
-    return bsm_facs_bounds_fits(fits, n_sigma=1)
+    return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=1)
 
 @table
-def bsm_facs_95bounds_fits(fits):
+def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
     Table generator to obtain the 95% CL
     for BSM factors while comparing fits.
@@ -727,7 +728,7 @@ def bsm_facs_95bounds_fits(fits):
     ----------
         fits: NSList of FitSpec 
     """ 
-    return bsm_facs_bounds_fits(fits, n_sigma=2)
+    return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
