@@ -95,24 +95,46 @@ def format_residuals(residuals):
 """
 
 @figuregen
-def plot_nd_bsm_facs(read_bsm_facs):
+def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings=None):
     """Plot a histogram for each BSM coefficient.
     The nd is used for n-dimensional, if two BSM facs 
     are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
     """
-    for label, column in read_bsm_facs.iteritems():
+    # extract settings
+    if posterior_plots_settings is None:
+        n_bins = 10
+        rangex = None
+        rangey = None
+    else:
+        try:
+            n_bins = posterior_plots_settings["n_bins"]
+        except KeyError:
+            n_bins = 10
+        try:
+            rangex = posterior_plots_settings["rangex"]
+        except KeyError:
+            rangex = None
+        try:
+            rangey = posterior_plots_settings["rangey"]
+        except KeyError:
+            rangey = None
+
+    for label, column in read_bsm_facs.items():
         # TODO: surely there is a better way
-        if label == 'Cb':
-            label = r"$\mathbf{C}_{33}^{D\mu}$"
         fig, ax = plt.subplots()
 
-        ax.hist(column.values)
+        ax.hist(column.values, density=True, bins=n_bins)
 
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-        ax.set_title(f"Distribution for {label} coefficient")
-        ax.set_ylabel("Count")
-        ax.set_xlabel(label)
+        ax.set_title(f"Distribution for {bsm_names_to_latex[label]} coefficient")
+        ax.set_ylabel("Prob. density", fontsize=14)
+        ax.set_xlabel(bsm_names_to_latex[label] + r"$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
         ax.grid(False)
+
+        if rangex is not None:
+            ax.set_xlim(rangex)
+        if rangey is not None:
+            ax.set_ylim(rangey)
 
         yield fig
 
@@ -129,10 +151,22 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
         rangex = None
         rangey = None
     else:
-        same_bins = posterior_plots_settings["same_bins"]
-        n_bins = posterior_plots_settings["n_bins"]
-        rangex = posterior_plots_settings["rangex"]
-        rangey = posterior_plots_settings["rangey"]
+        try:
+            same_bins = posterior_plots_settings["same_bins"]
+        except KeyError:
+            same_bins = False
+        try:
+            n_bins = posterior_plots_settings["n_bins"]
+        except KeyError:
+            n_bins = 10
+        try:
+            rangex = posterior_plots_settings["rangex"]
+        except KeyError:
+            rangex = None
+        try:
+            rangey = posterior_plots_settings["rangey"]
+        except KeyError:
+            rangey = None
 
     # extract all operators in the fits
     all_ops = []
@@ -176,11 +210,12 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
                 if bsm_names_to_latex is None:
                     ax.set_xlabel(op, fontsize=14)
                 else:
-                    ax.set_xlabel(bsm_names_to_latex[op] + "$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
+                    ax.set_xlabel(bsm_names_to_latex[op] + r"$/\Lambda^2$ [TeV$^{-2}$]", fontsize=16)
                 ax.legend()
                 ax.grid(False)
                 if rangex is not None:
                     ax.set_xlim(rangex)
+                if rangey is not None:
                     ax.set_ylim(rangey)
         yield fig
 
