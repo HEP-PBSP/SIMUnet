@@ -595,7 +595,7 @@ def plot_bsm_pdf_corr(
             
         ax.set_xscale(scale)
         ax.set_xlabel(r'$x$')
-        fig.suptitle(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs (Q = {Q} GeV)\n{pdf.label}')
+        fig.suptitle(f'Correlation {bsm_names_to_latex[bsm_fac]} - {pdf.label}\nQ = {Q} GeV')
 
 
         ax.set_ylim(ymin, ymax)
@@ -604,7 +604,7 @@ def plot_bsm_pdf_corr(
         ax.grid(True)
         #ax.set_axisbelow(True)
         #ax.set_adjustable("datalim")
-        yield fig
+        yield fig, bsm_fac
 
 @figuregen
 def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
