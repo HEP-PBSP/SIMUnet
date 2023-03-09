@@ -33,6 +33,7 @@ from validphys.fitdata import replica_paths
 from validphys.fitdata import read_bsm_facs
 from validphys.plotutils import grey_centre_cmap
 from validphys.pdfbases import PDG_PARTONS
+from validphys.utils import split_ranges
 
 from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
@@ -550,13 +551,20 @@ def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     return fig
 
 @figuregen
-def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, xplotting_grid, Q, bsm_names_to_latex):
+def plot_bsm_pdf_corr(
+    pdf,
+    read_bsm_facs,
+    xplotting_grid,
+    Q,
+    bsm_names_to_latex,
+    mark_threshold: float = 0.9,
+    ymin: (float, type(None)) = None,
+    ymax: (float, type(None)) = None,
+):
     # read dataframe
     bsm_facs_df = read_bsm_facs
     # reorder BSM facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
-    # get PDF
-    pdf = fitpdf['pdf']
     # get xplotting_grid
     # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
     x_grid_obj = xplotting_grid
@@ -571,25 +579,31 @@ def plot_bsm_pdf_corr(fitpdf, read_bsm_facs, xplotting_grid, Q, bsm_names_to_lat
         scale = x_grid_obj.scale
         # get grid values
         gv = x_grid_obj.grid_values.error_members()
-        for flavour in x_grid_obj.flavours:
+        for index, flavour in enumerate(x_grid_obj.flavours):
             flavour_label = flavour
-            index = tuple(x_grid_obj.flavours).index(flavour)
             parton_grids = gv[:, index, ...]
             # calculate correlation
             num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
             den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
             corr = num / den
-            ax.plot(xgrid, corr, label=fr'$\rho({flavour_label},$ ' + bsm_names_to_latex[bsm_fac] + f') {pdf.label}')
+            ax.plot(xgrid, corr, label=fr'${flavour_label}$')
+            # Plot threshold
+            mask = np.abs(corr) > mark_threshold
+            ranges = split_ranges(xgrid, mask, filter_falses=True)
+            for r in ranges:
+                ax.axvspan(r[0], r[-1], color='#eeeeff')
+            
         ax.set_xscale(scale)
         ax.set_xlabel(r'$x$')
-        ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
+        fig.suptitle(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs (Q = {Q} GeV)\n{pdf.label}')
 
-        ax.set_ylim(-0.30, 0.30)
+
+        ax.set_ylim(ymin, ymax)
         
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
+        ax.legend(loc="best")
         ax.grid(True)
-        ax.set_axisbelow(True)
-        ax.set_adjustable("datalim")
+        #ax.set_axisbelow(True)
+        #ax.set_adjustable("datalim")
         yield fig
 
 @figuregen
