@@ -596,7 +596,7 @@ def plot_bsm_pdf_corr(
         ax.set_xscale(scale)
         ax.set_xlim(xgrid[0], xgrid[-1])
         ax.set_xlabel(r'$x$')
-        fig.suptitle(f'Correlation {bsm_names_to_latex[bsm_fac]} - {pdf.label}\nQ = {Q} GeV')
+        ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - {pdf.label}\nQ = {Q} GeV')
 
 
         ax.set_ylim(ymin, ymax)
