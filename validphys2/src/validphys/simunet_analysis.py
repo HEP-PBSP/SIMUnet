@@ -592,14 +592,15 @@ def plot_bsm_pdf_corr(
             ranges = split_ranges(xgrid, mask, filter_falses=True)
             for r in ranges:
                 ax.axvspan(r[0], r[-1], color='#eeeeff')
-            
+
         ax.set_xscale(scale)
+        ax.set_xlim(xgrid[0], xgrid[-1])
         ax.set_xlabel(r'$x$')
         fig.suptitle(f'Correlation {bsm_names_to_latex[bsm_fac]} - {pdf.label}\nQ = {Q} GeV')
 
 
         ax.set_ylim(ymin, ymax)
-        
+
         ax.legend(loc="best")
         ax.grid(True)
         #ax.set_axisbelow(True)
