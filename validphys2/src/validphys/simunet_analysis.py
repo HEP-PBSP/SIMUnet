@@ -560,6 +560,7 @@ def plot_bsm_pdf_corr(
     mark_threshold: float = 0.9,
     ymin: (float, type(None)) = None,
     ymax: (float, type(None)) = None,
+    dashed_line_flavours: (list, type(None)) = None,
 ):
     # read dataframe
     bsm_facs_df = read_bsm_facs
@@ -568,6 +569,8 @@ def plot_bsm_pdf_corr(
     # get xplotting_grid
     # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
     x_grid_obj = xplotting_grid
+    if dashed_line_flavours is None:
+        dashed_line_flavours = []
 
     for bsm_fac in bsm_facs_df.columns:
         # get the values of the BSM factors
@@ -586,7 +589,11 @@ def plot_bsm_pdf_corr(
             num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
             den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
             corr = num / den
-            ax.plot(xgrid, corr, label=fr'${flavour_label}$')
+            if flavour in dashed_line_flavours:
+                style = "--"
+            else:
+                style = "-"
+            ax.plot(xgrid, corr, style, label=fr'${flavour_label}$')
             # Plot threshold
             mask = np.abs(corr) > mark_threshold
             ranges = split_ranges(xgrid, mask, filter_falses=True)
