@@ -243,14 +243,17 @@ def lumigrid1d(
                 y_max = y_cut
 
             if y_cut_low is not None:
-                if -y_cut_low > y_min and  y_cut_low < y_max:
+                if -y_cut_low >= y_min and  y_cut_low <= y_max:
                     y_min_low = -y_cut_low
                     y_max_low = y_cut_low
                 else:
-                    raise ValueError(f"y_cut_low has to be smaller than y_cut.")
+                    y_min_low = y_min
+                    y_max_low = y_max
+                    #raise ValueError(f"y_cut_low has to be smaller than y_cut.")
 
-        print(f"y_min = {y_min}   y_max = {y_max}   ")
-        print(f"y_min_low = {y_min_low}   y_max_low = {y_max_low}   \n")
+            print(f"y_min = {y_min}   y_max = {y_max}   ")
+            print(f"y_min_low = {y_min_low}   y_max_low = {y_max_low}   \n")
+
         for irep in range(nmembers):
             # Eq.(3) in arXiv:1607.01831
             f = lambda y: evaluate_luminosity(
