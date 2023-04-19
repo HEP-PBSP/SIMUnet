@@ -655,23 +655,24 @@ def plot_lumi1d(
     ax.set_ylim(ymin, ymax)
     ax.set_xscale(scale)
     ax.grid(False)
-    #if y_cut==None:
-        #ax.set_title(
-            #f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
-            #f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
-        #)
 
-    if y_cut_in is None and y_cut_out is None:
+    if y_cut==None:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
         )
 
+    #if y_cut_in is None and y_cut_out is None:
+        #ax.set_title(
+            #f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
+            #f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
+        #)
+
     else:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
-            f"${format_number(y_cut_in)} < |y| <{format_number(y_cut_out)}$"
+            f"$|y| <{format_number(y_cut)}$"
         )      
 
     return fig
