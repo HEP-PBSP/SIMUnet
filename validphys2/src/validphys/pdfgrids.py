@@ -196,8 +196,7 @@ def lumigrid1d(
     mxmin: numbers.Real = 10,
     mxmax: (type(None), numbers.Real) = None,
     scale="log",
-    y_cut_out: (type(None), numbers.Real) = None,
-    y_cut_in: (type(None), numbers.Real) = None
+    y_cut_low: (type(None), numbers.Real) = None
 ):
     """
     Return the integrated luminosity in a grid of nbins_m points, for the
@@ -230,24 +229,26 @@ def lumigrid1d(
     weights = np.full(shape=(nmembers, nbins_m), fill_value=np.NaN)
 
     for im, (mx, sqrt_tau) in enumerate(zip(mxs, sqrt_taus)):
+        # kinematic limits of the rapidity by default
         y_min = -np.log(1/sqrt_tau)
         y_max =  np.log(1/sqrt_tau)
 
-        y_min_in = -np.log(1/sqrt_tau)
-        y_max_in =  np.log(1/sqrt_tau)
+        # no lower boundary on the absolute value of the rapidity by default
+        y_min_in = 0
+        y_max_in = 0
 
-        if y_cut_out is not None:
-            if -y_cut_out > y_min and  y_cut_out < y_max:
-                y_min = -y_cut_out
-                y_max = y_cut_out
+        if y_cut is not None:
+            if -y_cut > y_min and  y_cut < y_max:
+                y_min = -y_cut
+                y_max = y_cut
 
-        if y_cut_in is not None:
-            if -y_cut_in > y_min and  y_cut_in < y_max:
-                y_min_in = -y_cut_in
-                y_max_in = y_cut_in
+            if y_cut_low is not None:
+                if -y_cut_low > y_min and  y_cut_low < y_max:
+                    y_min_in = -y_cut_low
+                    y_max_in = y_cut_low
 
-        #print(f"y_min = {y_min}   y_max = {y_max}   ")
-        #print(f"y_min_in = {y_min_in}   y_max_in = {y_max_in}   \n")
+        print(f"y_min = {y_min}   y_max = {y_max}   ")
+        print(f"y_min_in = {y_min_in}   y_max_in = {y_max_in}   \n")
         for irep in range(nmembers):
             # Eq.(3) in arXiv:1607.01831
             f = lambda y: evaluate_luminosity(
