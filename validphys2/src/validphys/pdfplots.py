@@ -561,8 +561,7 @@ def plot_lumi1d(
     pdfs_noband=None,
     scale="log",
     legend_stat_labels: bool=True,
-    y_cut_in: (type(None), numbers.Real) = None,
-    y_cut_out: (type(None), numbers.Real) = None
+    y_cut_low: (type(None), numbers.Real) = None,
 ):
     """Plot PDF luminosities at a given center of mass energy.
     sqrts is the center of mass energy (GeV).
@@ -662,6 +661,13 @@ def plot_lumi1d(
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
         )
 
+    elif y_cut is not None and y_cut_low is None:
+        ax.set_title(
+            f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
+            f"$|y| <{format_number(y_cut)}$"
+        )
+
     #if y_cut_in is None and y_cut_out is None:
         #ax.set_title(
             #f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
@@ -672,7 +678,7 @@ def plot_lumi1d(
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
-            f"$|y| <{format_number(y_cut)}$"
+            f"${format_number(y_cut_low)} <|y| <{format_number(y_cut)}$"
         )      
 
     return fig
