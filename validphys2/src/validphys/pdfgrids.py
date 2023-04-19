@@ -246,6 +246,8 @@ def lumigrid1d(
                 if -y_cut_low > y_min and  y_cut_low < y_max:
                     y_min_in = -y_cut_low
                     y_max_in = y_cut_low
+                else:
+                    raise ValueError(f"y_cut_low has to be smaller than y_cut.")
 
         print(f"y_min = {y_min}   y_max = {y_max}   ")
         print(f"y_min_in = {y_min_in}   y_max_in = {y_max_in}   \n")
