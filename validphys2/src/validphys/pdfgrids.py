@@ -222,6 +222,13 @@ def lumigrid1d(
         raise ValueError("Unknown scale")
     sqrt_taus = (mxs / sqrts)
 
+    # make sure that the cuts in rapidity make sense
+    if y_cut is not None and y_cut_low is not None:
+        if y_cut > y_cut_low:
+            pass
+        else:
+            raise ValueError('y_cut_low has to be smaller than y_cut.')
+        
     # TODO: Write this in something fast
     lpdf = pdf.load()
     nmembers = pdf.get_members()
@@ -239,31 +246,18 @@ def lumigrid1d(
 
         # execute if upper bound on the modulus of the rapidity is given
         if y_cut is not None:
-            if -y_cut > y_min and  y_cut < y_max:
+            if -y_cut >= y_min and y_cut <= y_max:
                 y_min = -y_cut
                 y_max = y_cut
 
         # execute if lower bound on the modulus of the rapidity is given
         if y_cut_low is not None:
-            # make sure the cut is within kinematic limits
             if -y_cut_low >= y_min and  y_cut_low <= y_max:
-                if y_cut_low < y_cut:
-                    # the lower bound cut has to smaller than the upper bound
-                    # by construction
-                    y_min_low = -y_cut_low
-                    y_max_low = y_cut_low
-                else:
-                    raise ValueError('y_cut_low has to be smaller than y_cut.')
+                y_min_low = -y_cut_low
+                y_max_low = y_cut_low
             else:
-                raise ValueError('y_cut_low has to be within kinematic limits')
-            ## y_cut_low has to be y_cut in the critical case
-            #else:
-                #y_min_low = y_min
-                #y_max_low = y_max
-        print(f'y_max = {y_max}')
-        print(f'y_min = {y_min}')
-        print(f'y_max_low = {y_max_low}')
-        print(f'y_min_low = {y_min_low}')
+                y_min_low = y_min
+                y_max_low = y_max
 
         for irep in range(nmembers):
             # Eq.(3) in arXiv:1607.01831
