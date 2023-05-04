@@ -202,7 +202,14 @@ def lumigrid1d(
     Return the integrated luminosity in a grid of nbins_m points, for the
     values of invariant mass given (proton-proton) collider energy ``sqrts``
     (given in GeV). A rapidity cut on the integration range (if specified)
-    is taken into account.
+    ``y_cut``is taken into account. This integration range therefore consists
+    on [-y_cut, y_cut], leaving out extreme values (which are nonetheless
+    allowed by the kinematical constraints of the invariant mass). Also, a
+    lower rapidity cut ``y_cut_low`` is given to change the integration range to
+    [y_min, -y_cut_low] U [y_cut_low, y_max], where ``y_min`` and ``y_max`` are
+    the minimal and maximal rapidities allowed by the invariant mass. If both 
+    ``y_cut`` and ``y_cut_low`` are given, the integration range is the intersection
+    of both individual ranges
 
     By default, the grid is sampled logarithmically in mass. The limits are
     given by ``mxmin`` and ``mxmax``, given in GeV. By default ``mxmin`` is 10
@@ -221,6 +228,8 @@ def lumigrid1d(
     else:
         raise ValueError("Unknown scale")
     sqrt_taus = (mxs / sqrts)
+
+    import IPython; IPython.embed()
 
     # make sure that the cuts in rapidity make sense
     if y_cut is not None and y_cut_low is not None:
