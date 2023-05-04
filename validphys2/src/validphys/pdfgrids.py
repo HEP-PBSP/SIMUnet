@@ -229,8 +229,6 @@ def lumigrid1d(
         raise ValueError("Unknown scale")
     sqrt_taus = (mxs / sqrts)
 
-    import IPython; IPython.embed()
-
     # make sure that the cuts in rapidity make sense
     if y_cut is not None and y_cut_low is not None:
         if y_cut > y_cut_low:
