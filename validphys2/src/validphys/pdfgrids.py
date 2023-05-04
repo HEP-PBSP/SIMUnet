@@ -242,15 +242,28 @@ def lumigrid1d(
             if -y_cut > y_min and  y_cut < y_max:
                 y_min = -y_cut
                 y_max = y_cut
-            # execute if a lower bound on the modulus of the rapidity is given
-            if y_cut_low is not None:
-                if -y_cut_low >= y_min and  y_cut_low <= y_max:
+
+        # execute if lower bound on the modulus of the rapidity is given
+        if y_cut_low is not None:
+            # make sure the cut is within kinematic limits
+            if -y_cut_low >= y_min and  y_cut_low <= y_max:
+                if y_cut_low < y_cut:
+                    # the lower bound cut has to smaller than the upper bound
+                    # by construction
                     y_min_low = -y_cut_low
                     y_max_low = y_cut_low
-                # y_cut_low has to be y_cut in the critical case
                 else:
-                    y_min_low = y_min
-                    y_max_low = y_max
+                    raise ValueError('y_cut_low has to be smaller than y_cut.')
+            else:
+                raise ValueError('y_cut_low has to be within kinematic limits')
+            ## y_cut_low has to be y_cut in the critical case
+            #else:
+                #y_min_low = y_min
+                #y_max_low = y_max
+        print(f'y_max = {y_max}')
+        print(f'y_min = {y_min}')
+        print(f'y_max_low = {y_max_low}')
+        print(f'y_min_low = {y_min_low}')
 
         for irep in range(nmembers):
             # Eq.(3) in arXiv:1607.01831
