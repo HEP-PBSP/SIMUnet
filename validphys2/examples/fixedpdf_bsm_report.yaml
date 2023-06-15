@@ -1,0 +1,43 @@
+meta:
+  title: BSM results
+  author: LM
+  keywords: [simunet, plots, validphys]
+
+fit: 230127-lm-ttbar-fixedpdf-nlo-lin
+
+fits: 
+  - 230127-lm-ttbar-fixedpdf-nlo-lin
+
+use_cuts: fromfit
+
+pdfs:
+ - {id: “230127-lm-ttbar-fixedpdf-nlo-lin”, label: “230127-lm-ttbar-fixedpdf-nlo-lin”}
+
+Q: 100
+
+flavours:
+ - 2 # up
+ - 21 # gluon
+ 
+template_text: |
+ # Histograms of BSM factors
+ {@plot_nd_bsm_facs@}
+ # KDE of BSM factors
+ {@plot_kde_bsm_facs@}
+ # 2D correlations of BSM factors
+ {@plot_bsm_2d_combs@}
+ # BSM factor statistics
+ {@bsm_facs_bounds@}
+ # 95% CL bounds
+ {@plot_bsm_facs_bounds@}
+ # BSM 68% Residuals
+ {@plot_bsm_facs_68res@}
+ # Plot Chi2
+ {@plot_fits_datasets_chi2@}
+ # BSM correlation matrix
+ {@plot_bsm_corr@}
+ # PDF-BSM factor correlations
+ {@fits plot_bsm_pdf_corr@}
+
+actions_:
+  - report(main=True)

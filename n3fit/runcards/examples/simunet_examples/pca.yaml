@@ -1,0 +1,156 @@
+meta:
+  title: Principal component analysis test
+  author: James Moore
+  keywords: [simunet]
+
+pdf: 221103-jmm-no_top_iterated
+
+dataset_inputs:
+- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTTBARTOT5TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}  
+- {dataset: CMSTTBARTOT7TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMSTTBARTOT8TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"} 
+- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTOPDIFF8TEVTTRAPNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: CMSTTBARTOT13TEV, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], bsm_sector: "ttbar_total", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_TTMNORM, cfac: [QCD], bsm_sector: "ttbar_dist", bsm_order: "NLO_LIN"} 
+- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_TTBAR_13TEV_ASY_2022, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: CMS_TTBAR_13TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, cfac: [QCD], bsm_sector: "asy", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_TTBARZ_8TEV_TOTAL, bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: ATLAS_TTBARZ_13TEV_TOTAL, cfac: [QCD], bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: ATLAS_TTBARZ_13TEV_PTZNORM, bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: CMS_TTBARZ_8TEV_TOTAL, bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: CMS_TTBARZ_13TEV_TOTAL, cfac: [QCD], bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: CMS_TTBARZ_13TEV_PTZNORM, bsm_sector: "ttz", bsm_order: "LO_LIN"}
+- {dataset: ATLAS_TTBARW_8TEV_TOTAL, bsm_sector: "ttw", bsm_order: "LO_LIN"}
+- {dataset: ATLAS_TTBARW_13TEV_TOTAL, cfac: [QCD], bsm_sector: "ttw", bsm_order: "LO_LIN"}
+- {dataset: CMS_TTBARW_8TEV_TOTAL, bsm_sector: "ttw", bsm_order: "LO_LIN"}
+- {dataset: CMS_TTBARW_13TEV_TOTAL, cfac: [QCD], bsm_sector: "ttw", bsm_order: "LO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_7TEV_TB, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_DIFF_7TEV_T_RAP_NORM, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_DIFF_7TEV_TBAR_RAP_NORM, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_8TEV_T, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_8TEV_TB, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_T_RAP_NORM, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_TBAR_RAP_NORM, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_SCH_8TEV_TOTAL, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_13TEV_T, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_TCH_13TEV_TB, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOP_SCH_13TEV_TOTAL, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_TOT_7TEV, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_8TEV_T, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_8TEV_TB, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_SCH_8TEV_TOTAL, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_13TEV_T, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_13TEV_TB, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOP_TCH_13TEV_YTNORM, frac: 0.75, cfac: [QCD], bsm_sector: "singletop", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOPW_8TEV_SLEP_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+- {dataset: ATLAS_SINGLETOPW_13TEV_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOPW_8TEV_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOPW_13TEV_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+
+fixed_observable_inputs:
+  - {dataset: ATLAS_WHEL_13TEV, bsm_sector: "whel", bsm_order: "NLO_LIN"}
+  - {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "whel", bsm_order: "NLO_LIN"}
+  - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, bsm_sector: "tta", bsm_order: "LO_LIN"}
+  - {dataset: ATLAS_TTBARGAMMA_13TEV_PTGAMMA, bsm_sector: "tta", bsm_order: "LO_LIN"}
+  - {dataset: ATLAS_4TOP_13TEV_MULTILEP_TOTAL, bsm_sector: "tttt", bsm_order: "LO_LIN"}
+  - {dataset: ATLAS_4TOP_13TEV_SLEP_TOTAL, bsm_sector: "tttt", bsm_order: "LO_LIN"}
+  - {dataset: CMS_4TOP_13TEV_MULTILEP_TOTAL, bsm_sector: "tttt", bsm_order: "LO_LIN"}
+  - {dataset: CMS_TTBB_13TEV_ALLJET_TOTAL, bsm_sector: "ttbb", bsm_order: "LO_LIN"}
+  - {dataset: CMS_TTBB_13TEV_DILEPTON_TOTAL, bsm_sector: "ttbb", bsm_order: "LO_LIN"}
+  - {dataset: CMS_TTBB_13TEV_LJETS_TOTAL, bsm_sector: "ttbb", bsm_order: "LO_LIN"}
+  - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, bsm_sector: "tz", bsm_order: "LO_LIN"}
+  - {dataset: CMS_SINGLETOPZ_13TEV_TOTAL, bsm_sector: "tz", bsm_order: "LO_LIN"}
+
+bsm_fac_data:
+- {name: 'OtG', scale: 1, latex: '$c_{tG}$'}
+- {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$'}
+- {name: 'OtZ', scale: 1, latex: '$c_{tZ}$'}
+- {name: 'OtW', scale: 1, latex: '$c_{tW}$'}
+- {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$'}
+- {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$'}
+- {name: 'O1qd', scale: 1, latex: '$c_{Qd}^{1}$'}
+- {name: 'O1qu', scale: 1, latex: '$c_{Qu}^{1}$'}
+- {name: 'O1dt', scale: 1, latex: '$c_{dt}^{1}$'} 
+- {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$'} 
+- {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$'} 
+- {name: 'O11qq', scale: 1, latex: '$c_{Qq}^{1,1}$'} 
+- {name: 'O13qq', scale: 1, latex: '$c_{Qq}^{1,3}$'} 
+- {name: 'O8qd', scale: 1, latex: '$c_{Qd}^{8}$'}
+- {name: 'O8qu', scale: 1, latex: '$c_{Qu}^{8}$'}
+- {name: 'O8dt', scale: 1, latex: '$c_{dt}^{8}$'} 
+- {name: 'O8qt', scale: 1, latex: '$c_{qt}^{8}$'} 
+- {name: 'O8ut', scale: 1, latex: '$c_{ut}^{8}$'} 
+- {name: 'O81qq', scale: 1, latex: '$c_{Qq}^{8,1}$'} 
+- {name: 'O83qq', scale: 1, latex: '$c_{Qq}^{8,3}$'}
+- {name: 'OQt8', scale: 1, latex: '$c_{Qt}^{8}$'}
+- {name: 'OQQ1', scale: 1, latex: '$c_{QQ}^{1}$'}
+- {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$'}
+- {name: 'OQt1', scale: 1, latex: '$c_{Qt}^{1}$'}
+- {name: 'Ott1', scale: 1, latex: '$c_{tt}^{1}$'}
+
+bsm_sectors_to_latex:
+  "ttbar_total": '$t \bar{t}$ total xsec'
+  "ttbar_dist": '$t \bar{t}$ differential xsec'
+  "asy": '$t \bar{t}$ $A_{c}$'
+  "whel": '$W$ helicities'
+  "ttz": '$t \bar{t} Z$'
+  "ttw": '$t \bar{t} W$'
+  "tz": '$tZj$'
+  "tw": '$tW$'
+  "singletop": 'single $t$'
+  "tta": '$t \bar{t} \gamma$'
+  "tttt": '$t \bar{t} t \bar{t}$'
+  "ttbb": '$t \bar{t} b \bar{b}$'
+
+bsm_sector_data:
+- {name: "ttbar_total", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "ttbar_dist", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "asy", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "whel", operators: ['OtW', 'OtG']}
+- {name: "ttz", operators: ['OtG', 'Opt', 'OtZ', 'O3pQ3', 'OpQM', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "ttw", operators: ['OtG', 'O1qt', 'O8qt', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "tz", operators: ['Opt', 'OtZ', 'OtW', 'O3pQ3', 'OpQM', 'O13qq', 'O83qq']}
+- {name: "tw", operators: ['O3pQ3', 'OtG', 'OtW']}
+- {name: "singletop", operators: ['O3pQ3', 'OtW', 'O13qq', 'O83qq']}
+- {name: "tta", operators: ['OtG', 'OtZ', 'OtW', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq']}
+- {name: "tttt", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq', 'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1']}
+- {name: "ttbb", operators: ['OtG', 'O8qd', 'O1qd', 'O1qu', 'O8qu', 'O1dt', 'O8dt', 'O1qt', 'O8qt', 'O1ut', 'O8ut', 'O11qq', 'O13qq', 'O81qq', 'O83qq', 'OQt8', 'OQQ1', 'OQQ8', 'OQt1']}
+
+theoryid: 200
+
+use_cuts: internal
+
+template_text: |
+  # Normalised Fisher information by sector, plot
+  {@plot_fisher_information_by_sector@}
+  # Normalised Fisher information by sector
+  {@fisher_information_by_sector@}
+  # Fisher information matrix
+  {@fisher_information_matrix@}
+  # Principal component eigenvalues
+  {@principal_component_values@}
+  # Principal component eigenvectors
+  {@principal_component_vectors@}
+
+actions_:
+  - report(main=True)

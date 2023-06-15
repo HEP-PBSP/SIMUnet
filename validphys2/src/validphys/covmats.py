@@ -506,7 +506,7 @@ def groups_corrmat(groups_covmat):
 
 
 @check_pdf_is_montecarlo
-def pdferr_plus_covmat(dataset, pdf, covmat_t0_considered):
+def pdferr_plus_covmat(dataset, pdf, covmat_t0_considered, dataset_bsm_factor):
     """For a given `dataset`, returns the sum of the covariance matrix given by
     `covmat_t0_considered` and the PDF error: a covariance matrix estimated from the
     replica theory predictions from a given monte carlo `pdf`
@@ -543,7 +543,7 @@ def pdferr_plus_covmat(dataset, pdf, covmat_t0_considered):
     >>> np.allclose(a == b)
     True
     """
-    th = ThPredictionsResult.from_convolution(pdf, dataset)
+    th = ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor)
     pdf_cov = np.cov(th.error_members, rowvar=True)
     return pdf_cov + covmat_t0_considered
 
@@ -557,13 +557,13 @@ def reorder_thcovmat_as_expcovmat(fitthcovmat, data):
     tmp = theory_covmat.droplevel(0, axis=0).droplevel(0, axis=1)
     return tmp.reindex(index=bb, columns=bb, level=0)
 
-def pdferr_plus_dataset_inputs_covmat(data, pdf, dataset_inputs_covmat_t0_considered, fitthcovmat):
+def pdferr_plus_dataset_inputs_covmat(data, pdf, dataset_inputs_covmat_t0_considered, fitthcovmat, dataset_inputs_bsm_factor):
     """Like `pdferr_plus_covmat` except for an experiment"""
     # do checks get performed here?
     if fitthcovmat is not None:
         #change ordering according to exp_covmat (so according to runcard order)
         return pdferr_plus_covmat(data, pdf, dataset_inputs_covmat_t0_considered+ reorder_thcovmat_as_expcovmat(fitthcovmat,data).values)
-    return pdferr_plus_covmat(data, pdf, dataset_inputs_covmat_t0_considered)
+    return pdferr_plus_covmat(data, pdf, dataset_inputs_covmat_t0_considered, dataset_inputs_bsm_factor)
 
 
 def dataset_inputs_sqrt_covmat(dataset_inputs_covariance_matrix):

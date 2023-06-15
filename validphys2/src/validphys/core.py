@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specidy a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_quad_names):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_quad_names, bsm_sector):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -333,6 +333,7 @@ class DataSetInput(TupleComp):
         self.custom_group = custom_group
         self.bsm_fac_data_names = bsm_fac_data_names
         self.bsm_fac_quad_names = bsm_fac_quad_names
+        self.bsm_sector = bsm_sector
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -924,6 +925,7 @@ class FixedObservableSpec:
     bsm_fac_quad_names_CF_data: tuple = ()
     bsm_fac_quad_names: tuple = ()
     bsm_fac_data_names: tuple = ()
+    bsm_sector: str = None
 
     @property
     def bsm_fac_data_names_CF(self):

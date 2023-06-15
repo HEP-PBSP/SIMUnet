@@ -359,7 +359,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     if not read_bsm_facs.empty:
         scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
         _, nops = read_bsm_facs.shape
-    
+
     if parsed_bsm_quad_facs is not None:
         # We must also apply quadratic C-factors
         quad_bsm_fac_df = pd.DataFrame(
@@ -389,6 +389,8 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
 
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
+ 
+
     return result
 
 
@@ -539,6 +541,7 @@ def procs_corrmat(procs_covmat):
 
 
 def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_bsm_factor):
+    
     """Tuple of data and theory results for a single pdf. The data will have an associated
     covariance matrix, which can include a contribution from the theory covariance matrix which
     is constructed from scale variation. The inclusion of this covariance matrix by default is used

@@ -75,7 +75,7 @@ def tr_masks(data, replica_trvlseed):
         frac = dataset.frac
         trmax = int(frac * ndata)
         mask = np.concatenate(
-            [np.ones(trmax, dtype=np.bool), np.zeros(ndata - trmax, dtype=np.bool)]
+            [np.ones(trmax, dtype=bool), np.zeros(ndata - trmax, dtype=bool)]
         )
         np.random.shuffle(mask)
         trmask_partial.append(mask)
@@ -93,7 +93,7 @@ def fixed_observables_masks(fixed_observables, replica_trvlseed):
         frac = dataset.frac
         trmax = int(frac * ndata)
         mask = np.concatenate(
-            [np.ones(trmax, dtype=np.bool), np.zeros(ndata - trmax, dtype=np.bool)]
+            [np.ones(trmax, dtype=bool), np.zeros(ndata - trmax, dtype=bool)]
         )
         np.random.shuffle(mask)
         trmask_partial.append(mask)

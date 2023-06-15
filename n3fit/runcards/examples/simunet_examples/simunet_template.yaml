@@ -22,10 +22,12 @@ fixed_observable_inputs:
 fixed_pdf_fit: False
 # load_weights_from_fit: 220907-jmm-fixed_test # If this is uncommented, training starts here.
 
+bsm_initialisation_seed: 0
+
 bsm_fac_data:
-- {name: "OtG", scale: 100}
-- {name: "Opt", scale: 10}
-- {name: "OtZ", scale: 1}
+- {name: "OtG", scale: 100, initialisation: {type: uniform, minval: -10, maxval: 10} }
+- {name: "Opt", scale: 10, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
+- {name: "OtZ", scale: 1, initialisation: {type: constant, value: 0} }
 
 bsm_sector_data:
 - {name: "ttbar", operators: ["OtG"]}

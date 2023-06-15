@@ -1,0 +1,14 @@
+meta:
+  title: BSM 68% Residuals
+  author: MMA
+  keywords: [simunet, plot]
+
+fits:
+ - 221125-lm-global-fixedpdf-nlo-quad
+ - 221125-lm-global-nlo-quad
+
+template_text: |
+ # BSM 68% Residuals
+ {@plot_bsm_facs_68res@}
+actions_:
+  - report(main=True)

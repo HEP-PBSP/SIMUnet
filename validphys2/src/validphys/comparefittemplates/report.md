@@ -129,6 +129,9 @@ SIMUnet analysis
 ### 95% CL bounds comparison
 {@bsm_facs_95bounds_fits@}
 
+### BSM 68% residuals
+{@plot_bsm_facs_68res@}
+
 ### Combined 2D histograms
 {@plot_2d_bsm_facs_fits@}
 

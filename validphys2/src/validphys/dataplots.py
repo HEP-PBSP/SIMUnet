@@ -267,7 +267,7 @@ def _plot_fancy_impl(results, commondata, cutlist,
             table[('err', i)] = err
         else:
             table[cvcol] = cv/norm_cv
-            table[('err', i)] = err/norm_cv
+            table[('err', i)] = np.abs(err/norm_cv)
         cvcols.append(cvcol)
 
 
@@ -300,7 +300,7 @@ def _plot_fancy_impl(results, commondata, cutlist,
             x = info.get_xcol(line_data)
 
             try:
-                x = np.asanyarray(x, np.float)
+                x = np.asanyarray(x, float)
             except ValueError:
                 xticklabels = x
                 npoints = len(x)
