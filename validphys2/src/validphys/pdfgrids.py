@@ -196,12 +196,20 @@ def lumigrid1d(
     mxmin: numbers.Real = 10,
     mxmax: (type(None), numbers.Real) = None,
     scale="log",
+    y_cut_low: (type(None), numbers.Real) = None
 ):
     """
     Return the integrated luminosity in a grid of nbins_m points, for the
     values of invariant mass given (proton-proton) collider energy ``sqrts``
     (given in GeV). A rapidity cut on the integration range (if specified)
-    is taken into account.
+    ``y_cut``is taken into account. This integration range therefore consists
+    on [-y_cut, y_cut], leaving out extreme values (which are nonetheless
+    allowed by the kinematical constraints of the invariant mass). Also, a
+    lower rapidity cut ``y_cut_low`` is given to change the integration range to
+    [y_min, -y_cut_low] U [y_cut_low, y_max], where ``y_min`` and ``y_max`` are
+    the minimal and maximal rapidities allowed by the invariant mass. If both 
+    ``y_cut`` and ``y_cut_low`` are given, the integration range is the intersection
+    of both individual ranges
 
     By default, the grid is sampled logarithmically in mass. The limits are
     given by ``mxmin`` and ``mxmax``, given in GeV. By default ``mxmin`` is 10
@@ -213,6 +221,11 @@ def lumigrid1d(
     s = sqrts * sqrts
     if mxmax is None:
         mxmax = _default_mxmax(sqrts)
+    # if a lower cut on rapidity is given
+    # the invariant mass range is decreased until the point
+    # where the integral becomes identically zero
+    if y_cut_low is not None:
+        mxmax = 0.8 * np.sqrt(s) * np.exp(-y_cut_low)
     if scale == "log":
         mxs = np.logspace(np.log10(mxmin), np.log10(mxmax), nbins_m)
     elif scale == "linear":
@@ -221,6 +234,13 @@ def lumigrid1d(
         raise ValueError("Unknown scale")
     sqrt_taus = (mxs / sqrts)
 
+    # make sure that the cuts in rapidity make sense
+    if y_cut is not None and y_cut_low is not None:
+        if y_cut > y_cut_low:
+            pass
+        else:
+            raise ValueError('y_cut_low has to be smaller than y_cut.')
+        
     # TODO: Write this in something fast
     lpdf = pdf.load()
     nmembers = pdf.get_members()
@@ -228,13 +248,28 @@ def lumigrid1d(
     weights = np.full(shape=(nmembers, nbins_m), fill_value=np.NaN)
 
     for im, (mx, sqrt_tau) in enumerate(zip(mxs, sqrt_taus)):
+        # kinematic limits of the rapidity by default
         y_min = -np.log(1/sqrt_tau)
         y_max =  np.log(1/sqrt_tau)
 
+        # no lower boundary on the absolute value of the rapidity by default
+        y_min_low = 0
+        y_max_low = 0
+
+        # execute if upper bound on the modulus of the rapidity is given
         if y_cut is not None:
-            if -y_cut > y_min and  y_cut < y_max:
+            if -y_cut >= y_min and y_cut <= y_max:
                 y_min = -y_cut
-                y_max =  y_cut
+                y_max = y_cut
+
+        # execute if lower bound on the modulus of the rapidity is given
+        if y_cut_low is not None:
+            if -y_cut_low >= y_min and  y_cut_low <= y_max:
+                y_min_low = -y_cut_low
+                y_max_low = y_cut_low
+            else:
+                y_min_low = y_min
+                y_max_low = y_max
 
         for irep in range(nmembers):
             # Eq.(3) in arXiv:1607.01831
@@ -243,7 +278,8 @@ def lumigrid1d(
                 sqrt_tau * np.exp(y), sqrt_tau * np.exp(-y),
                 lumi_channel
             )
-            res = integrate.quad(f, y_min, y_max, epsrel=5e-4, limit=50)[0]
+
+            res = integrate.quad(f, y_min, y_max, epsrel=5e-4, limit=50)[0] - integrate.quad(f, y_min_low, y_max_low, epsrel=5e-4, limit=50)[0]
 
             weights[irep, im] = res
 

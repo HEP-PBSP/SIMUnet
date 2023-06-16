@@ -561,6 +561,7 @@ def plot_lumi1d(
     pdfs_noband=None,
     scale="log",
     legend_stat_labels: bool=True,
+    y_cut_low: (type(None), numbers.Real) = None,
 ):
     """Plot PDF luminosities at a given center of mass energy.
     sqrts is the center of mass energy (GeV).
@@ -653,16 +654,32 @@ def plot_lumi1d(
     ax.set_ylim(ymin, ymax)
     ax.set_xscale(scale)
     ax.grid(False)
-    if y_cut==None:
+
+    if y_cut is None and y_cut_low is None:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
         )
+
+    elif y_cut is not None and y_cut_low is None:
+        ax.set_title(
+            f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
+            f"$|y| <{format_number(y_cut)}$"
+        )
+
+    elif y_cut is None and y_cut_low is not None:
+        ax.set_title(
+            f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
+            f"${format_number(y_cut_low)} < |y|$"
+        )
+
     else:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity\n"
-            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   "
-            f"$\\|y|<{format_number(y_cut)}$"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   , "
+            f"${format_number(y_cut_low)} <|y| <{format_number(y_cut)}$"
         )      
 
     return fig
@@ -680,6 +697,7 @@ def plot_lumi1d_uncertainties(
     ymin: (numbers.Real, type(None)) = None,
     ymax: (numbers.Real, type(None)) = None,
     scale = "log",
+    y_cut_low: (type(None), numbers.Real) = None
 ):
     """Plot PDF luminosity uncertainties at a given center of mass energy.
     sqrts is the center of mass energy (GeV).
@@ -714,17 +732,34 @@ def plot_lumi1d_uncertainties(
     ax.set_xlim(mx[0], mx[-1])
     ax.set_xscale(scale)
     ax.grid(False)
-    if y_cut==None:
+
+    if y_cut is None and y_cut_low is None:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity uncertainty\n"
             f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV"
         )
+
+    elif y_cut is not None and y_cut_low is None:
+        ax.set_title(
+            f"${LUMI_CHANNELS[lumi_channel]}$ luminosity uncertainty\n"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV, "
+            f"$|y| <{format_number(y_cut)}$"
+        )
+
+    elif y_cut is None and y_cut_low is not None:
+        ax.set_title(
+            f"${LUMI_CHANNELS[lumi_channel]}$ luminosity uncertainty\n"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV, "
+            f"${format_number(y_cut_low)} < |y|$"
+        )
+
     else:
         ax.set_title(
             f"${LUMI_CHANNELS[lumi_channel]}$ luminosity uncertainty\n"
-            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV   "    
-            f"$\\|y|<{format_number(y_cut)}$"
+            f"$\\sqrt{{s}}={format_number(sqrts/1000)}$ TeV, "
+            f"${format_number(y_cut_low)} < |y| <{format_number(y_cut)}$"
         )
+
     ax.set_ylim(ymin, ymax)
     current_ymin, _ = ax.get_ylim()
     ax.set_ylim(max(0, current_ymin), None)
