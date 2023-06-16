@@ -221,6 +221,11 @@ def lumigrid1d(
     s = sqrts * sqrts
     if mxmax is None:
         mxmax = _default_mxmax(sqrts)
+    # if a lower cut on rapidity is given
+    # the invariant mass range is decreased until the point
+    # where the integral becomes identically zero
+    if y_cut_low is not None:
+        mxmax = 0.8 * np.sqrt(s) * np.exp(-y_cut_low)
     if scale == "log":
         mxs = np.logspace(np.log10(mxmin), np.log10(mxmax), nbins_m)
     elif scale == "linear":
