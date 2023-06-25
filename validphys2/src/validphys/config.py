@@ -515,7 +515,7 @@ class CoreConfig(configparser.Config):
         return {}
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
@@ -745,7 +745,6 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
-        bsm_fac_quad_names = dataset_input.bsm_fac_quad_names
 
         try:
             ds = self.loader.check_dataset(
@@ -759,7 +758,6 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 bsm_fac_data_names=bsm_fac_data_names,
-                bsm_fac_quad_names=bsm_fac_quad_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
