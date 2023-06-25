@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 
+
 def linear_datum_to_op(name:str):
     """Convert something like "None_OtZ" to OtZ"""
     return name.rsplit("_", 1)[1]
@@ -13,135 +14,57 @@ def get_bsm_data(
     bsm_fac_data,
     bsm_sector_data,
     bsm_fac_data_names,
-    n_bsm_fac_data,
+    n_bsm_fac_data
 ):
-    if bsm_fac_data is not None:
-        if bsm_order is not None:
-            new_bsm_fac_data_names = []
-            # Now go through all operators, and see which are in the appropriate sector.
-            for op in bsm_fac_data_names:
-                if op in bsm_sector_data[bsm_sector]:
-                    if bsm_order == "LO_QUAD":
-                        new_bsm_fac_data_names += ["LO_LIN_" + op]
-                    elif bsm_order == "NLO_QUAD":
-                        new_bsm_fac_data_names += ["NLO_LIN_" + op]
-                    else:
-                        new_bsm_fac_data_names += [bsm_order + "_" + op]
-                else:
-                    new_bsm_fac_data_names += ["None_" + op]
+    """
+    Given BSM specifications within dataset_inputs specs
+    return names of bsm kfactors stored in the data/bsm_factors
+    folder.
 
-            # This takes care of linear. Now need to do the same for quadratic, if it's
-            # switched on...
 
-            if bsm_order in ["LO_QUAD", "NLO_QUAD"]:
-                # Some care needed here...
-                new_bsm_fac_quad_names = pd.DataFrame(
-                    index=range(n_bsm_fac_data), columns=range(n_bsm_fac_data)
-                )
+    The output is used by config.parse_dataset_input to add
+    bsm_fac_data_names to the DataSetInput class constructor.
 
-                for i in range(n_bsm_fac_data):
-                    for j in range(n_bsm_fac_data):
-                        if bsm_fac_data_names[i] in bsm_sector_data[bsm_sector]:
-                            if bsm_fac_data_names[j] in bsm_sector_data[bsm_sector]:
-                                if i == j:
-                                    new_bsm_fac_quad_names.iloc[i, j] = (
-                                        bsm_order + "_" + bsm_fac_data_names[i]
-                                    )
-                                else:
-                                    new_bsm_fac_quad_names.iloc[i, j] = (
-                                        bsm_order
-                                        + "_"
-                                        + bsm_fac_data_names[i]
-                                        + "*"
-                                        + bsm_fac_data_names[j]
-                                    )
-                                    new_bsm_fac_quad_names.iloc[j, i] = (
-                                        bsm_order
-                                        + "_"
-                                        + bsm_fac_data_names[j]
-                                        + "*"
-                                        + bsm_fac_data_names[i]
-                                    )
-                            else:
-                                if i == j:
-                                    new_bsm_fac_quad_names.iloc[i, j] = (
-                                        "None_" + bsm_fac_data_names[i]
-                                    )
-                                else:
-                                    # Ignore contribution entirely
-                                    new_bsm_fac_quad_names.iloc[i, j] = (
-                                        "None_"
-                                        + bsm_fac_data_names[i]
-                                        + "*"
-                                        + bsm_fac_data_names[j]
-                                    )
-                                    new_bsm_fac_quad_names.iloc[j, i] = (
-                                        "None_"
-                                        + bsm_fac_data_names[j]
-                                        + "*"
-                                        + bsm_fac_data_names[i]
-                                    )
-                        else:
-                            if i == j:
-                                new_bsm_fac_quad_names.iloc[i, j] = (
-                                    "None_" + bsm_fac_data_names[i]
-                                )
-                            else:
-                                new_bsm_fac_quad_names.iloc[i, j] = (
-                                    "None_"
-                                    + bsm_fac_data_names[i]
-                                    + "*"
-                                    + bsm_fac_data_names[j]
-                                )
-                                new_bsm_fac_quad_names.iloc[j, i] = (
-                                    "None_"
-                                    + bsm_fac_data_names[j]
-                                    + "*"
-                                    + bsm_fac_data_names[i]
-                                )
-                new_bsm_fac_quad_names = new_bsm_fac_quad_names.values.tolist()
-            else:
-                new_bsm_fac_quad_names = None
+    Parameters
+    ----------
+    bsm_sector : str
+    bsm_order : str,
+            specifies the order of the bsm k-factors. Options are:
+            - LO_LIN: LO in pQCD, LIN SMEFT correction
+            - NLO_LIN: NLO in pQCD, LIN SMEFT correction
 
-        else:
-            new_bsm_fac_data_names = None
-            new_bsm_fac_quad_names = None
+    bsm_fac_data : list
+    bsm_sector_data : list
+    bsm_fac_data_names : list
+                        list containing names of the dimension 6 operators
+                        read from the runcard with production rule
+    n_bsm_fac_data: int
 
-    else:
-        new_bsm_fac_data_names = None
-        new_bsm_fac_quad_names = None
+    Returns
+    -------
+    dict
+        - bsm_fac_data_names : list containing names of bsm k-factors
 
+        - bsm_sector : str
+    
+
+    """
+
+    
+    # Raise error if bsm_order is not either LO_LIN or NLO_LIN
+    if bsm_order not in (None, 'LO_LIN', 'NLO_LIN'):
+        raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
+    
+    # default value
+    new_bsm_fac_data_names = None
+
+    if bsm_fac_data is not None and bsm_order is not None:
+        new_bsm_fac_data_names = [
+        bsm_order + "_" + op if op in bsm_sector_data[bsm_sector] else "None_" + op
+        for op in bsm_fac_data_names
+        ]
+        
     return {
         "bsm_fac_data_names": new_bsm_fac_data_names,
-        "bsm_fac_quad_names": new_bsm_fac_quad_names,
         "bsm_sector": bsm_sector,
     }
-
-def get_bsm_coefs(ds):
-    bsm_fac_data_names_CF = ds.bsm_fac_data_names_CF
-    bsm_fac_quad_names_CF = ds.bsm_fac_quad_names_CF
-    bsm_fac_data_names = ds.bsm_fac_data_names
-    bsm_fac_quad_names = ds.bsm_fac_quad_names
-
-    # It's useful to flatten the list of quadratic names first
-    if bsm_fac_quad_names_CF is not None:
-        flat_bsm_fac_quad_names = []
-        for i in range(len(bsm_fac_quad_names)):
-            for j in range(len(bsm_fac_quad_names)):
-                flat_bsm_fac_quad_names += [bsm_fac_quad_names[i][j]]
-
-    if bsm_fac_data_names_CF is not None:
-        coefficients = np.array(
-            [bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names]
-        )
-        if bsm_fac_quad_names_CF is not None:
-            quad_coefficients = np.array(
-                [
-                    bsm_fac_quad_names_CF[i].central_value
-                    for i in flat_bsm_fac_quad_names
-                ]
-            )
-        else:
-            nops, ndat = coefficients.shape
-            quad_coefficients = np.zeros((nops**2, ndat))
-    return coefficients, quad_coefficients
