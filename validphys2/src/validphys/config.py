@@ -482,39 +482,6 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_names
         return []
 
-    def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
-        """Produces a list of names of the quadratics that could be included in the fit, regardless
-        of whether we actually end up using them or not.
-        """
-        if len(bsm_fac_data_names) != 0:
-            bsm_fac_quad_names = []
-            for i in range(len(bsm_fac_data_names)):
-                current_quad_names = []
-                for j in range(len(bsm_fac_data_names)):
-                    if i == j:
-                        current_quad_names += [bsm_fac_data_names[i]]
-                    else:
-                        # Cross-term is created
-                        current_quad_names += [bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]]
-                bsm_fac_quad_names += [current_quad_names]
-            return bsm_fac_quad_names
-        return []
-
-    def produce_bsm_fac_quad_names_dict(self, bsm_fac_data_names):
-        """For use in the correlation plots.
-        """
-        if not bsm_fac_data_names:
-            return []
-        bsm_fac_quad_names = []
-        for i in range(len(bsm_fac_data_names)):
-            current_quad_names = []
-            for j in range(len(bsm_fac_data_names)):
-                if j < i:
-                    current_quad_names += [{'name': bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j], 'op1': bsm_fac_data_names[i], 'op2': bsm_fac_data_names[j]}]
-            bsm_fac_quad_names += [current_quad_names]
-        # Flatten the list
-        flat_list = [item for sublist in bsm_fac_quad_names for item in sublist]
-        return flat_list
 
     def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
