@@ -306,7 +306,6 @@ class FixedObservableData:
     commondata: CommonData
     prediction: CFactorData
     linear_bsm: Dict[str, CFactorData]
-    quad_bsm: Dict[str, CFactorData]
 
     @property
     def ndata(self):
@@ -327,13 +326,11 @@ class FixedObservableData:
             commondata=self.commondata.with_cuts(trmask),
             prediction=self.prediction.with_cuts(trmask),
             linear_bsm={k: v.with_cuts(trmask) for k, v in self.linear_bsm.items()},
-            quad_bsm={k: v.with_cuts(trmask) for k, v in self.quad_bsm.items()},
         )
         vl = self.__class__(
             commondata=self.commondata.with_cuts(vlmask),
             prediction=self.prediction.with_cuts(vlmask),
             linear_bsm={k: v.with_cuts(vlmask) for k, v in self.linear_bsm.items()},
-            quad_bsm={k: v.with_cuts(vlmask) for k, v in self.quad_bsm.items()},
         )
         return tr, vl
 
@@ -341,14 +338,11 @@ class FixedObservableData:
     def from_spec(cls, spec):
         """Construct an object from a
         :py:class:`validphys.core.FixedObservableSpec` instance."""
-        linear, quad = spec.load_bsm()
+        linear = spec.load_bsm()
         if linear is None:
             linear = {}
-        if quad is None:
-            quad = {}
         return cls(
             commondata=spec.load_exp(),
             prediction=spec.load_pred(),
             linear_bsm=linear,
-            quad_bsm=quad,
         )
