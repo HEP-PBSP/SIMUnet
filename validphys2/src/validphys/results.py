@@ -39,7 +39,6 @@ from validphys.convolution import (
 )
 
 from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
-from validphys.n3fit_data_utils import parse_bsm_fac_quad_names_CF
 
 from validphys.coredata import FixedObservableData
 
@@ -344,7 +343,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
     parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
-    parsed_bsm_quad_facs = parse_bsm_fac_quad_names_CF(dataset.bsm_fac_quad_names_CF, dataset.cuts)
+
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
@@ -358,26 +357,6 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
 
     if not read_bsm_facs.empty:
         scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
-        _, nops = read_bsm_facs.shape
-
-    if parsed_bsm_quad_facs is not None:
-        # We must also apply quadratic C-factors
-        quad_bsm_fac_df = pd.DataFrame(
-            {k: v.central_value for k, v in parsed_bsm_quad_facs.items()}
-        )
-        for i in range(nops):
-            for j in range(nops):
-                if i <= j:
-                    # Add the contribution from the quadratic
-                    op_products = read_bsm_facs.iloc[:,i].values * read_bsm_facs.iloc[:,j].values
-                    op_name = dataset.bsm_fac_quad_names[i][j] 
-                    op_values = quad_bsm_fac_df[op_name]
-                    nreps = len(op_products)
-                    ndat = len(op_values)
-                    new_op_contribution = np.zeros((ndat,nreps,1))
-                    for a in range(ndat):
-                        new_op_contribution[a,:,0] = op_products[:]*op_values[a]
-                    np.append(scaled_replicas, new_op_contribution, axis=2)               
 
     if not read_bsm_facs.empty:
         replica_result = 1 + np.sum(scaled_replicas, axis=2)
@@ -390,7 +369,6 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
  
-
     return result
 
 
