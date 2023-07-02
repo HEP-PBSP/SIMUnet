@@ -133,9 +133,7 @@ class ModelTrainer:
         failed_status="fail",
         n_bsm_fac_data=0,
         bsm_fac_data_names=None,
-        bsm_fac_quad_names=None,
         bsm_fac_data_scales=None,
-        bsm_fac_quad_scales=None,
         bsm_fac_initialisations=None,
         bsm_initialisation_seed=0,
         debug=False,
@@ -199,8 +197,6 @@ class ModelTrainer:
         self.n_bsm_fac_data=n_bsm_fac_data
         self.bsm_fac_data_names=bsm_fac_data_names
         self.bsm_fac_data_scales = bsm_fac_data_scales
-        self.bsm_fac_quad_names = bsm_fac_quad_names
-        self.bsm_fac_quad_scales = bsm_fac_quad_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
         self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
@@ -525,9 +521,6 @@ class ModelTrainer:
         combiner = CombineCfacLayer(
             scales=np.array(self.bsm_fac_data_scales, dtype=np.float32),
             linear_names=self.bsm_fac_data_names,
-            quad_names=[
-                name for sublist in self.bsm_fac_quad_names for name in sublist
-            ],
             initialisations=self.bsm_fac_initialisations,
             initialisation_seed=self.bsm_initialisation_seed,
             replica_number=self.replicas[0],

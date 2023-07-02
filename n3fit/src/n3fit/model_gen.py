@@ -127,11 +127,7 @@ class ObservableWrapper:
         ):
             # Use get here to prevent having to worry about POSDATSETS
             bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
-            bsm_fac_quad_names_CF = dataset_dict.get('bsm_fac_quad_names_CF')
             bsm_fac_data_names = dataset_dict.get('bsm_fac_data_names')
-            bsm_fac_quad_names = dataset_dict.get('bsm_fac_quad_names')
-
-            # It's useful to flatten the list of quadratic names first
 
             if bsm_fac_data_names_CF is not None:
 
@@ -141,46 +137,27 @@ class ObservableWrapper:
                     for k, v in bsm_fac_data_names_CF.items()
                 }
 
-                if bsm_fac_quad_names_CF is not None:
-                    quad_coefficients = {
-                        bsmnames.linear_datum_to_op(k): v.central_value
-                        for k, v in bsm_fac_quad_names_CF.items()
-                    }
-                else:
-                    ndat = dataset_dict["ndata"]
-                    quad_coefficients = {
-                        name: np.zeros(ndat)
-                        for name in self.post_observable.quad_names
-                    }
-
                 if self.split == 'ex':
                     cfacs = coefficients
-                    quad_cfacs = quad_coefficients
+                    
                 elif self.split == 'tr':
                     cfacs = {
                         k: v[dataset_dict["ds_tr_mask"]]
                         for k, v in coefficients.items()
                     }
-                    quad_cfacs = {
-                        k: v[dataset_dict["ds_tr_mask"]]
-                        for k, v in quad_coefficients.items()
-                    }
+                    
                 elif self.split == 'vl':
                     # cfacs = coefficients[:, ~dataset_dict['ds_tr_mask']]
                     cfacs = {
                         k: v[~dataset_dict["ds_tr_mask"]]
                         for k, v in coefficients.items()
                     }
-                    quad_cfacs = {
-                        k: v[~dataset_dict["ds_tr_mask"]]
-                        for k, v in quad_coefficients.items()
-                    }
+                    
                 log.info("Applying combination layer")
 
                 output_layers[idx] = self.post_observable(
                     output_layer,
                     linear_values=cfacs,
-                    quad_values=quad_cfacs,
                 )
 
         for fo, inp in zip(self.fixed, fixed_inputs):
@@ -188,7 +165,6 @@ class ObservableWrapper:
                 bsmnames.linear_datum_to_op(k): v.central_value
                 for k, v in fo.linear_bsm.items()
             }
-            quad = {bsmnames.linear_datum_to_op(k): v.central_value for k, v in fo.quad_bsm.items()}
 
             # NOTE: Generating the input like
             #
@@ -199,8 +175,7 @@ class ObservableWrapper:
             output_layers.append(
                 self.post_observable(
                     inputs=inp,
-                    linear_values=linear,
-                    quad_values=quad,
+                    linear_values=linear
                 )
             )
 
