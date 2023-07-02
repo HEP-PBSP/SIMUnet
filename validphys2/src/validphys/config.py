@@ -493,19 +493,6 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_scales
         return []
 
-    def produce_bsm_fac_quad_scales(self, bsm_fac_data_scales):
-        """Produces a list of scales for the quadratics that could be included in the fit,
-        regardless of whether we actually end up using them or not.
-        """
-        if len(bsm_fac_data_scales) != 0:
-            bsm_fac_quad_scales = np.empty((len(bsm_fac_data_scales), len(bsm_fac_data_scales)))
-            for i in range(len(bsm_fac_data_scales)):
-                for j in range(len(bsm_fac_data_scales)):
-                    # Cross-term is created
-                    bsm_fac_quad_scales[i][j] = bsm_fac_data_scales[i] * bsm_fac_data_scales[j]
-            return bsm_fac_quad_scales
-        return []
-
     def parse_bsm_sector_data(self, bsm_sector_data=None):
         if bsm_sector_data is not None:
             new_bsm_sector_data = {}
@@ -515,7 +502,7 @@ class CoreConfig(configparser.Config):
         return {}
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
