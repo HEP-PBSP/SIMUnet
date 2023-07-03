@@ -21,3 +21,6 @@ Important files:
 - sphinx/source/conf.py configures the set-up.  The project name, authors, version as well as extensions and project theme can all be changed here.
 - sphinx/source/index.rst is the 'front page', and table of contents etc are specified here
 - sphinx/source/simunet_analysis.rst contains some first basic examples of how we can generate documentation directly from the code docstrings.
+
+
+See also https://www.sphinx-doc.org/en/master/index.html for much more info on Sphinx
