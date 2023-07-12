@@ -117,23 +117,7 @@ Dataset differences and cuts
 
 SIMUnet analysis
 ----------------
-### Comparison histograms of BSM factors
-{@plot_nd_bsm_facs_fits@}
 
-
-### BSM 68% residuals
-{@plot_bsm_facs_68res@}
-
-### Combined 2D histograms
-{@plot_2d_bsm_facs_fits@}
-
-### BSM correlations  
-{@fits plot_bsm_corr@}
-
-### PDF-BSM correlations
-{@with flavour_sets@}
-{@plot_bsm_pdf_corr_fits@}
-{@endwith@}
 
 Code versions
 -------------
