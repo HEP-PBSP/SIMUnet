@@ -322,13 +322,11 @@ class CoreConfig(configparser.Config):
         _, bsmfacdata = self.parse_from_("fit", "bsm_fac_data", write=False)
         _, bsmsecdata = self.parse_from_("fit", "bsm_sector_data", write=False)
 
-        _, fo = self.parse_from_("fit", "fixed_observable_inputs", write=False)
-
         data_input = self._parse_data_input_from_(
             "fit", {"theoryid": thid, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
         )
 
-        return {"theoryid": thid, "data_input": data_input, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata, "fixed_observable_inputs": fo}
+        return {"theoryid": thid, "data_input": data_input, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
 
     def produce_fitpdf(self, fit):
         """Like ``fitcontext`` only setting the PDF"""
