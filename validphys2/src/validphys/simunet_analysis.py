@@ -615,7 +615,7 @@ def plot_bsm_pdf_corr(
         yield fig, bsm_fac
 
 @figuregen
-def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
+def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -637,7 +637,7 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
             # get PDF
             pdf = pdfs[fits.index(fit)]
             # get x_object
-            x_grid_obj = xplotting_grid 
+            x_grid_obj = xplotting_grids[fits.index(fit)]
             if bsm_facs_df.get([bsm_fac]) is not None:
                 bsm_fac_vals = bsm_facs_df[bsm_fac].values
                 # Define xgrid and scale
