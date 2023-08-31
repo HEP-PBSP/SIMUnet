@@ -322,9 +322,9 @@ class CommonDataSpec(TupleComp):
 
 
 class DataSetInput(TupleComp):
-    """Represents whatever the user enters in the YAML to specidy a
+    """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_quad_names, bsm_sector):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_sector):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -332,7 +332,6 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_quad_names = bsm_fac_quad_names
         self.bsm_sector = bsm_sector
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
@@ -462,7 +461,7 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_quad_names_CF=None, bsm_fac_data_names=None, bsm_fac_quad_names=None):
+                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_data_names=None):
         self.name = name
         self.commondata = commondata
 
@@ -474,11 +473,9 @@ class DataSetSpec(TupleComp):
         self.cuts = cuts
         self.frac = frac
         self.bsm_fac_data_names_CF = bsm_fac_data_names_CF 
-        self.bsm_fac_quad_names_CF = bsm_fac_quad_names_CF
 
         # These are important because they are ORDERED correctly, but the dictionaries might not be
         self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_quad_names = bsm_fac_quad_names
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere
@@ -914,20 +911,12 @@ class FixedObservableSpec:
     # Note: This is not a dict as we want it to be hashable
     custom_group: Optional[str] = None
     bsm_fac_data_names_CF_data: tuple = ()
-    bsm_fac_quad_names_CF_data: tuple = ()
-    bsm_fac_quad_names: tuple = ()
     bsm_fac_data_names: tuple = ()
     bsm_sector: str = None
 
     @property
     def bsm_fac_data_names_CF(self):
         return dict(self.bsm_fac_data_names_CF_data)
-
-    @property
-    def bsm_fac_quad_names_CF(self):
-        if self.bsm_fac_quad_names_CF_data is not None:
-            return dict(self.bsm_fac_quad_names_CF_data)
-        return None
 
     # Bogus cuts to make this more compatible with the usual data
     @property
@@ -971,10 +960,7 @@ class FixedObservableSpec:
         return name_cf_map
 
     def load_bsm(self):
-        return (
-            self._load_bsm_values(self.bsm_fac_data_names_CF),
-            self._load_bsm_values(self.bsm_fac_quad_names_CF),
-        )
+        return self._load_bsm_values(self.bsm_fac_data_names_CF)
 
 
     def load(self):

@@ -27,7 +27,6 @@ def performfit(
     basis,
     fitbasis,
     bsm_fac_data_scales,
-    bsm_fac_quad_scales,
     bsm_fac_initialisations,
     fixed_pdf_fit=False,
     sum_rules=True,
@@ -44,7 +43,6 @@ def performfit(
     maxcores=None,
     parallel_models=False, 
     bsm_fac_data_names=None,
-    bsm_fac_quad_names=None,
     bsm_initialisation_seed=0,
 ):
     """
@@ -207,9 +205,7 @@ def performfit(
             parallel_models=n_models,
             n_bsm_fac_data=n_bsm_fac_data,
             bsm_fac_data_names=bsm_fac_data_names, 
-            bsm_fac_quad_names=bsm_fac_quad_names,
             bsm_fac_data_scales=bsm_fac_data_scales,
-            bsm_fac_quad_scales=bsm_fac_quad_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
             bsm_initialisation_seed=bsm_initialisation_seed,
         )

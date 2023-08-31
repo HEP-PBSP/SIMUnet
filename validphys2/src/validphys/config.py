@@ -480,39 +480,6 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_names
         return []
 
-    def produce_bsm_fac_quad_names(self, bsm_fac_data_names):
-        """Produces a list of names of the quadratics that could be included in the fit, regardless
-        of whether we actually end up using them or not.
-        """
-        if len(bsm_fac_data_names) != 0:
-            bsm_fac_quad_names = []
-            for i in range(len(bsm_fac_data_names)):
-                current_quad_names = []
-                for j in range(len(bsm_fac_data_names)):
-                    if i == j:
-                        current_quad_names += [bsm_fac_data_names[i]]
-                    else:
-                        # Cross-term is created
-                        current_quad_names += [bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j]]
-                bsm_fac_quad_names += [current_quad_names]
-            return bsm_fac_quad_names
-        return []
-
-    def produce_bsm_fac_quad_names_dict(self, bsm_fac_data_names):
-        """For use in the correlation plots.
-        """
-        if not bsm_fac_data_names:
-            return []
-        bsm_fac_quad_names = []
-        for i in range(len(bsm_fac_data_names)):
-            current_quad_names = []
-            for j in range(len(bsm_fac_data_names)):
-                if j < i:
-                    current_quad_names += [{'name': bsm_fac_data_names[i] + "*" + bsm_fac_data_names[j], 'op1': bsm_fac_data_names[i], 'op2': bsm_fac_data_names[j]}]
-            bsm_fac_quad_names += [current_quad_names]
-        # Flatten the list
-        flat_list = [item for sublist in bsm_fac_quad_names for item in sublist]
-        return flat_list
 
     def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
@@ -524,19 +491,6 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_scales
         return []
 
-    def produce_bsm_fac_quad_scales(self, bsm_fac_data_scales):
-        """Produces a list of scales for the quadratics that could be included in the fit,
-        regardless of whether we actually end up using them or not.
-        """
-        if len(bsm_fac_data_scales) != 0:
-            bsm_fac_quad_scales = np.empty((len(bsm_fac_data_scales), len(bsm_fac_data_scales)))
-            for i in range(len(bsm_fac_data_scales)):
-                for j in range(len(bsm_fac_data_scales)):
-                    # Cross-term is created
-                    bsm_fac_quad_scales[i][j] = bsm_fac_data_scales[i] * bsm_fac_data_scales[j]
-            return bsm_fac_quad_scales
-        return []
-
     def parse_bsm_sector_data(self, bsm_sector_data=None):
         if bsm_sector_data is not None:
             new_bsm_sector_data = {}
@@ -546,7 +500,7 @@ class CoreConfig(configparser.Config):
         return {}
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, bsm_fac_quad_names, bsm_fac_quad_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
@@ -776,7 +730,6 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         bsm_fac_data_names = dataset_input.bsm_fac_data_names
-        bsm_fac_quad_names = dataset_input.bsm_fac_quad_names
 
         try:
             ds = self.loader.check_dataset(
@@ -790,7 +743,6 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 bsm_fac_data_names=bsm_fac_data_names,
-                bsm_fac_quad_names=bsm_fac_quad_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
