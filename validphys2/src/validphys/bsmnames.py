@@ -51,19 +51,18 @@ def get_bsm_data(
     """
 
     
-    # Raise error if bsm_order is not either LO_LIN or NLO_LIN
+    # Raise error if bsm_order is neither LO_LIN nor NLO_LIN
     if bsm_order not in (None, 'LO_LIN', 'NLO_LIN'):
         raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
     
     # default value
     new_bsm_fac_data_names = None
 
-    if bsm_fac_data is not None and bsm_order is not None:
+    if all(bsm_fac_data, bsm_order, bsm_sector_data):
         new_bsm_fac_data_names = [
         bsm_order + "_" + op if op in bsm_sector_data[bsm_sector] else "None_" + op
         for op in bsm_fac_data_names
         ]
-        
     return {
         "bsm_fac_data_names": new_bsm_fac_data_names,
         "bsm_sector": bsm_sector,
