@@ -1093,10 +1093,15 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
     Figure generator to plot the bounds of
     the BSM coefficients fitted.
-    Paramaters
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-        n_sigma: number
+    fits: NSList of FitSpec 
+    
+    bsm_names_to_latex: dict or None
+
+    bsm_names_to_plot_scales: dict or None
+
     The plot contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the confidence levels by 
