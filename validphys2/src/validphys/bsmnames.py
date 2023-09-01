@@ -58,7 +58,7 @@ def get_bsm_data(
     # default value
     new_bsm_fac_data_names = None
 
-    if all(bsm_fac_data, bsm_order, bsm_sector_data):
+    if all((bsm_fac_data, bsm_order, bsm_sector_data)):
         new_bsm_fac_data_names = [
         bsm_order + "_" + op if op in bsm_sector_data[bsm_sector] else "None_" + op
         for op in bsm_fac_data_names
