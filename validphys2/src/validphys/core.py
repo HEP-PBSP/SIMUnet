@@ -952,10 +952,19 @@ class FixedObservableSpec:
                 )
             else:
                 with open(path, "rb") as stream:
-                    cfac = parse_cfactor(stream)
-                    # TODO: Don't do this
-                    cfac.central_value -= 1
-                    # cfac.uncertainty = ???
+                    cfac_file = yaml.safe_load(stream)
+                    eft_order = name.split("_")[0] + "_" + name.split("_")[1]
+                    eft_operator = name.split("_")[2]
+                    central_value = np.array(cfac_file[eft_order][eft_operator]) - 1
+                    cfac = CFactorData(
+                        description=cfac_file["ref"],
+                        central_value=central_value,
+                        uncertainty=np.zeros(len(central_value)),
+                    )
+                    # cfac = parse_cfactor(stream)
+                    # # TODO: Don't do this
+                    # cfac.central_value -= 1
+                    # # cfac.uncertainty = ???
             name_cf_map[name] = cfac
         return name_cf_map
 
