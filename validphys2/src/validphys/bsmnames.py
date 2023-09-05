@@ -51,9 +51,9 @@ def get_bsm_data(
     """
 
     
-    # Raise error if bsm_order is not either LO_LIN or NLO_LIN
-    if bsm_order not in (None, 'EFT_LO', 'EFT_NLO'):
-        raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
+    # # Raise error if bsm_order is not either LO_LIN or NLO_LIN
+    # if bsm_order not in (None, 'EFT_LO', 'EFT_NLO'):
+    #     raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
     
     # default value
     new_bsm_fac_data_names = None
