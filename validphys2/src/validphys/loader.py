@@ -477,21 +477,31 @@ class Loader(LoaderBase):
         ]
 
     def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
+        """
+        TODO
+        Parameters
+        ----------
+        setname:
+        bsm_fac_data_names:
+        theoryid:
+        Returns
+        -------
+        dict
+        """
         _, theopath = self.check_theoryID(theoryid)
         bsm_fac_names_paths = {}
-        for bsm_fac_data_name in bsm_fac_data_names:
-            cfactorpath = (
-                theopath / 'bsm_factors' / f'BSM_{bsm_fac_data_name}_{setname}.dat'
-            )
 
-            # If we are expecting a BSM factor, we should check that the path actually exists.
-            if bsm_fac_data_name[:4] != "None":
-                if not cfactorpath.exists():
-                    msg = (
-                        f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
-                        f"The path {cfactorpath} does not exist."
-                    )
-                    raise CfactorNotFound(msg)
+        cfactorpath = theopath / "bsm_factors" / f"BSM_{setname}.yaml"
+
+        if not cfactorpath.exists():
+            msg = (
+                f"Could not find a BSM factor for setname in {theopath}. "
+                f"The path {cfactorpath} does not exist."
+            )
+            raise CfactorNotFound(msg)
+        
+        # assign to each operator name the same cfactorpath
+        for bsm_fac_data_name in bsm_fac_data_names:
             bsm_fac_names_paths[bsm_fac_data_name] = cfactorpath
 
         return bsm_fac_names_paths
