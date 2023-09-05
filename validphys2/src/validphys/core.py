@@ -957,7 +957,7 @@ class FixedObservableSpec:
                     eft_operator = name.split("_")[2]
                     central_value = np.array(cfac_file[eft_order][eft_operator]) - 1
                     cfac = CFactorData(
-                        description=cfac_file["ref"],
+                        description=path,
                         central_value=central_value,
                         uncertainty=np.zeros(len(central_value)),
                     )

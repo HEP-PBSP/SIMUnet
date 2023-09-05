@@ -93,13 +93,15 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
         else:
             with open(path, "rb") as stream:
                 cfac_file = yaml.safe_load(stream)
-                eft_order = name.split("_")[0] + "_" + name.split("_")[1]
-                eft_operator = name.split("_")[2]
+                eft_order = "_".join(name.split("_")[:-1])
+                eft_operator = name.split("_")[-1]
 
-                central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] - 1
+                SM_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
 
+                central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / SM_prediction
+                
                 cfac = CFactorData(
-                    description=cfac_file["ref"],
+                    description=path,
                     central_value=central_value,
                     uncertainty=None,
                 )
