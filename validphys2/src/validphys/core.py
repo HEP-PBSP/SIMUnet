@@ -960,7 +960,7 @@ class FixedObservableSpec:
                     
                     standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
 
-                    central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction - 1
+                    central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction
 
                     cfac = CFactorData(
                         description=path,
