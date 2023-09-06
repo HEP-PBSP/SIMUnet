@@ -931,10 +931,17 @@ class FixedObservableSpec:
 
     def load_pred(self):
         """Load the raw theory predictions (without wilson coefficients)"""
-        from validphys.fkparser import parse_cfactor
+        from validphys.coredata import CFactorData
 
-        with open(self.pred_path, 'rb') as f:
-            return parse_cfactor(f)
+        with open(self.pred_path, 'rb') as stream:
+            cfac_file = yaml.safe_load(stream)
+            sm_fixed = np.array(cfac_file["SM_fixed"])
+
+            return CFactorData(
+                description=self.pred_path,
+                central_value=sm_fixed,
+                uncertainty=np.zeros(len(sm_fixed))
+            )
 
     def _load_bsm_values(self, inp):
         """

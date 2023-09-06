@@ -660,7 +660,7 @@ class Loader(LoaderBase):
         setname = fixed_observable_input.dataset
         cd = self.check_commondata(setname)
         theoryid = self.check_theoryID(theoryid)
-        pred_path = theoryid.path / 'fixed' / f'FIXED_{setname}.dat'
+        pred_path = theoryid.path / 'bsm_factors' / f'BSM_{setname}.yaml'
         if not pred_path.is_file():
             raise FixedPredictionNotFound(
                 f"Could not find fixed prediction for set {setname}. "
