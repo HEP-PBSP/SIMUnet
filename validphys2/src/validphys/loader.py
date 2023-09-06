@@ -478,16 +478,22 @@ class Loader(LoaderBase):
 
     def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
         """
-        TODO
         Parameters
         ----------
-        setname:
-        bsm_fac_data_names:
-        theoryid:
+        setname: str
+                name of the dataset
+
+        bsm_fac_data_names: list
+                list containing the joined `bsm_order` and operator
+
+        theoryid: str
+        
         Returns
         -------
         dict
+
         """
+
         _, theopath = self.check_theoryID(theoryid)
         bsm_fac_names_paths = {}
 
