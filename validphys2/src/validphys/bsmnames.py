@@ -21,9 +21,9 @@ def get_bsm_data(
     return names of bsm kfactors stored in the data/bsm_factors
     folder.
 
-
     The output is used by config.parse_dataset_input to add
     bsm_fac_data_names to the DataSetInput class constructor.
+
 
     Parameters
     ----------
@@ -49,12 +49,6 @@ def get_bsm_data(
     
 
     """
-
-    
-    # # Raise error if bsm_order is not either LO_LIN or NLO_LIN
-    # if bsm_order not in (None, 'EFT_LO', 'EFT_NLO'):
-    #     raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
-    
     # default value
     new_bsm_fac_data_names = None
 

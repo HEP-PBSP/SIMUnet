@@ -937,8 +937,10 @@ class FixedObservableSpec:
             return parse_cfactor(f)
 
     def _load_bsm_values(self, inp):
+        """
+        TODO
+        """
         from validphys.coredata import CFactorData
-        from validphys.fkparser import parse_cfactor
 
         if inp is None:
             return None
@@ -953,18 +955,19 @@ class FixedObservableSpec:
             else:
                 with open(path, "rb") as stream:
                     cfac_file = yaml.safe_load(stream)
-                    eft_order = name.split("_")[0] + "_" + name.split("_")[1]
-                    eft_operator = name.split("_")[2]
-                    central_value = np.array(cfac_file[eft_order][eft_operator]) - 1
+                    eft_order = "_".join(name.split("_")[:-1])
+                    eft_operator = name.split("_")[-1]
+                    
+                    standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
+
+                    central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction - 1
+
                     cfac = CFactorData(
                         description=path,
                         central_value=central_value,
                         uncertainty=np.zeros(len(central_value)),
                     )
-                    # cfac = parse_cfactor(stream)
-                    # # TODO: Don't do this
-                    # cfac.central_value -= 1
-                    # # cfac.uncertainty = ???
+                    
             name_cf_map[name] = cfac
         return name_cf_map
 

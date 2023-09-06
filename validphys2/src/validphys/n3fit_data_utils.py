@@ -96,9 +96,9 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
                 eft_order = "_".join(name.split("_")[:-1])
                 eft_operator = name.split("_")[-1]
 
-                SM_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
+                standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
 
-                central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / SM_prediction - 1
+                central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / standard_model_prediction - 1
                 
                 cfac = CFactorData(
                     description=path,
