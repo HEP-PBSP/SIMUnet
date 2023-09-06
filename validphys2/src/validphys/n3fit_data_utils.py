@@ -75,7 +75,20 @@ def fk_parser(fk, is_hadronic=False):
 
 def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
     """
-    TODO
+    Returns a dictionary containing the bsm k-factor corrections 
+    to be applied to the theory predictions.
+
+    Parameters
+    ----------
+    bsm_fac_data_names_CF: dict or NoneType
+
+    cuts: validphys.core.InternalCutsWrapper
+
+    Returns
+    -------
+    dict
+        dictionary with (key, value) = (EFT-Order_Name-Operator, coredata.CFactorData)
+        
     """
     if bsm_fac_data_names_CF is None:
         return None
@@ -103,7 +116,7 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
                 cfac = CFactorData(
                     description=path,
                     central_value=central_value,
-                    uncertainty=None,
+                    uncertainty=np.zeros(len(cuts)),
                 )
         
         name_cfac_map[name] = cfac

@@ -938,10 +938,24 @@ class FixedObservableSpec:
 
     def _load_bsm_values(self, inp):
         """
-        TODO
+        For fixed observables (PDF independent), loads the EFT correction
+        stored in the `theoryid/BSM_namedataset.yaml` file to the specified 
+        order in perturbation theory and constructs a k-factor correction 
+        from the SM prediction computed at the same order in perturbation theory.
+
+
+        Parameters
+        ----------
+        inp: dict
+            dictionary with key computed from bsmnames.get_bsm_data
+            and values paths to the yaml file containing bsm corrections.
+
+        Returns
+        -------
+        dict
+
         """
         from validphys.coredata import CFactorData
-
         if inp is None:
             return None
         name_cf_map = {}
