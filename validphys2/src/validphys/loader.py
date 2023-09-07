@@ -655,7 +655,6 @@ class Loader(LoaderBase):
         fixed_observable_input,
         theoryid,
         bsm_fac_data_names=None,
-        bsm_sector=None,
     ):
         setname = fixed_observable_input.dataset
         cd = self.check_commondata(setname)
@@ -686,7 +685,6 @@ class Loader(LoaderBase):
             frac=fixed_observable_input.frac,
             bsm_fac_data_names_CF_data=bsm_fac_data_names_CF,
             bsm_fac_data_names=bsm_fac_data_names,
-            bsm_sector=bsm_sector,
         )
 
 

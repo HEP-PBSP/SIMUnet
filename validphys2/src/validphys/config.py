@@ -320,13 +320,12 @@ class CoreConfig(configparser.Config):
         thid = theory["theoryid"]
 
         _, bsmfacdata = self.parse_from_("fit", "bsm_fac_data", write=False)
-        _, bsmsecdata = self.parse_from_("fit", "bsm_sector_data", write=False)
 
         data_input = self._parse_data_input_from_(
-            "fit", {"theoryid": thid, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
+            "fit", {"theoryid": thid, "bsm_fac_data": bsmfacdata}
         )
 
-        return {"theoryid": thid, "data_input": data_input, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
+        return {"theoryid": thid, "data_input": data_input, "bsm_fac_data": bsmfacdata}
 
     def produce_fitpdf(self, fit):
         """Like ``fitcontext`` only setting the PDF"""
@@ -491,19 +490,11 @@ class CoreConfig(configparser.Config):
             return bsm_fac_data_scales
         return []
 
-    def parse_bsm_sector_data(self, bsm_sector_data=None):
-        if bsm_sector_data is not None:
-            new_bsm_sector_data = {}
-            for entry in bsm_sector_data:
-                new_bsm_sector_data[entry['name']] = entry['operators']
-            return new_bsm_sector_data
-        return {}
-
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_order"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -534,14 +525,11 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_sector = dataset.get("bsm_sector")
         bsm_order = dataset.get("bsm_order")
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_sector,
             bsm_order,
             bsm_fac_data,
-            bsm_sector_data,
             bsm_fac_data_names,
             n_bsm_fac_data,
         )
@@ -1832,19 +1820,15 @@ class CoreConfig(configparser.Config):
         fixed_observable_input,
         theoryid,
         bsm_fac_data=None,
-        bsm_sector_data=None,
         bsm_fac_data_names=None,
         n_bsm_fac_data=None,
     ):
 
-        bsm_sector = fixed_observable_input.bsm_sector
         bsm_order = fixed_observable_input.bsm_order
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_sector,
             bsm_order,
             bsm_fac_data,
-            bsm_sector_data,
             bsm_fac_data_names,
             n_bsm_fac_data,
         )
@@ -1864,7 +1848,6 @@ class CoreConfig(configparser.Config):
         fixed_observable_inputs,
         theoryid,
         bsm_fac_data=None,
-        bsm_sector_data=None,
         bsm_fac_data_names=None,
         n_bsm_fac_data=None,
     ):
@@ -1876,7 +1859,6 @@ class CoreConfig(configparser.Config):
                     f,
                     theoryid.id,
                     bsm_fac_data=bsm_fac_data,
-                    bsm_sector_data=bsm_sector_data,
                     bsm_fac_data_names=bsm_fac_data_names,
                     n_bsm_fac_data=n_bsm_fac_data,
                 )

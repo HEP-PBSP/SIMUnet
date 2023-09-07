@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_sector):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -332,7 +332,6 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_sector = bsm_sector
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -895,7 +894,6 @@ class FixedObservableInput:
     dataset: str
     weight: float = 1.
     frac: float = 1.
-    bsm_sector: Optional[str] = None
     bsm_order: Optional[str] = None
 
 
@@ -912,7 +910,6 @@ class FixedObservableSpec:
     custom_group: Optional[str] = None
     bsm_fac_data_names_CF_data: tuple = ()
     bsm_fac_data_names: tuple = ()
-    bsm_sector: str = None
 
     @property
     def bsm_fac_data_names_CF(self):
@@ -935,6 +932,7 @@ class FixedObservableSpec:
 
         with open(self.pred_path, 'rb') as stream:
             cfac_file = yaml.safe_load(stream)
+            # TODO: add test here that raises appropriate error if SM_fixed is not present as a key
             sm_fixed = np.array(cfac_file["SM_fixed"])
 
             return CFactorData(
@@ -967,27 +965,29 @@ class FixedObservableSpec:
             return None
         name_cf_map = {}
         for name, path in inp.items():
-            if name[:4] == "None":
+            # load SIMU yaml file
+            with open(path, "rb") as stream:
+                cfac_file = yaml.safe_load(stream)
+            eft_order = "_".join(name.split("_")[:-1])
+            eft_operator = name.split("_")[-1]
+
+            if eft_operator not in cfac_file[eft_order]:
+                # make dummy BSM-factor
                 cfac = CFactorData(
                     description="dummy",
                     central_value=np.zeros(self.commondata.ndata),
                     uncertainty=np.zeros(self.commondata.ndata),
                 )
             else:
-                with open(path, "rb") as stream:
-                    cfac_file = yaml.safe_load(stream)
-                    eft_order = "_".join(name.split("_")[:-1])
-                    eft_operator = name.split("_")[-1]
-                    
-                    standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
+                # TODO: add a test here to make sure that SM is a key and raise appropriate exception if this is not the case
+                standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
+                central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction
 
-                    central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction
-
-                    cfac = CFactorData(
-                        description=path,
-                        central_value=central_value,
-                        uncertainty=np.zeros(len(central_value)),
-                    )
+                cfac = CFactorData(
+                    description=path,
+                    central_value=central_value,
+                    uncertainty=np.zeros(len(central_value)),
+                )
                     
             name_cf_map[name] = cfac
         return name_cf_map

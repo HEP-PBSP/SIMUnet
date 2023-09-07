@@ -88,7 +88,7 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
     -------
     dict
         dictionary with (key, value) = (EFT-Order_Name-Operator, coredata.CFactorData)
-        
+
     """
     if bsm_fac_data_names_CF is None:
         return None
@@ -96,24 +96,22 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
         cuts = cuts.load()
     name_cfac_map = {}
     for name, path in bsm_fac_data_names_CF.items():
+        # load SIMU yaml file
+        with open(path, "rb") as stream:
+            cfac_file = yaml.safe_load(stream)
+        eft_order = "_".join(name.split("_")[:-1])
+        eft_operator = name.split("_")[-1]
 
-        if name[:4] == "None":
-            # Now is the time to make a dummy BSM-factor
-            central = np.array([0.0]*len(cuts))
-            uncertainty = np.array([0.0]*len(cuts))
+        if eft_operator not in cfac_file[eft_order]:
+            # make dummy BSM-factor
+            central = np.zeros(len(cuts))
+            uncertainty = np.zeros(len(cuts))
             cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
-
         else:
-            with open(path, "rb") as stream:
-                cfac_file = yaml.safe_load(stream)
-                eft_order = "_".join(name.split("_")[:-1])
-                eft_operator = name.split("_")[-1]
-
-                standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
-
-                central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / standard_model_prediction
-                
-                cfac = CFactorData(
+            # TODO: add a test here to make sure that SM is a key and raise appropriate exception if this is not the case
+            standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
+            central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / standard_model_prediction
+            cfac = CFactorData(
                     description=path,
                     central_value=central_value,
                     uncertainty=np.zeros(len(cuts)),
