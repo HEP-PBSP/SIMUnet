@@ -494,7 +494,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_order"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -525,10 +525,10 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_order = dataset.get("bsm_order")
+        simu_fac = dataset.get("simu_fac")
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_order,
+            simu_fac,
             bsm_fac_data,
             bsm_fac_data_names,
             n_bsm_fac_data,
@@ -1824,10 +1824,10 @@ class CoreConfig(configparser.Config):
         n_bsm_fac_data=None,
     ):
 
-        bsm_order = fixed_observable_input.bsm_order
+        simu_fac = fixed_observable_input.simu_fac
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_order,
+            simu_fac,
             bsm_fac_data,
             bsm_fac_data_names,
             n_bsm_fac_data,

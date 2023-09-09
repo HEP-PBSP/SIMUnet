@@ -9,7 +9,7 @@ def linear_datum_to_op(name:str):
     return name.rsplit("_", 1)[1]
 
 def get_bsm_data(
-    bsm_order,
+    simu_fac,
     bsm_fac_data,
     bsm_fac_data_names,
     n_bsm_fac_data
@@ -24,7 +24,7 @@ def get_bsm_data(
 
     Parameters
     ----------
-    bsm_order : str,
+    simu_fac : str,
             specifies the order of the bsm k-factors
 
     bsm_fac_data : list
@@ -45,9 +45,9 @@ def get_bsm_data(
     # default value
     new_bsm_fac_data_names = None
 
-    if bsm_fac_data is not None and bsm_order is not None:
+    if bsm_fac_data is not None and simu_fac is not None:
         new_bsm_fac_data_names = [
-        bsm_order + "_" + op for op in bsm_fac_data_names
+        simu_fac + "_" + op for op in bsm_fac_data_names
         ]
         
     return {

@@ -894,7 +894,7 @@ class FixedObservableInput:
     dataset: str
     weight: float = 1.
     frac: float = 1.
-    bsm_order: Optional[str] = None
+    simu_fac: Optional[str] = None
 
 
 @dataclasses.dataclass(frozen=True)

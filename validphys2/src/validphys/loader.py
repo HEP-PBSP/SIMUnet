@@ -484,7 +484,7 @@ class Loader(LoaderBase):
                 name of the dataset
 
         bsm_fac_data_names: list
-                list containing the joined `bsm_order` and operator
+                list containing the joined `simu_fac` and operator
 
         theoryid: str
         
