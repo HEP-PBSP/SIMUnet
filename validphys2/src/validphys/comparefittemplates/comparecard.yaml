@@ -148,5 +148,28 @@ DataGroups:
 ProcessGroup:
     metadata_group: nnpdf31_process
 
+bsm_fac_data:
+- {name: 'OtG', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'Opt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OtZ', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OtW', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O3pQ3', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OpQM', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O1qd', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O1qu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O1dt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O1qt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O1ut', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O11qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O13qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O8qd', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O8qu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O8dt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O8qt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O8ut', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O81qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+- {name: 'O83qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+
+
 actions_:
   - report(main=true)
