@@ -169,11 +169,7 @@ bsm_fac_data:
  - {name: 'O8ut', scale: 1, latex: '$c_{ut}^{8}$', plot_scale: 1} 
  - {name: 'O81qq', scale: 1, latex: '$c_{Qq}^{8,1}$', plot_scale: 1} 
  - {name: 'O83qq', scale: 1, latex: '$c_{Qq}^{8,3}$', plot_scale: 1}
- - {name: 'OQt8', scale: 1, latex: '$c_{Qt}^{8}$', plot_scale: 1}
- - {name: 'OQQ1', scale: 1, latex: '$c_{QQ}^{1}$', plot_scale: 1}
- - {name: 'OQQ8', scale: 1, latex: '$c_{QQ}^{8}$', plot_scale: 1}
- - {name: 'OQt1', scale: 1, latex: '$c_{Qt}^{1}$', plot_scale: 1}
- - {name: 'Ott1', scale: 1, latex: '$c_{tt}^{1}$', plot_scale: 1}
+ 
 
 actions_:
   - report(main=true)
