@@ -73,14 +73,14 @@ def fk_parser(fk, is_hadronic=False):
     }
     return dict_out
 
-def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
+def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
     """
     Returns a dictionary containing the bsm k-factor corrections 
     to be applied to the theory predictions.
 
     Parameters
     ----------
-    bsm_fac_data_names_CF: dict or NoneType
+    simu_parameters_names_CF: dict or NoneType
 
     cuts: validphys.core.InternalCutsWrapper
 
@@ -90,12 +90,12 @@ def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
         dictionary with (key, value) = (EFT-Order_Name-Operator, coredata.CFactorData)
 
     """
-    if bsm_fac_data_names_CF is None:
+    if simu_parameters_names_CF is None:
         return None
     if hasattr(cuts, 'load'):
         cuts = cuts.load()
     name_cfac_map = {}
-    for name, path in bsm_fac_data_names_CF.items():
+    for name, path in simu_parameters_names_CF.items():
         # load SIMU yaml file
         with open(path, "rb") as stream:
             cfac_file = yaml.safe_load(stream)
@@ -168,8 +168,8 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
-        "bsm_fac_data_names_CF": parse_bsm_fac_data_names_CF(dataset_spec.bsm_fac_data_names_CF, cuts),
-        "bsm_fac_data_names": dataset_spec.bsm_fac_data_names,
+        "simu_parameters_names_CF": parse_simu_parameters_names_CF(dataset_spec.simu_parameters_names_CF, cuts),
+        "simu_parameters_names": dataset_spec.simu_parameters_names,
     }
 
     return [dataset_dict]

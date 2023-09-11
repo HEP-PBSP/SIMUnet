@@ -324,14 +324,14 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names):
         self.name=name
         self.sys=sys
         self.cfac = cfac
         self.frac = frac
         self.weight = weight
         self.custom_group = custom_group
-        self.bsm_fac_data_names = bsm_fac_data_names
+        self.simu_parameters_names = simu_parameters_names
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -460,7 +460,7 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_data_names=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None):
         self.name = name
         self.commondata = commondata
 
@@ -471,10 +471,10 @@ class DataSetSpec(TupleComp):
 
         self.cuts = cuts
         self.frac = frac
-        self.bsm_fac_data_names_CF = bsm_fac_data_names_CF 
+        self.simu_parameters_names_CF = simu_parameters_names_CF 
 
         # These are important because they are ORDERED correctly, but the dictionaries might not be
-        self.bsm_fac_data_names = bsm_fac_data_names
+        self.simu_parameters_names = simu_parameters_names
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere
@@ -664,7 +664,7 @@ class FitSpec(TupleComp):
             for vari in to_take_out:
                 if vari in fitting and vari not in d:
                     d[vari] = fitting[vari]
-        d.setdefault("bsm_fac_data", None)
+        d.setdefault("simu_parameters", None)
         d.setdefault("bsm_sector_data", None)
         return d
 
@@ -908,12 +908,12 @@ class FixedObservableSpec:
     frac: float = 1
     # Note: This is not a dict as we want it to be hashable
     custom_group: Optional[str] = None
-    bsm_fac_data_names_CF_data: tuple = ()
-    bsm_fac_data_names: tuple = ()
+    simu_parameters_names_CF_data: tuple = ()
+    simu_parameters_names: tuple = ()
 
     @property
-    def bsm_fac_data_names_CF(self):
-        return dict(self.bsm_fac_data_names_CF_data)
+    def simu_parameters_names_CF(self):
+        return dict(self.simu_parameters_names_CF_data)
 
     # Bogus cuts to make this more compatible with the usual data
     @property
@@ -993,7 +993,7 @@ class FixedObservableSpec:
         return name_cf_map
 
     def load_bsm(self):
-        return self._load_bsm_values(self.bsm_fac_data_names_CF)
+        return self._load_bsm_values(self.simu_parameters_names_CF)
 
 
     def load(self):

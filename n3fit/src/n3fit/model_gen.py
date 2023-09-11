@@ -126,15 +126,15 @@ class ObservableWrapper:
             zip(self.spec_dict['datasets'], output_layers)
         ):
             # Use get here to prevent having to worry about POSDATSETS
-            bsm_fac_data_names_CF = dataset_dict.get('bsm_fac_data_names_CF')
-            bsm_fac_data_names = dataset_dict.get('bsm_fac_data_names')
+            simu_parameters_names_CF = dataset_dict.get('simu_parameters_names_CF')
+            simu_parameters_names = dataset_dict.get('simu_parameters_names')
 
-            if bsm_fac_data_names_CF is not None:
+            if simu_parameters_names_CF is not None:
 
-                # coefficients = np.array([bsm_fac_data_names_CF[i].central_value for i in bsm_fac_data_names])
+                # coefficients = np.array([simu_parameters_names_CF[i].central_value for i in simu_parameters_names])
                 coefficients = {
                     bsmnames.linear_datum_to_op(k): v.central_value
-                    for k, v in bsm_fac_data_names_CF.items()
+                    for k, v in simu_parameters_names_CF.items()
                 }
 
                 if self.split == 'ex':

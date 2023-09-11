@@ -11,7 +11,7 @@ def linear_datum_to_op(name:str):
 def get_bsm_data(
     simu_fac,
     simu_parameters,
-    bsm_fac_data_names,
+    simu_parameters_names,
     n_simu_parameters
 ):
     """
@@ -20,7 +20,7 @@ def get_bsm_data(
     folder.
 
     The output is used by config.parse_dataset_input to add
-    bsm_fac_data_names to the DataSetInput class constructor.
+    simu_parameters_names to the DataSetInput class constructor.
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def get_bsm_data(
             specifies the order of the bsm k-factors
 
     simu_parameters : list
-    bsm_fac_data_names : list
+    simu_parameters_names : list
                         list containing names of the dimension 6 operators
                         read from the runcard with production rule
     n_simu_parameters: int
@@ -36,20 +36,20 @@ def get_bsm_data(
     Returns
     -------
     dict
-        - bsm_fac_data_names : list containing names of bsm k-factors
+        - simu_parameters_names : list containing names of bsm k-factors
 
         - bsm_sector : str
     
 
     """
     # default value
-    new_bsm_fac_data_names = None
+    new_simu_parameters_names = None
 
     if simu_parameters is not None and simu_fac is not None:
-        new_bsm_fac_data_names = [
-        simu_fac + "_" + op for op in bsm_fac_data_names
+        new_simu_parameters_names = [
+        simu_fac + "_" + op for op in simu_parameters_names
         ]
         
     return {
-        "bsm_fac_data_names": new_bsm_fac_data_names,
+        "simu_parameters_names": new_simu_parameters_names,
     }

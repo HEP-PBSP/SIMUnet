@@ -467,7 +467,7 @@ class CoreConfig(configparser.Config):
             bsm_fac_initialisations.append(init)
         return bsm_fac_initialisations
 
-    def produce_bsm_fac_data_names(self, simu_parameters=None):
+    def produce_simu_parameters_names(self, simu_parameters=None):
         """
         Produces the list of the names of the
         BSM coefficients to include in the fit.
@@ -491,7 +491,7 @@ class CoreConfig(configparser.Config):
         return []
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
+    def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
@@ -530,7 +530,7 @@ class CoreConfig(configparser.Config):
         bsm_data = bsmnames.get_bsm_data(
             simu_fac,
             simu_parameters,
-            bsm_fac_data_names,
+            simu_parameters_names,
             n_simu_parameters,
         )
 
@@ -717,7 +717,7 @@ class CoreConfig(configparser.Config):
         cfac = dataset_input.cfac
         frac = dataset_input.frac
         weight = dataset_input.weight
-        bsm_fac_data_names = dataset_input.bsm_fac_data_names
+        simu_parameters_names = dataset_input.simu_parameters_names
 
         try:
             ds = self.loader.check_dataset(
@@ -730,7 +730,7 @@ class CoreConfig(configparser.Config):
                 use_fitcommondata=use_fitcommondata,
                 fit=fit,
                 weight=weight,
-                bsm_fac_data_names=bsm_fac_data_names,
+                simu_parameters_names=simu_parameters_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
@@ -1820,7 +1820,7 @@ class CoreConfig(configparser.Config):
         fixed_observable_input,
         theoryid,
         simu_parameters=None,
-        bsm_fac_data_names=None,
+        simu_parameters_names=None,
         n_simu_parameters=None,
     ):
 
@@ -1829,7 +1829,7 @@ class CoreConfig(configparser.Config):
         bsm_data = bsmnames.get_bsm_data(
             simu_fac,
             simu_parameters,
-            bsm_fac_data_names,
+            simu_parameters_names,
             n_simu_parameters,
         )
 
@@ -1848,7 +1848,7 @@ class CoreConfig(configparser.Config):
         fixed_observable_inputs,
         theoryid,
         simu_parameters=None,
-        bsm_fac_data_names=None,
+        simu_parameters_names=None,
         n_simu_parameters=None,
     ):
         if fixed_observable_inputs is None:
@@ -1859,7 +1859,7 @@ class CoreConfig(configparser.Config):
                     f,
                     theoryid.id,
                     simu_parameters=simu_parameters,
-                    bsm_fac_data_names=bsm_fac_data_names,
+                    simu_parameters_names=simu_parameters_names,
                     n_simu_parameters=n_simu_parameters,
                 )
                 for f in fixed_observable_inputs

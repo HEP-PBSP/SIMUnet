@@ -42,7 +42,7 @@ def performfit(
     debug=False,
     maxcores=None,
     parallel_models=False, 
-    bsm_fac_data_names=None,
+    simu_parameters_names=None,
     bsm_initialisation_seed=0,
 ):
     """
@@ -204,7 +204,7 @@ def performfit(
             sum_rules=sum_rules,
             parallel_models=n_models,
             n_simu_parameters=n_simu_parameters,
-            bsm_fac_data_names=bsm_fac_data_names, 
+            simu_parameters_names=simu_parameters_names, 
             simu_parameters_scales=simu_parameters_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
             bsm_initialisation_seed=bsm_initialisation_seed,

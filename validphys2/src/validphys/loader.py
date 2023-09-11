@@ -476,14 +476,14 @@ class Loader(LoaderBase):
             for inp in default_filter_rules_input()
         ]
 
-    def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
+    def get_simu_parameters_name_dict(self, setname, simu_parameters_names, theoryid):
         """
         Parameters
         ----------
         setname: str
                 name of the dataset
 
-        bsm_fac_data_names: list
+        simu_parameters_names: list
                 list containing the joined `simu_fac` and operator
 
         theoryid: str
@@ -507,8 +507,8 @@ class Loader(LoaderBase):
             raise CfactorNotFound(msg)
         
         # assign to each operator name the same cfactorpath
-        for bsm_fac_data_name in bsm_fac_data_names:
-            bsm_fac_names_paths[bsm_fac_data_name] = cfactorpath
+        for simu_parameters_name in simu_parameters_names:
+            bsm_fac_names_paths[simu_parameters_name] = cfactorpath
 
         return bsm_fac_names_paths
 
@@ -526,7 +526,7 @@ class Loader(LoaderBase):
         use_fitcommondata=False,
         fit=None,
         weight=1,
-        bsm_fac_data_names=None,
+        simu_parameters_names=None,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -558,10 +558,10 @@ class Loader(LoaderBase):
             elif cuts is CutsPolicy.FROM_CUT_INTERSECTION_NAMESPACE:
                 raise LoaderError(f"Intersection cuts not supported in loader calls.")
 
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno)
+        if simu_parameters_names is not None:
+            simu_parameters_names_CF = self.get_simu_parameters_name_dict(name, simu_parameters_names, theoryno)
         else: 
-            bsm_fac_data_names_CF = None
+            simu_parameters_names_CF = None
 
         
         return DataSetSpec(
@@ -573,8 +573,8 @@ class Loader(LoaderBase):
             frac=frac,
             op=op,
             weight=weight,
-            bsm_fac_data_names_CF=bsm_fac_data_names_CF,
-            bsm_fac_data_names=bsm_fac_data_names,
+            simu_parameters_names_CF=simu_parameters_names_CF,
+            simu_parameters_names=simu_parameters_names,
         )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
@@ -654,7 +654,7 @@ class Loader(LoaderBase):
         self,
         fixed_observable_input,
         theoryid,
-        bsm_fac_data_names=None,
+        simu_parameters_names=None,
     ):
         setname = fixed_observable_input.dataset
         cd = self.check_commondata(setname)
@@ -666,16 +666,16 @@ class Loader(LoaderBase):
                 f"File {pred_path} not found."
             )
 
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(setname, bsm_fac_data_names, theoryid.id)
+        if simu_parameters_names is not None:
+            simu_parameters_names_CF = self.get_simu_parameters_name_dict(setname, simu_parameters_names, theoryid.id)
         else:
-            bsm_fac_data_names_CF = None
+            simu_parameters_names_CF = None
 
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names = tuple(bsm_fac_data_names)
+        if simu_parameters_names is not None:
+            simu_parameters_names = tuple(simu_parameters_names)
 
-        if bsm_fac_data_names_CF is not None:
-            bsm_fac_data_names_CF = tuple(bsm_fac_data_names_CF.items())
+        if simu_parameters_names_CF is not None:
+            simu_parameters_names_CF = tuple(simu_parameters_names_CF.items())
 
 
         return FixedObservableSpec(
@@ -683,8 +683,8 @@ class Loader(LoaderBase):
             commondata=cd,
             pred_path=pred_path,
             frac=fixed_observable_input.frac,
-            bsm_fac_data_names_CF_data=bsm_fac_data_names_CF,
-            bsm_fac_data_names=bsm_fac_data_names,
+            simu_parameters_names_CF_data=simu_parameters_names_CF,
+            simu_parameters_names=simu_parameters_names,
         )
 
 
