@@ -932,7 +932,6 @@ class FixedObservableSpec:
 
         with open(self.pred_path, 'rb') as stream:
             cfac_file = yaml.safe_load(stream)
-            # TODO: add test here that raises appropriate error if SM_fixed is not present as a key
             sm_fixed = np.array(cfac_file["SM_fixed"])
 
             return CFactorData(
