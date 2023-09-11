@@ -12,7 +12,7 @@ def get_bsm_data(
     simu_fac,
     simu_parameters,
     bsm_fac_data_names,
-    n_bsm_fac_data
+    n_simu_parameters
 ):
     """
     Given BSM specifications within dataset_inputs specs
@@ -31,7 +31,7 @@ def get_bsm_data(
     bsm_fac_data_names : list
                         list containing names of the dimension 6 operators
                         read from the runcard with production rule
-    n_bsm_fac_data: int
+    n_simu_parameters: int
 
     Returns
     -------

@@ -131,7 +131,7 @@ class ModelTrainer:
         fixed_pdf=False,
         pass_status="ok",
         failed_status="fail",
-        n_bsm_fac_data=0,
+        n_simu_parameters=0,
         bsm_fac_data_names=None,
         bsm_fac_data_scales=None,
         bsm_fac_initialisations=None,
@@ -174,7 +174,7 @@ class ModelTrainer:
                         whether sum rules should be enabled (All, MSR, VSR, False)
             parallel_models: int
                 number of models to fit in parallel
-            n_bsm_fac_data: int
+            n_simu_parameters: int
                 number of bsm coefficients in the fit
         """
         # Save all input information
@@ -194,7 +194,7 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
-        self.n_bsm_fac_data=n_bsm_fac_data
+        self.n_simu_parameters=n_simu_parameters
         self.bsm_fac_data_names=bsm_fac_data_names
         self.bsm_fac_data_scales = bsm_fac_data_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations

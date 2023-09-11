@@ -437,7 +437,7 @@ class CoreConfig(configparser.Config):
                 bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
             return bsm_names_to_plot_scales
 
-    def produce_n_bsm_fac_data(self, simu_parameters=None):
+    def produce_n_simu_parameters(self, simu_parameters=None):
         """
         Produces the number of BSM coefficients to include in the fit.
         """
@@ -491,7 +491,7 @@ class CoreConfig(configparser.Config):
         return []
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, simu_parameters=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
@@ -531,7 +531,7 @@ class CoreConfig(configparser.Config):
             simu_fac,
             simu_parameters,
             bsm_fac_data_names,
-            n_bsm_fac_data,
+            n_simu_parameters,
         )
 
 
@@ -1821,7 +1821,7 @@ class CoreConfig(configparser.Config):
         theoryid,
         simu_parameters=None,
         bsm_fac_data_names=None,
-        n_bsm_fac_data=None,
+        n_simu_parameters=None,
     ):
 
         simu_fac = fixed_observable_input.simu_fac
@@ -1830,7 +1830,7 @@ class CoreConfig(configparser.Config):
             simu_fac,
             simu_parameters,
             bsm_fac_data_names,
-            n_bsm_fac_data,
+            n_simu_parameters,
         )
 
 
@@ -1849,7 +1849,7 @@ class CoreConfig(configparser.Config):
         theoryid,
         simu_parameters=None,
         bsm_fac_data_names=None,
-        n_bsm_fac_data=None,
+        n_simu_parameters=None,
     ):
         if fixed_observable_inputs is None:
             fixed_observable_inputs = []
@@ -1860,7 +1860,7 @@ class CoreConfig(configparser.Config):
                     theoryid.id,
                     simu_parameters=simu_parameters,
                     bsm_fac_data_names=bsm_fac_data_names,
-                    n_bsm_fac_data=n_bsm_fac_data,
+                    n_simu_parameters=n_simu_parameters,
                 )
                 for f in fixed_observable_inputs
             ],
