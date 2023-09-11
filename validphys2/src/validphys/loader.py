@@ -495,22 +495,22 @@ class Loader(LoaderBase):
         """
 
         _, theopath = self.check_theoryID(theoryid)
-        bsm_fac_names_paths = {}
+        simu_fac_names_paths = {}
 
-        cfactorpath = theopath / "bsm_factors" / f"BSM_{setname}.yaml"
+        simufactorpath = theopath / "simu_factors" / f"SIMU_{setname}.yaml"
 
-        if not cfactorpath.exists():
+        if not simufactorpath.exists():
             msg = (
-                f"Could not find a BSM factor for setname in {theopath}. "
-                f"The path {cfactorpath} does not exist."
+                f"Could not find a SIMU factor for setname in {theopath}. "
+                f"The path {simufactorpath} does not exist."
             )
             raise CfactorNotFound(msg)
         
-        # assign to each operator name the same cfactorpath
+        # assign to each operator name the same simufactorpath
         for simu_parameters_name in simu_parameters_names:
-            bsm_fac_names_paths[simu_parameters_name] = cfactorpath
+            simu_fac_names_paths[simu_parameters_name] = simufactorpath
 
-        return bsm_fac_names_paths
+        return simu_fac_names_paths
 
    
     def check_dataset(
@@ -659,7 +659,7 @@ class Loader(LoaderBase):
         setname = fixed_observable_input.dataset
         cd = self.check_commondata(setname)
         theoryid = self.check_theoryID(theoryid)
-        pred_path = theoryid.path / 'bsm_factors' / f'BSM_{setname}.yaml'
+        pred_path = theoryid.path / 'simu_factors' / f'SIMU_{setname}.yaml'
         if not pred_path.is_file():
             raise FixedPredictionNotFound(
                 f"Could not find fixed prediction for set {setname}. "
