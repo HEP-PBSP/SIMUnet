@@ -108,7 +108,10 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
             uncertainty = np.zeros(len(cuts))
             cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
         else:
-            # TODO: add a test here to make sure that SM is a key and raise appropriate exception if this is not the case
+
+            if "SM" not in cfac_file[eft_order]:
+                raise KeyError(f"The 'SM' key is not present under the {eft_order} key in the SIMU file at {path}.")
+
             standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
             central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / standard_model_prediction
             cfac = CFactorData(

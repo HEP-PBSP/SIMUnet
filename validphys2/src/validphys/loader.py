@@ -506,6 +506,16 @@ class Loader(LoaderBase):
             )
             raise CfactorNotFound(msg)
         
+        # test whether all the mandatory keys are present
+        with open(simufactorpath, 'rb') as stream:
+            cfac_file = yaml.safe_load(stream)
+        
+        if "metadata" not in cfac_file:
+                raise KeyError(f"The 'metadata' key is not present in the SIMU file at {simufactorpath}.")
+
+        if "SM_fixed" not in cfac_file:
+                raise KeyError(f"The 'SM_fixed' key is not present in the SIMU file at {simufactorpath}.")
+
         # assign to each operator name the same simufactorpath
         for simu_parameters_name in simu_parameters_names:
             simu_fac_names_paths[simu_parameters_name] = simufactorpath
