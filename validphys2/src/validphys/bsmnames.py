@@ -10,7 +10,7 @@ def linear_datum_to_op(name:str):
 
 def get_bsm_data(
     simu_fac,
-    bsm_fac_data,
+    simu_parameters,
     bsm_fac_data_names,
     n_bsm_fac_data
 ):
@@ -27,7 +27,7 @@ def get_bsm_data(
     simu_fac : str,
             specifies the order of the bsm k-factors
 
-    bsm_fac_data : list
+    simu_parameters : list
     bsm_fac_data_names : list
                         list containing names of the dimension 6 operators
                         read from the runcard with production rule
@@ -45,7 +45,7 @@ def get_bsm_data(
     # default value
     new_bsm_fac_data_names = None
 
-    if bsm_fac_data is not None and simu_fac is not None:
+    if simu_parameters is not None and simu_fac is not None:
         new_bsm_fac_data_names = [
         simu_fac + "_" + op for op in bsm_fac_data_names
         ]

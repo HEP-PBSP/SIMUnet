@@ -247,12 +247,12 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
 
 @make_argcheck
 def _check_two_bsm_facs(fit):
-    cf = fit.as_input().get("bsm_fac_data", [])
+    cf = fit.as_input().get("simu_parameters", [])
     l = len(cf)
     check(
         l == 2,
         "Exactly two elements are required in "
-        f"`bsm_fac_data` for fit '{fit}', but {l} found.",
+        f"`simu_parameters` for fit '{fit}', but {l} found.",
     )
 
 @figure
