@@ -105,6 +105,19 @@ Contents
    tutorials/tutorials_overview.rst
    datasets.rst
    results/overview.rst
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Simunet Examples
+   :hidden:
+
+   tutorials.rst
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Simunet analysis files
+   :hidden:
+
    simunet_analysis.rst
    bibliography.rst
 
