@@ -26,7 +26,7 @@ def performfit(
     n_simu_parameters,
     basis,
     fitbasis,
-    bsm_fac_data_scales,
+    simu_parameters_scales,
     bsm_fac_initialisations,
     fixed_pdf_fit=False,
     sum_rules=True,
@@ -205,7 +205,7 @@ def performfit(
             parallel_models=n_models,
             n_simu_parameters=n_simu_parameters,
             bsm_fac_data_names=bsm_fac_data_names, 
-            bsm_fac_data_scales=bsm_fac_data_scales,
+            simu_parameters_scales=simu_parameters_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
             bsm_initialisation_seed=bsm_initialisation_seed,
         )

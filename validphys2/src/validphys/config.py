@@ -480,7 +480,7 @@ class CoreConfig(configparser.Config):
         return []
 
 
-    def produce_bsm_fac_data_scales(self, simu_parameters=None):
+    def produce_simu_parameters_scales(self, simu_parameters=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
         if simu_parameters is not None:
@@ -491,7 +491,7 @@ class CoreConfig(configparser.Config):
         return []
 
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_simu_parameters, simu_parameters=None):
+    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
