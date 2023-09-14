@@ -148,7 +148,7 @@ DataGroups:
 ProcessGroup:
     metadata_group: nnpdf31_process
 
-bsm_fac_data:
+simu_parameters:
  - {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 100}
  - {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$', plot_scale: 1}
  - {name: 'OtZ', scale: 1, latex: '$c_{tZ}$', plot_scale: 1}
