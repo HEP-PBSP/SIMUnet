@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, use_fixed_predictions):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -332,6 +332,7 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.simu_parameters_names = simu_parameters_names
+        self.use_fixed_predictions = use_fixed_predictions
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -534,9 +535,10 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False):
         self.fkpath = fkpath
         self.cfactors = cfactors
+        self.use_fixed_predictions = use_fixed_predictions
         super().__init__(fkpath, cfactors)
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying

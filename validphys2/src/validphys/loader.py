@@ -353,8 +353,14 @@ class Loader(LoaderBase):
         return cd.load()
 
     #   @functools.lru_cache()
-    def check_fktable(self, theoryID, setname, cfac):
+    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False):
         _, theopath = self.check_theoryID(theoryID)
+
+        if use_fixed_predictions:
+            fkpath = theopath/ 'fixed' / ('FIXED_%s.dat' % setname)
+            cfactors = self.check_cfactor(theoryID, setname, cfac)
+            return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True)
+
         fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
         if not fkpath.exists():
           raise FKTableNotFound(("Could not find FKTable for set '%s'. "
@@ -537,6 +543,7 @@ class Loader(LoaderBase):
         fit=None,
         weight=1,
         simu_parameters_names=None,
+        use_fixed_predictions=False,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -549,7 +556,7 @@ class Loader(LoaderBase):
         try:
             fkspec, op = self.check_compound(theoryno, name, cfac)
         except CompoundNotFound:
-            fkspec = self.check_fktable(theoryno, name, cfac)
+            fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions)
             op = None
 
         #Note this is simply for convenience when scripting. The config will

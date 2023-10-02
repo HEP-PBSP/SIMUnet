@@ -494,7 +494,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -507,6 +507,7 @@ class CoreConfig(configparser.Config):
         sysnum = dataset.get("sys")
         cfac = dataset.get("cfac", tuple())
         frac = dataset.get("frac", 1)
+        use_fixed_predictions = dataset.get("use_fixed_predictions", False)
         if not isinstance(frac, numbers.Real):
             raise ConfigError(f"'frac' must be a number, not '{frac}'")
         if frac < 0 or frac > 1:
@@ -534,7 +535,6 @@ class CoreConfig(configparser.Config):
             n_simu_parameters,
         )
 
-
         return DataSetInput(
             name=name,
             sys=sysnum,
@@ -542,6 +542,7 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
+            use_fixed_predictions=use_fixed_predictions,
             **bsm_data
         )
 
@@ -718,6 +719,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         simu_parameters_names = dataset_input.simu_parameters_names
+        use_fixed_predictions = dataset_input.use_fixed_predictions
 
         try:
             ds = self.loader.check_dataset(
@@ -731,6 +733,7 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 simu_parameters_names=simu_parameters_names,
+                use_fixed_predictions=use_fixed_predictions,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
