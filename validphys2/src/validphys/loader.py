@@ -357,9 +357,13 @@ class Loader(LoaderBase):
         _, theopath = self.check_theoryID(theoryID)
 
         if use_fixed_predictions:
-            fkpath = theopath/ 'fixed' / ('FIXED_%s.dat' % setname)
+            fkpath = theopath/ 'fastkernel' / ('FK_FAKEKTABLE.dat')
+            if not fkpath.exists():
+                raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
+            # Also set the fixed predictions path
+            fixed_predictions_path = theopath/ 'fixed' / ('FIXED_%s.dat' % setname)
             cfactors = self.check_cfactor(theoryID, setname, cfac)
-            return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True)
+            return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
 
         fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
         if not fkpath.exists():

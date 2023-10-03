@@ -53,20 +53,6 @@ class GridInfo:
 def load_fktable(spec):
     """Load the data corresponding to a FKSpec object. The cfactors
     will be applied to the grid."""
-
-    if spec.use_fixed_predictions:
-        # Create an FK-table filled with zeroes
-        # First need to obtain the amount of data
-        with open(spec.fkpath, "rb") as f:
-            fixed_predictions = parse_cfactor(f)
-            ndata = len(fixed_predictions.central_value)
-
-        zero_table = np.zeros((ndata, 11))
-        table_index = pd.MultiIndex.from_arrays([[i for i in range(ndata)], [0]*ndata], names=('data', 'x'))
-        tabledata = pd.DataFrame(zero_table, columns=[i for i in range(1,12)], index=table_index)
-
-        return FKTableData(hadronic=False, Q0=1.65, xgrid=[0.01], sigma=tabledata, ndata=ndata)
-
     with open_fkpath(spec.fkpath) as handle:
         tabledata = parse_fktable(handle)
     if not spec.cfactors:

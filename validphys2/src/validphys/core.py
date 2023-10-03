@@ -535,10 +535,11 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors, use_fixed_predictions=False):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
         self.fkpath = fkpath
         self.cfactors = cfactors
         self.use_fixed_predictions = use_fixed_predictions
+        self.fixed_predictions_path = fixed_predictions_path
         super().__init__(fkpath, cfactors)
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
