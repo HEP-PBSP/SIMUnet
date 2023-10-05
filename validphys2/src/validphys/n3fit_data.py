@@ -23,6 +23,13 @@ from validphys.n3fit_data_utils import (
     fixed_observables_with_pseudodata,
 )
 
+from validphys.core import FixedObservableInput
+from validphys.core import FixedObservableSpec
+
+from validphys.fkparser import parse_cfactor
+
+from pathlib import Path
+
 log = logging.getLogger(__name__)
 
 def replica_trvlseed(replica, trvlseed, same_trvl_per_replica=False):
@@ -206,7 +213,6 @@ def _mask_fk_tables(dataset_dicts, tr_masks):
 
     return np.concatenate(trmask_partial)
 
-
 def fitting_data_dict(
     data,
     fixed_observables,
@@ -258,6 +264,7 @@ def fitting_data_dict(
         'count_chi2'
             should this be counted towards the chi2
     """
+
     # TODO: Plug in the python data loading when available. Including but not
     # limited to: central values, ndata, replica generation, covmat construction
     if data.datasets:
@@ -268,6 +275,20 @@ def fitting_data_dict(
         ndata = spec_c.GetNData()
         expdata_true = spec_c.get_cv().reshape(1, ndata)
         datasets = common_data_reader_experiment(spec_c, data)
+        for i in range(len(data.datasets)):
+            if data.datasets[i].use_fixed_predictions:
+                datasets[i]['use_fixed_predictions'] = True
+                # Access the fixed_predictions
+                # Prepare the fixed observable path
+                path = ""
+                if str(data.datasets[i].fkspecs[0].fkpath).endswith('fastkernel/FK_FAKEKTABLE.dat'):
+                    prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
+                    path = Path(prefix + "fixed/" + 'FIXED_' + data.datasets[i].name + '.dat')
+                with open(path, 'rb') as f:
+                    fixed_predictions = parse_cfactor(f).central_value
+                datasets[i]['fixed_predictions'] = fixed_predictions
+            else:
+                datasets[i]['use_fixed_predictions'] = False
     else:
         ndata = 0
         expdata_true = np.array([])

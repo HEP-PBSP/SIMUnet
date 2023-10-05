@@ -17,7 +17,7 @@ import tensorflow as tf
 from validphys import bsmnames
 
 from n3fit.msr import msr_impose
-from n3fit.layers import DIS, DY, ObsRotation, losses
+from n3fit.layers import DIS, DY, Fixed, ObsRotation, losses
 from n3fit.layers import Preprocessing, FkRotation, FlavourToEvolution
 from n3fit.backends import MetaModel, Input
 from n3fit.backends import operations as op
@@ -246,10 +246,22 @@ def observable_generator(
         dataset_name = dataset_dict["name"]
 
         # Look at what kind of layer do we need for this dataset
-        if dataset_dict["hadronic"]:
-            Obs_Layer = DY
+        
+        # If there is a 'use_fixed_predictions' key, check if it's true
+        if 'use_fixed_predictions' in dataset_dict.keys():
+            if dataset_dict['use_fixed_predictions']:
+                Obs_Layer = Fixed
+            else:
+                if dataset_dict["hadronic"]:
+                    Obs_Layer = DY
+                else:
+                    Obs_Layer = DIS
         else:
-            Obs_Layer = DIS
+            # We are dealing with a positivity or integrability set
+            if dataset_dict["hadronic"]:
+                Obs_Layer = DY
+            else:
+                Obs_Layer = DIS
 
         # Set the operation (if any) to be applied to the fktables of this dataset
         operation_name = dataset_dict["operation"]
@@ -279,6 +291,8 @@ def observable_generator(
                 operation_name,
                 name=f"exp_{dataset_name}",
             )
+            if dataset_dict['use_fixed_predictions']:
+                obs_layer_ex.fixed_predictions = dataset_dict['fixed_predictions']
             obs_layer_tr = obs_layer_vl = obs_layer_ex
         else:
             obs_layer_tr = Obs_Layer(
@@ -299,6 +313,11 @@ def observable_generator(
                 operation_name,
                 name=f"val_{dataset_name}",
             )
+            if dataset_dict['use_fixed_predictions']:
+                mask = dataset_dict['ds_tr_mask']
+                obs_layer_tr.fixed_predictions = dataset_dict['fixed_predictions'][mask]
+                obs_layer_vl.fixed_predictions = dataset_dict['fixed_predictions'][~mask]
+                obs_layer_ex.fixed_predictions = dataset_dict['fixed_predictions']
 
         # To know how many xpoints we compute we are duplicating functionality from obs_layer
         if obs_layer_tr.splitting is None:
@@ -343,7 +362,6 @@ def observable_generator(
     else:
         obsrot_tr = None
         obsrot_vl = None
-
 
     out_tr = ObservableWrapper(
         spec_name,

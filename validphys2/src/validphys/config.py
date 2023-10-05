@@ -1854,6 +1854,7 @@ class CoreConfig(configparser.Config):
         simu_parameters_names=None,
         n_simu_parameters=None,
     ):
+
         if fixed_observable_inputs is None:
             fixed_observable_inputs = []
         return NSList(

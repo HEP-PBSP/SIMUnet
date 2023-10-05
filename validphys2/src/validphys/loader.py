@@ -596,6 +596,7 @@ class Loader(LoaderBase):
             weight=weight,
             simu_parameters_names_CF=simu_parameters_names_CF,
             simu_parameters_names=simu_parameters_names,
+            use_fixed_predictions=use_fixed_predictions,
         )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:

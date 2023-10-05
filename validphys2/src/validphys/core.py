@@ -461,9 +461,10 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, use_fixed_predictions=False):
         self.name = name
         self.commondata = commondata
+        self.use_fixed_predictions = use_fixed_predictions
 
         if isinstance(fkspecs, FKTableSpec):
             fkspecs = (fkspecs,)
@@ -485,7 +486,7 @@ class DataSetSpec(TupleComp):
         self.weight = weight
 
         super().__init__(name, commondata, fkspecs, thspec, cuts,
-                         frac, op, weight)
+                         frac, op, weight, use_fixed_predictions)
 
     @functools.lru_cache()
     def load(self):

@@ -17,6 +17,9 @@ dataset_inputs:
 #- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, frac: 0.75, bsm_sector: "tw", bsm_order: "LO_LIN"} 
 - {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "tw", bsm_order: "NLO_LIN", use_fixed_predictions: True}
 
+#fixed_observable_inputs:
+#- {dataset: ATLAS_CMS_WHEL_8TEV, bsm_sector: "tw", bsm_order: "NLO_LIN"}
+
 fixed_pdf_fit: False
 # load_weights_from_fit: 220907-jmm-fixed_test # If this is uncommented, training starts here.
 
@@ -99,26 +102,11 @@ fitting:
 positivity:
   posdatasets:
   - {dataset: POSF2U, maxlambda: 1e6}        # Positivity Lagrange Multiplier
-  - {dataset: POSF2DW, maxlambda: 1e6}
-  - {dataset: POSF2S, maxlambda: 1e6}
-  - {dataset: POSFLL, maxlambda: 1e6}
-  - {dataset: POSDYU, maxlambda: 1e10}
-  - {dataset: POSDYD, maxlambda: 1e10}
-  - {dataset: POSDYS, maxlambda: 1e10}
-  - {dataset: POSF2C, maxlambda: 1e6}
-  - {dataset: POSXUQ, maxlambda: 1e6}        # Positivity of MSbar PDFs
-  - {dataset: POSXUB, maxlambda: 1e6}
-  - {dataset: POSXDQ, maxlambda: 1e6}
-  - {dataset: POSXDB, maxlambda: 1e6}
-  - {dataset: POSXSQ, maxlambda: 1e6}
-  - {dataset: POSXSB, maxlambda: 1e6}
-  - {dataset: POSXGL, maxlambda: 1e6}
 
 ############################################################
 integrability:
   integdatasets:
   - {dataset: INTEGXT8, maxlambda: 1e2}
-  - {dataset: INTEGXT3, maxlambda: 1e2}
 
 ############################################################
 debug: false
