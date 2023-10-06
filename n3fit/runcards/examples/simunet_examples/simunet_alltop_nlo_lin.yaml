@@ -124,34 +124,30 @@ dataset_inputs:
 - {dataset: CMS_SINGLETOP_TCH_13TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
 - {dataset: CMS_SINGLETOP_TCH_13TEV_YTNORM, cfac: [QCD], simu_fac: "EFT_NLO"}
 # # # tW
-- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-- {dataset: ATLAS_SINGLETOPW_8TEV_SLEP_TOTAL, simu_fac: "EFT_NLO"}
-- {dataset: ATLAS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO"}
-- {dataset: CMS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-- {dataset: CMS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO"}
-- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, simu_fac: "EFT_NLO"}
-
-
-fixed_observable_inputs:
-# # WHel
-  - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO"}
-  - {dataset: ATLAS_CMS_WHEL_8TEV, simu_fac: "EFT_NLO"}
+- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_SINGLETOPW_8TEV_SLEP_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: CMS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: CMS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_CMS_WHEL_8TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
 # # ttgamma
-  - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO"}
+- {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
 # 4Heavy
-  - {dataset: ATLAS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: ATLAS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_TTBB_13TEV_ALLJET_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_TTBB_13TEV_DILEPTON_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: ATLAS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO"}
+- {dataset: ATLAS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: ATLAS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_TTBB_13TEV_ALLJET_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_TTBB_13TEV_DILEPTON_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: ATLAS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
 # # tz
-  - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO"}
-  - {dataset: CMS_SINGLETOPZ_13TEV_PTT, simu_fac: "EFT_LO"}
+- {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: CMS_SINGLETOPZ_13TEV_PTT, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
 fixed_pdf_fit: False
 # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
