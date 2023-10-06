@@ -131,9 +131,9 @@ class ModelTrainer:
         fixed_pdf=False,
         pass_status="ok",
         failed_status="fail",
-        n_bsm_fac_data=0,
-        bsm_fac_data_names=None,
-        bsm_fac_data_scales=None,
+        n_simu_parameters=0,
+        simu_parameters_names=None,
+        simu_parameters_scales=None,
         bsm_fac_initialisations=None,
         bsm_initialisation_seed=0,
         debug=False,
@@ -174,7 +174,7 @@ class ModelTrainer:
                         whether sum rules should be enabled (All, MSR, VSR, False)
             parallel_models: int
                 number of models to fit in parallel
-            n_bsm_fac_data: int
+            n_simu_parameters: int
                 number of bsm coefficients in the fit
         """
         # Save all input information
@@ -194,9 +194,9 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
-        self.n_bsm_fac_data=n_bsm_fac_data
-        self.bsm_fac_data_names=bsm_fac_data_names
-        self.bsm_fac_data_scales = bsm_fac_data_scales
+        self.n_simu_parameters=n_simu_parameters
+        self.simu_parameters_names=simu_parameters_names
+        self.simu_parameters_scales = simu_parameters_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
         self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
@@ -519,14 +519,14 @@ class ModelTrainer:
         #
 
         combiner = CombineCfacLayer(
-            scales=np.array(self.bsm_fac_data_scales, dtype=np.float32),
-            linear_names=self.bsm_fac_data_names,
+            scales=np.array(self.simu_parameters_scales, dtype=np.float32),
+            linear_names=self.simu_parameters_names,
             initialisations=self.bsm_fac_initialisations,
             initialisation_seed=self.bsm_initialisation_seed,
             replica_number=self.replicas[0],
         )
 
-        log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")
+        log.info(f"Using bsm_factor scales: {self.simu_parameters_scales}")
         self.combiner = combiner
   
         for exp_dict in self.exp_info:
@@ -1027,8 +1027,8 @@ class ModelTrainer:
 
         # Get the values of the Wilson coefficients, then appropriately rescale each one
         unscaled_coeffs=self.combiner.get_weights()[0]
-        scaled_coeffs=[unscaled_coeffs[i] / self.bsm_fac_data_scales[i] for i in range(len(unscaled_coeffs))]
+        scaled_coeffs=[unscaled_coeffs[i] / self.simu_parameters_scales[i] for i in range(len(unscaled_coeffs))]
 
-        dict_out['bsm_fac_df'] = pd.DataFrame([scaled_coeffs], columns=self.bsm_fac_data_names)
+        dict_out['bsm_fac_df'] = pd.DataFrame([scaled_coeffs], columns=self.simu_parameters_names)
 
         return dict_out

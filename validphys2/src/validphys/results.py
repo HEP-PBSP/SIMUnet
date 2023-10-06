@@ -38,7 +38,7 @@ from validphys.convolution import (
     PredictionsRequireCutsError,
 )
 
-from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 
 
 log = logging.getLogger(__name__)
@@ -328,7 +328,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
-    parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
+    parsed_bsm_facs = parse_simu_parameters_names_CF(dataset.simu_parameters_names_CF, dataset.cuts)
 
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep

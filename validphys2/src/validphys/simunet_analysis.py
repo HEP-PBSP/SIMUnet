@@ -36,7 +36,7 @@ from validphys.pdfbases import PDG_PARTONS
 from validphys.utils import split_ranges
 
 from validphys.loader import Loader
-from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
+from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 from validphys.loader import _get_nnpdf_profile
 
 from validphys.convolution import central_predictions
@@ -247,12 +247,12 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
 
 @make_argcheck
 def _check_two_bsm_facs(fit):
-    cf = fit.as_input().get("bsm_fac_data", [])
+    cf = fit.as_input().get("simu_parameters", [])
     l = len(cf)
     check(
         l == 2,
         "Exactly two elements are required in "
-        f"`bsm_fac_data` for fit '{fit}', but {l} found.",
+        f"`simu_parameters` for fit '{fit}', but {l} found.",
     )
 
 @figure
@@ -615,7 +615,7 @@ def plot_bsm_pdf_corr(
         yield fig, bsm_fac
 
 @figuregen
-def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
+def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -637,7 +637,7 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grid, Q, bsm_names_to_latex):
             # get PDF
             pdf = pdfs[fits.index(fit)]
             # get x_object
-            x_grid_obj = xplotting_grid 
+            x_grid_obj = xplotting_grids[fits.index(fit)] 
             if bsm_facs_df.get([bsm_fac]) is not None:
                 bsm_fac_vals = bsm_facs_df[bsm_fac].values
                 # Define xgrid and scale
@@ -1342,10 +1342,10 @@ Principal component analysis
 """
 
 @table
-def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Obtains the full Fisher information matrix for the BSM parameters.
     """
-    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf)
+    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
@@ -1395,7 +1395,7 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
     return fig
 
 @table
-def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Obtains the Fisher information matrices for each of the BSM sectors.
     """
     
@@ -1452,7 +1452,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         reduced_covmat = pd.concat(reduced_covmats, axis=1)
 
         # Hence construct the Fisher matrices
-        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, bsm_fac_data_names, pdf)]
+        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, simu_parameters_names, pdf)]
 
     # Now go through the matrices one-by-one, and take the diagonal
     fisher_diags_by_sector = []
@@ -1468,18 +1468,18 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
     for i in range(rows):
         array[i,:] = array[i,:] / sums[i]*100
 
-    df = pd.DataFrame(array, columns=all_sectors, index=bsm_fac_data_names)
+    df = pd.DataFrame(array, columns=all_sectors, index=simu_parameters_names)
     
     return df
 
-def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, bsm_fac_data_names, pdf):
+def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Computes a Fisher information matrix.
     """
     bsm_factors = []
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
-            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, bsm_fac_data_names=dataset.bsm_fac_data_names)
-            bsm_fac = parse_bsm_fac_data_names_CF(ds.bsm_fac_data_names_CF, cuts=ds.cuts)
+            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, simu_parameters_names=dataset.simu_parameters_names)
+            bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, cuts=ds.cuts)
             central_sm = central_predictions(ds, pdf)
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
@@ -1487,7 +1487,7 @@ def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theory
     if fixed_observables is not None:
         for fo in fixed_observables:
             cvs = fo.load_pred().central_value
-            bsm_fac = parse_bsm_fac_data_names_CF(fo.bsm_fac_data_names_CF, cuts=fo.cuts)
+            bsm_fac = parse_simu_parameters_names_CF(fo.simu_parameters_names_CF, cuts=fo.cuts)
             coefficients = cvs * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
@@ -1499,9 +1499,9 @@ def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theory
     inv_cov = np.linalg.inv(cov)
     fisher = bsm_factors.T @ inv_cov @ bsm_factors
 
-    fisher = pd.DataFrame(fisher, index=bsm_fac_data_names)
+    fisher = pd.DataFrame(fisher, index=simu_parameters_names)
     fisher = fisher.T
-    fisher.index = bsm_fac_data_names
+    fisher.index = simu_parameters_names
 
     return fisher
 
@@ -1516,11 +1516,11 @@ def principal_component_values(fisher_information_matrix):
     return values
 
 @table
-def principal_component_vectors(fisher_information_matrix, bsm_fac_data_names):
+def principal_component_vectors(fisher_information_matrix, simu_parameters_names):
     """Performs a principal component analysis to obtain the flat directions
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
     _, _, vectors = np.linalg.svd(fisher)
-    vectors = pd.DataFrame(vectors, columns=bsm_fac_data_names)
+    vectors = pd.DataFrame(vectors, columns=simu_parameters_names)
     return vectors

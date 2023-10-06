@@ -9,62 +9,47 @@ def linear_datum_to_op(name:str):
     return name.rsplit("_", 1)[1]
 
 def get_bsm_data(
-    bsm_sector,
-    bsm_order,
-    bsm_fac_data,
-    bsm_sector_data,
-    bsm_fac_data_names,
-    n_bsm_fac_data
+    simu_fac,
+    simu_parameters,
+    simu_parameters_names,
+    n_simu_parameters
 ):
     """
     Given BSM specifications within dataset_inputs specs
     return names of bsm kfactors stored in the data/bsm_factors
     folder.
 
-
     The output is used by config.parse_dataset_input to add
-    bsm_fac_data_names to the DataSetInput class constructor.
+    simu_parameters_names to the DataSetInput class constructor.
 
     Parameters
     ----------
-    bsm_sector : str
-    bsm_order : str,
-            specifies the order of the bsm k-factors. Options are:
-            - LO_LIN: LO in pQCD, LIN SMEFT correction
-            - NLO_LIN: NLO in pQCD, LIN SMEFT correction
+    simu_fac : str,
+            specifies the order of the bsm k-factors
 
-    bsm_fac_data : list
-    bsm_sector_data : list
-    bsm_fac_data_names : list
+    simu_parameters : list
+    simu_parameters_names : list
                         list containing names of the dimension 6 operators
                         read from the runcard with production rule
-    n_bsm_fac_data: int
+    n_simu_parameters: int
 
     Returns
     -------
     dict
-        - bsm_fac_data_names : list containing names of bsm k-factors
+        - simu_parameters_names : list containing names of bsm k-factors
 
         - bsm_sector : str
     
 
     """
-
-    
-    # Raise error if bsm_order is not either LO_LIN or NLO_LIN
-    if bsm_order not in (None, 'LO_LIN', 'NLO_LIN'):
-        raise ValueError(f"bsm_order must be either LO_LIN or NLO_LIN and not {bsm_order}")
-    
     # default value
-    new_bsm_fac_data_names = None
+    new_simu_parameters_names = None
 
-    if bsm_fac_data is not None and bsm_order is not None:
-        new_bsm_fac_data_names = [
-        bsm_order + "_" + op if op in bsm_sector_data[bsm_sector] else "None_" + op
-        for op in bsm_fac_data_names
+    if simu_parameters is not None and simu_fac is not None:
+        new_simu_parameters_names = [
+        simu_fac + "_" + op for op in simu_parameters_names
         ]
         
     return {
-        "bsm_fac_data_names": new_bsm_fac_data_names,
-        "bsm_sector": bsm_sector,
+        "simu_parameters_names": new_simu_parameters_names,
     }

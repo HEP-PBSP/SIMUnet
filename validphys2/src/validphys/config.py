@@ -319,14 +319,13 @@ class CoreConfig(configparser.Config):
         _, theory = self.parse_from_("fit", "theory", write=False)
         thid = theory["theoryid"]
 
-        _, bsmfacdata = self.parse_from_("fit", "bsm_fac_data", write=False)
-        _, bsmsecdata = self.parse_from_("fit", "bsm_sector_data", write=False)
+        _, simu_params = self.parse_from_("fit", "simu_parameters", write=False)
 
         data_input = self._parse_data_input_from_(
-            "fit", {"theoryid": thid, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
+            "fit", {"theoryid": thid, "simu_parameters": simu_params}
         )
 
-        return {"theoryid": thid, "data_input": data_input, "bsm_fac_data": bsmfacdata, "bsm_sector_data": bsmsecdata}
+        return {"theoryid": thid, "data_input": data_input, "simu_parameters": simu_params}
 
     def produce_fitpdf(self, fit):
         """Like ``fitcontext`` only setting the PDF"""
@@ -420,46 +419,46 @@ class CoreConfig(configparser.Config):
         """ Set the PDF and basis from the fit config. """
         return {**fitpdf, **basisfromfit}
 
-    def produce_bsm_names_to_latex(self, bsm_fac_data=None):
-        if bsm_fac_data is None:
+    def produce_bsm_names_to_latex(self, simu_parameters=None):
+        if simu_parameters is None:
             return None
         else:
             bsm_names_to_latex = {}
-            for entry in bsm_fac_data:
+            for entry in simu_parameters:
                 bsm_names_to_latex[entry['name']] = entry['latex']
             return bsm_names_to_latex
 
-    def produce_bsm_names_to_plot_scales(self, bsm_fac_data=None):
-        if bsm_fac_data is None:
+    def produce_bsm_names_to_plot_scales(self, simu_parameters=None):
+        if simu_parameters is None:
             return None
         else:
             bsm_names_to_plot_scales = {}
-            for entry in bsm_fac_data:
+            for entry in simu_parameters:
                 bsm_names_to_plot_scales[entry['name']] = entry['plot_scale']
             return bsm_names_to_plot_scales
 
-    def produce_n_bsm_fac_data(self, bsm_fac_data=None):
+    def produce_n_simu_parameters(self, simu_parameters=None):
         """
         Produces the number of BSM coefficients to include in the fit.
         """
-        if bsm_fac_data is not None:
-            return len(bsm_fac_data)
+        if simu_parameters is not None:
+            return len(simu_parameters)
         return 0
 
-    def produce_bsm_fac_initialisations(self, bsm_fac_data=None):
+    def produce_bsm_fac_initialisations(self, simu_parameters=None):
         """Produces the list of initialisation settings for each of
         the BSM coefficients entering into the fit.
         """
         from validphys.initialisation_specs import Initialisation
 
-        if bsm_fac_data is None:
+        if simu_parameters is None:
             return []
 
         bsm_fac_initialisations = []
-        for entry in bsm_fac_data:
+        for entry in simu_parameters:
             if not (init_dict := entry.get("initialisation")):
                 raise ConfigError(
-                    f"bsm_fac_data entry '{entry}' must containt a valid 'initialisation' key"
+                    f"simu_parameters entry '{entry}' must containt a valid 'initialisation' key"
                 )
             try:
                 init = validobj.parse_input(init_dict, Initialisation)
@@ -468,42 +467,34 @@ class CoreConfig(configparser.Config):
             bsm_fac_initialisations.append(init)
         return bsm_fac_initialisations
 
-    def produce_bsm_fac_data_names(self, bsm_fac_data=None):
+    def produce_simu_parameters_names(self, simu_parameters=None):
         """
         Produces the list of the names of the
         BSM coefficients to include in the fit.
         """
-        if bsm_fac_data is not None:
-            bsm_fac_data_names = []
-            for entry in bsm_fac_data:
-                bsm_fac_data_names += [entry['name']]
-            return bsm_fac_data_names
+        if simu_parameters is not None:
+            simu_parameters_names = []
+            for entry in simu_parameters:
+                simu_parameters_names += [entry['name']]
+            return simu_parameters_names
         return []
 
 
-    def produce_bsm_fac_data_scales(self, bsm_fac_data=None):
+    def produce_simu_parameters_scales(self, simu_parameters=None):
         """Produces the list of rescaling values used to multiply predictions going into the fit.
         """
-        if bsm_fac_data is not None:
-            bsm_fac_data_scales = []
-            for entry in bsm_fac_data:
-                bsm_fac_data_scales += [entry['scale']]
-            return bsm_fac_data_scales
+        if simu_parameters is not None:
+            simu_parameters_scales = []
+            for entry in simu_parameters:
+                simu_parameters_scales += [entry['scale']]
+            return simu_parameters_scales
         return []
 
-    def parse_bsm_sector_data(self, bsm_sector_data=None):
-        if bsm_sector_data is not None:
-            new_bsm_sector_data = {}
-            for entry in bsm_sector_data:
-                new_bsm_sector_data[entry['name']] = entry['operators']
-            return new_bsm_sector_data
-        return {}
-
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, bsm_fac_data_names, bsm_fac_data_scales, n_bsm_fac_data, bsm_fac_data=None, bsm_sector_data=None):
+    def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "bsm_sector", "bsm_order"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -534,16 +525,13 @@ class CoreConfig(configparser.Config):
                 ConfigError(f"Key '{k}' in dataset_input not known.", k, known_keys)
             )
 
-        bsm_sector = dataset.get("bsm_sector")
-        bsm_order = dataset.get("bsm_order")
+        simu_fac = dataset.get("simu_fac")
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_sector,
-            bsm_order,
-            bsm_fac_data,
-            bsm_sector_data,
-            bsm_fac_data_names,
-            n_bsm_fac_data,
+            simu_fac,
+            simu_parameters,
+            simu_parameters_names,
+            n_simu_parameters,
         )
 
 
@@ -729,7 +717,7 @@ class CoreConfig(configparser.Config):
         cfac = dataset_input.cfac
         frac = dataset_input.frac
         weight = dataset_input.weight
-        bsm_fac_data_names = dataset_input.bsm_fac_data_names
+        simu_parameters_names = dataset_input.simu_parameters_names
 
         try:
             ds = self.loader.check_dataset(
@@ -742,7 +730,7 @@ class CoreConfig(configparser.Config):
                 use_fitcommondata=use_fitcommondata,
                 fit=fit,
                 weight=weight,
-                bsm_fac_data_names=bsm_fac_data_names,
+                simu_parameters_names=simu_parameters_names,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
@@ -1831,22 +1819,18 @@ class CoreConfig(configparser.Config):
         self,
         fixed_observable_input,
         theoryid,
-        bsm_fac_data=None,
-        bsm_sector_data=None,
-        bsm_fac_data_names=None,
-        n_bsm_fac_data=None,
+        simu_parameters=None,
+        simu_parameters_names=None,
+        n_simu_parameters=None,
     ):
 
-        bsm_sector = fixed_observable_input.bsm_sector
-        bsm_order = fixed_observable_input.bsm_order
+        simu_fac = fixed_observable_input.simu_fac
 
         bsm_data = bsmnames.get_bsm_data(
-            bsm_sector,
-            bsm_order,
-            bsm_fac_data,
-            bsm_sector_data,
-            bsm_fac_data_names,
-            n_bsm_fac_data,
+            simu_fac,
+            simu_parameters,
+            simu_parameters_names,
+            n_simu_parameters,
         )
 
 
@@ -1863,10 +1847,9 @@ class CoreConfig(configparser.Config):
         self,
         fixed_observable_inputs,
         theoryid,
-        bsm_fac_data=None,
-        bsm_sector_data=None,
-        bsm_fac_data_names=None,
-        n_bsm_fac_data=None,
+        simu_parameters=None,
+        simu_parameters_names=None,
+        n_simu_parameters=None,
     ):
         if fixed_observable_inputs is None:
             fixed_observable_inputs = []
@@ -1875,10 +1858,9 @@ class CoreConfig(configparser.Config):
                 self.produce_fixed_observable(
                     f,
                     theoryid.id,
-                    bsm_fac_data=bsm_fac_data,
-                    bsm_sector_data=bsm_sector_data,
-                    bsm_fac_data_names=bsm_fac_data_names,
-                    n_bsm_fac_data=n_bsm_fac_data,
+                    simu_parameters=simu_parameters,
+                    simu_parameters_names=simu_parameters_names,
+                    n_simu_parameters=n_simu_parameters,
                 )
                 for f in fixed_observable_inputs
             ],

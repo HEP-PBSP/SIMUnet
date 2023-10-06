@@ -324,15 +324,14 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_sector):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names):
         self.name=name
         self.sys=sys
         self.cfac = cfac
         self.frac = frac
         self.weight = weight
         self.custom_group = custom_group
-        self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_sector = bsm_sector
+        self.simu_parameters_names = simu_parameters_names
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -461,7 +460,7 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_data_names=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None):
         self.name = name
         self.commondata = commondata
 
@@ -472,10 +471,10 @@ class DataSetSpec(TupleComp):
 
         self.cuts = cuts
         self.frac = frac
-        self.bsm_fac_data_names_CF = bsm_fac_data_names_CF 
+        self.simu_parameters_names_CF = simu_parameters_names_CF 
 
         # These are important because they are ORDERED correctly, but the dictionaries might not be
-        self.bsm_fac_data_names = bsm_fac_data_names
+        self.simu_parameters_names = simu_parameters_names
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere
@@ -665,7 +664,7 @@ class FitSpec(TupleComp):
             for vari in to_take_out:
                 if vari in fitting and vari not in d:
                     d[vari] = fitting[vari]
-        d.setdefault("bsm_fac_data", None)
+        d.setdefault("simu_parameters", None)
         d.setdefault("bsm_sector_data", None)
         return d
 
@@ -895,8 +894,7 @@ class FixedObservableInput:
     dataset: str
     weight: float = 1.
     frac: float = 1.
-    bsm_sector: Optional[str] = None
-    bsm_order: Optional[str] = None
+    simu_fac: Optional[str] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -910,13 +908,12 @@ class FixedObservableSpec:
     frac: float = 1
     # Note: This is not a dict as we want it to be hashable
     custom_group: Optional[str] = None
-    bsm_fac_data_names_CF_data: tuple = ()
-    bsm_fac_data_names: tuple = ()
-    bsm_sector: str = None
+    simu_parameters_names_CF_data: tuple = ()
+    simu_parameters_names: tuple = ()
 
     @property
-    def bsm_fac_data_names_CF(self):
-        return dict(self.bsm_fac_data_names_CF_data)
+    def simu_parameters_names_CF(self):
+        return dict(self.simu_parameters_names_CF_data)
 
     # Bogus cuts to make this more compatible with the usual data
     @property
@@ -931,36 +928,71 @@ class FixedObservableSpec:
 
     def load_pred(self):
         """Load the raw theory predictions (without wilson coefficients)"""
-        from validphys.fkparser import parse_cfactor
+        from validphys.coredata import CFactorData
 
-        with open(self.pred_path, 'rb') as f:
-            return parse_cfactor(f)
+        with open(self.pred_path, 'rb') as stream:
+            cfac_file = yaml.safe_load(stream)
+            sm_fixed = np.array(cfac_file["SM_fixed"])
+
+            return CFactorData(
+                description=self.pred_path,
+                central_value=sm_fixed,
+                uncertainty=np.zeros(len(sm_fixed))
+            )
 
     def _load_bsm_values(self, inp):
-        from validphys.coredata import CFactorData
-        from validphys.fkparser import parse_cfactor
+        """
+        For fixed observables (PDF independent), loads the EFT correction
+        stored in the `theoryid/BSM_namedataset.yaml` file to the specified 
+        order in perturbation theory and constructs a k-factor correction 
+        from the SM prediction computed at the same order in perturbation theory.
 
+
+        Parameters
+        ----------
+        inp: dict
+            dictionary with key computed from bsmnames.get_bsm_data
+            and values paths to the yaml file containing bsm corrections.
+
+        Returns
+        -------
+        dict
+
+        """
+        from validphys.coredata import CFactorData
         if inp is None:
             return None
         name_cf_map = {}
         for name, path in inp.items():
-            if name[:4] == "None":
+            # load SIMU yaml file
+            with open(path, "rb") as stream:
+                cfac_file = yaml.safe_load(stream)
+            eft_order = "_".join(name.split("_")[:-1])
+            eft_operator = name.split("_")[-1]
+
+            if eft_operator not in cfac_file[eft_order]:
+                # make dummy BSM-factor
                 cfac = CFactorData(
                     description="dummy",
                     central_value=np.zeros(self.commondata.ndata),
                     uncertainty=np.zeros(self.commondata.ndata),
                 )
             else:
-                with open(path, "rb") as stream:
-                    cfac = parse_cfactor(stream)
-                    # TODO: Don't do this
-                    cfac.central_value -= 1
-                    # cfac.uncertainty = ???
+                # TODO: add a test here to make sure that SM is a key and raise appropriate exception if this is not the case
+                standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
+                central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction
+
+                cfac = CFactorData(
+                    description=path,
+                    central_value=central_value,
+                    uncertainty=np.zeros(len(central_value)),
+                )
+                    
             name_cf_map[name] = cfac
         return name_cf_map
 
     def load_bsm(self):
-        return self._load_bsm_values(self.bsm_fac_data_names_CF)
+        return self._load_bsm_values(self.simu_parameters_names_CF)
 
 
     def load(self):

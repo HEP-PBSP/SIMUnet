@@ -222,7 +222,7 @@ class CompareFitApp(App):
                 'from_': 'theory'
             },
             'speclabel': args['current_fit_label'],
-            'bsm_fac_data': {
+            'simu_parameters': {
                 'from_': 'fit'
             },
             'bsm_sector_data': {
@@ -240,7 +240,7 @@ class CompareFitApp(App):
                 'from_': 'theory'
             },
             'speclabel': args['reference_fit_label'],
-            'bsm_fac_data': {
+            'simu_parameters': {
                 'from_': 'fit'
             },
             'bsm_sector_data': {
