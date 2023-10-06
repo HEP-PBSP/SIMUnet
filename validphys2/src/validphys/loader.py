@@ -361,7 +361,7 @@ class Loader(LoaderBase):
             if not fkpath.exists():
                 raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
             # Also set the fixed predictions path
-            fixed_predictions_path = theopath/ 'fixed' / ('FIXED_%s.dat' % setname)
+            fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
             cfactors = self.check_cfactor(theoryID, setname, cfac)
             return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
 
