@@ -17,7 +17,7 @@ import tensorflow as tf
 from validphys import bsmnames
 
 from n3fit.msr import msr_impose
-from n3fit.layers import DIS, DY, ObsRotation, losses
+from n3fit.layers import DIS, DY, Fixed, ObsRotation, losses
 from n3fit.layers import Preprocessing, FkRotation, FlavourToEvolution
 from n3fit.backends import MetaModel, Input
 from n3fit.backends import operations as op
@@ -51,42 +51,15 @@ class ObservableWrapper:
     multiplier: float = 1.0
     integrability: bool = False
     positivity: bool = False
-    fixed: list = field(default_factory=list)
     data: np.array = None
     spec_dict: dict = None
     rotation: ObsRotation = None  # only used for diagonal covmat
     split: str = None
     post_observable: CombineCfacLayer = None
 
-
-    def make_fixed_observable_inputs(self):
-        """Generate a dictionary with values corresponding to the predictions
-        for the fixed observables. Use the values to call the model.
-        """
-        # Note: Even though the inputs are constant, we still need to generate
-        # them in one step and pass them to the model in another. See
-        #
-        # https://github.com/keras-team/keras/issues/11912
-        #
-        # Also we need the raw tensorflow tensor because there is no way to get
-        # it from the Keras wrapper.
-        res = {}
-        for fo in self.fixed:
-            inp = tf.constant(fo.prediction.central_value.reshape((1, 1, -1)))
-            kinp = tf.keras.Input(tensor=inp)
-            res[fo.commondata.setname] = (kinp, inp)
-        return res
-
     def _all_data(self):
-        """Concatenate experimental data from datasets and fixed observables"""
-        return np.concatenate(
-            [
-                np.atleast_2d(self.data),
-                *[np.atleast_2d(fo.commondata.central_values) for fo in self.fixed],
-            ],
-            axis=1,
-        )
-
+        """Concatenate experimental data from datasets"""
+        return np.atleast_2d(self.data)
 
     def _generate_loss(self, mask=None):
         """Generates the corresponding loss function depending on the values the wrapper
@@ -106,7 +79,7 @@ class ObservableWrapper:
         return loss
 
 
-    def _generate_experimental_layer(self, pdf, fixed_inputs):
+    def _generate_experimental_layer(self, pdf):
         """Generates the experimental layer from the PDF"""
         # First split the layer into the different datasets (if needed!)
         if len(self.dataset_xsizes) > 1:
@@ -160,25 +133,6 @@ class ObservableWrapper:
                     linear_values=cfacs,
                 )
 
-        for fo, inp in zip(self.fixed, fixed_inputs):
-            linear = {
-                bsmnames.linear_datum_to_op(k): v.central_value
-                for k, v in fo.linear_bsm.items()
-            }
-
-            # NOTE: Generating the input like
-            #
-            # inp = tf.keras.Input(tensor=tf.constant(fo.prediction.central_value))
-            #
-            # doesn't work becuse it needs to be seen by the model instance (despite being constant). See
-            # https://github.com/keras-team/keras/issues/11912
-            output_layers.append(
-                self.post_observable(
-                    inputs=inp,
-                    linear_values=linear
-                )
-            )
-
         # Concatenate all datasets (so that experiments are one single entity)
         ret = op.concatenate(output_layers, axis=2)
 
@@ -186,9 +140,9 @@ class ObservableWrapper:
             ret = self.rotation(ret)
         return ret
 
-    def __call__(self, pdf_layer, fixed_inputs, mask=None):
+    def __call__(self, pdf_layer, mask=None):
         loss_f = self._generate_loss(mask)
-        experiment_prediction = self._generate_experimental_layer(pdf_layer, fixed_inputs)
+        experiment_prediction = self._generate_experimental_layer(pdf_layer)
         return loss_f(experiment_prediction)
 
 
@@ -246,10 +200,22 @@ def observable_generator(
         dataset_name = dataset_dict["name"]
 
         # Look at what kind of layer do we need for this dataset
-        if dataset_dict["hadronic"]:
-            Obs_Layer = DY
+        
+        # If there is a 'use_fixed_predictions' key, check if it's true
+        if 'use_fixed_predictions' in dataset_dict.keys():
+            if dataset_dict['use_fixed_predictions']:
+                Obs_Layer = Fixed
+            else:
+                if dataset_dict["hadronic"]:
+                    Obs_Layer = DY
+                else:
+                    Obs_Layer = DIS
         else:
-            Obs_Layer = DIS
+            # We are dealing with a positivity or integrability set
+            if dataset_dict["hadronic"]:
+                Obs_Layer = DY
+            else:
+                Obs_Layer = DIS
 
         # Set the operation (if any) to be applied to the fktables of this dataset
         operation_name = dataset_dict["operation"]
@@ -279,6 +245,8 @@ def observable_generator(
                 operation_name,
                 name=f"exp_{dataset_name}",
             )
+            if dataset_dict['use_fixed_predictions']:
+                obs_layer_ex.fixed_predictions = dataset_dict['fixed_predictions']
             obs_layer_tr = obs_layer_vl = obs_layer_ex
         else:
             obs_layer_tr = Obs_Layer(
@@ -299,6 +267,11 @@ def observable_generator(
                 operation_name,
                 name=f"val_{dataset_name}",
             )
+            if dataset_dict['use_fixed_predictions']:
+                mask = dataset_dict['ds_tr_mask']
+                obs_layer_tr.fixed_predictions = dataset_dict['fixed_predictions'][mask]
+                obs_layer_vl.fixed_predictions = dataset_dict['fixed_predictions'][~mask]
+                obs_layer_ex.fixed_predictions = dataset_dict['fixed_predictions']
 
         # To know how many xpoints we compute we are duplicating functionality from obs_layer
         if obs_layer_tr.splitting is None:
@@ -344,7 +317,6 @@ def observable_generator(
         obsrot_tr = None
         obsrot_vl = None
 
-
     out_tr = ObservableWrapper(
         spec_name,
         model_obs_tr,
@@ -355,7 +327,6 @@ def observable_generator(
         spec_dict=spec_dict,
         split='tr',
         post_observable=post_observable,
-        fixed=spec_dict["fixed"],
     )
     out_vl = ObservableWrapper(
         f"{spec_name}_val",
@@ -367,7 +338,6 @@ def observable_generator(
         spec_dict=spec_dict,
         split='vl',
         post_observable=post_observable,
-        fixed=spec_dict["fixed_vl"],
     )
     out_exp = ObservableWrapper(
         f"{spec_name}_exp",
@@ -380,7 +350,6 @@ def observable_generator(
         spec_dict=spec_dict,
         split='ex',
         post_observable=post_observable,
-        fixed=spec_dict["fixed_true"],
     )
 
     layer_info = {

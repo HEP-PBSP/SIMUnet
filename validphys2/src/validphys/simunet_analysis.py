@@ -1342,10 +1342,10 @@ Principal component analysis
 """
 
 @table
-def fisher_information_matrix(dataset_inputs, groups_index, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
+def fisher_information_matrix(dataset_inputs, groups_index, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Obtains the full Fisher information matrix for the BSM parameters.
     """
-    return _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf)
+    return _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
@@ -1395,14 +1395,13 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
     return fig
 
 @table
-def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
+def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Obtains the Fisher information matrices for each of the BSM sectors.
     """
     
     # First, get the names of the BSM sectors.
 
     bsm_dataset_inputs_sectors = {} 
-    bsm_fixed_observables_sectors = {}
 
     for dataset in dataset_inputs:
         if dataset.bsm_sector in bsm_dataset_inputs_sectors.keys():
@@ -1410,13 +1409,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         else:
             bsm_dataset_inputs_sectors[dataset.bsm_sector] = [dataset]
     
-    for fo in fixed_observables:
-        if fo.bsm_sector in bsm_fixed_observables_sectors.keys():
-            bsm_fixed_observables_sectors[fo.bsm_sector] += [fo]
-        else:
-            bsm_fixed_observables_sectors[fo.bsm_sector] = [fo]
-
-    all_sectors_duplicates = list(bsm_dataset_inputs_sectors.keys()) + list(bsm_fixed_observables_sectors.keys())
+    all_sectors_duplicates = list(bsm_dataset_inputs_sectors.keys())
     all_sectors = []
     [all_sectors.append(x) for x in all_sectors_duplicates if x not in all_sectors]
 
@@ -1429,14 +1422,8 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         else:
             datasets = None
             dataset_names = []
-        if sec in bsm_fixed_observables_sectors.keys():
-            fos = bsm_fixed_observables_sectors[sec]
-            fo_names = [fo.name for fo in fos]
-        else:
-            fos = None
-            fo_names = []
 
-        ds_and_fo_names = dataset_names + fo_names
+        ds_and_fo_names = dataset_names
 
         # Take correct submatrix of groups_covmat
         reduced_covmats = []
@@ -1452,7 +1439,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
         reduced_covmat = pd.concat(reduced_covmats, axis=1)
 
         # Hence construct the Fisher matrices
-        fisher_by_sector += [_compute_fisher_information_matrix(datasets, fos, theoryid, reduced_covmat, simu_parameters_names, pdf)]
+        fisher_by_sector += [_compute_fisher_information_matrix(datasets, theoryid, reduced_covmat, simu_parameters_names, pdf)]
 
     # Now go through the matrices one-by-one, and take the diagonal
     fisher_diags_by_sector = []
@@ -1472,7 +1459,7 @@ def fisher_information_by_sector(dataset_inputs, fixed_observables, theoryid, gr
     
     return df
 
-def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theoryid, groups_covmat, simu_parameters_names, pdf):
+def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
     """Computes a Fisher information matrix.
     """
     bsm_factors = []
@@ -1482,13 +1469,6 @@ def _compute_fisher_information_matrix(dataset_inputs, fixed_observables, theory
             bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, cuts=ds.cuts)
             central_sm = central_predictions(ds, pdf)
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
-            bsm_factors += [coefficients] 
-
-    if fixed_observables is not None:
-        for fo in fixed_observables:
-            cvs = fo.load_pred().central_value
-            bsm_fac = parse_simu_parameters_names_CF(fo.simu_parameters_names_CF, cuts=fo.cuts)
-            coefficients = cvs * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
     # Make bsm_factors into a nice numpy array. 

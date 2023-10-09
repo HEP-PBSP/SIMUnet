@@ -42,8 +42,10 @@ import functools
 import pandas as pd
 import numpy as np
 
+import yaml
+
 from validphys.pdfbases import evolution
-from validphys.fkparser import load_fktable
+from validphys.fkparser import load_fktable, parse_cfactor
 
 
 FK_FLAVOURS = evolution.to_known_elements(
@@ -112,9 +114,23 @@ def _predictions(dataset, pdf, fkfunc):
             "commondata and is not supported."
         )
     cuts = dataset.cuts.load()
-    all_predictions = [
-        fkfunc(load_fktable(fk).with_cuts(cuts), pdf) for fk in dataset.fkspecs
-    ]
+
+    # When making predictions, we check each set to see whether we should use fixed
+    # predictions instead.
+    all_predictions = []
+    for fk in dataset.fkspecs:
+         if not fk.use_fixed_predictions:
+             all_predictions.append(fkfunc(load_fktable(fk).with_cuts(cuts), pdf))
+         else:
+             with open(fk.fixed_predictions_path, 'rb') as f:
+                 fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+             # Now need to reshape it according it to the expected number of predictions
+             if fkfunc == central_fk_predictions:
+                 all_predictions.append(pd.DataFrame(fixed_predictions, columns=['data']))
+             elif fkfunc == fk_predictions:
+                 fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), 1))
+                 all_predictions.append(pd.DataFrame(fixed_predictions.T, columns=[i for i in range(pdf.get_members())]))
+
     return opfunc(*all_predictions)
 
 

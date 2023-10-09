@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, use_fixed_predictions):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -332,6 +332,7 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.simu_parameters_names = simu_parameters_names
+        self.use_fixed_predictions = use_fixed_predictions
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -460,9 +461,10 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, use_fixed_predictions=False):
         self.name = name
         self.commondata = commondata
+        self.use_fixed_predictions = use_fixed_predictions
 
         if isinstance(fkspecs, FKTableSpec):
             fkspecs = (fkspecs,)
@@ -484,7 +486,7 @@ class DataSetSpec(TupleComp):
         self.weight = weight
 
         super().__init__(name, commondata, fkspecs, thspec, cuts,
-                         frac, op, weight)
+                         frac, op, weight, use_fixed_predictions)
 
     @functools.lru_cache()
     def load(self):
@@ -534,9 +536,11 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
         self.fkpath = fkpath
         self.cfactors = cfactors
+        self.use_fixed_predictions = use_fixed_predictions
+        self.fixed_predictions_path = fixed_predictions_path
         super().__init__(fkpath, cfactors)
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
@@ -571,11 +575,9 @@ class PositivitySetSpec(DataSetSpec):
 #We allow to expand the experiment as a list of datasets
 class DataGroupSpec(TupleComp, namespaces.NSList):
 
-    def __init__(self, name, datasets, dsinputs=None, fixed_observables=None, foinputs=None):
+    def __init__(self, name, datasets, dsinputs=None):
         #This needs to be hashable
         datasets = tuple(datasets)
-        if fixed_observables is not None:
-            fixed_observables = tuple(fixed_observables)
 
         #TODO: Find a better way for interactive usage.
         if dsinputs is not None:
@@ -585,17 +587,11 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
         self.datasets = datasets
         self.dsinputs = dsinputs
 
-        self.fixed_observables = fixed_observables
-        self.foinputs = foinputs
-
         #TODO: Add dsinputs to comp tuple?
-        super().__init__(name, datasets, fixed_observables)
+        super().__init__(name, datasets)
 
         #TODO: Can we do  better cooperative inherece trick than this?
         namespaces.NSList.__init__(self, dsinputs, nskey='dataset_input')
-
-    def iterfixed(self):
-        return namespaces.NSList(self.foinputs, nskey='fixed_observable_input')
 
     @functools.lru_cache(maxsize=32)
     def load(self):
@@ -887,114 +883,3 @@ class Filter:
 
     def __str__(self):
         return '%s: %s' % (self.label, self.indexes)
-
-@dataclasses.dataclass(frozen=True)
-class FixedObservableInput:
-    """Representation of the data the user inputs to obtain a fixed observable"""
-    dataset: str
-    weight: float = 1.
-    frac: float = 1.
-    simu_fac: Optional[str] = None
-
-
-@dataclasses.dataclass(frozen=True)
-class FixedObservableSpec:
-    """Representation of a fixed observable"""
-
-    name: str
-    commondata: CommonDataSpec
-    pred_path: Path
-    weight: float = 1.0
-    frac: float = 1
-    # Note: This is not a dict as we want it to be hashable
-    custom_group: Optional[str] = None
-    simu_parameters_names_CF_data: tuple = ()
-    simu_parameters_names: tuple = ()
-
-    @property
-    def simu_parameters_names_CF(self):
-        return dict(self.simu_parameters_names_CF_data)
-
-    # Bogus cuts to make this more compatible with the usual data
-    @property
-    def cuts(self):
-        return TrivialCuts(self.commondata.ndata)
-
-    def load_exp(self):
-        """Load the experimental data for the fixed observable"""
-        from validphys.commondata import load_commondata
-
-        return load_commondata(self.commondata)
-
-    def load_pred(self):
-        """Load the raw theory predictions (without wilson coefficients)"""
-        from validphys.coredata import CFactorData
-
-        with open(self.pred_path, 'rb') as stream:
-            cfac_file = yaml.safe_load(stream)
-            sm_fixed = np.array(cfac_file["SM_fixed"])
-
-            return CFactorData(
-                description=self.pred_path,
-                central_value=sm_fixed,
-                uncertainty=np.zeros(len(sm_fixed))
-            )
-
-    def _load_bsm_values(self, inp):
-        """
-        For fixed observables (PDF independent), loads the EFT correction
-        stored in the `theoryid/BSM_namedataset.yaml` file to the specified 
-        order in perturbation theory and constructs a k-factor correction 
-        from the SM prediction computed at the same order in perturbation theory.
-
-
-        Parameters
-        ----------
-        inp: dict
-            dictionary with key computed from bsmnames.get_bsm_data
-            and values paths to the yaml file containing bsm corrections.
-
-        Returns
-        -------
-        dict
-
-        """
-        from validphys.coredata import CFactorData
-        if inp is None:
-            return None
-        name_cf_map = {}
-        for name, path in inp.items():
-            # load SIMU yaml file
-            with open(path, "rb") as stream:
-                cfac_file = yaml.safe_load(stream)
-            eft_order = "_".join(name.split("_")[:-1])
-            eft_operator = name.split("_")[-1]
-
-            if eft_operator not in cfac_file[eft_order]:
-                # make dummy BSM-factor
-                cfac = CFactorData(
-                    description="dummy",
-                    central_value=np.zeros(self.commondata.ndata),
-                    uncertainty=np.zeros(self.commondata.ndata),
-                )
-            else:
-                # TODO: add a test here to make sure that SM is a key and raise appropriate exception if this is not the case
-                standard_model_prediction = np.array(cfac_file[eft_order]["SM"])
-                central_value =  np.array(cfac_file[eft_order][eft_operator]) / standard_model_prediction
-
-                cfac = CFactorData(
-                    description=path,
-                    central_value=central_value,
-                    uncertainty=np.zeros(len(central_value)),
-                )
-                    
-            name_cf_map[name] = cfac
-        return name_cf_map
-
-    def load_bsm(self):
-        return self._load_bsm_values(self.simu_parameters_names_CF)
-
-
-    def load(self):
-        from validphys.coredata import FixedObservableData
-        return FixedObservableData.from_spec(self)

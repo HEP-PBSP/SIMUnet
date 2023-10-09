@@ -124,16 +124,6 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
     return name_cfac_map
 
 
-def fixed_observables_with_pseudodata(replica_data, fixed_observables_data):
-    out = []
-    i = 0
-    for fo in fixed_observables_data:
-        end = i + fo.ndata
-        out.append(fo.with_central_value(replica_data[i:end]))
-        i = end
-    return out
-
-
 def common_data_reader_dataset(dataset_c, dataset_spec):
     """
     Import fktable, common data and experimental data for the given data_name

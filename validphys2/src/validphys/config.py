@@ -38,7 +38,6 @@ from validphys.core import (
     MatchedCuts,
     SimilarCuts,
     ThCovMatSpec,
-    FixedObservableInput
 )
 from validphys.fitdata import fitted_replica_indexes, num_fitted_replicas
 from validphys.loader import (
@@ -494,7 +493,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -507,6 +506,7 @@ class CoreConfig(configparser.Config):
         sysnum = dataset.get("sys")
         cfac = dataset.get("cfac", tuple())
         frac = dataset.get("frac", 1)
+        use_fixed_predictions = dataset.get("use_fixed_predictions", False)
         if not isinstance(frac, numbers.Real):
             raise ConfigError(f"'frac' must be a number, not '{frac}'")
         if frac < 0 or frac > 1:
@@ -534,7 +534,6 @@ class CoreConfig(configparser.Config):
             n_simu_parameters,
         )
 
-
         return DataSetInput(
             name=name,
             sys=sysnum,
@@ -542,6 +541,7 @@ class CoreConfig(configparser.Config):
             frac=frac,
             weight=weight,
             custom_group=custom_group,
+            use_fixed_predictions=use_fixed_predictions,
             **bsm_data
         )
 
@@ -718,6 +718,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         simu_parameters_names = dataset_input.simu_parameters_names
+        use_fixed_predictions = dataset_input.use_fixed_predictions
 
         try:
             ds = self.loader.check_dataset(
@@ -731,6 +732,7 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 simu_parameters_names=simu_parameters_names,
+                use_fixed_predictions=use_fixed_predictions,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
@@ -1444,7 +1446,6 @@ class CoreConfig(configparser.Config):
     def produce_data(
         self,
         data_input,
-        fixed_observable_inputs=None,
         *,
         group_name="data",
     ):
@@ -1456,29 +1457,11 @@ class CoreConfig(configparser.Config):
             with self.set_context(ns=self._curr_ns.new_child({"dataset_input": dsinp})):
                 datasets.append(self.parse_from_(None, "dataset", write=False)[1])
 
-        if fixed_observable_inputs is None:
-            fixed_observable_inputs = []
-
-
-        fixed_observables = []
-        for fo in fixed_observable_inputs:
-            with self.set_context(
-                ns=self._curr_ns.new_child({"fixed_observable_input": fo})
-            ):
-                fixed_observables.append(
-                    self.parse_from_(None, "fixed_observable", write=False)[1]
-                )
-
         return DataGroupSpec(
             name=group_name,
             datasets=datasets,
             dsinputs=data_input,
-            fixed_observables=fixed_observables,
-            foinputs=fixed_observable_inputs,
         )
-
-    def produce_fixed_inputs_from_data(self, data):
-        return data.iterfixed()
 
     def _parse_data_input_from_(
         self,
@@ -1603,14 +1586,11 @@ class CoreConfig(configparser.Config):
         self,
         data_input,
         processed_metadata_group,
-        fixed_observable_inputs=None,
     ):
         """Take the data and the processed_metadata_group key and attempt
         to group the data, returns a list where each element specifies the data_input
         for a single group and the group_name
         """
-        if fixed_observable_inputs is None:
-            fixed_observable_inputs = []
         res = defaultdict(lambda: defaultdict(list))
 
         def _get_info_group(cd):
@@ -1639,19 +1619,9 @@ class CoreConfig(configparser.Config):
             # in both cases we cast group name to str explicitly.
             res[group_name]["data"].append(dsinput)
 
-        for fo in fixed_observable_inputs:
-            if processed_metadata_group == "custom_group":
-                group_name = fo.custom_group
-            else:
-                cd = self.loader.check_commondata(fo.dataset)
-                group_name = _get_info_group(cd)
-
-            res[group_name]["fixed"].append(fo)
-
         return [
             {
                 "data_input": NSList(group["data"], nskey="dataset_input"),
-                "fixed_observable_inputs": NSList(group["fixed"], nskey="fixed_observable_input"),
                 "group_name": name,
             }
             for name, group in res.items()
@@ -1673,21 +1643,19 @@ class CoreConfig(configparser.Config):
         return None
 
     def produce_group_dataset_inputs_by_experiment(
-        self, data_input, fixed_observable_inputs=None
+        self, data_input
     ):
         return self.produce_group_dataset_inputs_by_metadata(
             data_input,
             processed_metadata_group="experiment",
-            fixed_observable_inputs=fixed_observable_inputs,
         )
 
     def produce_group_dataset_inputs_by_process(
-        self, data_input, fixed_observable_inputs=None
+        self, data_input
     ):
         return self.produce_group_dataset_inputs_by_metadata(
             data_input,
             processed_metadata_group="nnpdf31_process",
-            fixed_observable_inputs=fixed_observable_inputs,
         )
 
     def produce_scale_variation_theories(self, theoryid, point_prescription):
@@ -1804,69 +1772,6 @@ class CoreConfig(configparser.Config):
         if fitthcovmat is None:
             return validphys.results.total_phi_data_from_experiments
         return validphys.results.dataset_inputs_phi_data
-
-    @element_of("fixed_observable_inputs")
-    def parse_fixed_observable_input(self, obs:dict):
-        try:
-            return validobj.parse_input(obs, FixedObservableInput)
-        except validobj.ValidationError as e:
-            raise ConfigError(e) from e
-
-    def produce_fixed_observable_input_commondata(self, fixed_observable_input):
-        return self.loader.check_commondata(fixed_observable_input.name)
-
-    def produce_fixed_observable(
-        self,
-        fixed_observable_input,
-        theoryid,
-        simu_parameters=None,
-        simu_parameters_names=None,
-        n_simu_parameters=None,
-    ):
-
-        simu_fac = fixed_observable_input.simu_fac
-
-        bsm_data = bsmnames.get_bsm_data(
-            simu_fac,
-            simu_parameters,
-            simu_parameters_names,
-            n_simu_parameters,
-        )
-
-
-        try:
-            return self.loader.check_fixed_observable(
-                fixed_observable_input, theoryid, **bsm_data
-            )
-        except LoaderError as e:
-            raise ConfigError(
-                f"Could not process fixed observable {fixed_observable_input}: {e}"
-            ) from e
-
-    def produce_fixed_observables(
-        self,
-        fixed_observable_inputs,
-        theoryid,
-        simu_parameters=None,
-        simu_parameters_names=None,
-        n_simu_parameters=None,
-    ):
-        if fixed_observable_inputs is None:
-            fixed_observable_inputs = []
-        return NSList(
-            [
-                self.produce_fixed_observable(
-                    f,
-                    theoryid.id,
-                    simu_parameters=simu_parameters,
-                    simu_parameters_names=simu_parameters_names,
-                    n_simu_parameters=n_simu_parameters,
-                )
-                for f in fixed_observable_inputs
-            ],
-            nskey="fixed_observable",
-        )
-
 
 class Config(report.Config, CoreConfig, ParamfitsConfig):
     """The effective configuration parser class."""

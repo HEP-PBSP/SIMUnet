@@ -29,7 +29,7 @@ from reportengine import filefinder
 from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             PositivitySetSpec, DataSetSpec, PDF, Cuts, DataGroupSpec,
                             peek_commondata_metadata, CutsPolicy,
-                            InternalCutsWrapper, HyperscanSpec, FixedObservableSpec)
+                            InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
 
@@ -46,8 +46,6 @@ class DataNotFoundError(LoadFailedError): pass
 class SysNotFoundError(LoadFailedError): pass
 
 class FKTableNotFound(LoadFailedError): pass
-
-class FixedPredictionNotFound(LoadFailedError): pass
 
 class CfactorNotFound(LoadFailedError): pass
 
@@ -353,8 +351,18 @@ class Loader(LoaderBase):
         return cd.load()
 
     #   @functools.lru_cache()
-    def check_fktable(self, theoryID, setname, cfac):
+    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False):
         _, theopath = self.check_theoryID(theoryID)
+
+        if use_fixed_predictions:
+            fkpath = theopath/ 'fastkernel' / ('FK_FAKEKTABLE.dat')
+            if not fkpath.exists():
+                raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
+            # Also set the fixed predictions path
+            fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
+            cfactors = self.check_cfactor(theoryID, setname, cfac)
+            return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
+
         fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
         if not fkpath.exists():
           raise FKTableNotFound(("Could not find FKTable for set '%s'. "
@@ -537,6 +545,7 @@ class Loader(LoaderBase):
         fit=None,
         weight=1,
         simu_parameters_names=None,
+        use_fixed_predictions=False,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -549,7 +558,7 @@ class Loader(LoaderBase):
         try:
             fkspec, op = self.check_compound(theoryno, name, cfac)
         except CompoundNotFound:
-            fkspec = self.check_fktable(theoryno, name, cfac)
+            fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions)
             op = None
 
         #Note this is simply for convenience when scripting. The config will
@@ -585,6 +594,7 @@ class Loader(LoaderBase):
             weight=weight,
             simu_parameters_names_CF=simu_parameters_names_CF,
             simu_parameters_names=simu_parameters_names,
+            use_fixed_predictions=use_fixed_predictions,
         )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
@@ -659,44 +669,6 @@ class Loader(LoaderBase):
         except filefinder.FinderError as e:
             raise LoaderError(e) from e
         return path/name
-
-    def check_fixed_observable(
-        self,
-        fixed_observable_input,
-        theoryid,
-        simu_parameters_names=None,
-    ):
-        setname = fixed_observable_input.dataset
-        cd = self.check_commondata(setname)
-        theoryid = self.check_theoryID(theoryid)
-        pred_path = theoryid.path / 'simu_factors' / f'SIMU_{setname}.yaml'
-        if not pred_path.is_file():
-            raise FixedPredictionNotFound(
-                f"Could not find fixed prediction for set {setname}. "
-                f"File {pred_path} not found."
-            )
-
-        if simu_parameters_names is not None:
-            simu_parameters_names_CF = self.get_simu_parameters_name_dict(setname, simu_parameters_names, theoryid.id)
-        else:
-            simu_parameters_names_CF = None
-
-        if simu_parameters_names is not None:
-            simu_parameters_names = tuple(simu_parameters_names)
-
-        if simu_parameters_names_CF is not None:
-            simu_parameters_names_CF = tuple(simu_parameters_names_CF.items())
-
-
-        return FixedObservableSpec(
-            name=setname,
-            commondata=cd,
-            pred_path=pred_path,
-            frac=fixed_observable_input.frac,
-            simu_parameters_names_CF_data=simu_parameters_names_CF,
-            simu_parameters_names=simu_parameters_names,
-        )
-
 
 #http://stackoverflow.com/a/15645088/1007990
 def _download_and_show(response, stream):
