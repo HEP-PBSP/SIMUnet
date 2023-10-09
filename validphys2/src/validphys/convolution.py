@@ -128,7 +128,7 @@ def _predictions(dataset, pdf, fkfunc):
              if fkfunc == central_fk_predictions:
                  all_predictions.append(pd.DataFrame(fixed_predictions, columns=['data']))
              elif fkfunc == fk_predictions:
-                 fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), len(fixed_predictions)-1))
+                 fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), 1))
                  all_predictions.append(pd.DataFrame(fixed_predictions.T, columns=[i for i in range(pdf.get_members())]))
 
     return opfunc(*all_predictions)
