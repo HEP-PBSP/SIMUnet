@@ -199,9 +199,6 @@ def groups_index(groups_data):
                 data_id = np.arange(dataset.commondata.ndata, dtype=int)
             for idat in data_id:
                 records_append(group, dataset, idat)
-        for fo in group.fixed_observables:
-            for idat in fo.cuts.load():
-                records_append(group, fo, idat)
 
     columns = ["group", "dataset", "id"]
     df = pd.DataFrame(records, columns=columns)
@@ -543,17 +540,6 @@ def pdf_results(
     th_results = [ThPredictionsResult.from_convolution(pdf, dataset, dataset_bsm_factor) for pdf in pdfs]
 
     return (DataResult(dataset.load(), covariance_matrix, sqrt_covmat), *th_results)
-
-def fixed_observable_exp_data(fixed_observable):
-    return fixed_observable.load_exp()
-
-fixed_observables_exp_data = collect("fixed_observable_exp_data", ("fixed_observables",))
-
-def fixed_observable_data(fixed_observable):
-    return fixed_observable.load()
-
-fixed_observables_data = collect("fixed_observable_data", ("fixed_observables",))
-
 
 @require_one("pdfs", "pdf")
 @remove_outer("pdfs", "pdf")
