@@ -4,10 +4,10 @@ description: "Runcard template for the new (more flexible) contaminated fits. Th
 ############################################################
 dataset_inputs:
 - {dataset: NMC, frac: 0.75}
-- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], contamination: 'EFT-LO'}
-- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], contamination: 'EFT-LO'} 
-- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], contamination: 'EFT-LO'}
-- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, use_fixed_predictions: True, contamination: 'EFT-LO'}
+- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], contamination: 'EFT_LO'}
+- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], contamination: 'EFT_LO'} 
+- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], contamination: 'EFT_LO'}
+- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, use_fixed_predictions: True, contamination: 'EFT_LO'}
 
 fixed_pdf_fit: False
 # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
@@ -27,8 +27,8 @@ closuretest:
   rancuttrnval: false # 0(1) to output training(valiation) chi2 in report
   printpdf4gen: false # To print info on PDFs during minimization
   contamination_parameters:
-    - {name: 'OtG', value: 0.01}
-    - {name: 'Opt', value: 0.02}
+    - {name: 'OtG', value: 10}
+    - {name: 'Opt', value: 1}
 
 seed: 0
 rngalgo: 0

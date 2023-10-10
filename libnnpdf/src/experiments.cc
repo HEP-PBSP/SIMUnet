@@ -407,16 +407,18 @@ void Experiment::MakeClosure(const vector<ThPredictions>& predictions, bool cons
     for (int i = 0; i < set.GetNData(); i++)
     {
       newdata[i] = theory.GetObsCV(i);
-      // This is our opportunity to CONTAMINATE things, and sort out the fixed observables
+
+      // Sort out fixed observables first, if necessary
       if (set.GetUseFixedPredictions())
       {
          string fixed_prediction_path = get_data_path() + "theory_" + std::to_string(set.GetSpecialTheoryID()) + "/simu_factors/SIMU_" + set.GetSetName() + ".yaml";
-         cout << fixed_prediction_path << endl;
          YAML::Node read_file = YAML::LoadFile(fixed_prediction_path);
-       
          std::vector<float> fixed_predictions = read_file["SM_fixed"].as<std::vector<float>>();
          newdata[i] = fixed_predictions[i];
       }
+
+      // Finally, add the contamination
+      newdata[i] = newdata[i]*set.GetContaminationFactor()[i];
     }
 
     set.UpdateData(newdata.data()); // MakeClosure treated as shifts rather than normalisations

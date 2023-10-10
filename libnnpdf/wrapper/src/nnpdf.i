@@ -37,6 +37,7 @@
 %template(vector_str) std::vector<std::string>;
 %template(vector_double) std::vector<double>;
 %template(vector_int) std::vector<int>;
+%template(vector_float) std::vector<float>;
 
 %typemap(out) NNPDF::matrix<double> {
     auto size = $1.size(0)*$1.size(1);

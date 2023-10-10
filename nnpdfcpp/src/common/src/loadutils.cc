@@ -33,7 +33,11 @@ DataSet LoadDataSet(NNPDFSettings const &settings, std::string const &setname,
   if (mask.size() > 0) {
     fk = FKSet(fk, mask);
   }
-  return DataSet(cd, fk, weight);
+
+  // Since this is outside the contamination pipeline, set the contamination factor to be 1.
+  std::vector<float> contamination_factor(cd.GetNData(), 1.0);
+
+  return DataSet(cd, fk, contamination_factor, weight);
 }
 
 /**
