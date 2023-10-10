@@ -503,7 +503,7 @@ class DataSetSpec(TupleComp):
 
         fkset = FKSet(FKSet.parseOperator(self.op), fktables)
 
-        data = DataSet(cd, fkset, self.weight, self.use_fixed_predictions)
+        data = DataSet(cd, fkset, self.weight, self.use_fixed_predictions, int(self.thspec.id))
 
         if self.cuts is not None:
             #ugly need to convert from numpy.int64 to int, so we can pass
