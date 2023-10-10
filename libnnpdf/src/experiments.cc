@@ -403,7 +403,11 @@ void Experiment::MakeClosure(const vector<ThPredictions>& predictions, bool cons
     auto newdata  =  vector<double>(set.GetNData());
 
     for (int i = 0; i < set.GetNData(); i++)
+    {
       newdata[i] = theory.GetObsCV(i);
+      // This is our opportunity to CONTAMINATE things, and sort out the fixed observables
+      cout << set.GetUseFixedPredictions() << endl;
+    }
 
     set.UpdateData(newdata.data()); // MakeClosure treated as shifts rather than normalisations
 

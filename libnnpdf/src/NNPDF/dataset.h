@@ -37,6 +37,8 @@ namespace NNPDF
     mutable matrix<double> fCovMat;      //!< The covariance matrix
     mutable matrix<double> fSqrtCov;     //!< The Cholesky decomposition of the covariance matrix
 
+    bool UseFixedPredictions; //!< Flag to indicate using fixed predictions from simu_factor file
+
     // private methods for constructor
     void GenCovMat() const;     //!< Generate covariance matrix
     double fWeight = 1; //!< Factor that divides the covariance matrix and increases
@@ -45,7 +47,7 @@ namespace NNPDF
     DataSet();                          //!< Disable default constructor
 
    public:
-    DataSet(CommonData const&, FKSet const&, double weight=1.); //!< Constructor
+    DataSet(CommonData const&, FKSet const&, double weight=1., bool use_fixed_predictions=false); //!< Constructor
     DataSet(const DataSet&, std::vector<int> const&); //!< Masked Copy constructor
     DataSet(const DataSet&) = default; //!< Masked Copy constructor
     virtual ~DataSet();                       //!< The destructor.
@@ -57,6 +59,8 @@ namespace NNPDF
     bool   const& IsT0 ()  const { return fIsT0; }      //!< Return t0 covmat flag
 
     // ************************ Data Get Methods ******************************
+
+    bool GetUseFixedPredictions() const {return UseFixedPredictions; } //!< Getter for UseFixedPredictions
 
     double const&  GetT0Pred(int i)    const { return fT0Pred[i];}  //!< Return t0 prediction
     double GetWeight() const {return fWeight;}
