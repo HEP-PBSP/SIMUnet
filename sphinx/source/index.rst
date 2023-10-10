@@ -62,11 +62,17 @@ The SM theoretical observables are encoded using interpolation grids, known as *
 
 
 
-Team Description
+The PBSP team
 ----------------------------------
-- ...
+The team is currently composed by the following members: 
 
-
+- Mark Costantini - University of Cambridge
+- Elie Hammou - University of Cambridge
+- Maeve Madigan - University of Heidelberg
+- Luca Mantani - University of Cambridge
+- James Moore - University of Cambridge
+- Manuel Morales-Alvarado - University of Cambridge
+- Maria Ubiali - University of Cambridge
 
 Citation policy
 ----------------------------------
