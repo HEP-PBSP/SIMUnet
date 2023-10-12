@@ -9,7 +9,9 @@
 SIMUnet
 ===================================
 
-The :math:`\text{SIMUnet}` methodology :cite:`Iranipour:2022iak` extends the :math:`\text{NNPDF}` framework :cite:`NNPDF:2021njg, NNPDF:2021uiq` to account for the EFT dependence (or, in principle, any parametric dependence) of the theory cross-sections entering the PDF determination.
+The :math:`\text{SIMUnet}` methodology :cite:`Iranipour:2022iak` is an open-source methodology to perform simultaneous PDF-EFT fits and fixed-PDF EFT fits. 
+
+It extends the :math:`\text{NNPDF}` framework :cite:`NNPDF:2021njg, NNPDF:2021uiq` to account for the EFT dependence (or, in principle, any parametric dependence) of the theory cross-sections entering the PDF determination.
 
 This is achieved by adding an extra layer to the :math:`\text{NNPDF}` neural network to encapsulate the dependence of the theory predictions on the EFT coefficients, including the free parameters in the general optimization procedure. This results in a simultaneous fit of the PDF as well as EFT coefficients to the input data.
 
