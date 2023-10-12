@@ -128,6 +128,13 @@ in the fit to avoid fitting bias associated with multiplicative uncertainties.
 
 .. toctree::
    :maxdepth: 4
+   :caption: Tutorial
+   :hidden:
+
+   tutorial.rst
+
+.. toctree::
+   :maxdepth: 4
    :caption: Results
    :hidden:
 
