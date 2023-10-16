@@ -513,13 +513,16 @@ class DataSetSpec(TupleComp):
             with open(simu_fac_path, 'rb') as file:
                 simu_file = yaml.safe_load(file)
             contamination_values = np.array([1.0]*cd.GetNData())
-            for parameter in self.contamination_data:
-                if parameter['name'] in simu_file[self.contamination].keys():
-                    op_prediction = parameter['value']*np.array(simu_file[self.contamination][parameter['name']])
-                    sm_prediction = np.array(simu_file[self.contamination]['SM'])
-                    percentages = op_prediction / sm_prediction
-                    contamination_values += percentages
-            contamination_values = contamination_values.tolist()
+            if self.contamination_data:
+                for parameter in self.contamination_data:
+                    if parameter['name'] in simu_file[self.contamination].keys():
+                        op_prediction = parameter['value']*np.array(simu_file[self.contamination][parameter['name']])
+                        sm_prediction = np.array(simu_file[self.contamination]['SM'])
+                        percentages = op_prediction / sm_prediction
+                        contamination_values += percentages
+                contamination_values = contamination_values.tolist()
+            else:
+                contamination_values = [1.0]*cd.GetNData() 
         else:
             # The contamination is just an array of 1s
             contamination_values = [1.0]*cd.GetNData()
