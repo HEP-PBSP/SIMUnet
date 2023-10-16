@@ -81,12 +81,17 @@ class CompareFitApp(App):
             default=None,
             help="Covariance matrix regularisation threshold.")
 
+        parser.add_argument(
+            '--use_fit_commondata',
+            default=False,
+            help="True if we are doing a closure test.")
+
         parser.set_defaults()
 
     def try_complete_args(self):
         args = self.args
         argnames = (
-            'current_fit', 'reference_fit', 'title', 'author', 'keywords', 'norm_threshold')
+            'current_fit', 'reference_fit', 'title', 'author', 'keywords', 'norm_threshold', 'use_fit_commondata')
         optionalnames = (
             'current_fit_label', 'reference_fit_label')
         boolnames = (
@@ -251,6 +256,9 @@ class CompareFitApp(App):
         if args['norm_threshold'] != None:
             args['norm_threshold'] = float(args['norm_threshold'])
         autosettings['norm_threshold']=args['norm_threshold']
+        if args['use_fit_commondata'] != None:
+            args['use_fit_commondata'] = bool(args['use_fit_commondata'])
+        autosettings['use_fit_commondata']=args['use_fit_commondata']
         return autosettings
 
 
