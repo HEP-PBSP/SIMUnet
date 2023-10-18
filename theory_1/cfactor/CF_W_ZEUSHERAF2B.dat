@@ -1,0 +1,30 @@
+*******************************************************************************************
+SetName: ZEUSHERAF2B
+Author: James Moore jmm232@cam.ac.uk
+Date: 2020
+CodesUsed: APFEL (apfel4eft branch)
+TheoryInput: Gmu EW input scheme
+PDFset: NNPDF31_nnlo_as_0118
+Warnings: For PDF4EFT project.
+Operator: W
+Coefficient: -10e-4
+InputParameters: G_F = 1.1663787e-5 GeV-2, m_Z = 91.1876 GeV, m_W = 80.398 GeV, Gamma_Z = 2.4952 GeV, Gamma_W = 2.085 GeV
+Notes: Correction is for electron channel. SMEFT contribution is linearised and includes SMEFT x QCD effects.
+********************************************************************************************
+1.0000017097    0.00000
+1.0000017098    0.00000
+1.0000031600    0.00000
+1.0000031602    0.00000
+1.0000065909    0.00000
+1.0000066068    0.00000
+1.0000079499    0.00000
+1.0000079332    0.00000
+1.0000079042    0.00000
+1.0000213748    0.00000
+1.0000213721    0.00000
+1.0000213506    0.00000
+1.0000434290    0.00000
+1.0000434324    0.00000
+1.0000434433    0.00000
+1.0001753332    0.00000
+1.0001753256    0.00000

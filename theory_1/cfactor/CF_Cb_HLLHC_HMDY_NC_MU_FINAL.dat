@@ -1,0 +1,25 @@
+*******************************************************************************************
+SetName: HLLHC_HMDY_NC_MU_FINAL
+Author: Maeve Madigan mum20@cam.ac.uk
+Date: 2021
+CodesUsed: Mathematica
+TheoryInput: Gmu EW input scheme
+PDFset: NNPDF31_nnlo_as_0118
+Warnings: For PDF4EFT project. Only K-factors above Z pole (>= 120 GeV) are != 1.
+Operator: Cb
+Coefficient: -10e-4
+InputParameters: G_F = 1.1663787e-5 GeV-2, m_Z = 91.1876 GeV, m_W = 80.398 GeV, Gamma_Z = 2.4952 GeV, Gamma_W = 2.085 GeV
+Notes: SMEFT contribution is linearised.
+********************************************************************************************
+0.9995704123040577427	0.0
+0.9995070345196584993	0.0
+0.9994447234633722088	0.0
+0.9993820074491379657	0.0
+0.9993302797904853874	0.0
+0.9992874950446182236	0.0
+0.9992600588454267907	0.0
+0.9992433945602310352	0.0
+0.999233149817762345	0.0
+0.9992284404361716499	0.0
+0.9992285764038780771	0.0
+0.9992202982650099097	0.0
