@@ -493,7 +493,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -507,6 +507,7 @@ class CoreConfig(configparser.Config):
         cfac = dataset.get("cfac", tuple())
         frac = dataset.get("frac", 1)
         use_fixed_predictions = dataset.get("use_fixed_predictions", False)
+        contamination = dataset.get("contamination", None)
         if not isinstance(frac, numbers.Real):
             raise ConfigError(f"'frac' must be a number, not '{frac}'")
         if frac < 0 or frac > 1:
@@ -542,6 +543,7 @@ class CoreConfig(configparser.Config):
             weight=weight,
             custom_group=custom_group,
             use_fixed_predictions=use_fixed_predictions,
+            contamination=contamination,
             **bsm_data
         )
 
@@ -698,6 +700,12 @@ class CoreConfig(configparser.Config):
             return self._produce_similarity_cuts(commondata)
         raise TypeError("Wrong use_cuts")
 
+    def produce_contamination_data(self, closuretest):
+        if "contamination_parameters" in closuretest.keys():
+            return closuretest["contamination_parameters"]
+        else:
+            return None
+
     def produce_dataset(
         self,
         *,
@@ -707,6 +715,7 @@ class CoreConfig(configparser.Config):
         use_fitcommondata=False,
         fit=None,
         check_plotting: bool = False,
+        contamination_data = None,
     ):
         """Dataset specification from the theory and CommonData.
            Use the cuts from the fit, if provided. If check_plotting is set to
@@ -719,6 +728,8 @@ class CoreConfig(configparser.Config):
         weight = dataset_input.weight
         simu_parameters_names = dataset_input.simu_parameters_names
         use_fixed_predictions = dataset_input.use_fixed_predictions
+        contamination = dataset_input.contamination
+        contamination_data = contamination_data
 
         try:
             ds = self.loader.check_dataset(
@@ -733,6 +744,8 @@ class CoreConfig(configparser.Config):
                 weight=weight,
                 simu_parameters_names=simu_parameters_names,
                 use_fixed_predictions=use_fixed_predictions,
+                contamination=contamination,
+                contamination_data=contamination_data,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)

@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, use_fixed_predictions):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, use_fixed_predictions, contamination):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -333,6 +333,7 @@ class DataSetInput(TupleComp):
         self.custom_group = custom_group
         self.simu_parameters_names = simu_parameters_names
         self.use_fixed_predictions = use_fixed_predictions
+        self.contamination = contamination
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -461,10 +462,12 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, use_fixed_predictions=False):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, use_fixed_predictions=False, contamination=None, contamination_data=None):
         self.name = name
         self.commondata = commondata
         self.use_fixed_predictions = use_fixed_predictions
+        self.contamination = contamination
+        self.contamination_data = contamination_data
 
         if isinstance(fkspecs, FKTableSpec):
             fkspecs = (fkspecs,)
@@ -503,8 +506,35 @@ class DataSetSpec(TupleComp):
 
         fkset = FKSet(FKSet.parseOperator(self.op), fktables)
 
-        data = DataSet(cd, fkset, self.weight)
+        if self.contamination:
+            # Determine the multiplicative factors that we have to contaminate the closure test
+            # pseudodata with.
+            simu_fac_path = str(self.fkspecs[0].fkpath).split('fastkernel')[0] + "simu_factors/SIMU_" + cd.GetSetName() + ".yaml"
+            with open(simu_fac_path, 'rb') as file:
+                simu_file = yaml.safe_load(file)
+            contamination_values = np.array([1.0]*cd.GetNData())
+            if self.contamination_data:
+                for parameter in self.contamination_data:
+                    if parameter['name'] in simu_file[self.contamination].keys():
+                        op_prediction = parameter['value']*np.array(simu_file[self.contamination][parameter['name']])
+                        sm_prediction = np.array(simu_file[self.contamination]['SM'])
+                        percentages = op_prediction / sm_prediction
+                        contamination_values += percentages
+                contamination_values = contamination_values.tolist()
+            else:
+                contamination_values = [1.0]*cd.GetNData() 
+        else:
+            # The contamination is just an array of 1s
+            contamination_values = [1.0]*cd.GetNData()
 
+        data = DataSet(
+            cd,
+            fkset,
+            contamination_values,
+            self.weight,
+            self.use_fixed_predictions,
+            int(self.thspec.id),
+        )
 
         if self.cuts is not None:
             #ugly need to convert from numpy.int64 to int, so we can pass

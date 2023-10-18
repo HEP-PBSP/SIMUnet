@@ -546,6 +546,8 @@ class Loader(LoaderBase):
         weight=1,
         simu_parameters_names=None,
         use_fixed_predictions=False,
+        contamination=None,
+        contamination_data=None,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -595,6 +597,8 @@ class Loader(LoaderBase):
             simu_parameters_names_CF=simu_parameters_names_CF,
             simu_parameters_names=simu_parameters_names,
             use_fixed_predictions=use_fixed_predictions,
+            contamination=contamination,
+            contamination_data=contamination_data,
         )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:

@@ -35,12 +35,15 @@ using namespace NNPDF;
  * \param weight the factor by which the importance of the dataset in the fit chi²
  * is increased.
  */
-DataSet::DataSet(CommonData const& data, FKSet const& set, double weight):
+DataSet::DataSet(CommonData const& data, FKSet const& set, std::vector<float> contamination_factor, double weight, bool use_fixed_predictions, int special_theory_id):
   CommonData(data),
   FKSet(set),
   fIsArtificial(false),
   fIsT0(false),
-  fWeight(weight)
+  fWeight(weight),
+  UseFixedPredictions(use_fixed_predictions),
+  SpecialTheoryID(special_theory_id),
+  ContaminationFactor(contamination_factor)
 {
   fT0Pred.reserve(fNData);
 
@@ -54,7 +57,10 @@ DataSet::DataSet(const DataSet& set, std::vector<int> const& mask):
   FKSet(set, mask),
   fIsArtificial(set.fIsArtificial),
   fIsT0(set.fIsT0),
-  fWeight(set.fWeight)
+  fWeight(set.fWeight),
+  UseFixedPredictions(set.UseFixedPredictions),
+  SpecialTheoryID(set.SpecialTheoryID),
+  ContaminationFactor(set.ContaminationFactor)
 {
   fT0Pred.reserve(fNData);
 
