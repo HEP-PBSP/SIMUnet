@@ -1,0 +1,8 @@
+dataset_label: "CMS 13TeV single-top rapidity $y_t$"
+x: k1
+y_label: '$1/\sigma d\sigma_{t}/dy_t$ (1/GeV)'
+figure_by:
+  - k2
+
+experiment: "CMS"
+nnpdf31_process: TOP

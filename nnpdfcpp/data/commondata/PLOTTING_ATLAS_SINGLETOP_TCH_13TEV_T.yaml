@@ -1,0 +1,5 @@
+dataset_label: "ATLAS $\\sigma_{t}^{\\rm tot}$ 13 TeV"
+
+experiment: "ATLAS"
+
+nnpdf31_process: TOP

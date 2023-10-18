@@ -1,0 +1,5 @@
+dataset_label: "ATLAS $W$-helicities 13 TeV"
+
+y_label: '$F_0$/$F_L$'
+experiment: "ATLAS"
+nnpdf31_process: TOP
