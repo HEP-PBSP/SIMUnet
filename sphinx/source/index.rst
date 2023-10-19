@@ -137,6 +137,13 @@ in the fit to avoid fitting bias associated with multiplicative uncertainties.
 
 .. toctree::
    :maxdepth: 4
+   :caption: Dataset selection
+   :hidden:
+
+   datasets.rst
+
+.. toctree::
+   :maxdepth: 4
    :caption: Results
    :hidden:
 
