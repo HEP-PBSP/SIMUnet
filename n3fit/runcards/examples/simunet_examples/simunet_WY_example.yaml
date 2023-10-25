@@ -91,11 +91,11 @@ fixed_pdf_fit: False
 # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
 
 simu_parameters:
-  #- name: 'W'
-  #  linear_combination: 
-  #    'Olq3': -15.94
-  #  scale: 100
-  #  initialisation: {type: uniform, minval: -1, maxval: 1}
+  - name: 'W'
+    linear_combination: 
+      'Olq3': -15.94
+    scale: 1000
+    initialisation: {type: uniform, minval: -1, maxval: 1}
 
   - name: 'Y'
     linear_combination: 
@@ -105,7 +105,7 @@ simu_parameters:
       'Olu': 6.0606
       'Old': -3.0394
       'Oqe': 3.0394
-    scale: 100
+    scale: 1000
     initialisation: {type: uniform, minval: -1, maxval: 1}
 
 ############################################################
