@@ -30,11 +30,11 @@ dataset_inputs:
 #- {dataset: D0ZRAP_40, frac: 0.75, cfac: ['QCD']}
 #- {dataset: D0WMASY, frac: 0.75, cfac: ['QCD']}
 #- {dataset: ATLASWZRAP36PB, frac: 0.75, cfac: ['QCD']}
-#- {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
+#- {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], simu_fac: 'EFT_LO'}
 #- {dataset: ATLASLOMASSDY11EXT, frac: 0.75, cfac: ['QCD']}
 #- {dataset: ATLASWZRAP11CC, frac: 0.75, cfac: ['QCD']}
 #- {dataset: ATLASWZRAP11CF, frac: 0.75, cfac: ['QCD']}
-#- {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], contamination: 'EFT_LO'}
+#- {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], simu_fac: 'EFT_LO'}
 #- {dataset: ATLAS_DY_2D_8TEV_LOWMASS, frac: 0.75, cfac: ['QCD']}
 #- {dataset: ATLAS_WZ_TOT_13TEV, frac: 0.75, cfac: ['NRM', 'QCD']}
 #- {dataset: ATLAS_WP_JET_8TEV_PT, frac: 0.75, cfac: ['QCD']}
@@ -58,7 +58,7 @@ dataset_inputs:
 #- {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_TBAR_RAP_NORM, frac: 0.75, cfac: ['QCD']}
 #- {dataset: CMSWEASY840PB, frac: 0.75, cfac: ['QCD']}
 #- {dataset: CMSWMASY47FB, frac: 0.75, cfac: ['QCD']}
-#- {dataset: CMSDY2D11, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
+#- {dataset: CMSDY2D11, frac: 0.75, cfac: ['QCD'], simu_fac: 'EFT_LO'}
 #- {dataset: CMSWMU8TEV, frac: 0.75, cfac: ['QCD']}
 #- {dataset: CMSZDIFF12, frac: 0.75, cfac: ['QCD', 'NRM']}
 #- {dataset: CMS_2JET_7TEV, frac: 0.75, cfac: ['QCD']}
@@ -80,12 +80,12 @@ dataset_inputs:
 #- {dataset: LHCBWZMU8TEV, frac: 0.75, cfac: ['NRM', 'QCD']}
 #- {dataset: LHCB_Z_13TEV_DIMUON, frac: 0.75, cfac: ['QCD']}
 #- {dataset: LHCB_Z_13TEV_DIELECTRON, frac: 0.75, cfac: ['QCD']}
-#- {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-#- {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
+#- {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+#- {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
 - {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
-#- {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-#- {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-#- {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
 
 fixed_pdf_fit: False
 # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
@@ -94,7 +94,7 @@ simu_parameters:
   - name: 'W'
     linear_combination: 
       'Olq3': -15.94
-    scale: 0.01
+    scale: 0.001
     initialisation: {type: uniform, minval: -1, maxval: 1}
 
   - name: 'Y'
@@ -105,7 +105,7 @@ simu_parameters:
       'Olu': 6.0606
       'Old': -3.0394
       'Oqe': 3.0394
-    scale: 0.01
+    scale: 0.001
     initialisation: {type: uniform, minval: -1, maxval: 1}
 
 ############################################################
