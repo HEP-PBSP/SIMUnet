@@ -1,5 +1,5 @@
 ############################################################
-description: "Runcard template for the new (more flexible) contaminated fits. This one sets up a fit with contaminated pseudodata when we run the vp-contaminate script. We can then run n3fit as normal."
+description: "Runcard template for a simultaneous fit of W, Y and the PDFs, where W, Y are defined as linear combinations of the SMEFT Warsaw basis operators."
 
 ############################################################
 dataset_inputs:
@@ -30,11 +30,11 @@ dataset_inputs:
 - {dataset: D0ZRAP_40, frac: 0.75, cfac: ['QCD']}
 - {dataset: D0WMASY, frac: 0.75, cfac: ['QCD']}
 - {dataset: ATLASWZRAP36PB, frac: 0.75, cfac: ['QCD']}
-- {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
+- {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], simu_fac: 'EFT_LO'}
 - {dataset: ATLASLOMASSDY11EXT, frac: 0.75, cfac: ['QCD']}
 - {dataset: ATLASWZRAP11CC, frac: 0.75, cfac: ['QCD']}
 - {dataset: ATLASWZRAP11CF, frac: 0.75, cfac: ['QCD']}
-- {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], contamination: 'EFT_LO'}
+- {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], simu_fac: 'EFT_LO'}
 - {dataset: ATLAS_DY_2D_8TEV_LOWMASS, frac: 0.75, cfac: ['QCD']}
 - {dataset: ATLAS_WZ_TOT_13TEV, frac: 0.75, cfac: ['NRM', 'QCD']}
 - {dataset: ATLAS_WP_JET_8TEV_PT, frac: 0.75, cfac: ['QCD']}
@@ -58,7 +58,7 @@ dataset_inputs:
 - {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_TBAR_RAP_NORM, frac: 0.75, cfac: ['QCD']}
 - {dataset: CMSWEASY840PB, frac: 0.75, cfac: ['QCD']}
 - {dataset: CMSWMASY47FB, frac: 0.75, cfac: ['QCD']}
-- {dataset: CMSDY2D11, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
+- {dataset: CMSDY2D11, frac: 0.75, cfac: ['QCD'], simu_fac: 'EFT_LO'}
 - {dataset: CMSWMU8TEV, frac: 0.75, cfac: ['QCD']}
 - {dataset: CMSZDIFF12, frac: 0.75, cfac: ['QCD', 'NRM']}
 - {dataset: CMS_2JET_7TEV, frac: 0.75, cfac: ['QCD']}
@@ -80,37 +80,34 @@ dataset_inputs:
 - {dataset: LHCBWZMU8TEV, frac: 0.75, cfac: ['NRM', 'QCD']}
 - {dataset: LHCB_Z_13TEV_DIMUON, frac: 0.75, cfac: ['QCD']}
 - {dataset: LHCB_Z_13TEV_DIELECTRON, frac: 0.75, cfac: ['QCD']}
-- {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-- {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-- {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-- {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-- {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-- {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
+- {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_NC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_NC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_CC_EL_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
+- {dataset: HLLHC_HMDY_CC_MU_FINAL, frac: 0.75, cfac: ['QCD', 'EWK'], simu_fac: 'EFT_LO'}
 
 fixed_pdf_fit: False
 # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
 
-###########################################################
-# The closure test namespace tells us the settings for the
-# (possible contaminated) closure test.
-############################################################
-closuretest:
-  filterseed: 0 # Random seed to be used in filtering data partitions
-  fakedata: true     # true = to use FAKEPDF to generate pseudo-data
-  fakepdf: NNPDF40_nnlo_as_01180      # Theory input for pseudo-data
-  errorsize: 1.0    # uncertainties rescaling
-  fakenoise: true    # true = to add random fluctuations to pseudo-data
-  rancutprob: 1.0   # Fraction of data to be included in the fit
-  rancutmethod: 0   # Method to select rancutprob data fraction
-  rancuttrnval: false # 0(1) to output training(valiation) chi2 in report
-  printpdf4gen: false # To print info on PDFs during minimization
-  # W=1 corresponds to Olq3=-15.94. To obtain any other value fo W, multiply
-  # for the desired value of W, e.g. W=8e-5 corresponds to Olq3=-15.94 * 8e-5
-  contamination_parameters:
-    - {name: 'Olq3', value: -15.94}
+simu_parameters:
+  - name: 'W'
+    linear_combination: 
+      'Olq3': -15.94
+    scale: 1000
+    initialisation: {type: uniform, minval: -1, maxval: 1}
 
-seed: 0
-rngalgo: 0
+  - name: 'Y'
+    linear_combination: 
+      'Olq1': 1.51606
+      'Oed': -6.0606
+      'Oeu': 12.1394
+      'Olu': 6.0606
+      'Old': -3.0394
+      'Oqe': 3.0394
+    scale: 1000
+    initialisation: {type: uniform, minval: -1, maxval: 1}
+
 ############################################################
 datacuts:
   t0pdfset: NNPDF40_nnlo_as_01180 # PDF set to generate t0 covmat

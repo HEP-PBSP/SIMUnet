@@ -12,7 +12,8 @@ def get_bsm_data(
     simu_fac,
     simu_parameters,
     simu_parameters_names,
-    n_simu_parameters
+    n_simu_parameters,
+    simu_parameters_linear_combinations,
 ):
     """
     Given BSM specifications within dataset_inputs specs
@@ -32,24 +33,34 @@ def get_bsm_data(
                         list containing names of the dimension 6 operators
                         read from the runcard with production rule
     n_simu_parameters: int
+    simu_parameters_linear_combinations: list of dictionaries
+                        list containing the linear combinations that each of
+                        the parameters are defined in terms of
 
     Returns
     -------
     dict
         - simu_parameters_names : list containing names of bsm k-factors
-
-        - bsm_sector : str
-    
+        - simu_parameters_linear_combinations: list containing the linear combinations
+            that each of the parameters are defined in terms of, now with order attached
 
     """
     # default value
     new_simu_parameters_names = None
+    new_simu_parameters_linear_combinations = None
 
     if simu_parameters is not None and simu_fac is not None:
         new_simu_parameters_names = [
         simu_fac + "_" + op for op in simu_parameters_names
         ]
-        
+
+        new_simu_parameters_linear_combinations = {}
+        index = 0
+        for dictionary in simu_parameters_linear_combinations:
+            new_simu_parameters_linear_combinations[simu_fac + "_" +simu_parameters_names[index]] = dictionary
+            index += 1
+
     return {
         "simu_parameters_names": new_simu_parameters_names,
+        "simu_parameters_linear_combinations": new_simu_parameters_linear_combinations,
     }

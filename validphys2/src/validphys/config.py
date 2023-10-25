@@ -489,8 +489,22 @@ class CoreConfig(configparser.Config):
             return simu_parameters_scales
         return []
 
+    def produce_simu_parameters_linear_combinations(self, simu_parameters=None):
+        """Produces the list of linear combinations for each of the parameters entering the 
+        simultaneous fit.
+        """
+        if simu_parameters is not None:
+            simu_parameters_linear_combinations = []
+            for entry in simu_parameters:
+                if 'linear_combination' in entry.keys():
+                    simu_parameters_linear_combinations += [entry['linear_combination']]
+                else:
+                    simu_parameters_linear_combinations += [{entry['name'] : 1}]
+            return simu_parameters_linear_combinations
+        return []
+
     @element_of("dataset_inputs")
-    def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters=None):
+    def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters_linear_combinations, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
         known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination"}
@@ -533,6 +547,7 @@ class CoreConfig(configparser.Config):
             simu_parameters,
             simu_parameters_names,
             n_simu_parameters,
+            simu_parameters_linear_combinations,
         )
 
         return DataSetInput(
@@ -727,6 +742,7 @@ class CoreConfig(configparser.Config):
         frac = dataset_input.frac
         weight = dataset_input.weight
         simu_parameters_names = dataset_input.simu_parameters_names
+        simu_parameters_linear_combinations = dataset_input.simu_parameters_linear_combinations
         use_fixed_predictions = dataset_input.use_fixed_predictions
         contamination = dataset_input.contamination
         contamination_data = contamination_data
@@ -743,6 +759,7 @@ class CoreConfig(configparser.Config):
                 fit=fit,
                 weight=weight,
                 simu_parameters_names=simu_parameters_names,
+                simu_parameters_linear_combinations=simu_parameters_linear_combinations,
                 use_fixed_predictions=use_fixed_predictions,
                 contamination=contamination,
                 contamination_data=contamination_data,

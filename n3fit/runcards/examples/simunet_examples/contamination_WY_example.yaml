@@ -1,5 +1,5 @@
 ############################################################
-description: "Runcard template for the new (more flexible) contaminated fits. This one sets up a fit with contaminated pseudodata when we run the vp-contaminate script. We can then run n3fit as normal."
+description: "Runcard template for a simultaneous fit of W, Y and the PDFs, where W, Y are defined as linear combinations of the SMEFT Warsaw basis operators."
 
 ############################################################
 dataset_inputs:
@@ -104,23 +104,21 @@ closuretest:
   rancutmethod: 0   # Method to select rancutprob data fraction
   rancuttrnval: false # 0(1) to output training(valiation) chi2 in report
   printpdf4gen: false # To print info on PDFs during minimization
-  #  Mapping to Y = 1:
-  #  factor = 18.2
-  #  "Olq1": 0.0833 * factor,
-  #  "Oed": -0.333 * factor,
-  #  "Oeu": 0.667 * factor,
-  #  "Olu": 0.333 * factor,
-  #  "Old": -0.167 * factor,
-  #  "Oqe": 0.167 * factor
-  #
-  # for the desired value of Y, e.g. Y=5e-5 corresponds to Op= X * 5e-5
   contamination_parameters:
-    - {name: 'Olq1', value: 1.516}
-    - {name: 'Oed', value: -6.0606}
-    - {name: 'Oeu', value: 12.1394}
-    - {name: 'Olu', value: 6.0606}
-    - {name: 'Old', value: -3.0394}
-    - {name: 'Oqe', value: 3.0394}
+    - name: 'W'
+      value: 0.00008
+      linear_combination:
+        'Olq3': -15.94
+
+    - name: 'Y'
+      value: 1 
+      linear_combination:
+        'Olq1': 1.51606
+        'Oed': -6.0606
+        'Oeu': 12.1394
+        'Olu': 6.0606
+        'Old': -3.0394
+        'Oqe': 3.0394
 
 seed: 0
 rngalgo: 0

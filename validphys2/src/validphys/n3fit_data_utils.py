@@ -73,7 +73,7 @@ def fk_parser(fk, is_hadronic=False):
     }
     return dict_out
 
-def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
+def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_linear_combinations, cuts):
     """
     Returns a dictionary containing the bsm k-factor corrections 
     to be applied to the theory predictions.
@@ -81,6 +81,7 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
     Parameters
     ----------
     simu_parameters_names_CF: dict or NoneType
+    simu_parameters_linear_combinations: The mapping that gives the correct linear combinations
 
     cuts: validphys.core.InternalCutsWrapper
 
@@ -90,6 +91,7 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
         dictionary with (key, value) = (EFT-Order_Name-Operator, coredata.CFactorData)
 
     """
+
     if simu_parameters_names_CF is None:
         return None
     if hasattr(cuts, 'load'):
@@ -99,28 +101,27 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, cuts):
         # load SIMU yaml file
         with open(path, "rb") as stream:
             cfac_file = yaml.safe_load(stream)
+
         eft_order = "_".join(name.split("_")[:-1])
-        eft_operator = name.split("_")[-1]
+        eft_operator_list = list(simu_parameters_linear_combinations[name].keys())
 
-        if eft_operator not in cfac_file[eft_order]:
-            # make dummy BSM-factor
-            central = np.zeros(len(cuts))
-            uncertainty = np.zeros(len(cuts))
-            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
-        else:
+        central = np.zeros(len(cuts))
+        uncertainty = np.zeros(len(cuts))
+        standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
+        for op in eft_operator_list:
+            if op in cfac_file[eft_order]:
+                central += simu_parameters_linear_combinations[name][op] * np.array(cfac_file[eft_order][op])[cuts]
 
-            if "SM" not in cfac_file[eft_order]:
-                raise KeyError(f"The 'SM' key is not present under the {eft_order} key in the SIMU file at {path}.")
+        central = central / standard_model_prediction
 
-            standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
-            central_value = np.array(cfac_file[eft_order][eft_operator])[cuts] / standard_model_prediction
-            cfac = CFactorData(
-                    description=path,
-                    central_value=central_value,
-                    uncertainty=np.zeros(len(cuts)),
-                )
-        
+        cfac = CFactorData(
+                description=path,
+                central_value=central,
+                uncertainty=np.zeros(len(cuts)),
+               )
+
         name_cfac_map[name] = cfac
+
     return name_cfac_map
 
 
@@ -161,7 +162,7 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
-        "simu_parameters_names_CF": parse_simu_parameters_names_CF(dataset_spec.simu_parameters_names_CF, cuts),
+        "simu_parameters_names_CF": parse_simu_parameters_names_CF(dataset_spec.simu_parameters_names_CF, dataset_spec.simu_parameters_linear_combinations, cuts),
         "simu_parameters_names": dataset_spec.simu_parameters_names,
     }
 
