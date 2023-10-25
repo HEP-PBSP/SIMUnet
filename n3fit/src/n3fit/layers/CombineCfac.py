@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 import numpy as np
+import hashlib
 
 from validphys import initialisation_specs
 
@@ -37,7 +38,8 @@ class CombineCfacLayer(Layer):
         initial_values = []
         assert len(initialisations) == len(linear_names)
         for ini, name in zip(initialisations, linear_names):
-            seed = np.int32((initialisation_seed + replica_number) ^ hash(name))
+            hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (10 ** 18)
+            seed = np.int32((initialisation_seed + replica_number) ^ hash_value)
 
             if isinstance(ini, initialisation_specs.ConstantInitialisation):
                 val = tf.constant(ini.value, dtype='float32', shape=(1,))
