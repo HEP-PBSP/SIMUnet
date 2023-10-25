@@ -514,14 +514,18 @@ class DataSetSpec(TupleComp):
             simu_fac_path = str(self.fkspecs[0].fkpath).split('fastkernel')[0] + "simu_factors/SIMU_" + cd.GetSetName() + ".yaml"
             with open(simu_fac_path, 'rb') as file:
                 simu_file = yaml.safe_load(file)
-            contamination_values = np.array([1.0]*cd.GetNData())
+            contamination_values = np.array([0.0]*cd.GetNData())
             if self.contamination_data:
                 for parameter in self.contamination_data:
-                    if parameter['name'] in simu_file[self.contamination].keys():
-                        op_prediction = parameter['value']*np.array(simu_file[self.contamination][parameter['name']])
-                        sm_prediction = np.array(simu_file[self.contamination]['SM'])
-                        percentages = op_prediction / sm_prediction
-                        contamination_values += percentages
+                    if 'linear_combination' not in parameter.keys():
+                        # Default if no linear combination is just to take the parameter name itself
+                        parameter['linear_combination'] = {parameter['name'] : 1.0}
+                    for op in list(parameter['linear_combination'].keys()):
+                        if op in simu_file[self.contamination].keys():
+                            contamination_values += parameter['value']*parameter['linear_combination'][op]*np.array(simu_file[self.contamination][op])
+                sm_prediction = np.array(simu_file[self.contamination]['SM'])
+                contamination_values = contamination_values / sm_prediction
+                contamination_values += np.array([1.0]*cd.GetNData())
                 contamination_values = contamination_values.tolist()
             else:
                 contamination_values = [1.0]*cd.GetNData() 
