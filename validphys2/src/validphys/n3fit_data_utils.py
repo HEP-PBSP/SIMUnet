@@ -110,7 +110,9 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_lin
         standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
         for op in eft_operator_list:
             if op in cfac_file[eft_order]:
-                central += simu_parameters_linear_combinations[name][op] * np.array(cfac_file[eft_order][op])[cuts] / standard_model_prediction
+                central += simu_parameters_linear_combinations[name][op] * np.array(cfac_file[eft_order][op])[cuts]
+
+        central = central / standard_model_prediction
 
         cfac = CFactorData(
                 description=path,
