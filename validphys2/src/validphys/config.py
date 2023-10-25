@@ -496,7 +496,10 @@ class CoreConfig(configparser.Config):
         if simu_parameters is not None:
             simu_parameters_linear_combinations = []
             for entry in simu_parameters:
-                simu_parameters_linear_combinations += [entry['linear_combination']]
+                if 'linear_combination' in entry.keys():
+                    simu_parameters_linear_combinations += [entry['linear_combination']]
+                else:
+                    simu_parameters_linear_combinations += [{entry['name'] : 1}]
             return simu_parameters_linear_combinations
         return []
 
