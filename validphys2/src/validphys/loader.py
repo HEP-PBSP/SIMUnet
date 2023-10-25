@@ -545,6 +545,7 @@ class Loader(LoaderBase):
         fit=None,
         weight=1,
         simu_parameters_names=None,
+        simu_parameters_linear_combinations=None,
         use_fixed_predictions=False,
         contamination=None,
         contamination_data=None,
@@ -584,7 +585,6 @@ class Loader(LoaderBase):
         else: 
             simu_parameters_names_CF = None
 
-        
         return DataSetSpec(
             name=name,
             commondata=commondata,
@@ -596,6 +596,7 @@ class Loader(LoaderBase):
             weight=weight,
             simu_parameters_names_CF=simu_parameters_names_CF,
             simu_parameters_names=simu_parameters_names,
+            simu_parameters_linear_combinations=simu_parameters_linear_combinations,
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
             contamination_data=contamination_data,

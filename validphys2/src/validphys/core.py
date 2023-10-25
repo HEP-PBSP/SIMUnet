@@ -324,7 +324,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, use_fixed_predictions, contamination):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -332,6 +332,7 @@ class DataSetInput(TupleComp):
         self.weight = weight
         self.custom_group = custom_group
         self.simu_parameters_names = simu_parameters_names
+        self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
         super().__init__(name, sys, cfac, frac, weight, custom_group)
@@ -462,7 +463,7 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, use_fixed_predictions=False, contamination=None, contamination_data=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, simu_parameters_linear_combinations=None, use_fixed_predictions=False, contamination=None, contamination_data=None):
         self.name = name
         self.commondata = commondata
         self.use_fixed_predictions = use_fixed_predictions
@@ -480,6 +481,7 @@ class DataSetSpec(TupleComp):
 
         # These are important because they are ORDERED correctly, but the dictionaries might not be
         self.simu_parameters_names = simu_parameters_names
+        self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere

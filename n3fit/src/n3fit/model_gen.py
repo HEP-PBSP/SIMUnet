@@ -101,6 +101,11 @@ class ObservableWrapper:
             # Use get here to prevent having to worry about POSDATSETS
             simu_parameters_names_CF = dataset_dict.get('simu_parameters_names_CF')
             simu_parameters_names = dataset_dict.get('simu_parameters_names')
+            simu_parameters_linear_combinations = dataset_dict.get('simu_parameter_linear_combinations')
+
+            print(simu_parameters_names_CF)
+            print(simu_parameters_names)
+            print(simu_parameters_linear_combinations)
 
             if simu_parameters_names_CF is not None:
 
