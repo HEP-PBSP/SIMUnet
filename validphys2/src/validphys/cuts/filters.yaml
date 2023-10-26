@@ -16,12 +16,6 @@
    linearly dependent on the others
   rule: "p_T>45.0"
 
-- dataset: ATLAS_TTBAR_13TEV_HADRONIC_TTMNORM
-  reason: |
-   We remove the /first/ bin of the normalised distribution because it is
-   linearly dependent on the others
-  rule: "MQQ>450"
-
 - dataset: CMS_TTBARZ_13TEV_PTZNORM
   reason: |
    We remove the /first/ bin of the normalised distribution because it is
