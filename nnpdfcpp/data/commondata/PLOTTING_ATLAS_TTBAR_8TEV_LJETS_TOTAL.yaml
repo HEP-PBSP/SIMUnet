@@ -2,4 +2,4 @@ dataset_label: "ATLAS $\\sigma_{t\\bar{t}}^{\\rm tot}$ (l+jets) 8 TeV"
 
 experiment: "ATLAS"
 
-nnpdf31_process: TOP
+nnpdf31_process: TTBAR

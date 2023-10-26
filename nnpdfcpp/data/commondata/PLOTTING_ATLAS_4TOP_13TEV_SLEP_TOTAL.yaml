@@ -2,4 +2,4 @@ dataset_label: "ATLAS $\\sigma_{t\\bar{t}t\\bar{t}}^{\\rm tot}$ (single lepton) 
 
 experiment: "ATLAS"
 
-nnpdf31_process: TOP
+nnpdf31_process: "4HEAVY"

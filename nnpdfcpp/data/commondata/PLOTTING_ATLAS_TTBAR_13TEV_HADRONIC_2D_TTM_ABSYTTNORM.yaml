@@ -9,4 +9,4 @@ figure_by:
   - k2
 
 experiment: "ATLAS"
-nnpdf31_process: TOP
+nnpdf31_process: TTBAR

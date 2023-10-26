@@ -2,4 +2,4 @@ dataset_label: "ATLAS $\\sigma_{ttW}^{\\rm tot}$ 13 TeV"
 
 experiment: "ATLAS"
 
-nnpdf31_process: TOP
+nnpdf31_process: TTBARV

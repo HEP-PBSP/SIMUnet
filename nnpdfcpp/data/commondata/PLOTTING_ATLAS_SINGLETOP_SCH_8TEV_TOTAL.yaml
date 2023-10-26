@@ -2,4 +2,4 @@ dataset_label: "ATLAS single-top production total cross-section in s-channel, 8 
 
 experiment: "ATLAS"
 
-nnpdf31_process: TOP
+nnpdf31_process: SINGLETOP

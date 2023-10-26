@@ -2,4 +2,4 @@ dataset_label: "CMS $\\sigma_{t\\bar{t}t\\bar{t}}^{\\rm tot}$ (multilepton) 13 T
 
 experiment: "CMS"
 
-nnpdf31_process: TOP
+nnpdf31_process: "4HEAVY"

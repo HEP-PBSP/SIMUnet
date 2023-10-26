@@ -2,4 +2,4 @@ dataset_label: "CMS $\\sigma_{t}^{\\rm tot}$ 8 TeV"
 
 experiment: "CMS"
 
-nnpdf31_process: TOP
+nnpdf31_process: SINGLETOP

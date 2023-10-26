@@ -2,4 +2,4 @@ dataset_label: "CMS single-top production total cross-section in s-channel, 8 Te
 
 experiment: "CMS"
 
-nnpdf31_process: TOP
+nnpdf31_process: SINGLETOP

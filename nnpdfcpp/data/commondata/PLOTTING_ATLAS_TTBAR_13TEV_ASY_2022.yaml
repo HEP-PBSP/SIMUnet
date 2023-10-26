@@ -2,4 +2,4 @@ dataset_label: "ATLAS 13TeV $t\\bar{t}$ asymmetry $A_C$ (2022 update)"
 x: k1
 y_label: '$A_C$' 
 experiment: "ATLAS"
-nnpdf31_process: TOP
+nnpdf31_process: TTBAR
