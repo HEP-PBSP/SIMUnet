@@ -1,0 +1,3 @@
+dataset_label: "\mathcal{B}(W \rightarrow e^{-} \bar{v}_e), \mathcal{B}(W \rightarrow \mu^{-} \bar{v}_{\mu}), \mathcal{B}(W \rightarrow \tau^{-} \bar{v}_{\tau})"
+experiment: LEP
+nnpdf31_process: EWPO
