@@ -325,7 +325,11 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
-    parsed_bsm_facs = parse_simu_parameters_names_CF(dataset.simu_parameters_names_CF, dataset.cuts)
+    parsed_bsm_facs = parse_simu_parameters_names_CF(
+                                                    dataset.simu_parameters_names_CF, 
+                                                    dataset.simu_parameters_linear_combinations, 
+                                                    dataset.cuts
+                                                    )
 
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
