@@ -49,10 +49,12 @@ l = Loader()
 Format routines
 ---------------
 """
+
 def display_format(series):
     """
     Determines the format of the BSM factors
     to be displayed in the tables
+
     Parameters
     ----------
         series: pd.Series
@@ -74,6 +76,7 @@ def format_residuals(residuals):
     """
     Makes a list of intervals to display
     in the pulls. 
+
     Parameters
     ----------
         residuals: list[float]
@@ -225,6 +228,7 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
     """
     Plots the kernel estimation density for a distribution
     of BSM coefficients. 
+
     Parameters
     ----------
         read_bsm_facs: pd.DataFrame
@@ -380,7 +384,8 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
 def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
     """
     Plot two dimensional distributions for all pairs
-    of BSM coefficients in a fit
+    of BSM coefficients in a fit.
+
     Parameters
     ----------
         read_bsm_facs: pd.Dataframe 
@@ -457,9 +462,11 @@ def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     """
     Table generator to summarise information about
     the BSM coefficient results.
+
     Paramaters
     ----------
         read_bsm_facs: pd.Dataframe
+
     The returned table contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the 68% (95%) confidence level by 
@@ -496,7 +503,8 @@ def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
 
 @table
 def tabulate_bsm_corr(fit, read_bsm_facs):
-    """Same as plot_bsm_corr, but table rather than plot.
+    """
+    Same as plot_bsm_corr, but table rather than plot.
     """
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
@@ -519,9 +527,11 @@ def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     """
     Correlation matrix to summarise information about
     the BSM coefficient results.
+
     Paramaters
     ----------
         read_bsm_facs: pd.Dataframe
+
     """
 
     # figsize (11, 9) has good proportions
@@ -726,13 +736,16 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
     """
     Table generator to summarise information about
     the BSM coefficient results.
+
     Paramaters
     ----------
         fits: NSList of FitSpec 
+
     The returned table contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the confidence levels by 
     computing mean ± n_sigma * std.
+
     """ 
     # extract all operators in the fits
     all_ops = []
@@ -806,9 +819,11 @@ def bsm_facs_68bounds_fits(fits, bsm_names_to_latex,):
     """
     Table generator to obtain the 68% CL
     for BSM factors while comparing fits.
+
     Parameters
     ----------
         fits: NSList of FitSpec 
+
     """ 
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=1)
 
@@ -817,15 +832,18 @@ def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
     Table generator to obtain the 95% CL
     for BSM factors while comparing fits.
+
     Parameters
     ----------
         fits: NSList of FitSpec 
+
     """ 
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
-    """Compares two SMEFiT fits.
+    """
+    Compares two SMEFiT fits.
     """
     # extract all operators in the SMEFiT fits
     all_ops = []
@@ -949,14 +967,17 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
     """
     Figure generator to compare bounds obtained with simunet with
     bounds obtained by smefit.
+
     Paramaters
     ----------
         fits: NSList of FitSpec 
         n_sigma: number
+
     The plot contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the confidence levels by 
     computing mean ± 2*std.
+
     """ 
     # extract all operators in the fits
     all_ops = []
@@ -1093,10 +1114,12 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
     Figure generator to plot the bounds of
     the BSM coefficients fitted.
+    
     Paramaters
     ----------
         fits: NSList of FitSpec 
         n_sigma: number
+
     The plot contains information about the mean
     and standard deviation of the BSM coefficients in the fit, 
     as well as showing the confidence levels by 
@@ -1211,9 +1234,11 @@ def plot_bsm_facs_68res(fits, bsm_names_to_latex):
     """
     Figure generator to plot the 68% residuals
     pulls of the BSM coefficients
+
     Parameters
     ----------
         fits: NSList[FitSpec] 
+
     """ 
     # extract all operators in the fits
     all_ops = []
@@ -1299,7 +1324,8 @@ def read_pdf_cfactors(_read_pdf_cfactors, pdf):
     return _read_pdf_cfactors[0]
 
 def dataset_inputs_scaled_fit_cfactor(data, pdf, read_pdf_cfactors, quad_cfacs):
-    """Same as :py:func:`validphys.results.dataset_scaled_fit_cfactor`
+    """
+    Same as :py:func:`validphys.results.dataset_scaled_fit_cfactor`
     but for a list of dataset inputs.
     """
     res =  np.concatenate(
@@ -1308,12 +1334,15 @@ def dataset_inputs_scaled_fit_cfactor(data, pdf, read_pdf_cfactors, quad_cfacs):
     return res
 
 def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
-    """For each replica of ``pdf``, scale the fit cfactors by
+    """
+    For each replica of ``pdf``, scale the fit cfactors by
     the best fit value.
+
     Returns
     -------
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the scaled fit cfactors.
+
     """
     parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts)
     if parsed_cfacs is None or not read_pdf_cfactors.values.size:
@@ -1343,7 +1372,8 @@ Principal component analysis
 
 @table
 def fisher_information_matrix(dataset_inputs, groups_index, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    Obtains the full Fisher information matrix for the BSM parameters.
     """
     return _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf)
 
@@ -1355,7 +1385,8 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 @figure
 def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to_latex, bsm_sectors_to_latex):
-    """Produces a nice plot from the table fisher_information_by_sector.
+    """
+    Produces a nice plot from the table fisher_information_by_sector.
     """
     f = fisher_information_by_sector
 
@@ -1396,7 +1427,8 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
 
 @table
 def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the Fisher information matrices for each of the BSM sectors.
+    """
+    Obtains the Fisher information matrices for each of the BSM sectors.
     """
     
     # First, get the names of the BSM sectors.
@@ -1460,7 +1492,8 @@ def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_p
     return df
 
 def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Computes a Fisher information matrix.
+    """
+    Computes a Fisher information matrix.
     """
     bsm_factors = []
     if dataset_inputs is not None:
@@ -1487,7 +1520,8 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
 
 @table
 def principal_component_values(fisher_information_matrix):
-    """Returns the eigenvalues corresponding to the various principal directions
+    """
+    Returns the eigenvalues corresponding to the various principal directions
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
@@ -1497,7 +1531,8 @@ def principal_component_values(fisher_information_matrix):
 
 @table
 def principal_component_vectors(fisher_information_matrix, simu_parameters_names):
-    """Performs a principal component analysis to obtain the flat directions
+    """
+    Performs a principal component analysis to obtain the flat directions
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
