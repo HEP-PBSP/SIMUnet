@@ -203,7 +203,7 @@ def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genr
 
             # mask out the data we want to check are all positive
             non_positive_sets = ["ATLAS_CMS_WHEL_8TEV", "ATLAS_CMS_SSINC_RUNI", "ATLAS_CMS_TTBAR_8TEV_ASY", "ATLAS_STXS_RUNII", "CMS_TTBAR_8TEV_ASY", "CMS_TTBAR_13TEV_ASY", "CMS_SSINC_RUNII"]
-            print(cd.setname)
+            
             if cd.setname in non_positive_sets:
                 check_positive_masks.append(np.zeros_like(pseudodata, dtype=bool))
             else:
