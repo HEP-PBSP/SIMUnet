@@ -156,15 +156,15 @@ simu_parameters:
   # Quark Currents
   - {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$', plot_scale: 1}
   - {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$', plot_scale: 10}
-  - {name: ‘O3pq’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi q}^{(3)}$’}
+  - {name: 'O3pq', scale: 1, plot_scale: 1, latex: '$c_{\varphi q}^{(3)}$'}
   - {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$', plot_scale: 1}
-  - {name: ‘OpqMi’,  plot_scale: 1, scale: 1, latex: ‘$c_{\varphi q}^{(-)}$’}
-  - {name: ‘Opui’, plot_scale: 1, scale: 1, latex: ‘$c_{\varphi u}$’}
-  - {name: ‘Opdi’, plot_scale: 1, scale: 1, latex: ‘$c_{\varphi d}$’}
+  - {name: 'OpqMi',  plot_scale: 1, scale: 1, latex: '$c_{\varphi q}^{(-)}$'}
+  - {name: 'Opui', plot_scale: 1, scale: 1, latex: '$c_{\varphi u}$'}
+  - {name: 'Opdi', plot_scale: 1, scale: 1, latex: '$c_{\varphi d}$'}
   # Lepton currents
-  - {name: ‘O3pl’, plot_scale: 1, scale: 1, latex: ‘$c_{\varphi l}^{(3)}$’}
-  - {name: ‘Opl’, plot_scale: 1, scale: 1, latex: ‘$c_{\varphi l}$’}
-  - {name: ‘Ope’, plot_scale: 1, scale: 1, latex: ‘$c_{\varphi e}$’}
+  - {name: 'O3pl', plot_scale: 1, scale: 1, latex: '$c_{\varphi l}^{(3)}$'}
+  - {name: 'Opl', plot_scale: 1, scale: 1, latex: '$c_{\varphi l}$'}
+  - {name: 'Ope', plot_scale: 1, scale: 1, latex: '$c_{\varphi e}$'}
   # 4 Fermions 4Q
   - {name: 'O1qd', scale: 1, latex: '$c_{Qd}^{1}$', plot_scale: 1}
   - {name: 'O1qu', scale: 1, latex: '$c_{Qu}^{1}$', plot_scale: 1}
@@ -181,36 +181,36 @@ simu_parameters:
   - {name: 'O81qq', scale: 1, latex: '$c_{Qq}^{8,1}$', plot_scale: 1}
   - {name: 'O83qq', scale: 1, latex: '$c_{Qq}^{8,3}$', plot_scale: 1} 
   # 4 Fermions 4HeavyQ
-  - {name: ‘OQt8’, scale: 1, plot_scale: 1, latex: ‘$c_{Qt}^{8}$’}
-  - {name: ‘OQQ1’, scale: 1, plot_scale: 1, latex: ‘$c_{QQ}^{1}$’}
-  - {name: ‘OQQ8’, scale: 1, plot_scale: 1, latex: ‘$c_{QQ}^{8}$’}
-  - {name: ‘OQt1’, scale: 1, plot_scale: 1, latex: ‘$c_{Qt}^{1}$’}
-  - {name: ‘Ott1’, scale: 1, plot_scale: 1, latex: ‘$c_{tt}^{1}$’}
+  - {name: 'OQt8', scale: 1, plot_scale: 1, latex: '$c_{Qt}^{8}$'}
+  - {name: 'OQQ1', scale: 1, plot_scale: 1, latex: '$c_{QQ}^{1}$'}
+  - {name: 'OQQ8', scale: 1, plot_scale: 1, latex: '$c_{QQ}^{8}$'}
+  - {name: 'OQt1', scale: 1, plot_scale: 1, latex: '$c_{Qt}^{1}$'}
+  - {name: 'Ott1', scale: 1, plot_scale: 1, latex: '$c_{tt}^{1}$'}
   # 4 Fermions 2L2Q
-  - {name: ‘Oeu’, scale: 1, plot_scale: 1, latex: ‘$c_{eu}$’}
-  - {name: ‘Olu’, scale: 1, plot_scale: 1, latex: ‘$c_{lu}$’}
-  - {name: ‘Oed’, scale: 1, plot_scale: 1, latex: ‘$c_{ed}$’}
-  - {name: ‘Olq3’, scale: 1, plot_scale: 1, latex: ‘$c_{lq}^{(3)}$’}
-  - {name: ‘Olq1’, scale: 1, plot_scale: 1, latex: ‘$c_{lq}^{(1)}$’}
-  - {name: ‘Oqe’, scale: 1, plot_scale: 1, latex: ‘$c_{qe}$’}
-  - {name: ‘Old’, scale: 1, plot_scale: 1, latex: ‘$c_{ld}$’}
+  - {name: 'Oeu', scale: 1, plot_scale: 1, latex: '$c_{eu}$'}
+  - {name: 'Olu', scale: 1, plot_scale: 1, latex: '$c_{lu}$'}
+  - {name: 'Oed', scale: 1, plot_scale: 1, latex: '$c_{ed}$'}
+  - {name: 'Olq3', scale: 1, plot_scale: 1, latex: '$c_{lq}^{(3)}$'}
+  - {name: 'Olq1', scale: 1, plot_scale: 1, latex: '$c_{lq}^{(1)}$'}
+  - {name: 'Oqe', scale: 1, plot_scale: 1, latex: '$c_{qe}$'}
+  - {name: 'Old', scale: 1, plot_scale: 1, latex: '$c_{ld}$'}
   # 4 Fermions 4L
-  - {name: ‘Oll’, scale: 1, plot_scale: 1, latex: ‘$c_{ll}$’}
+  - {name: 'Oll', scale: 1, plot_scale: 1, latex: '$c_{ll}$'}
   # Yukawa
-  - {name: ‘Omup’, scale: 1, plot_scale: 1, latex: ‘$c_{\mu \varphi}$’}
-  - {name: ‘Otap’, scale: 1, plot_scale: 1, latex: ‘$c_{\tau \varphi}$’}
-  - {name: ‘Otp’, scale: 1, plot_scale: 1, latex: ‘$c_{t \varphi}$’}
-  - {name: ‘Obp’, scale: 1, plot_scale: 1, latex: ‘$c_{b \varphi}$’}
-  - {name: ‘Ocp’, scale: 1, plot_scale: 1, latex: ‘$c_{c \varphi}$’}
+  - {name: 'Omup', scale: 1, plot_scale: 1, latex: '$c_{\mu \varphi}$'}
+  - {name: 'Otap', scale: 1, plot_scale: 1, latex: '$c_{\tau \varphi}$'}
+  - {name: 'Otp', scale: 1, plot_scale: 1, latex: '$c_{t \varphi}$'}
+  - {name: 'Obp', scale: 1, plot_scale: 1, latex: '$c_{b \varphi}$'}
+  - {name: 'Ocp', scale: 1, plot_scale: 1, latex: '$c_{c \varphi}$'}
   # Bosonic
-  - {name: ‘OG’, scale: 1, plot_scale: 1, latex: ‘$c_{G}$’}
-  - {name: ‘OWWW’, scale: 1, plot_scale: 1, latex: ‘$c_{WWW}$’}
-  - {name: ‘OpG’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi G}$’}
-  - {name: ‘OpW’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi W}$’}
-  - {name: ‘OpB’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi B}$’}
-  - {name: ‘OpWB’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi W B}$’}
-  - {name: ‘Opd’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi \Box}$’}
-  - {name: ‘OpD’, scale: 1, plot_scale: 1, latex: ‘$c_{\varphi D}$’}
+  - {name: 'OG', scale: 1, plot_scale: 1, latex: '$c_{G}$'}
+  - {name: 'OWWW', scale: 1, plot_scale: 1, latex: '$c_{WWW}$'}
+  - {name: 'OpG', scale: 1, plot_scale: 1, latex: '$c_{\varphi G}$'}
+  - {name: 'OpW', scale: 1, plot_scale: 1, latex: '$c_{\varphi W}$'}
+  - {name: 'OpB', scale: 1, plot_scale: 1, latex: '$c_{\varphi B}$'}
+  - {name: 'OpWB', scale: 1, plot_scale: 1, latex: '$c_{\varphi W B}$'}
+  - {name: 'Opd', scale: 1, plot_scale: 1, latex: '$c_{\varphi \Box}$'}
+  - {name: 'OpD', scale: 1, plot_scale: 1, latex: '$c_{\varphi D}$'}
   
 
 actions_:
