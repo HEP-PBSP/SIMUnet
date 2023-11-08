@@ -209,7 +209,7 @@ simu_parameters:
   - {name: 'OpW', scale: 1, plot_scale: 1, latex: '$c_{\varphi W}$'}
   - {name: 'OpB', scale: 1, plot_scale: 1, latex: '$c_{\varphi B}$'}
   - {name: 'OpWB', scale: 1, plot_scale: 1, latex: '$c_{\varphi W B}$'}
-  - {name: 'Opd', scale: 1, plot_scale: 1, latex: '$c_{\varphi \Box}$'}
+  - {name: 'Opd', scale: 1, plot_scale: 1, latex: '$c_{\varphi Box}$'}
   - {name: 'OpD', scale: 1, plot_scale: 1, latex: '$c_{\varphi D}$'}
   
 
