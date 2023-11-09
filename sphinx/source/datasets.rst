@@ -1,19 +1,338 @@
 Dataset selection
 ==================
 
+Here is the list of the datasets we implemented in SIMUnet to fit SMEFT coefficients. For each dataset, we indicate the experiment, the centre of mass energy :math:`\sqrt{s}`, the final-state channel, the observable(s) used in the fit, the integrated luminosity :math:`\mathcal{L}` in inverse femtobarns, and the number of data points :math:`n_{\rm dat}`, together with the corresponding publication reference. The datasets are organised by physical sectors, namely top, Drell-Yan, W helicity, EW precision observables, Higgs and Diboson.
+
+
 ================================
 Top sector
 ================================
 
+TTBAR
+----------------------
+
+.. list-table:: 
+   :widths: 5 5 5 8 5 5 5 5
+   :header-rows: 1
+
+   * - **Exp.**
+     - :math:`\bf{\sqrt{s}} \textbf{(TeV)}`
+     - **Channel**
+     - **Observable**
+     - :math:`\mathcal{L} (\text{fb}^{-1})`
+     - :math:`\mathbf{n_{\rm dat}}`
+     - **Dataset name**
+     - **Ref.**
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLASTTBARTOT7TEV
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLASTTBARTOT8TEV
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_8TEV_LJETS_TOTAL
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_DILEPTON_TOTAL
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_HADRONIC_TOTAL
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_LJETS_TOTAL
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_TTMNORM
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMSTTBARTOT5TEV
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMSTTBARTOT7TEV
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMSTTBARTOT8TEV
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMSTOPDIFF8TEVTTRAPNORM
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMSTTBARTOT13TEV
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTBAR_13TEV_LJETS_TOTAL
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTBAR_13TEV_TTMNORM
+     - 
+
+TTBAR Asymmetry
+----------------------
+
+.. list-table:: 
+   :widths: 5 5 5 8 5 5 5 5
+   :header-rows: 1
+
+   * - **Exp.**
+     - :math:`\bf{\sqrt{s}} \textbf{(TeV)}`
+     - **Channel**
+     - **Observable**
+     - :math:`\mathcal{L} (\text{fb}^{-1})`
+     - :math:`\mathbf{n_{\rm dat}}`
+     - **Dataset name**
+     - **Ref.**
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_8TEV_ASY
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_TTBAR_13TEV_ASY_2022
+     - 
+   * - **ATLAS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - ATLAS_CMS_TTBAR_8TEV_ASY
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTBAR_8TEV_ASY
+     - 
+   * - **CMS**
+     -
+     - 
+     - 
+     - 
+     - 
+     - CMS_TTBAR_13TEV_ASY
+     - 
+
+TTZ
+----------------------
+
+TTW
+----------------------
+
+TTGamma
+----------------------
+
+4 Heavy quarks
+----------------------
+
+T
+----------------------
+
+TW
+----------------------
+
+================================
+Drell-Yan
+================================
+
+.. list-table:: 
+   :widths: 5 5 5 8 5 5 5 5
+   :header-rows: 1
+
+   * - **Exp.**
+     - :math:`\bf{\sqrt{s}} \textbf{(TeV)}`
+     - **Channel**
+     - **Observable**
+     - :math:`\mathcal{L} (\text{fb}^{-1})`
+     - :math:`\mathbf{n_{\rm dat}}`
+     - **Dataset name**
+     - **Ref.**
+   * - **ATLAS**
+     - 
+     - 
+     - 
+     - 
+     - 
+     - ATLASDY2D8TEV
+     - 
+   * - **ATLAS**
+     - 
+     - 
+     - 
+     - 
+     - 
+     - ATLASZHIGHMASS49FB
+     - 
+   * - **CMS**
+     - 
+     - 
+     - 
+     - 
+     - 
+     - CMSDY2D11
+     - 
+   * - **CMS**
+     - 
+     - 
+     - 
+     - 
+     - 
+     - CMSDY1D12
+     - 
+   * - **CMS**
+     - 
+     - 
+     - 
+     - 
+     - 
+     - CMS_HMDY_13TEV
+     - 
+
+================================
+W helicity
+================================
+
+=================================
+Electroweak Precision Observables
+=================================
+
+================================
+Higgs
+================================
+
+================================
+Diboson
+================================
+
 In this section we describe the top quark datasets of SIMUnet.
 
-- :ref:`dataset_sel-label`
-
-.. _dataset_sel-label:
-
-This is another header
-----------------------
-Some text
 
 .. list-table:: The inclusive cross-sections and differential distributions for top quark pair production from ATLAS and CMS that we consider in this analysis. For each dataset, we indicate the experiment, the centre of mass energy :math:`\sqrt{s}`, the final-state channel, the observable(s) used in the fit, the integrated luminosity :math:`\mathcal{L}` in inverse femtobarns, and the number of data points :math:`n_{\rm dat}`, together with the corresponding publication reference. In the last two columns, we indicate with a :math:`\checkmark` the datasets that are included for the first time here in a global PDF fit and in a SMEFT interpretation, respectively. The sets marked with brackets have already been included in previous studies but here we account for their constraints in different manner (e.g. by changing spectra or normalisation), as indicated in the table and in the text description.
    :widths: 5 5 5 8 5 5 5 5
