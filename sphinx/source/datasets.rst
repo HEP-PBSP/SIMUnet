@@ -454,7 +454,7 @@ T
 ----------------------
 
 .. list-table:: 
-   :widths: 5 5 5 8 5 5 5 5
+   :widths: 5 5 8 8 5 5 5 5
    :header-rows: 1
 
    * - **Exp.**
@@ -538,85 +538,85 @@ T
      - ATLAS_SINGLETOP_SCH_8TEV_TOTAL
      - `Reference <https://arxiv.org/abs/1511.05980>`_
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - t-channel
+     - :math:`\sigma_\text{tot}(t)`
+     - 3.2
+     - 1
      - ATLAS_SINGLETOP_TCH_13TEV_T
-     - 
+     - `Reference <https://arxiv.org/abs/1609.03920>`_
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - t-channel
+     - :math:`\sigma_{\text{tot}}(\bar{t})`
+     - 3.2
+     - 1
      - ATLAS_SINGLETOP_TCH_13TEV_TB
-     - 
+     - `Reference <https://arxiv.org/abs/1609.03920>`_
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - s-channel
+     - :math:`\sigma_\text{tot}(t+\bar{t})`
+     - 139
+     - 1
      - ATLAS_SINGLETOP_SCH_13TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/2209.08990>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 7
+     - t-channel
+     - :math:`\sigma_\text{tot}(t) + \sigma_{\text{tot}}(\bar{t})`
+     - 1.17, 1.56
+     - 1
      - CMS_SINGLETOP_TCH_TOT_7TEV
-     - 
+     - `Reference <https://arxiv.org/abs/1209.4533>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - t-channel
+     - :math:`\sigma_\text{tot}(t)`
+     - 19.7
+     - 1
      - CMS_SINGLETOP_TCH_8TEV_T
-     - 
+     - `Reference <https://arxiv.org/abs/1403.7366>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - t-channel
+     - :math:`\sigma_{\text{tot}}(\bar{t})`
+     - 19.7
+     - 1
      - CMS_SINGLETOP_TCH_8TEV_TB
-     - 
+     - `Reference <https://arxiv.org/abs/1403.7366>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - s-channel
+     - :math:`\sigma_\text{tot}(t+\bar{t})`
+     - 19.7
+     - 1
      - CMS_SINGLETOP_SCH_8TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1603.02555>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - t-channel
+     - :math:`\sigma_\text{tot}(t)`
+     - 2.2
+     - 1
      - CMS_SINGLETOP_TCH_13TEV_T
-     - 
+     - `Reference <https://arxiv.org/abs/1610.00678>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - t-channel
+     - :math:`\sigma_{\text{tot}}(\bar{t})`
+     - 2.2
+     - 1
      - CMS_SINGLETOP_TCH_13TEV_TB
-     - 
+     - `Reference <https://arxiv.org/abs/1610.00678>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - t-channel
+     - :math:`1/\sigma d\sigma/d|y^{(t)}|`
+     - 35.9
+     - 4
      - CMS_SINGLETOP_TCH_13TEV_YTNORM
-     - 
+     - `Reference <https://arxiv.org/abs/1907.08330>`_
 
 TW
 ----------------------
@@ -634,53 +634,53 @@ TW
      - **Dataset name**
      - **Ref.**
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - dilepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 20.3
+     - 1
      - ATLAS_SINGLETOPW_8TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1510.03752>`_
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - single-lepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 20.2
+     - 1
      - ATLAS_SINGLETOPW_8TEV_SLEP_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/2007.01554>`_
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - dilepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 3.2
+     - 1
      - ATLAS_SINGLETOPW_13TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1612.07231>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - dilepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 12.2
+     - 1
      - CMS_SINGLETOPW_8TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1401.2942>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - dilepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 35.9
+     - 1
      - CMS_SINGLETOPW_13TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1805.07399>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - single-lepton
+     - :math:`\sigma_{\text{tot}}(tW)`
+     - 36
+     - 1
      - CMS_SINGLETOPW_13TEV_SLEP_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/2109.01706>`_
 
 TZ
 ----------------------
@@ -698,86 +698,80 @@ TZ
      - **Dataset name**
      - **Ref.**
    * - **ATLAS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - dilepton
+     - :math:`\sigma_{\text{fid}}(tZj)`
+     - 139
+     - 1
      - ATLAS_SINGLETOPZ_13TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/2002.07546>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - dilepton
+     - :math:`\sigma_{\text{fid}}(tZj)`
+     - 77.4
+     - 1
      - CMS_SINGLETOPZ_13TEV_TOTAL
-     - 
+     - `Reference <https://arxiv.org/abs/1812.05900>`_
    * - **CMS**
-     -
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - dilepton
+     - :math:`d\sigma_{\text{fid}}(tZj)/dp_T^t`
+     - 138
+     - 3
      - CMS_SINGLETOPZ_13TEV_PTT
-     - 
+     - `Reference <https://arxiv.org/abs/2111.02860>`_
 
 ================================
 Drell-Yan
 ================================
 
 .. list-table:: 
-   :widths: 5 5 5 8 5 5 5 5
+   :widths: 5 5 8 5 5 5 5
    :header-rows: 1
 
    * - **Exp.**
      - :math:`\bf{\sqrt{s}} \textbf{(TeV)}`
-     - **Channel**
      - **Observable**
      - :math:`\mathcal{L} (\text{fb}^{-1})`
      - :math:`\mathbf{n_{\rm dat}}`
      - **Dataset name**
      - **Ref.**
    * - **ATLAS**
-     - 
-     - 
-     - 
-     - 
-     - 
+     - 8
+     - :math:`d^2\sigma/dm_{\ell\ell}d|y_{\ell\ell}|`
+     - 20.3
+     - 48
      - ATLASDY2D8TEV
-     - 
+     - `Reference <https://arxiv.org/abs/1606.01736>`_ (Table 3)
    * - **ATLAS**
-     - 
-     - 
-     - 
-     - 
-     - 
+     - 7
+     - :math:`d\sigma_{Z/\gamma^{*}}/dM_{ll}`
+     - 49
+     - 13
      - ATLASZHIGHMASS49FB
      - 
    * - **CMS**
+     - 7
+     - :math:`d\sigma_{Z/\gamma^{*}}/dy`
      - 
-     - 
-     - 
-     - 
-     - 
+     - 132
      - CMSDY2D11
      - 
    * - **CMS**
+     - 8
+     - :math:`d\sigma_{Z/\gamma^{*}}/dy`
      - 
-     - 
-     - 
-     - 
-     - 
+     - 132
      - CMSDY1D12
      - 
    * - **CMS**
-     - 
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - :math:`d\sigma/dM_{\ell\ell}`
+     - 5.1
+     - 43
      - CMS_HMDY_13TEV
-     - 
+     - `Reference <https://arxiv.org/abs/1812.10529v2>`_
 
 ================================
 W helicity
@@ -877,33 +871,33 @@ Higgs
      - ATLAS_CMS_SSinc_RunI
      - `Reference <https://arxiv.org/abs/1606.02266>`_ (Table 13)
    * - **CMS**
+     - 13
      - 
-     - 
-     - 
-     - 
+     - 35.9
+     - 24
      - CMS_SSINC_RUNII
-     - 
+     - `Reference <https://arxiv.org/abs/1809.10733>`_
    * - **ATLAS**
+     - 13
      - 
-     - 
-     - 
-     - 
+     - 80
+     - 25
      - ATLAS_STXS_RUNII
-     - 
+     - `Reference <https://arxiv.org/abs/1909.02845>`_
    * - **ATLAS**
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - :math:`\mu_{H \rightarrow Z \gamma}`
+     - 139
+     - 1
      - ATLAS_SSINC_RUNII_ZGAM
-     - 
+     - `Reference <https://arxiv.org/abs/2005.05382>`_
    * - **ATLAS**
-     - 
-     - 
-     - 
-     - 
+     - 13
+     - :math:`\mu_{H \rightarrow \mu^+ \mu^-}`
+     - 139
+     - 1
      - ATLAS_SSINC_RUNII_MUMU
-     - 
+     - `Reference <https://arxiv.org/abs/2007.07830>`_
 
 ================================
 Diboson
@@ -911,7 +905,7 @@ Diboson
 
 
 .. list-table:: 
-   :widths: 5 5 8 5 5 5 5
+   :widths: 5 5 8 5 5 5 9
    :header-rows: 1
 
    * - **Exp.**
