@@ -782,7 +782,7 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
         # broadening column
         curr_len, ref_len = bound_lengths
         if ref_len > 0:
-            df['Broadening'].loc[op] = str((curr_len - ref_len) / ref_len * 100.0) + '%'
+            df['Broadening'].loc[op] = str(np.round((curr_len - ref_len) / ref_len * 100.0, decimals=2)) + '%'
         else:
             df['Broadening'].loc[op] = 'n/a'
 
