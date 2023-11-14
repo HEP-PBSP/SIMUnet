@@ -1,5 +1,5 @@
-Dataset selection
-==================
+**Dataset selection**
+=====================
 
 Here is the list of the datasets we implemented in SIMUnet to fit SMEFT coefficients. For each dataset, we indicate the experiment, the centre of mass energy :math:`\sqrt{s}`, the final-state channel, the observable(s) used in the fit, the integrated luminosity :math:`\mathcal{L}` in inverse femtobarns, and the number of data points :math:`n_{\rm dat}`, together with the corresponding publication reference. The datasets are organised by physical sectors, namely top, Drell-Yan, W helicity, EW precision observables, Higgs and Diboson.
 

@@ -1,4 +1,4 @@
-Drell-Yan
+Drell-Yan sector
 =====================================================
 
 The high-energy tails of charged- and neutral-current Drell-Yan processes provide 

@@ -96,51 +96,16 @@ Can PDFs absorb new physics?
     :label: fig-cont_chi2
 
 
+Contents
+========
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Methodology
-   :hidden:
 
    methodology.rst
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Tutorial
-   :hidden:
-
-   tutorial.rst
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Dataset selection
-   :hidden:
-
+   tutorials/tutorials_overview.rst
    datasets.rst
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Results
-   :hidden:
-
    results/overview.rst
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Simunet analysis files
-   :hidden:
-
    simunet_analysis.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Bibliography
-   :hidden:
-
    bibliography.rst
 
 

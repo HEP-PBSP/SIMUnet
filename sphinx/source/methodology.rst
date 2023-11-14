@@ -1,5 +1,5 @@
 ===================================
-Methodology
+**Methodology**
 ===================================
 
 The SIMUnet framework

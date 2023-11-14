@@ -1,4 +1,4 @@
-Bibliography
-============
+**Bibliography**
+================
 
 .. bibliography:: simunet.bib

@@ -1,5 +1,5 @@
-simunet analysis 
-==================
+**Functions documentation**
+===========================
 
 
 Example 1: documentation of a specific function from the file 'simunet_analysis.py'"

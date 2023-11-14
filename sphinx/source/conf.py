@@ -18,7 +18,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'simunet'
+project = 'SIMUnet'
 copyright = '2023, PBSP'
 author = 'PBSP'
 

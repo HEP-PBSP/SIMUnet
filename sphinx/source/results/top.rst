@@ -1,4 +1,4 @@
-Top
+Top sector
 =====================================================
 We assess the impact of top quark production at the LHC on global analyses of parton distributions (PDFs) and of Wilson coefficients in the SMEFT, both separately and in the framework of a joint interpretation.
 We consider the broadest top quark dataset to date containing all available measurements based on the full Run II luminosity. 
