@@ -747,24 +747,24 @@ Drell-Yan
    * - **ATLAS**
      - 7
      - :math:`d\sigma_{Z/\gamma^{*}}/dM_{ll}`
-     - 49
+     - 4.9
      - 13
      - ATLASZHIGHMASS49FB
-     - 
+     - `Reference <https://arxiv.org/abs/1305.4192>`_
    * - **CMS**
      - 7
      - :math:`d\sigma_{Z/\gamma^{*}}/dy`
-     - 
+     - 4.5
      - 132
      - CMSDY2D11
-     - 
+     - `Reference <https://arxiv.org/abs/1310.7291>`_
    * - **CMS**
      - 8
      - :math:`d\sigma_{Z/\gamma^{*}}/dy`
-     - 
-     - 132
+     - 19.7
+     - 41
      - CMSDY1D12
-     - 
+     - `Reference <https://arxiv.org/abs/1412.1115>`_
    * - **CMS**
      - 13
      - :math:`d\sigma/dM_{\ell\ell}`
@@ -809,7 +809,7 @@ Electroweak Precision Observables
 =================================
 
 .. list-table:: 
-   :widths: 5 5 5 8 5 5 5 5
+   :widths: 5 5 8 5 5 5 5
    :header-rows: 1
 
    * - **Exp.**
@@ -822,28 +822,28 @@ Electroweak Precision Observables
    * - **LEP**
      - 0.250
      - Z observables
-     - 
+     -
      - 19
      - LEP_ZDATA
      - `Reference <https://arxiv.org/abs/hep-ex/0509008>`_ (Tables 2.13, 3.6, 4.3, 5.8, and 5.10)
    * - **LEP**
      - 0.196
      - :math:`\mathcal{B}(W \rightarrow e^{-} \bar{v}_e),` :math:`\mathcal{B}(W \rightarrow \mu^{-} \bar{v}_{\mu}),` :math:`\mathcal{B}(W \rightarrow \tau^{-} \bar{v}_{\tau})`
-     - 
+     - 3
      - 3
      - LEP_BRW
      - `Reference <https://arxiv.org/abs/1302.3415>`_ (Table E.6)
    * - **LEP**
      - 0.189
      - :math:`\sigma(e^+ e^- \rightarrow e^+ e^-)`
-     - 
+     - 3
      - 21
      - LEP_BHABHA
      - `Reference <https://arxiv.org/abs/1302.3415>`_ (Table 3.11 and 3.12)
    * - **LEP**
      - 0.209
      - :math:`\hat{\alpha}^{(5)}_{\rm}(M_Z)`
-     - 
+     - 3
      - 1
      - LEP_ALPHAEW
      - `Reference <https://pdg.lbl.gov/2023/web/viewer.html?file=../reviews/rpp2022-rev-standard-model.pdf>`_ (Equation 10.11)
@@ -865,21 +865,21 @@ Higgs
      - **Ref.**
    * - **ATLAS and CMS**
      - 7 and 8
-     - Higgs decay
+     - :math:`\mu_{H}`
      - 5 and 20
      - 22
      - ATLAS_CMS_SSinc_RunI
      - `Reference <https://arxiv.org/abs/1606.02266>`_ (Table 13)
    * - **CMS**
      - 13
-     - 
+     - :math:`\mu_{H}`
      - 35.9
      - 24
      - CMS_SSINC_RUNII
      - `Reference <https://arxiv.org/abs/1809.10733>`_
    * - **ATLAS**
      - 13
-     - 
+     - :math:`\mu_{H}`
      - 80
      - 25
      - ATLAS_STXS_RUNII
