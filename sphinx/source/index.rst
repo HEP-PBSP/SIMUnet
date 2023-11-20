@@ -115,10 +115,16 @@ Contents
 
 .. toctree::
    :maxdepth: 4
-   :caption: Simunet analysis files
+   :caption: Simunet analysis tools
    :hidden:
 
    simunet_analysis.rst
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Bibliography
+   :hidden:
+   
    bibliography.rst
 
 
