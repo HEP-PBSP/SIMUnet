@@ -12,6 +12,9 @@ import logging
 import numpy as np
 import pandas as pd
 import scipy.linalg as la
+import os
+import yaml
+import scipy as sp
 
 from NNPDF import CommonData
 from reportengine.checks import require_one, remove_outer, check_not_empty
@@ -39,7 +42,11 @@ from validphys.convolution import (
 )
 
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
+from validphys.loader import _get_nnpdf_profile
 
+from NNPDF import DataSet, Experiment
+
+import validphys.covmats as vp_covmats
 
 log = logging.getLogger(__name__)
 
@@ -502,7 +509,7 @@ def procs_corrmat(procs_covmat):
     return groups_corrmat(procs_covmat)
 
 
-def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_bsm_factor):
+def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, dataset_bsm_factor, use_th_covmat, theoryid):
     
     """Tuple of data and theory results for a single pdf. The data will have an associated
     covariance matrix, which can include a contribution from the theory covariance matrix which
@@ -512,6 +519,34 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, da
     A group of datasets is also allowed.
     (as a result of the C++ code layout)."""
     data = dataset.load()
+
+    if isinstance(data, DataSet):
+        dataset_list = [data]
+    elif isinstance(data, Experiment):
+        dataset_list = [ds for ds in data.DataSets()] 
+ 
+    if use_th_covmat:
+        data_path = str(_get_nnpdf_profile()['data_path']) + 'theory_' + theoryid.id + '/simu_factors'
+        # If using the theory covariance matrix, we must build it here.
+        th_covmats = []
+        for ds in dataset_list:
+            simu_fac_path = data_path + '/SIMU_' + ds.GetSetName() + '.yaml'
+            if os.path.exists(simu_fac_path):
+                with open(simu_fac_path, 'rb') as file:
+                    simu_file = yaml.safe_load(file)
+                if 'theory_cov' in simu_file.keys():
+                    th_covmats += [simu_file['theory_cov']]
+                else:
+                    th_covmats += [np.zeros((ds['ndata'],ds['ndata']))]
+            else:
+                th_covmats += [np.zeros((ds['ndata'],ds['ndata']))]
+
+        th_covmat = sp.linalg.block_diag(*th_covmats)
+
+        if not np.all((th_covmat == 0.0)):
+            covariance_matrix = th_covmat + covariance_matrix
+            sqrt_covmat = vp_covmats.sqrt_covmat(covariance_matrix) 
+
     return (
         DataResult(data, covariance_matrix, sqrt_covmat),
         ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor),
@@ -520,11 +555,11 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, da
 
 
 def dataset_inputs_results(
-    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor
+    data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor, use_th_covmat, theoryid
 ):
     """Like `results` but for a group of datasets"""
     return results(
-        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor
+        data, pdf, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor, use_th_covmat, theoryid
     )
 
 
@@ -552,17 +587,19 @@ def one_or_more_results(
     covariance_matrix,
     sqrt_covmat,
     dataset_bsm_factor,
+    theoryid,
     pdfs: (type(None), Sequence) = None,
     pdf: (type(None), PDF) = None,
+    use_th_covmat=False,
 ):
     """Generate a list of results, where the first element is the data values,
     and the next is either the prediction for pdf or for each of the pdfs.
     Which of the two is selected intelligently depending on the namespace,
     when executing as an action."""
     if pdf:
-        return results(dataset, pdf, covariance_matrix, sqrt_covmat, dataset_bsm_factor)
+        return results(dataset, pdf, covariance_matrix, sqrt_covmat, dataset_bsm_factor, use_th_covmat, theoryid)
     else:
-        return pdf_results(dataset, pdfs, covariance_matrix, sqrt_covmat, dataset_bsm_factor)
+        return pdf_results(dataset, pdfs, covariance_matrix, sqrt_covmat, dataset_bsm_factor, use_th_covmat, theoryid)
     raise ValueError("Either 'pdf' or 'pdfs' is required")
 
 
