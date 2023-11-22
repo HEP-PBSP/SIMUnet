@@ -56,8 +56,9 @@ class Result:
 
 
 class StatsResult(Result):
-    def __init__(self, stats):
+    def __init__(self, stats, th_covmat=None):
         self.stats = stats
+        self.th_covmat = th_covmat
 
     @property
     def rawdata(self):
@@ -75,7 +76,10 @@ class StatsResult(Result):
 
     @property
     def std_error(self):
-        return self.stats.std_error()
+        err = self.stats.std_error()
+        if self.th_covmat is not None:
+            err = [np.sqrt(err[i]**2 + self.th_covmat[i,i]) for i in range(len(err))]
+        return err
 
     def __len__(self):
         """Returns the number of data points in the result"""
@@ -117,12 +121,12 @@ class DataResult(StatsResult):
 class ThPredictionsResult(StatsResult):
     """Class holding theory prediction, inherits from StatsResult"""
 
-    def __init__(self, dataobj, stats_class, bsm_factor, label=None):
+    def __init__(self, dataobj, stats_class, bsm_factor, label=None, th_covmat=None):
         self.stats_class = stats_class
         self.label = label
         dataobj = pd.DataFrame(dataobj.values * bsm_factor)
         statsobj = stats_class(dataobj.T)
-        super().__init__(statsobj)
+        super().__init__(statsobj, th_covmat)
 
     @staticmethod
     def make_label(pdf, dataset):
@@ -140,7 +144,7 @@ class ThPredictionsResult(StatsResult):
         return label
 
     @classmethod
-    def from_convolution(cls, pdf, dataset, bsm_factor):
+    def from_convolution(cls, pdf, dataset, bsm_factor, th_covmat):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -157,7 +161,7 @@ class ThPredictionsResult(StatsResult):
 
         label = cls.make_label(pdf, dataset)
 
-        return cls(th_predictions, pdf.stats_class, bsm_factor, label)
+        return cls(th_predictions, pdf.stats_class, bsm_factor, label, th_covmat)
 
 
 class PositivityResult(StatsResult):
@@ -547,9 +551,12 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, da
             covariance_matrix = th_covmat + covariance_matrix
             sqrt_covmat = vp_covmats.sqrt_covmat(covariance_matrix) 
 
+    else:
+        th_covmat = None
+
     return (
         DataResult(data, covariance_matrix, sqrt_covmat),
-        ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor),
+        ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor, th_covmat=th_covmat),
     )
 
 
