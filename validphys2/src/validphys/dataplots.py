@@ -270,13 +270,6 @@ def _plot_fancy_impl(results, commondata, cutlist,
             table[('err', i)] = np.abs(err/norm_cv)
         cvcols.append(cvcol)
 
-        print("Central value")
-        print(cv/norm_cv)
-        print("Error")
-        print(err)
-        print(norm_cv)
-        print(err/norm_cv)
-
     figby = sane_groupby_iter(table, info.figure_by)
 
 
