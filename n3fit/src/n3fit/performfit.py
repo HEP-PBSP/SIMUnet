@@ -44,6 +44,7 @@ def performfit(
     parallel_models=False, 
     simu_parameters_names=None,
     bsm_initialisation_seed=0,
+    use_th_covmat=False,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -208,6 +209,8 @@ def performfit(
             simu_parameters_scales=simu_parameters_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
             bsm_initialisation_seed=bsm_initialisation_seed,
+            use_th_covmat=use_th_covmat,
+            theoryid=theoryid,
         )
 
         # This is just to give a descriptive name to the fit function
