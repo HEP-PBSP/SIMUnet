@@ -715,7 +715,7 @@ def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
         ax_histy.grid(False)
 
         ax.set_xlabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
-        ax.set_ylabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
+        ax.set_ylabel(bsm_names_to_latex[op_2] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.legend()
         ax.set_axisbelow(True)
 
