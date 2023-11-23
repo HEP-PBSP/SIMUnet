@@ -532,6 +532,7 @@ def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
+    # note that bsm_names_to_latex can be None
     if bsm_names_to_latex:
         bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
     corr_mat = bsm_facs_df.corr()
@@ -1124,6 +1125,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
+                # note that bsm_names_to_plot_scales can be None
                 if bsm_names_to_plot_scales:
                     values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
                 else:
@@ -1168,6 +1170,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
         ax.set_xticks(np.arange(len(all_ops)))
         bsm_latex_names = []
         for op in all_ops:
+            # note that bsm_names_to_plot_scales can be None
             if bsm_names_to_plot_scales:
                 if bsm_names_to_plot_scales[op] != 1:
                     bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
