@@ -5,7 +5,6 @@ Plots and analysis tools for SIMUnet.
 from __future__ import generator_stop
 
 import logging
-
 import numpy as np
 import numpy.linalg as la
 import matplotlib as mpl
@@ -28,7 +27,6 @@ from reportengine.table import table
 from reportengine.floatformatting import format_number
 
 from validphys import plotutils
-
 from validphys.fitdata import replica_paths
 from validphys.fitdata import read_bsm_facs
 from validphys.plotutils import grey_centre_cmap
@@ -38,11 +36,9 @@ from validphys.utils import split_ranges
 from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 from validphys.loader import _get_nnpdf_profile
-
 from validphys.convolution import central_predictions
 
 log = logging.getLogger(__name__)
-
 l = Loader()
 
 """
@@ -51,37 +47,57 @@ Format routines
 """
 def display_format(series):
     """
-    Determines the format of the BSM factors
-    to be displayed in the tables
+    Determines the format of the BSM factors to be displayed in the tables.
+
     Parameters
     ----------
-        series: pd.Series
+    series : pd.Series
+        Series containing the BSM factors.
+
+    Returns
+    -------
+    list
+        A list of formatted numbers representing the BSM factors.
     """
     return [format_number(x, digits=2) for x in series]
 
 BSM_FAC_DISPLAY = [
-'Opt', 'O3pQ3', 'OpQM', # currents
-'OtZ', 'OtW', 'OtG', # dipoles
-'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq', # octets
-'O1qd','O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq', # singlets
-'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1' # 4-heavy
+    'Opt', 'O3pQ3', 'OpQM',  # currents
+    'OtZ', 'OtW', 'OtG',  # dipoles
+    'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq',  # octets
+    'O1qd', 'O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq',  # singlets
+    'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1'  # 4-heavy
 ]
 
 def reorder_cols(cols):
+    """
+    Reorders columns based on predefined BSM factor display order.
+
+    Parameters
+    ----------
+    cols : list
+        List of column names to be reordered.
+
+    Returns
+    -------
+    list
+        Reordered list of columns.
+    """
     return sorted(cols, key=BSM_FAC_DISPLAY.index)
 
 def format_residuals(residuals):
     """
-    Makes a list of intervals to display
-    in the pulls. 
+    Formats residuals for display, splitting them into intervals.
+
     Parameters
     ----------
-        residuals: list[float]
-            List of mean/std for every BSM factor
+    residuals : list of float
+        List of residual values (mean/std) for BSM factors.
+
     Returns
     -------
-        new_residual: list[list]
-            List of the intervals to display
+    list of list
+        List of intervals for display of residuals.
     """
     new_residuals = []
     for residual in residuals:
@@ -97,9 +113,23 @@ def format_residuals(residuals):
 
 @figuregen
 def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings=None):
-    """Plot a histogram for each BSM coefficient.
-    The nd is used for n-dimensional, if two BSM facs 
-    are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
+    """
+    Plot a histogram for each BSM coefficient.
+    The nd is used for n-dimensional, if two BSM facs are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
+
+    Parameters
+    ----------
+    read_bsm_facs : function
+        Function to read BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    posterior_plots_settings : dict, optional
+        Settings for posterior plots, such as number of bins and range settings.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the histogram.
     """
     # extract settings
     if posterior_plots_settings is None:
@@ -121,11 +151,8 @@ def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings
             rangey = None
 
     for label, column in read_bsm_facs.items():
-        # TODO: surely there is a better way
         fig, ax = plt.subplots()
-
         ax.hist(column.values, density=True, bins=n_bins)
-
         ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
         ax.set_title(f"Distribution for {bsm_names_to_latex[label]} coefficient")
         ax.set_ylabel("Prob. density", fontsize=14)
@@ -142,8 +169,21 @@ def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings
 @figuregen
 def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=None):
     """
-    Compare histograms of BSM factors between different fits 
-    in SIMUnet
+    Compare histograms of BSM factors between different fits in SIMUnet.
+
+    Parameters
+    ----------
+    fits : list
+        List of fit specifications to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to their LaTeX representations.
+    posterior_plots_settings : dict, optional
+        Dictionary containing settings for posterior plots such as 'n_bins', 'rangex', 'rangey', and 'same_bins'.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for each BSM coefficient comparison.
     """
     # extract settings
     if posterior_plots_settings is None:
@@ -170,14 +210,12 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
             rangey = None
 
     # extract all operators in the fits
-    all_ops = []
+    all_ops = set()
     for fit in fits:
         paths = replica_paths(fit)
         bsm_facs_df = read_bsm_facs(paths)
         bsm_fac_ops = bsm_facs_df.columns.tolist()
-        all_ops.append(bsm_fac_ops)
-    # Remove repeated operators
-    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+        all_ops.update(bsm_fac_ops)
 
     # If same_bins=True, create binnings
     if same_bins:
@@ -199,13 +237,9 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
 
-            if same_bins:
-                bins = np.linspace(min_bins.loc[op], max_bins.loc[op], n_bins)
-            else:
-                bins = n_bins
-
-            if bsm_facs_df.get([op]) is not None:
-                ax.hist(bsm_facs_df.get([op]).values, bins=bins, density=True, alpha=0.5, label=fit.label)
+            if op in bsm_facs_df:
+                bins = np.linspace(min_bins[op], max_bins[op], n_bins) if same_bins else n_bins
+                ax.hist(bsm_facs_df[op].values, bins=bins, density=True, alpha=0.5, label=fit.label)
                 ax.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
                 ax.set_ylabel("Prob. density", fontsize=14)
                 if bsm_names_to_latex is None:
@@ -223,11 +257,19 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
 @figuregen
 def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
     """
-    Plots the kernel estimation density for a distribution
-    of BSM coefficients. 
+    Plots the kernel estimation density for a distribution of BSM coefficients.
+
     Parameters
     ----------
-        read_bsm_facs: pd.DataFrame
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the KDE plot.
     """
     for label, column in read_bsm_facs.items():
         # Initialise Axes instance
@@ -244,7 +286,6 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
 
         yield fig
 
-
 @make_argcheck
 def _check_two_bsm_facs(fit):
     cf = fit.as_input().get("simu_parameters", [])
@@ -256,11 +297,21 @@ def _check_two_bsm_facs(fit):
     )
 
 @figure
-#@_check_two_bsm_facs
 def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     """
-    Plot two dimensional distributions of the BSM coefficient
-    results
+    Plot two-dimensional distributions of the BSM coefficient results.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of replica data.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the 2D distribution plot.
     """
     bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns
@@ -275,17 +326,13 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
         bsm_facs_df.iloc[:, 0], bsm_facs_df.iloc[:, 1], c=chi2
     )
 
-    # create new axes to the bottom of the scatter plot
-    # for the colourbar 
+    # create new axes to the bottom of the scatter plot for the colourbar 
     divider = make_axes_locatable(ax)
-    # the width of the colorbar can be changed with `size`
     cax = divider.append_axes("bottom", size="8%", pad=0.7)
     fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
-    # set scientific notation for thei scatter plot
-    ax.ticklabel_format(
-        axis='both', scilimits=(0, 0), style='sci', useOffset=True
-    )
+    # set scientific notation for the scatter plot
+    ax.ticklabel_format(axis='both', scilimits=(0, 0), style='sci', useOffset=True)
 
     # append axes to the top and to the right for the histograms 
     ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
@@ -310,9 +357,23 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
 def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pair):
     """
-    Auxiliary function to plot 2D plots
-    of pair of operators in a N-dimensional fits
-    with BSM factors
+    Auxiliary function to plot 2D plots of pair of operators in a N-dimensional fits with BSM factors.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of replica data.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    pair : tuple
+        Pair of operators to be plotted.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the 2D plot.
     """
     op_1, op_2 = pair
     bsm_facs_df = read_bsm_facs
@@ -325,11 +386,7 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
 
     chi2 = [info.chi2 for info in replica_data]
 
-    # we use this figsize to have a square scatter plot
-    # smaller values do not display too well
     fig, ax = plt.subplots(1, 1, figsize=(7, 7))
-
-    chi2 = [info.chi2 for info in replica_data]
 
     if op_1 != op_2:
         scatter_plot = ax.scatter(
@@ -340,26 +397,18 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
             bsm_facs_df.values, bsm_facs_df.values, c=chi2, s=40
         )
 
-    # create new axes to the bottom of the scatter plot
-    # for the colourbar 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("bottom", size="9%", pad=0.7)
     fig.colorbar(scatter_plot, cax=cax, label=r"$\chi^2$", orientation='horizontal')
 
-    # set scientific notation for thei scatter plot
-    ax.ticklabel_format(
-        axis='both', scilimits=(0, 0), style='sci', useOffset=True
-    )
+    ax.ticklabel_format(axis='both', scilimits=(0, 0), style='sci', useOffset=True)
 
-    # append axes to the top and to the right for the histograms 
     ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
     ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
 
-    # Make some labels invisible
     ax_histx.xaxis.set_tick_params(labelbottom=False)
     ax_histy.yaxis.set_tick_params(labelleft=False)
 
-    # populate the histograms
     ax_histx.hist(bsm_facs_df.iloc[:, 0], density=True)
     if op_1 != op_2:
         ax_histy.hist(bsm_facs_df.iloc[:, 1], orientation='horizontal', density=True)
@@ -379,12 +428,21 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
 @figuregen
 def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
     """
-    Plot two dimensional distributions for all pairs
-    of BSM coefficients in a fit
+    Plot two-dimensional distributions for all pairs of BSM coefficients in a fit.
+
     Parameters
     ----------
-        read_bsm_facs: pd.Dataframe 
-        replica_data : list
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of replica data.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for each pair of BSM coefficient combination.
     """
     bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns 
@@ -397,8 +455,19 @@ def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
 @figure
 def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
     """
-    Generates bsm_fac value - chi2 scatter plots for all replicas
-    in a fit. 
+    Generates bsm_fac value - chi2 scatter plots for all replicas in a fit.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of replica data.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the chi2 scatter plot.
     """
 
     chi2 = [info.chi2 for info in replica_data]
@@ -411,7 +480,6 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
             column, chi2, s=40, alpha=0.8
         )
 
-        # set scientific notation for the scatter plot
         ax.ticklabel_format(
             axis='both', scilimits=(0, 0), style='sci', useOffset=True
         )
@@ -423,12 +491,23 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
 
         return fig
 
-
 @figuregen
 def plot_tr_val_epoch(fit, replica_paths):
     """
     Plot the average across replicas of training and validation chi2 
-    for a given epoch
+    for a given epoch.
+
+    Parameters
+    ----------
+    fit : object
+        The fit configuration object.
+    replica_paths : list
+        List of paths to the replica data.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The figure object containing the plot.
     """
     paths = [p / 'chi2exps.log' for p in replica_paths]
     # initialise dataframe
@@ -455,16 +534,20 @@ def plot_tr_val_epoch(fit, replica_paths):
 @table
 def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     """
-    Table generator to summarise information about
-    the BSM coefficient results.
-    Paramaters
+    Table generator to summarise information about the BSM coefficient results.
+
+    Parameters
     ----------
-        read_bsm_facs: pd.Dataframe
-    The returned table contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the 68% (95%) confidence level by 
-    computing mean ± std (mean ± 2*std).
-    """ 
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame summarizing the bounds and statistics of BSM coefficients.
+    """
     bsm_facs_df = read_bsm_facs
 
     # Get the numbers from the dataframe
@@ -496,7 +579,20 @@ def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
 
 @table
 def tabulate_bsm_corr(fit, read_bsm_facs):
-    """Same as plot_bsm_corr, but table rather than plot.
+    """
+    Generate a correlation table for BSM coefficients similar to the corresponding plot.
+
+    Parameters
+    ----------
+    fit : object
+        The fit configuration object.
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+
+    Returns
+    -------
+    pd.DataFrame
+        The correlation matrix as a DataFrame.
     """
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
@@ -508,93 +604,124 @@ def tabulate_bsm_corr(fit, read_bsm_facs):
 @figure
 def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, bsm_names_to_latex, op1, op2):
     """
-    Auxiliary function to plot 2D plots
-    of pair of operators in a N-dimensional fits
-    with BSM factors
+    Auxiliary function to plot 2D plots of a pair of operators in a N-dimensional fits with BSM factors.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of replica data.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    op1 : str
+        The first operator name.
+    op2 : str
+        The second operator name.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the 2D plot.
     """
     return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, (op1, op2))
 
 @figure
 def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     """
-    Correlation matrix to summarise information about
-    the BSM coefficient results.
-    Paramaters
-    ----------
-        read_bsm_facs: pd.Dataframe
-    """
+    Plot a correlation matrix to summarise information about the BSM coefficient results.
 
-    # figsize (11, 9) has good proportions
+    Parameters
+    ----------
+    fit : object
+        The fit configuration object.
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    corr_threshold : float, optional
+        Threshold for coloration in the correlation matrix.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the correlation matrix plot.
+    """
     fig, ax = plt.subplots(1, 1, figsize=(11, 9))
-    # set background colour
     ax.set_facecolor("0.9")
 
-    # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
     bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
-    # create colourmap with gret in the centre for colourbar
     new_cmap = grey_centre_cmap(frac=corr_threshold)
 
-    # formatting
-    ax.xaxis.tick_top() # x axis on top
+    ax.xaxis.tick_top()
     ax.xaxis.set_label_position('top')
     ax.set_title(fit.label, fontsize=20, pad=20)
 
-    # create heatmap
-    ax = sns.heatmap(corr_mat,
-    vmin=-1.0, vmax=1.0, linewidths=.5, square=True, cmap=new_cmap);
+    ax = sns.heatmap(corr_mat, vmin=-1.0, vmax=1.0, linewidths=.5, square=True, cmap=new_cmap);
 
     return fig
 
-@figuregen
-def plot_bsm_pdf_corr(
-    pdf,
-    read_bsm_facs,
-    xplotting_grid,
-    Q,
-    bsm_names_to_latex,
-    mark_threshold: float = 0.9,
-    ymin: (float, type(None)) = None,
-    ymax: (float, type(None)) = None,
-    dashed_line_flavours: (list, type(None)) = None,
-):
-    # read dataframe
+def plot_bsm_pdf_corr(pdf, read_bsm_facs, xplotting_grid, Q, bsm_names_to_latex,
+                      mark_threshold=0.9, ymin=None, ymax=None, dashed_line_flavours=None):
+    """
+    Plot the correlation between BSM factors and a PDF.
+
+    Parameters
+    ----------
+    pdf : PDF object
+        The parton distribution function being analyzed.
+    read_bsm_facs : DataFrame or callable
+        Data or function representing BSM factors.
+    xplotting_grid : XGrid object
+        Object containing the plotting grid information.
+    Q : float
+        Momentum transfer value in GeV.
+    bsm_names_to_latex : dict
+        Mapping of BSM factor names to their LaTeX representations.
+    mark_threshold : float, optional
+        Threshold for marking significant correlations, by default 0.9.
+    ymin : float or None, optional
+        Minimum y-axis value, by default None.
+    ymax : float or None, optional
+        Maximum y-axis value, by default None.
+    dashed_line_flavours : list of str or None, optional
+        List of flavours to be plotted with dashed lines, by default None.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the plot.
+    bsm_fac : str
+        Name of the BSM factor being plotted.
+    """
+
     bsm_facs_df = read_bsm_facs
-    # reorder BSM facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
-    # get xplotting_grid
-    # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
     x_grid_obj = xplotting_grid
     if dashed_line_flavours is None:
         dashed_line_flavours = []
 
     for bsm_fac in bsm_facs_df.columns:
-        # get the values of the BSM factors
         bsm_fac_vals = bsm_facs_df[bsm_fac].values
-        # Initialise axes
         fig, ax = plt.subplots()
-        # Define xgrid and scale
         xgrid = x_grid_obj.xgrid
         scale = x_grid_obj.scale
-        # get grid values
         gv = x_grid_obj.grid_values.error_members()
+
         for index, flavour in enumerate(x_grid_obj.flavours):
             flavour_label = flavour
             parton_grids = gv[:, index, ...]
-            # calculate correlation
             num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
             den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
             corr = num / den
-            if flavour in dashed_line_flavours:
-                style = "--"
-            else:
-                style = "-"
+            style = "--" if flavour in dashed_line_flavours else "-"
             ax.plot(xgrid, corr, style, label=fr'${flavour_label}$')
-            # Plot threshold
+
             mask = np.abs(corr) > mark_threshold
             ranges = split_ranges(xgrid, mask, filter_falses=True)
             for r in ranges:
@@ -604,52 +731,60 @@ def plot_bsm_pdf_corr(
         ax.set_xlim(xgrid[0], xgrid[-1])
         ax.set_xlabel(r'$x$')
         ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - {pdf.label}\nQ = {Q} GeV')
-
-
         ax.set_ylim(ymin, ymax)
-
         ax.legend(loc="best")
         ax.grid(True)
-        #ax.set_axisbelow(True)
-        #ax.set_adjustable("datalim")
         yield fig, bsm_fac
 
-@figuregen
+
 def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
-    # extract all operators in the fits
+    """
+    Plot correlations between BSM factors and multiple PDFs.
+
+    Parameters
+    ----------
+    fits : list
+        List of fit objects or identifiers.
+    pdfs : list of PDF objects
+        List of parton distribution functions corresponding to the fits.
+    xplotting_grids : list of XGrid objects
+        List of plotting grid objects corresponding to each fit.
+    Q : float
+        Momentum transfer value in GeV.
+    bsm_names_to_latex : dict
+        Mapping of BSM factor names to their LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the plot.
+    """
+
     all_ops = []
     for fit in fits:
         paths = replica_paths(fit)
         bsm_facs_df = read_bsm_facs(paths)
         bsm_fac_ops = bsm_facs_df.columns.tolist()
         all_ops.append(bsm_fac_ops)
-    # Remove repeated operators
+
     all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
-    # plot correlation per operator
-    # if an operator is not in the fit then it is 
-    # simply not plotted
+
     for bsm_fac in all_ops:
-        # Initialise axes
         fig, ax = plt.subplots()
         for fit in fits:
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
-            # get PDF
             pdf = pdfs[fits.index(fit)]
-            # get x_object
-            x_grid_obj = xplotting_grids[fits.index(fit)] 
+            x_grid_obj = xplotting_grids[fits.index(fit)]
             if bsm_facs_df.get([bsm_fac]) is not None:
                 bsm_fac_vals = bsm_facs_df[bsm_fac].values
-                # Define xgrid and scale
                 xgrid = x_grid_obj.xgrid
                 scale = x_grid_obj.scale
-                # get grid values
                 gv = x_grid_obj.grid_values.error_members()
                 for flavour in x_grid_obj.flavours:
                     flavour_label = flavour
                     index = tuple(x_grid_obj.flavours).index(flavour)
                     parton_grids = gv[:, index, ...]
-                    # calculate correlation
                     num = np.mean(bsm_fac_vals.reshape(-1, 1) * parton_grids, axis=0) - np.mean(parton_grids, axis=0) * np.mean(bsm_fac_vals)
                     den = np.sqrt(np.mean(bsm_fac_vals**2) - np.mean(bsm_fac_vals)**2) * np.sqrt(np.mean(parton_grids**2, axis=0)- np.mean(parton_grids, axis=0)**2)
                     corr = num / den
@@ -657,7 +792,6 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
                 ax.set_xscale(scale)
                 ax.set_xlabel(r'$x$')
                 ax.set_title(f'Correlation {bsm_names_to_latex[bsm_fac]} - PDFs ' + f'(Q = {Q} GeV)')
-                
                 ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.17))
                 ax.grid(True)
                 ax.set_axisbelow(True)
@@ -667,47 +801,51 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
 @figuregen
 def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
     """
-    Compare histograms of BSM factors between different fits
-    in SIMUnet
+    Generate 2D scatter plots and histograms comparing BSM factor values across different fits.
+
+    This function takes a set of fits and compares the BSM factors between them. For each pair
+    of BSM factors, it creates a 2D scatter plot with corresponding histograms on the x and y axes.
+
+    Parameters
+    ----------
+    fits : list
+        List of fit objects or identifiers.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX string representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each pair of BSM factors.
     """
-    # extract all operators in the fits
+
     all_ops = []
     for fit in fits:
         paths = replica_paths(fit)
         bsm_facs_df = read_bsm_facs(paths)
         bsm_fac_ops = bsm_facs_df.columns.tolist()
         all_ops.append(bsm_fac_ops)
-    # Remove repeated operators
+    
     all_ops = {o for fit_ops in all_ops for o in fit_ops}
-    # get all pairs
     pairs = itertools.combinations(all_ops, 2)
-    # plot all pairs of operators
+    
     for pair in pairs:
         op_1, op_2 = pair
-        # use this size to keep them sqaure
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-        ax.ticklabel_format(
-            axis='both', scilimits=(0, 0), style='sci', useOffset=True
-        )
+        ax.ticklabel_format(axis='both', scilimits=(0, 0), style='sci', useOffset=True)
 
         divider = make_axes_locatable(ax)
-        # append axes to the top and to the right for the histograms
         ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
         ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
 
-        # Make some labels invisible
         ax_histx.xaxis.set_tick_params(labelbottom=False)
         ax_histy.yaxis.set_tick_params(labelleft=False)
 
         for fit in fits:
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
-            # display the result in the figure only if the fit has the two operators in the pair
             if bsm_facs_df.get([op_1]) is not None and bsm_facs_df.get([op_2]) is not None:
-                ax.scatter(
-                    bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.label, alpha=0.5, s=40
-                )
-                # populate the histograms
+                ax.scatter(bsm_facs_df.get([op_1]), bsm_facs_df.get([op_2]), label=fit.label, alpha=0.5, s=40)
                 ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5, density=True)
                 ax_histy.hist(bsm_facs_df.get([op_2]), orientation='horizontal', alpha=0.5, density=True)
 
@@ -724,17 +862,28 @@ def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
 @table
 def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
     """
-    Table generator to summarise information about
-    the BSM coefficient results.
-    Paramaters
+    Generate a table summarizing the bounds of BSM coefficients in different fits.
+
+    This function processes a list of fits, extracting the BSM coefficients and
+    summarizing their mean, standard deviation, and confidence levels. The confidence
+    levels are computed as mean ± n_sigma * std.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-    The returned table contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± n_sigma * std.
-    """ 
-    # extract all operators in the fits
+    fits : list of FitSpec objects
+        The fits from which to extract BSM coefficients.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+    n_sigma : int, optional
+        The multiplier for the standard deviation to define confidence level bounds, by default 2.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
+        additional metrics like 'Best-fit shift' and 'Broadening'.
+    """
+
     all_ops = []
     for fit in fits:
         paths = replica_paths(fit)
@@ -743,15 +892,12 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
         all_ops.extend(bsm_fac_ops)
     all_ops = list(dict.fromkeys(all_ops))
 
-    fit_names =  [fit.label for fit in fits]
+    fit_names = [fit.label for fit in fits]
     extra_metrics = ['Best-fit shift', 'Broadening']
-    # include extra metrics in columns
     fit_names.extend(extra_metrics)
 
-    # Initialise df 
     df = pd.DataFrame(index=all_ops, columns=fit_names)
     
-    # plot all operators 
     for op in all_ops:
         best_fits = []
         bound_lengths = []
@@ -760,72 +906,100 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
                 values = bsm_facs_df[op]
-                mean =  values.mean()
+                mean = values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - n_sigma * std, mean + n_sigma * std)
-                lower_dis = format_number(cl_lower, digits=2)
-                upper_dis = format_number(cl_upper, digits=2)
-                df[fit.label].loc[op] = f"({lower_dis}, {upper_dis})"
-                # best-fit value
+                df[fit.label].loc[op] = f"({format_number(cl_lower, 2)}, {format_number(cl_upper, 2)})"
                 best_fits.append(mean)
-                # calculate bound length
-                length = cl_upper - cl_lower
-                bound_lengths.append(length)
+                bound_lengths.append(cl_upper - cl_lower)
             else:
                 df[fit.label].loc[op] = 'Not in fit'
-                # if the operator is not in the fit, then assume SM
-                # for best-fit value
                 best_fits.append(0.0)
                 bound_lengths.append(0.0)
-        # best-fit shift column
-        df['Best-fit shift'].loc[op] = format_number(best_fits[0] - best_fits[1], digits=2)
-        # broadening column
+
+        df['Best-fit shift'].loc[op] = format_number(best_fits[0] - best_fits[1], 2)
         curr_len, ref_len = bound_lengths
-        if ref_len > 0:
-            df['Broadening'].loc[op] = str(np.round((curr_len - ref_len) / ref_len * 100.0, decimals=2)) + '%'
-        else:
-            df['Broadening'].loc[op] = 'n/a'
+        df['Broadening'].loc[op] = f"{np.round((curr_len - ref_len) / ref_len * 100.0, 2)}%" if ref_len > 0 else 'n/a'
 
-    # formatting columns
     for column in df.columns[:2]:
-        if n_sigma == 1:
-            df = df.rename(columns={column: f'68% CL - {column}'})
-        elif n_sigma == 2:
-            df = df.rename(columns={column: f'95% CL - {column}'})
-
-    mapping = {df.columns[0]: '(Current) ' + df.columns[0],
-    df.columns[1]: '(Reference) ' + df.columns[1]}
-
+        cl_label = '68%' if n_sigma == 1 else '95%'
+        df = df.rename(columns={column: f'{cl_label} CL - {column}'})
+    mapping = {df.columns[0]: '(Current) ' + df.columns[0], df.columns[1]: '(Reference) ' + df.columns[1]}
     df = df.rename(columns=mapping)
     df.index = [bsm_names_to_latex[i] for i in df.index]
 
     return df
 
 @table
-def bsm_facs_68bounds_fits(fits, bsm_names_to_latex,):
+def bsm_facs_68bounds_fits(fits, bsm_names_to_latex):
     """
-    Table generator to obtain the 68% CL
-    for BSM factors while comparing fits.
+    Generate a table summarizing the 68% confidence level (CL) bounds for BSM factors from various fits.
+
+    This function processes a list of fits and utilizes `bsm_facs_bounds_fits` to calculate and
+    return the 68% CL bounds for BSM coefficients.
+
     Parameters
     ----------
-        fits: NSList of FitSpec 
-    """ 
+    fits : list of FitSpec objects
+        The fits from which to extract and calculate the BSM coefficients' bounds.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the 68% CL bounds for each BSM factor in each fit.
+    """
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=1)
 
 @table
 def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
-    Table generator to obtain the 95% CL
-    for BSM factors while comparing fits.
+    Generate a table summarizing the 95% confidence level (CL) bounds for BSM factors from various fits.
+
+    This function processes a list of fits and utilizes `bsm_facs_bounds_fits` to calculate and
+    return the 95% CL bounds for BSM coefficients.
+
     Parameters
     ----------
-        fits: NSList of FitSpec 
-    """ 
+    fits : list of FitSpec objects
+        The fits from which to extract and calculate the BSM coefficients' bounds.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the 95% CL bounds for each BSM factor in each fit.
+    """
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
-    """Compares two SMEFiT fits.
+    """
+    Generates comparison plots between two SMEFiT fits.
+
+    This function creates plots to compare two different SMEFiT fits. It plots the best fit values
+    and the bounds for BSM (Beyond the Standard Model) coefficients, allowing for an easy comparison
+    of the two fits. It supports both linear and symmetric logarithmic scales.
+
+    Parameters
+    ----------
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    smefit_reference_1 : list of dicts
+        List of dictionaries containing BSM coefficient information for the first SMEFiT reference.
+    smefit_reference_2 : list of dicts
+        List of dictionaries containing BSM coefficient information for the second SMEFiT reference.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+    smefit_labels : list of str
+        Labels for the SMEFiT references to be used in the plot.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the comparison plot.
     """
     # extract all operators in the SMEFiT fits
     all_ops = []
@@ -924,18 +1098,6 @@ def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smef
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
 
-        # Load image and add it to the plot
-        #file_name = "logo_black.png"
-        #logo = image.imread(file_name)
-
-        #The OffsetBox is a simple container artist.
-        #The child artists are meant to be drawn at a relative position to its #parent.
-        #imagebox = OffsetImage(logo, zoom = 0.15)
-
-        #Container for the imagebox referring to a specific position *xy*.
-        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
-        #ax.add_artist(ab)
-
         # frames on all sides
         ax.spines['top'].set_visible(True)
         ax.spines['right'].set_visible(True)
@@ -947,17 +1109,31 @@ def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smef
 @figuregen
 def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
     """
-    Figure generator to compare bounds obtained with simunet with
-    bounds obtained by smefit.
-    Paramaters
+    Generates plots comparing bounds obtained from SIMUnet fits with those obtained by SMEFiT.
+
+    This function takes a set of SIMUnet fits and a SMEFiT reference, extracting BSM coefficients
+    from each. It plots the mean and standard deviation of the BSM coefficients for each fit,
+    along with confidence levels calculated as mean ± 2*std. It supports both linear and symmetric
+    logarithmic scales for the plots.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-        n_sigma: number
-    The plot contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± 2*std.
-    """ 
+    fits : list of FitSpec objects
+        The SIMUnet fits from which to extract BSM coefficients.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    smefit_reference : list of dicts
+        List of dictionaries containing BSM coefficient information from a SMEFiT reference.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+    smefit_label : str
+        Label for the SMEFiT reference to be used in the plot.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the comparison plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1068,18 +1244,6 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
 
-        # Load image and add it to the plot
-        #file_name = "logo_black.png"
-        #logo = image.imread(file_name)
-
-        #The OffsetBox is a simple container artist.
-        #The child artists are meant to be drawn at a relative position to its #parent.
-        #imagebox = OffsetImage(logo, zoom = 0.15)
-
-        #Container for the imagebox referring to a specific position *xy*.
-        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
-        #ax.add_artist(ab)
-
         # frames on all sides
         ax.spines['top'].set_visible(True)
         ax.spines['right'].set_visible(True)
@@ -1091,17 +1255,26 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
 @figuregen
 def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
-    Figure generator to plot the bounds of
-    the BSM coefficients fitted.
-    Paramaters
+    Generates plots of the bounds for BSM coefficients from various fits.
+
+    This function takes a list of fits and generates plots showing the mean, standard deviation,
+    and confidence levels of the BSM coefficients. The confidence levels are calculated as mean ± 2*std.
+    It supports both linear and symmetric logarithmic scales for the plots.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-        n_sigma: number
-    The plot contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± 2*std.
-    """ 
+    fits : list of FitSpec objects
+        The fits from which to extract BSM coefficients.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each generated plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1209,12 +1382,25 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
 @figuregen
 def plot_bsm_facs_68res(fits, bsm_names_to_latex):
     """
-    Figure generator to plot the 68% residuals
-    pulls of the BSM coefficients
+    Generates plots of the 68% residuals of BSM coefficients for various fits.
+
+    This function processes a set of fits and generates plots showing the 68% residuals of the
+    BSM (Beyond the Standard Model) coefficients. The residuals are calculated as the mean of
+    the coefficients divided by their standard deviation, providing a measure of deviation
+    from the Standard Model.
+
     Parameters
     ----------
-        fits: NSList[FitSpec] 
-    """ 
+    fits : list of FitSpec objects
+        The fits from which to extract BSM coefficients.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the residual plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1341,13 +1527,58 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
 Principal component analysis
 """
 
-@table
 def fisher_information_matrix(dataset_inputs, groups_index, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    Obtains the full Fisher information matrix for the BSM parameters.
+
+    This function computes the Fisher information matrix for Beyond the Standard Model (BSM) parameters
+    given a dataset. It utilizes an internal function `_compute_fisher_information_matrix` to perform the computation.
+
+    Parameters
+    ----------
+    dataset_inputs : array-like
+        The inputs from the dataset used for computing the Fisher information matrix.
+    groups_index : array-like
+        Indexes representing different groups in the dataset.
+    theoryid : array-like
+        Array of theory identifiers.
+    groups_covmat : array-like
+        Covariance matrices for the groups in the dataset.
+    simu_parameters_names : list
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    array-like
+        The computed Fisher information matrix.
     """
     return _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    """
+    Truncates a colormap to a specific range.
+
+    This function creates a new colormap based on a given colormap but truncated to the range specified
+    by minval and maxval. This is useful for adjusting the range of colors used in a plot.
+
+    Parameters
+    ----------
+    cmap : matplotlib.colors.Colormap
+        The original colormap to be truncated.
+    minval : float, optional
+        The minimum value of the new colormap, by default 0.0.
+    maxval : float, optional
+        The maximum value of the new colormap, by default 1.0.
+    n : int, optional
+        The number of discrete colors in the new colormap, by default 100.
+
+    Returns
+    -------
+    matplotlib.colors.LinearSegmentedColormap
+        The truncated colormap.
+    """
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
         cmap(np.linspace(minval, maxval, n)))
@@ -1355,7 +1586,26 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 @figure
 def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to_latex, bsm_sectors_to_latex):
-    """Produces a nice plot from the table fisher_information_by_sector.
+    """
+    Produces a heatmap plot from the Fisher information by sector table.
+
+    This function creates a heatmap visualizing the Fisher information matrix, where rows correspond to BSM coefficients
+    and columns correspond to different sectors. This visualization helps in understanding the impact of various
+    sectors on the coefficients.
+
+    Parameters
+    ----------
+    fisher_information_by_sector : pandas.DataFrame
+        The Fisher information matrix with sectors as columns and BSM coefficients as rows.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    bsm_sectors_to_latex : dict
+        Dictionary mapping sector names to their LaTeX representations.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the heatmap plot of the Fisher information.
     """
     f = fisher_information_by_sector
 
@@ -1365,30 +1615,30 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
     ncoeff, ndata = f.shape
 
     fig, ax = plt.subplots(figsize=(15,5))
-    ax.set_xlim([-1.5,ncoeff-1.5])
-    ax.set_ylim([-1.5,ndata-1.5])
+    ax.set_xlim([-1.5, ncoeff - 1.5])
+    ax.set_ylim([-1.5, ndata - 1.5])
     ax.xaxis.set_major_locator(MultipleLocator(1.))
     ax.yaxis.set_major_locator(MultipleLocator(1.))
 
-    old_cmap =  plt.get_cmap('YlGnBu')
-    new_cmap  = truncate_colormap(old_cmap, minval=0.0, maxval=0.65)
+    old_cmap = plt.get_cmap('YlGnBu')
+    new_cmap = truncate_colormap(old_cmap, minval=0.0, maxval=0.65)
 
-    ax = sns.heatmap(f.T,vmin=0.0, vmax=100.0,cmap=new_cmap,cbar=False);
+    ax = sns.heatmap(f.T, vmin=0.0, vmax=100.0, cmap=new_cmap, cbar=False)
 
     ax.set_xticklabels(coeff_names, rotation=0., va='top', ha='center', fontsize=14)
     ax.set_yticklabels(sector_names, rotation=0., va='center', ha='right', fontsize=14)
 
-    for y,val in enumerate(f.index):
-        ax.plot([y, y],[-1.5, ndata+1], ls='solid', c='lightgray', lw=0.8)
+    for y, val in enumerate(f.index):
+        ax.plot([y, y], [-1.5, ndata + 1], ls='solid', c='lightgray', lw=0.8)
 
-    fisher_rounded = np.round(f.to_numpy(),0)
+    fisher_rounded = np.round(f.to_numpy(), 0)
 
-    #Plot numbers
+    # Plot numbers
     nrow, ncol = np.shape(f.T)
     for i in range(nrow):
         for j in range(ncol):
-            if fisher_rounded.T[i,j]!=0:
-                plt.text(x=j+0.15, y=i+0.6, s=str(fisher_rounded.T[i,j]),fontsize=10)
+            if fisher_rounded.T[i, j] != 0:
+                plt.text(x=j + 0.15, y=i + 0.6, s=str(fisher_rounded.T[i, j]), fontsize=10)
 
     plt.tight_layout()
 
@@ -1396,9 +1646,34 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
 
 @table
 def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the Fisher information matrices for each of the BSM sectors.
     """
-    
+    Obtains the Fisher information matrices for each of the BSM sectors.
+
+    This function computes the Fisher information matrix for each sector in a dataset, providing a
+    measure of the amount of information each sector contributes to the parameters. The function
+    accumulates datasets by sectors, calculates the reduced covariance matrices for each sector,
+    and computes the Fisher information matrices. The diagonal elements of these matrices are
+    extracted and normalized to provide a comparative view across sectors.
+
+    Parameters
+    ----------
+    dataset_inputs : list of Dataset objects
+        The datasets used for computing the Fisher information matrices.
+    theoryid : int or array-like
+        Theory identifier(s) associated with the datasets.
+    groups_covmat : pd.DataFrame
+        Covariance matrices for the groups in the datasets.
+    simu_parameters_names : list of str
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with the normalized diagonal elements of the Fisher information matrices,
+        indexed by simulation parameters and with sectors as columns.
+    """
     # First, get the names of the BSM sectors.
 
     bsm_dataset_inputs_sectors = {} 
@@ -1460,7 +1735,31 @@ def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_p
     return df
 
 def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Computes a Fisher information matrix.
+    """
+    Computes the Fisher information matrix for a given set of datasets and simulation parameters.
+
+    This function calculates the Fisher information matrix, which quantifies the amount of information
+    that an observable random variable carries about an unknown parameter upon which the probability
+    of the random variable depends. It takes into account the datasets, theory IDs, groups covariance
+    matrix, simulation parameters, and the parton distribution function (PDF).
+
+    Parameters
+    ----------
+    dataset_inputs : list of Dataset objects
+        The datasets used for computing the Fisher information matrix.
+    theoryid : int or array-like
+        Theory identifier(s) associated with the datasets.
+    groups_covmat : pd.DataFrame
+        Covariance matrices for the groups in the datasets.
+    simu_parameters_names : list of str
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    pd.DataFrame
+        The computed Fisher information matrix as a pandas DataFrame.
     """
     bsm_factors = []
     if dataset_inputs is not None:
@@ -1471,7 +1770,7 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
 
-    # Make bsm_factors into a nice numpy array. 
+    # Make bsm_factors into a numpy array. 
     bsm_factors = np.concatenate(bsm_factors, axis=1).T
 
     # The rows are the data, the columns are the operator
@@ -1487,7 +1786,22 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
 
 @table
 def principal_component_values(fisher_information_matrix):
-    """Returns the eigenvalues corresponding to the various principal directions
+    """
+    Returns the eigenvalues corresponding to the various principal directions.
+
+    This function performs a principal component analysis (PCA) on the Fisher information matrix
+    to return the eigenvalues. These eigenvalues represent the variance of the data along the
+    principal components, which can be used to understand the dominant directions in the data.
+
+    Parameters
+    ----------
+    fisher_information_matrix : pd.DataFrame
+        The Fisher information matrix.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the eigenvalues of the Fisher information matrix.
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
@@ -1497,7 +1811,24 @@ def principal_component_values(fisher_information_matrix):
 
 @table
 def principal_component_vectors(fisher_information_matrix, simu_parameters_names):
-    """Performs a principal component analysis to obtain the flat directions
+    """
+    Performs a principal component analysis to obtain the principal directions (vectors).
+
+    This function calculates the principal component vectors from the Fisher information matrix,
+    providing insights into the flat directions of the parameter space. These directions can
+    indicate combinations of parameters that are less constrained by the data.
+
+    Parameters
+    ----------
+    fisher_information_matrix : pd.DataFrame
+        The Fisher information matrix.
+    simu_parameters_names : list of str
+        Names of the simulation parameters.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the principal component vectors, indexed by the simulation parameters.
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
