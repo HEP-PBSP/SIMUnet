@@ -16,6 +16,7 @@ class CombineCfacLayer(Layer):
         scales,
         linear_names,
         initialisations,
+        analytic_initialisation,
         initialisation_seed,
         replica_number,
     ):
@@ -37,6 +38,7 @@ class CombineCfacLayer(Layer):
         # At this point, create a tf object with the correct random initialisation.
         initial_values = []
         assert len(initialisations) == len(linear_names)
+        index = 0
         for ini, name in zip(initialisations, linear_names):
             hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (10 ** 18)
             seed = np.int32((initialisation_seed + replica_number) ^ hash_value)
@@ -52,10 +54,13 @@ class CombineCfacLayer(Layer):
             elif isinstance(ini, initialisation_specs.GaussianInitialisation):
                 tf.random.set_seed(seed)
                 val = tf.random.normal([1], ini.mean, ini.std_dev, tf.float32)
+            elif isinstance(ini, initialisation_specs.AnalyticInitialisation):
+                val = float(analytic_initialisation[index])
             else:
                 raise RuntimeError(
                     "Invalid initialisation: choose form constant, uniform or Gaussian."
                 )
+            index += 1
             initial_values.append(val)
 
         if len(initial_values) > 0:
