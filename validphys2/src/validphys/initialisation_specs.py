@@ -36,7 +36,11 @@ Number = typing.Union[float, int]
 
 @dataclasses.dataclass
 class UniformInitialisation:
+<<<<<<< HEAD
     type: typing.Literal["uniform"]
+=======
+
+>>>>>>> 39afff8f5 (Added option for initialising at analytic minimum of chi2 on experimental data)
     maxval: Number
     minval: Number
 
