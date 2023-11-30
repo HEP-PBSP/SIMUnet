@@ -191,6 +191,12 @@ def performfit(
 
     rep_num = replicas_nnseed_fitting_data_dict[0][0]
 
+    exp_data = []
+    for i in range(len(replicas_nnseed_fitting_data_dict[0][1])):
+        exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'])]
+
+    exp_data = pd.concat(exp_data, axis=1).T
+
     compute_analytic = False
     for ini in bsm_fac_initialisations:
         if isinstance(ini, AnalyticInitialisation):
@@ -199,14 +205,12 @@ def performfit(
     if compute_analytic:
         # Compute the initialisations
         sm_predictions = []
-        dataset_values = []
         linear_bsm = []
         th_covmat = []
         for ds in data.datasets:
             pred_values = predictions(ds, PDF(analytic_initialisation_pdf))
             ndat = len(pred_values)
             sm_predictions += [pred_values]
-            dataset_values += [pd.DataFrame(ds.commondata.load().get_cv())]
             simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
             nop = len(ds.simu_parameters_linear_combinations)
             if os.path.exists(simu_path):
@@ -233,7 +237,6 @@ def performfit(
 
         # Take only the prediction corresponding to the replica we are interested in
         sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
-        dataset_values = pd.concat(dataset_values)
         linear_bsm = pd.concat(linear_bsm)
 
         covmat = dataset_inputs_t0_covmat_from_systematics
@@ -242,7 +245,7 @@ def performfit(
         total_covmat = covmat + th_covmat
         invcovmat = pd.DataFrame(np.linalg.inv(total_covmat))
 
-        analytic_initialisation = analytic_solution(dataset_values, sm_predictions, linear_bsm, invcovmat) 
+        analytic_initialisation = analytic_solution(exp_data, sm_predictions, linear_bsm, invcovmat) 
 
     else:
         analytic_initialisation = None
