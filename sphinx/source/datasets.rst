@@ -1,3 +1,5 @@
+.. _dataset:
+
 **Dataset selection**
 =====================
 

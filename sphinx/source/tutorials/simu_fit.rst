@@ -1,2 +1,4 @@
+.. _simufit:
+
 Simultaneous fits
 =================
