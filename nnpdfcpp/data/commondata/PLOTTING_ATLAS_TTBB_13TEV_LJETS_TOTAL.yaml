@@ -1,0 +1,5 @@
+dataset_label: "ATLAS $\\sigma_{t\\bar{t}b\\bar{b}}^{\\rm tot}$ (l+jets) 13 TeV"
+
+experiment: "ATLAS"
+
+nnpdf31_process: "4HEAVY"

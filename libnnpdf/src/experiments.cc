@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <cmath>
 #include <numeric>
+#include "yaml-cpp/yaml.h"
 
 #include "NNPDF/experiments.h"
 #include "NNPDF/chisquared.h"
@@ -24,6 +25,7 @@
 #include "NNPDF/utils.h"
 #include "NNPDF/randomgenerator.h"
 #include "NNPDF/exceptions.h"
+#include "NNPDF/pathlib.h"
 
 using namespace std;
 namespace NNPDF{
@@ -403,7 +405,21 @@ void Experiment::MakeClosure(const vector<ThPredictions>& predictions, bool cons
     auto newdata  =  vector<double>(set.GetNData());
 
     for (int i = 0; i < set.GetNData(); i++)
+    {
       newdata[i] = theory.GetObsCV(i);
+
+      // Sort out fixed observables first, if necessary
+      if (set.GetUseFixedPredictions())
+      {
+         string fixed_prediction_path = get_data_path() + "theory_" + std::to_string(set.GetSpecialTheoryID()) + "/simu_factors/SIMU_" + set.GetSetName() + ".yaml";
+         YAML::Node read_file = YAML::LoadFile(fixed_prediction_path);
+         std::vector<float> fixed_predictions = read_file["SM_fixed"].as<std::vector<float>>();
+         newdata[i] = fixed_predictions[i];
+      }
+
+      // Finally, add the contamination
+      newdata[i] = newdata[i]*set.GetContaminationFactor()[i];
+    }
 
     set.UpdateData(newdata.data()); // MakeClosure treated as shifts rather than normalisations
 

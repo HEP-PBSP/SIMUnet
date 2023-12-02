@@ -39,7 +39,7 @@ PUSH_POSITIVITY_EACH = 100
 PUSH_INTEGRABILITY_EACH = 100
 
 
-def _pdf_injection(pdf_layers, fixed_observable_inputs, observables, masks):
+def _pdf_injection(pdf_layers, observables, masks):
     """
     Takes as input a list of PDF layers each corresponding to one observable (also given as a list)
     And (where neded) a mask to select the output.
@@ -47,33 +47,22 @@ def _pdf_injection(pdf_layers, fixed_observable_inputs, observables, masks):
     Note that the list of masks don't need to be the same size as the list of layers/observables
     """
     return [
-        f(x, list(foi.values()), mask=m)
-        for f, x, foi, m in zip_longest(
-            observables, pdf_layers, fixed_observable_inputs, masks
+        f(x, mask=m)
+        for f, x, m in zip_longest(
+            observables, pdf_layers, masks
         )
     ]
 
 
 def _setup_meta_model(observables, base_inputs, pdf_model, mask):
     """Set up inputs and outputs for a meta model"""
-    fixed_observable_inputs = [o.make_fixed_observable_inputs() for o in observables]
-
 
     input_values = {}
 
-    f_obs = []
     inp = base_inputs.copy()
-    for foi in fixed_observable_inputs:
-        fo_keras = {}
-        for k, (keras_tensor, tf_tensor) in foi.items():
-            fo_keras[k] = keras_tensor
-            input_values[k] = tf_tensor
-        inp.update(fo_keras)
-        f_obs.append(fo_keras)
 
     output = _pdf_injection(
         pdf_model,
-        f_obs,
         observables,
         mask,
     )
@@ -131,11 +120,9 @@ class ModelTrainer:
         fixed_pdf=False,
         pass_status="ok",
         failed_status="fail",
-        n_bsm_fac_data=0,
-        bsm_fac_data_names=None,
-        bsm_fac_quad_names=None,
-        bsm_fac_data_scales=None,
-        bsm_fac_quad_scales=None,
+        n_simu_parameters=0,
+        simu_parameters_names=None,
+        simu_parameters_scales=None,
         bsm_fac_initialisations=None,
         bsm_initialisation_seed=0,
         debug=False,
@@ -176,7 +163,7 @@ class ModelTrainer:
                         whether sum rules should be enabled (All, MSR, VSR, False)
             parallel_models: int
                 number of models to fit in parallel
-            n_bsm_fac_data: int
+            n_simu_parameters: int
                 number of bsm coefficients in the fit
         """
         # Save all input information
@@ -196,11 +183,9 @@ class ModelTrainer:
         self.all_datasets = []
         self._scaler = None
         self._parallel_models = parallel_models
-        self.n_bsm_fac_data=n_bsm_fac_data
-        self.bsm_fac_data_names=bsm_fac_data_names
-        self.bsm_fac_data_scales = bsm_fac_data_scales
-        self.bsm_fac_quad_names = bsm_fac_quad_names
-        self.bsm_fac_quad_scales = bsm_fac_quad_scales
+        self.n_simu_parameters=n_simu_parameters
+        self.simu_parameters_names=simu_parameters_names
+        self.simu_parameters_scales = simu_parameters_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
         self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
@@ -523,17 +508,14 @@ class ModelTrainer:
         #
 
         combiner = CombineCfacLayer(
-            scales=np.array(self.bsm_fac_data_scales, dtype=np.float32),
-            linear_names=self.bsm_fac_data_names,
-            quad_names=[
-                name for sublist in self.bsm_fac_quad_names for name in sublist
-            ],
+            scales=np.array(self.simu_parameters_scales, dtype=np.float32),
+            linear_names=self.simu_parameters_names,
             initialisations=self.bsm_fac_initialisations,
             initialisation_seed=self.bsm_initialisation_seed,
             replica_number=self.replicas[0],
         )
 
-        log.info(f"Using bsm_factor scales: {self.bsm_fac_data_scales}")
+        log.info(f"Using bsm_factor scales: {self.simu_parameters_scales}")
         self.combiner = combiner
   
         for exp_dict in self.exp_info:
@@ -1034,8 +1016,8 @@ class ModelTrainer:
 
         # Get the values of the Wilson coefficients, then appropriately rescale each one
         unscaled_coeffs=self.combiner.get_weights()[0]
-        scaled_coeffs=[unscaled_coeffs[i] / self.bsm_fac_data_scales[i] for i in range(len(unscaled_coeffs))]
+        scaled_coeffs=[unscaled_coeffs[i] / self.simu_parameters_scales[i] for i in range(len(unscaled_coeffs))]
 
-        dict_out['bsm_fac_df'] = pd.DataFrame([scaled_coeffs], columns=self.bsm_fac_data_names)
+        dict_out['bsm_fac_df'] = pd.DataFrame([scaled_coeffs], columns=self.simu_parameters_names)
 
         return dict_out

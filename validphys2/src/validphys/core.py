@@ -322,18 +322,19 @@ class CommonDataSpec(TupleComp):
 
 
 class DataSetInput(TupleComp):
-    """Represents whatever the user enters in the YAML to specidy a
+    """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, bsm_fac_data_names, bsm_fac_quad_names, bsm_sector):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination):
         self.name=name
         self.sys=sys
         self.cfac = cfac
         self.frac = frac
         self.weight = weight
         self.custom_group = custom_group
-        self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_quad_names = bsm_fac_quad_names
-        self.bsm_sector = bsm_sector
+        self.simu_parameters_names = simu_parameters_names
+        self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
+        self.use_fixed_predictions = use_fixed_predictions
+        self.contamination = contamination
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -462,9 +463,12 @@ def cut_mask(cuts):
 class DataSetSpec(TupleComp):
 
     def __init__(self, *, name, commondata, fkspecs, thspec, cuts,
-                 frac=1, op=None, weight=1, bsm_fac_data_names_CF=None, bsm_fac_quad_names_CF=None, bsm_fac_data_names=None, bsm_fac_quad_names=None):
+                 frac=1, op=None, weight=1, simu_parameters_names_CF=None, simu_parameters_names=None, simu_parameters_linear_combinations=None, use_fixed_predictions=False, contamination=None, contamination_data=None):
         self.name = name
         self.commondata = commondata
+        self.use_fixed_predictions = use_fixed_predictions
+        self.contamination = contamination
+        self.contamination_data = contamination_data
 
         if isinstance(fkspecs, FKTableSpec):
             fkspecs = (fkspecs,)
@@ -473,12 +477,11 @@ class DataSetSpec(TupleComp):
 
         self.cuts = cuts
         self.frac = frac
-        self.bsm_fac_data_names_CF = bsm_fac_data_names_CF 
-        self.bsm_fac_quad_names_CF = bsm_fac_quad_names_CF
+        self.simu_parameters_names_CF = simu_parameters_names_CF 
 
         # These are important because they are ORDERED correctly, but the dictionaries might not be
-        self.bsm_fac_data_names = bsm_fac_data_names
-        self.bsm_fac_quad_names = bsm_fac_quad_names
+        self.simu_parameters_names = simu_parameters_names
+        self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
 
         #Do this way (instead of setting op='NULL' in the signature)
         #so we don't have to know the default everywhere
@@ -488,7 +491,7 @@ class DataSetSpec(TupleComp):
         self.weight = weight
 
         super().__init__(name, commondata, fkspecs, thspec, cuts,
-                         frac, op, weight)
+                         frac, op, weight, use_fixed_predictions)
 
     @functools.lru_cache()
     def load(self):
@@ -505,8 +508,39 @@ class DataSetSpec(TupleComp):
 
         fkset = FKSet(FKSet.parseOperator(self.op), fktables)
 
-        data = DataSet(cd, fkset, self.weight)
+        if self.contamination:
+            # Determine the multiplicative factors that we have to contaminate the closure test
+            # pseudodata with.
+            simu_fac_path = str(self.fkspecs[0].fkpath).split('fastkernel')[0] + "simu_factors/SIMU_" + cd.GetSetName() + ".yaml"
+            with open(simu_fac_path, 'rb') as file:
+                simu_file = yaml.safe_load(file)
+            contamination_values = np.array([0.0]*cd.GetNData())
+            if self.contamination_data:
+                for parameter in self.contamination_data:
+                    if 'linear_combination' not in parameter.keys():
+                        # Default if no linear combination is just to take the parameter name itself
+                        parameter['linear_combination'] = {parameter['name'] : 1.0}
+                    for op in list(parameter['linear_combination'].keys()):
+                        if op in simu_file[self.contamination].keys():
+                            contamination_values += parameter['value']*parameter['linear_combination'][op]*np.array(simu_file[self.contamination][op])
+                sm_prediction = np.array(simu_file[self.contamination]['SM'])
+                contamination_values = contamination_values / sm_prediction
+                contamination_values += np.array([1.0]*cd.GetNData())
+                contamination_values = contamination_values.tolist()
+            else:
+                contamination_values = [1.0]*cd.GetNData() 
+        else:
+            # The contamination is just an array of 1s
+            contamination_values = [1.0]*cd.GetNData()
 
+        data = DataSet(
+            cd,
+            fkset,
+            contamination_values,
+            self.weight,
+            self.use_fixed_predictions,
+            int(self.thspec.id),
+        )
 
         if self.cuts is not None:
             #ugly need to convert from numpy.int64 to int, so we can pass
@@ -538,9 +572,11 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
         self.fkpath = fkpath
         self.cfactors = cfactors
+        self.use_fixed_predictions = use_fixed_predictions
+        self.fixed_predictions_path = fixed_predictions_path
         super().__init__(fkpath, cfactors)
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
@@ -575,11 +611,9 @@ class PositivitySetSpec(DataSetSpec):
 #We allow to expand the experiment as a list of datasets
 class DataGroupSpec(TupleComp, namespaces.NSList):
 
-    def __init__(self, name, datasets, dsinputs=None, fixed_observables=None, foinputs=None):
+    def __init__(self, name, datasets, dsinputs=None):
         #This needs to be hashable
         datasets = tuple(datasets)
-        if fixed_observables is not None:
-            fixed_observables = tuple(fixed_observables)
 
         #TODO: Find a better way for interactive usage.
         if dsinputs is not None:
@@ -589,17 +623,11 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
         self.datasets = datasets
         self.dsinputs = dsinputs
 
-        self.fixed_observables = fixed_observables
-        self.foinputs = foinputs
-
         #TODO: Add dsinputs to comp tuple?
-        super().__init__(name, datasets, fixed_observables)
+        super().__init__(name, datasets)
 
         #TODO: Can we do  better cooperative inherece trick than this?
         namespaces.NSList.__init__(self, dsinputs, nskey='dataset_input')
-
-    def iterfixed(self):
-        return namespaces.NSList(self.foinputs, nskey='fixed_observable_input')
 
     @functools.lru_cache(maxsize=32)
     def load(self):
@@ -607,19 +635,12 @@ class DataGroupSpec(TupleComp, namespaces.NSList):
         for dataset in self.datasets:
             loaded_data = dataset.load()
             sets.append(loaded_data)
-
-        for dataset in self.fixed_observables:
-            loaded_data = dataset.load_as_dataspec()
-            sets.append(loaded_data)
-
         return Experiment(sets, self.name)
 
     @property
     def thspec(self):
         #TODO: Is this good enough? Should we explicitly pass the theory
-        if len(self.datasets) != 0:
-            return self.datasets[0].thspec
-        return self.fixed_observables[0].thspec
+        return self.datasets[0].thspec
 
     def __str__(self):
         return self.name
@@ -675,7 +696,7 @@ class FitSpec(TupleComp):
             for vari in to_take_out:
                 if vari in fitting and vari not in d:
                     d[vari] = fitting[vari]
-        d.setdefault("bsm_fac_data", None)
+        d.setdefault("simu_parameters", None)
         d.setdefault("bsm_sector_data", None)
         return d
 
@@ -898,115 +919,3 @@ class Filter:
 
     def __str__(self):
         return '%s: %s' % (self.label, self.indexes)
-
-@dataclasses.dataclass(frozen=True)
-class FixedObservableInput:
-    """Representation of the data the user inputs to obtain a fixed observable"""
-    dataset: str
-    weight: float = 1.
-    frac: float = 1.
-    bsm_sector: Optional[str] = None
-    bsm_order: Optional[str] = None
-
-
-@dataclasses.dataclass(frozen=True)
-class FixedObservableSpec:
-    """Representation of a fixed observable"""
-
-    name: str
-    commondata: CommonDataSpec
-    pred_path: Path
-    thspec: int
-    weight: float = 1.0
-    frac: float = 1
-    # Note: This is not a dict as we want it to be hashable
-    custom_group: Optional[str] = None
-    bsm_fac_data_names_CF_data: tuple = ()
-    bsm_fac_quad_names_CF_data: tuple = ()
-    bsm_fac_quad_names: tuple = ()
-    bsm_fac_data_names: tuple = ()
-    bsm_sector: str = None
-
-    @property
-    def bsm_fac_data_names_CF(self):
-        return dict(self.bsm_fac_data_names_CF_data)
-
-    @property
-    def bsm_fac_quad_names_CF(self):
-        if self.bsm_fac_quad_names_CF_data is not None:
-            return dict(self.bsm_fac_quad_names_CF_data)
-        return None
-
-    # Bogus cuts to make this more compatible with the usual data
-    @property
-    def cuts(self):
-        return TrivialCuts(self.commondata.ndata)
-
-    def load_exp(self):
-        """Load the experimental data for the fixed observable"""
-        from validphys.commondata import load_commondata
-
-        return load_commondata(self.commondata)
-
-    def load_pred(self):
-        """Load the raw theory predictions (without wilson coefficients)"""
-        from validphys.fkparser import parse_cfactor
-
-        with open(self.pred_path, 'rb') as f:
-            return parse_cfactor(f)
-
-    def _load_bsm_values(self, inp):
-        from validphys.coredata import CFactorData
-        from validphys.fkparser import parse_cfactor
-
-        if inp is None:
-            return None
-        name_cf_map = {}
-        for name, path in inp.items():
-            if name[:4] == "None":
-                cfac = CFactorData(
-                    description="dummy",
-                    central_value=np.zeros(self.commondata.ndata),
-                    uncertainty=np.zeros(self.commondata.ndata),
-                )
-            else:
-                with open(path, "rb") as stream:
-                    cfac = parse_cfactor(stream)
-                    # TODO: Don't do this
-                    cfac.central_value -= 1
-                    # cfac.uncertainty = ???
-            name_cf_map[name] = cfac
-        return name_cf_map
-
-    def load_bsm(self):
-        return (
-            self._load_bsm_values(self.bsm_fac_data_names_CF),
-            self._load_bsm_values(self.bsm_fac_quad_names_CF),
-        )
-
-    def load_as_dataspec(self):
-        super_dodgy_path = str(self.pred_path)
-        res = super_dodgy_path.split("/")
-        res[-2] = 'fastkernel' 
-        # This seems like an absolutely terrible idea, but oh well, never mind
-        res[-1] = 'FK_HERACOMBNCEM.dat'
-
-        super_dodgy_path = ""
-
-        for i in range(len(res)-1):
-            super_dodgy_path += "/" + res[i+1]
-
-        cd = self.commondata.load()
-
-        fake_fkspec = FKTableSpec(super_dodgy_path, [])
-        fktable = fake_fkspec.load()
-        fktable.thisown = 0
-
-        fake_fk = FKSet(FKSet.parseOperator('NULL'), [fktable])
-
-        data = DataSet(cd, fake_fk, self.weight)
-        return data
-
-    def load(self):
-        from validphys.coredata import FixedObservableData
-        return FixedObservableData.from_spec(self)

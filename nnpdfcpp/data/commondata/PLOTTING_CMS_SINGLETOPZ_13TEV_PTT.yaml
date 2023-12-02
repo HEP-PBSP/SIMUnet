@@ -1,0 +1,8 @@
+dataset_label: "CMS 13TeV $tZ$ transverse momentum $p_T^t$"
+x: k1
+y_label: '$d\sigma_{tZ}/dp_T^t$ (GeV)'
+figure_by:
+  - k2
+
+experiment: "CMS"
+nnpdf31_process: TV

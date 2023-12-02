@@ -29,7 +29,7 @@ from reportengine import filefinder
 from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             PositivitySetSpec, DataSetSpec, PDF, Cuts, DataGroupSpec,
                             peek_commondata_metadata, CutsPolicy,
-                            InternalCutsWrapper, HyperscanSpec, FixedObservableSpec)
+                            InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
 
@@ -46,8 +46,6 @@ class DataNotFoundError(LoadFailedError): pass
 class SysNotFoundError(LoadFailedError): pass
 
 class FKTableNotFound(LoadFailedError): pass
-
-class FixedPredictionNotFound(LoadFailedError): pass
 
 class CfactorNotFound(LoadFailedError): pass
 
@@ -353,8 +351,18 @@ class Loader(LoaderBase):
         return cd.load()
 
     #   @functools.lru_cache()
-    def check_fktable(self, theoryID, setname, cfac):
+    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False):
         _, theopath = self.check_theoryID(theoryID)
+
+        if use_fixed_predictions:
+            fkpath = theopath/ 'fastkernel' / ('FK_FAKEKTABLE.dat')
+            if not fkpath.exists():
+                raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
+            # Also set the fixed predictions path
+            fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
+            cfactors = self.check_cfactor(theoryID, setname, cfac)
+            return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
+
         fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
         if not fkpath.exists():
           raise FKTableNotFound(("Could not find FKTable for set '%s'. "
@@ -476,93 +484,53 @@ class Loader(LoaderBase):
             for inp in default_filter_rules_input()
         ]
 
-    def get_bsm_fac_data_name_dict(self, setname, bsm_fac_data_names, theoryid):
+    def get_simu_parameters_name_dict(self, setname, simu_parameters_names, theoryid):
+        """
+        Parameters
+        ----------
+        setname: str
+                name of the dataset
+
+        simu_parameters_names: list
+                list containing the joined `simu_fac` and operator
+
+        theoryid: str
+        
+        Returns
+        -------
+        dict
+
+        """
+
         _, theopath = self.check_theoryID(theoryid)
-        bsm_fac_names_paths = {}
-        for bsm_fac_data_name in bsm_fac_data_names:
-            cfactorpath = (
-                theopath / 'bsm_factors' / f'BSM_{bsm_fac_data_name}_{setname}.dat'
+        simu_fac_names_paths = {}
+
+        simufactorpath = theopath / "simu_factors" / f"SIMU_{setname}.yaml"
+
+        if not simufactorpath.exists():
+            msg = (
+                f"Could not find a SIMU factor for setname in {theopath}. "
+                f"The path {simufactorpath} does not exist."
             )
+            raise CfactorNotFound(msg)
+        
+        # test whether all the mandatory keys are present
+        with open(simufactorpath, 'rb') as stream:
+            cfac_file = yaml.safe_load(stream)
+        
+        if "metadata" not in cfac_file:
+                raise KeyError(f"The 'metadata' key is not present in the SIMU file at {simufactorpath}.")
 
-            # If we are expecting a BSM factor, we should check that the path actually exists.
-            if bsm_fac_data_name[:4] != "None":
-                if not cfactorpath.exists():
-                    msg = (
-                        f"Could not find a BSM factor for {bsm_fac_data_name} and {setname} in {theopath}. "
-                        f"The path {cfactorpath} does not exist."
-                    )
-                    raise CfactorNotFound(msg)
-            bsm_fac_names_paths[bsm_fac_data_name] = cfactorpath
+        if "SM_fixed" not in cfac_file:
+                raise KeyError(f"The 'SM_fixed' key is not present in the SIMU file at {simufactorpath}.")
 
-        return bsm_fac_names_paths
+        # assign to each operator name the same simufactorpath
+        for simu_parameters_name in simu_parameters_names:
+            simu_fac_names_paths[simu_parameters_name] = simufactorpath
 
-    def get_bsm_fac_quad_name_dict(self, setname, bsm_fac_quad_names, theoryid):
-        _, theopath = self.check_theoryID(theoryid)
-        bsm_fac_quad_paths = {}
+        return simu_fac_names_paths
 
-        nops = len(bsm_fac_quad_names)
-
-        # With the quadratics, things are slightly more complicated. Go through the array one
-        # entry at a time, and check the diagonally opposite entry at the same time. If at least
-        # one entry of the pair starts with None, then we need a blank dummy BSM-factor. Otherwise
-        # check if one of the entries of the pair exists - if neither exist, then raise an error.
-
-        for i in range(nops):
-            for j in range(i+1):
-                # If we are expecting a BSM factor, we should check that the path actually exists. 
-                if i == j:
-                    bsm_quad_name = bsm_fac_quad_names[i][j]
-                    cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name}_{setname}.dat'
-                    if bsm_fac_quad_names[i][j][:4] != "None":
-                        if not cfactorpath.exists():
-                            msg = (f"Could not find a BSM factor for {bsm_quad_name} and {setname} in {theopath}. "
-                                   f"The path {cfactorpath} does not exist."
-                            )
-                            raise CfactorNotFound(msg)
-                    bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = cfactorpath
-                else:    
-                    bsm_quad_name_ij = bsm_fac_quad_names[i][j]
-                    ij_cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name_ij}_{setname}.dat'
-
-                    if bsm_quad_name_ij[:4] == "None":
-                        ij_none = True
-                    else:
-                        ij_none = False
-
-                    bsm_quad_name_ji = bsm_fac_quad_names[j][i]
-                    ji_cfactorpath = theopath / 'bsm_factors' / f'BSM_{bsm_quad_name_ji}_{setname}.dat'
-
-                    if bsm_quad_name_ji[:4] == "None":
-                        ji_none = True
-                    else:
-                        ji_none = False
-
-                    if ij_none or ji_none:
-                        # We no longer care about producing the C-factor, just use a dummy
-                        if ij_none:
-                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
-                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ij_cfactorpath
-                        else:
-                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ji_cfactorpath
-                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ji_cfactorpath
-
-                    else:
-                        if not ij_cfactorpath.exists() and not ji_cfactorpath.exists():
-                            msg = (f"Could not find a BSM factor for {bsm_quad_name_ij} or {bsm_quad_name_ji} and {setname} in {theopath}. "
-                                   f"The paths {ij_cfactorpath} and {ji_cfactorpath} do not exist."
-                            )
-                            raise CfactorNotFound(msg)
-
-                        if ij_cfactorpath.exists():
-                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ij_cfactorpath
-                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ij_cfactorpath
-                        else:
-                            bsm_fac_quad_paths[bsm_fac_quad_names[i][j]] = ji_cfactorpath
-                            bsm_fac_quad_paths[bsm_fac_quad_names[j][i]] = ji_cfactorpath
-
-        return bsm_fac_quad_paths
-
-
+   
     def check_dataset(
         self,
         name,
@@ -576,8 +544,11 @@ class Loader(LoaderBase):
         use_fitcommondata=False,
         fit=None,
         weight=1,
-        bsm_fac_data_names=None,
-        bsm_fac_quad_names=None,
+        simu_parameters_names=None,
+        simu_parameters_linear_combinations=None,
+        use_fixed_predictions=False,
+        contamination=None,
+        contamination_data=None,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -590,7 +561,7 @@ class Loader(LoaderBase):
         try:
             fkspec, op = self.check_compound(theoryno, name, cfac)
         except CompoundNotFound:
-            fkspec = self.check_fktable(theoryno, name, cfac)
+            fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions)
             op = None
 
         #Note this is simply for convenience when scripting. The config will
@@ -609,17 +580,10 @@ class Loader(LoaderBase):
             elif cuts is CutsPolicy.FROM_CUT_INTERSECTION_NAMESPACE:
                 raise LoaderError(f"Intersection cuts not supported in loader calls.")
 
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(name, bsm_fac_data_names, theoryno)
+        if simu_parameters_names is not None:
+            simu_parameters_names_CF = self.get_simu_parameters_name_dict(name, simu_parameters_names, theoryno)
         else: 
-            bsm_fac_data_names_CF = None
-
-        # Now comes the trickier part! The quadratic ones...
-        if bsm_fac_quad_names is not None:
-            bsm_fac_quad_names_CF = self.get_bsm_fac_quad_name_dict(name, bsm_fac_quad_names, theoryno)
-        else:
-            bsm_fac_quad_names_CF = None
-
+            simu_parameters_names_CF = None
 
         return DataSetSpec(
             name=name,
@@ -630,10 +594,12 @@ class Loader(LoaderBase):
             frac=frac,
             op=op,
             weight=weight,
-            bsm_fac_data_names_CF=bsm_fac_data_names_CF,
-            bsm_fac_quad_names_CF=bsm_fac_quad_names_CF,
-            bsm_fac_quad_names=bsm_fac_quad_names,
-            bsm_fac_data_names=bsm_fac_data_names,
+            simu_parameters_names_CF=simu_parameters_names_CF,
+            simu_parameters_names=simu_parameters_names,
+            simu_parameters_linear_combinations=simu_parameters_linear_combinations,
+            use_fixed_predictions=use_fixed_predictions,
+            contamination=contamination,
+            contamination_data=contamination_data,
         )
 
     def check_experiment(self, name: str, datasets: List[DataSetSpec]) -> DataGroupSpec:
@@ -708,63 +674,6 @@ class Loader(LoaderBase):
         except filefinder.FinderError as e:
             raise LoaderError(e) from e
         return path/name
-
-    def check_fixed_observable(
-        self,
-        fixed_observable_input,
-        theoryid,
-        bsm_fac_data_names=None,
-        bsm_fac_quad_names=None,
-        bsm_sector=None,
-    ):
-        setname = fixed_observable_input.dataset
-        cd = self.check_commondata(setname)
-        theoryid = self.check_theoryID(theoryid)
-        pred_path = theoryid.path / 'fixed' / f'FIXED_{setname}.dat'
-        if not pred_path.is_file():
-            raise FixedPredictionNotFound(
-                f"Could not find fixed prediction for set {setname}. "
-                f"File {pred_path} not found."
-            )
-
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names_CF = self.get_bsm_fac_data_name_dict(setname, bsm_fac_data_names, theoryid.id)
-        else:
-            bsm_fac_data_names_CF = None
-
-        if bsm_fac_quad_names is not None:
-            bsm_fac_quad_names_CF = self.get_bsm_fac_quad_name_dict(setname, bsm_fac_quad_names, theoryid.id)
-            if len(bsm_fac_quad_names_CF) != len(bsm_fac_quad_names)*len(bsm_fac_quad_names[0]):
-                raise RuntimeError("Don't know what is going on anymore")
-        else:
-            bsm_fac_quad_names_CF = None
-
-        if bsm_fac_data_names is not None:
-            bsm_fac_data_names = tuple(bsm_fac_data_names)
-
-        if bsm_fac_quad_names is not None:
-            bsm_fac_quad_names = tuple(tuple(part) for part in bsm_fac_quad_names)
-
-        if bsm_fac_data_names_CF is not None:
-            bsm_fac_data_names_CF = tuple(bsm_fac_data_names_CF.items())
-
-        if bsm_fac_quad_names_CF is not None:
-            bsm_fac_quad_names_CF = tuple(bsm_fac_quad_names_CF.items())
-
-
-        return FixedObservableSpec(
-            name=setname,
-            commondata=cd,
-            pred_path=pred_path,
-            frac=fixed_observable_input.frac,
-            bsm_fac_data_names_CF_data=bsm_fac_data_names_CF,
-            bsm_fac_quad_names_CF_data=bsm_fac_quad_names_CF,
-            bsm_fac_quad_names=bsm_fac_quad_names,
-            bsm_fac_data_names=bsm_fac_data_names,
-            thspec=theoryid,
-            bsm_sector=bsm_sector,
-        )
-
 
 #http://stackoverflow.com/a/15645088/1007990
 def _download_and_show(response, stream):

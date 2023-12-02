@@ -1,0 +1,5 @@
+dataset_label: "CMS $\\sigma_{tZ}^{\\rm tot}$ 13 TeV"
+
+experiment: "CMS"
+
+nnpdf31_process: TV

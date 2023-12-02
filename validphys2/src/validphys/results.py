@@ -25,7 +25,7 @@ from validphys.checks import (
     check_two_dataspecs,
 )
 
-from validphys.core import DataSetSpec, PDF, DataGroupSpec, Stats, FixedObservableSpec
+from validphys.core import DataSetSpec, PDF, DataGroupSpec, Stats
 from validphys.calcutils import (
     all_chi2,
     central_chi2,
@@ -38,10 +38,8 @@ from validphys.convolution import (
     PredictionsRequireCutsError,
 )
 
-from validphys.n3fit_data_utils import parse_bsm_fac_data_names_CF
-from validphys.n3fit_data_utils import parse_bsm_fac_quad_names_CF
+from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 
-from validphys.coredata import FixedObservableData
 
 log = logging.getLogger(__name__)
 
@@ -81,11 +79,7 @@ class DataResult(StatsResult):
     """Holds the relevant information from a given dataset"""
 
     def __init__(self, dataobj, covmat, sqrtcovmat):
-        if isinstance(dataobj, FixedObservableData):
-            cd = dataobj.commondata
-            self._central_value = cd.central_values
-        else:
-            self._central_value = dataobj.get_cv()
+        self._central_value = dataobj.get_cv()
         stats = Stats(self._central_value)
         self._covmat = covmat
         self._sqrtcovmat = sqrtcovmat
@@ -142,21 +136,12 @@ class ThPredictionsResult(StatsResult):
     def from_convolution(cls, pdf, dataset, bsm_factor):
         # This should work for both single dataset and whole groups
         try:
-            datasets = dataset.datasets + dataset.fixed_observables
+            datasets = dataset.datasets
         except AttributeError:
             datasets = (dataset,)
 
         try:
-            preds = []
-            for d in datasets:
-                if isinstance(d, DataSetSpec):
-                    preds += [predictions(d, pdf)]
-                elif isinstance(d, FixedObservableSpec):
-                    pdf_indep_preds = pd.DataFrame(d.load_pred().central_value.T)
-                    df = pd.concat(len(pdf)*[pdf_indep_preds], axis=1)
-                    df.columns = [i for i in range(len(pdf))]
-                    preds += [df]
-            th_predictions = pd.concat(preds)
+            th_predictions = pd.concat([predictions(d, pdf) for d in datasets])
         except PredictionsRequireCutsError as e:
             raise PredictionsRequireCutsError(
                 "Predictions from FKTables always require cuts, "
@@ -214,9 +199,6 @@ def groups_index(groups_data):
                 data_id = np.arange(dataset.commondata.ndata, dtype=int)
             for idat in data_id:
                 records_append(group, dataset, idat)
-        for fo in group.fixed_observables:
-            for idat in fo.cuts.load():
-                records_append(group, fo, idat)
 
     columns = ["group", "dataset", "id"]
     df = pd.DataFrame(records, columns=columns)
@@ -331,7 +313,7 @@ def dataset_inputs_bsm_factor(data, pdf, read_bsm_facs):
     but for a list of dataset inputs.
     """
     res =  np.concatenate(
-        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets + data.fixed_observables]
+        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets]
     )
     return res
 
@@ -343,8 +325,12 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the fitted BSM-factors.
     """
-    parsed_bsm_facs = parse_bsm_fac_data_names_CF(dataset.bsm_fac_data_names_CF, dataset.cuts)
-    parsed_bsm_quad_facs = parse_bsm_fac_quad_names_CF(dataset.bsm_fac_quad_names_CF, dataset.cuts)
+    parsed_bsm_facs = parse_simu_parameters_names_CF(
+                                                    dataset.simu_parameters_names_CF, 
+                                                    dataset.simu_parameters_linear_combinations, 
+                                                    dataset.cuts
+                                                    )
+
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
@@ -358,39 +344,15 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
 
     if not read_bsm_facs.empty:
         scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
-        _, nops = read_bsm_facs.shape
-
-    if parsed_bsm_quad_facs is not None:
-        # We must also apply quadratic C-factors
-        quad_bsm_fac_df = pd.DataFrame(
-            {k: v.central_value for k, v in parsed_bsm_quad_facs.items()}
-        )
-        for i in range(nops):
-            for j in range(nops):
-                if i <= j:
-                    # Add the contribution from the quadratic
-                    op_products = read_bsm_facs.iloc[:,i].values * read_bsm_facs.iloc[:,j].values
-                    op_name = dataset.bsm_fac_quad_names[i][j] 
-                    op_values = quad_bsm_fac_df[op_name]
-                    nreps = len(op_products)
-                    ndat = len(op_values)
-                    new_op_contribution = np.zeros((ndat,nreps,1))
-                    for a in range(ndat):
-                        new_op_contribution[a,:,0] = op_products[:]*op_values[a]
-                    np.append(scaled_replicas, new_op_contribution, axis=2)               
 
     if not read_bsm_facs.empty:
         replica_result = 1 + np.sum(scaled_replicas, axis=2)
     else:
-        if not isinstance(dataset, FixedObservableSpec):
-            replica_result = np.ones((len(dataset.load().get_cv()), len(pdf)-1))
-        else:
-            replica_result = np.ones((len(dataset.load().prediction.central_value), len(pdf)-1))
-
+        replica_result = np.ones((len(dataset.load().get_cv()), len(pdf)-1))
+    
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)
  
-
     return result
 
 
@@ -555,41 +517,7 @@ def results(dataset: (DataSetSpec), pdf: PDF, covariance_matrix, sqrt_covmat, da
         ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor),
     )
 
-# Need to do this to avoid circular import
-def matrix_sqrt(matrix):
-    dimensions = matrix.shape
 
-    if matrix.size == 0:
-        raise ValueError("Attempting the decomposition of an empty matrix.")
-    elif dimensions[0] != dimensions[1]:
-        raise ValueError("The input matrix should be square but "
-                         f"instead it has dimensions {dimensions[0]} x "
-                         f"{dimensions[1]}")
-
-    sqrt_diags = np.sqrt(np.diag(matrix))
-    correlation_matrix = matrix / sqrt_diags[:, np.newaxis] / sqrt_diags
-    decomp = la.cholesky(correlation_matrix)
-    sqrt_matrix = (decomp * sqrt_diags).T
-    return sqrt_matrix
-
-def fo_results(fixed_observable: (FixedObservableSpec), pdf: PDF, groups_covmat, read_bsm_facs):
-    """Same as results, but for a fixed observable spec rather than a dataset spec.
-    """
-    # This is disgusting, but hey ho
-    fo_name = fixed_observable.name
-    covariance_matrix = groups_covmat.xs(fo_name, level=1, drop_level=False)
-    covariance_matrix = covariance_matrix.T.xs(fo_name, level=1, drop_level=False)
-
-    sqrt_cov = matrix_sqrt(covariance_matrix) 
-
-    data = fixed_observable.load()
-
-    res = dataset_bsm_factor(fixed_observable, pdf, read_bsm_facs)
-
-    return (
-        DataResult(data, covariance_matrix, sqrt_cov),
-        ThPredictionsResult.from_convolution(pdf, fixed_observable, bsm_factor=res),
-    )
 
 def dataset_inputs_results(
     data, pdf: PDF, dataset_inputs_covariance_matrix, dataset_inputs_sqrt_covmat, dataset_inputs_bsm_factor
@@ -616,17 +544,6 @@ def pdf_results(
     th_results = [ThPredictionsResult.from_convolution(pdf, dataset, dataset_bsm_factor) for pdf in pdfs]
 
     return (DataResult(dataset.load(), covariance_matrix, sqrt_covmat), *th_results)
-
-def fixed_observable_exp_data(fixed_observable):
-    return fixed_observable.load_exp()
-
-fixed_observables_exp_data = collect("fixed_observable_exp_data", ("fixed_observables",))
-
-def fixed_observable_data(fixed_observable):
-    return fixed_observable.load()
-
-fixed_observables_data = collect("fixed_observable_data", ("fixed_observables",))
-
 
 @require_one("pdfs", "pdf")
 @remove_outer("pdfs", "pdf")
@@ -665,18 +582,6 @@ def abs_chi2_data(results):
         th_result.stats_class(chi2s[:, np.newaxis]), central_result, len(data_result)
     )
 
-def abs_fo_chi2_data(fo_results):
-    """Like abs_chi2_data, but for a fixed observable.
-    """
-    data_result, th_result = fo_results
-
-    chi2s = all_chi2(fo_results)
-
-    central_result = central_chi2(fo_results)
-
-    return Chi2Data(
-        th_result.stats_class(chi2s[:, np.newaxis]), central_result, len(data_result)
-    )
 
 def dataset_inputs_abs_chi2_data(dataset_inputs_results):
     """Like `abs_chi2_data` but for a group of inputs"""
@@ -1005,18 +910,14 @@ def dataspecs_groups_chi2_table(
 groups_datasets_chi2_data = collect(
     "each_dataset_chi2", ("group_dataset_inputs_by_metadata",)
 )
-groups_fixed_observable_chi2_data = collect(
-    "each_fixed_observable_chi2", ("group_dataset_inputs_by_metadata",)
-)
 fits_datasets_chi2_data = collect("groups_datasets_chi2_data", ("fits", "fitcontext"))
-fits_fixed_observables_chi2_data = collect("groups_fixed_observable_chi2_data", ("fits", "fitcontext"))
+
 
 @table
 def fits_datasets_chi2_table(
     fits_name_with_covmat_label,
     fits_groups,
     fits_datasets_chi2_data,
-    fits_fixed_observables_chi2_data,
     per_point_data: bool = True,
 ):
     """A table with the chi2 for each included dataset in the fits, computed
@@ -1024,22 +925,6 @@ def fits_datasets_chi2_table(
     levels by experiment and dataset, where experiment is the grouping of datasets according to the
     `experiment` key in the PLOTTING info file.  If points_per_data is True, the chi² will be shown
     divided by ndata. Otherwise they will be absolute."""
-
-    # Begin by mergin fits_datasets_chi2_data and fits_fixed_observables_chi2_data
-    # (Pray to any and all gods that the ordering is correct)
-    big_merge = []
-    for i in range(len(fits_datasets_chi2_data)):
-        big_merge += [[]]
-        
-        # This loops over the fits
-        fit_ds = fits_datasets_chi2_data[i]
-        fit_fo = fits_fixed_observables_chi2_data[i]
-
-        for j in range(len(fit_ds)):
-            # This loops over the groups
-            big_merge[i] += [fit_ds[j] + fit_fo[j]]
- 
-    fits_datasets_chi2_data = big_merge
 
     cols = ("ndata", r"$\chi^2/ndata$") if per_point_data else ("ndata", r"$\chi^2$")
 
@@ -1049,18 +934,13 @@ def fits_datasets_chi2_table(
     ):
         records = []
         for group, dsets_chi2 in zip(groups, groups_dsets_chi2):
-            for dataset, chi2 in zip(group.datasets + group.fixed_observables, dsets_chi2):
+            for dataset, chi2 in zip(group.datasets, dsets_chi2):
                 ndata = chi2.ndata
-
-                if isinstance(dataset, FixedObservableSpec):
-                    name = dataset.name
-                else:
-                    name = str(dataset)
 
                 records.append(
                     dict(
                         group=str(group),
-                        dataset=name,
+                        dataset=str(dataset),
                         npoints=ndata,
                         mean_chi2=chi2.central_result.mean(),
                     )
@@ -1075,19 +955,11 @@ def fits_datasets_chi2_table(
             df["mean_chi2"] /= df["npoints"]
         df.columns = pd.MultiIndex.from_product(([label], cols))
         dfs.append(df)
-
     return pd.concat(dfs, axis=1)
 
 
 dataspecs_datasets_chi2_data = collect("groups_datasets_chi2_data", ("dataspecs",))
 
-groups_datasets_chi2_data = collect(
-    "each_dataset_chi2", ("group_dataset_inputs_by_metadata",)
-)
-groups_fixed_observable_chi2_data = collect(
-    "each_fixed_observable_chi2", ("group_dataset_inputs_by_metadata",)
-)
-dataspecs_fixed_observables_chi2_data = collect("groups_fixed_observable_chi2_data", ("dataspecs",))
 
 @table
 @check_speclabels_different
@@ -1095,18 +967,13 @@ def dataspecs_datasets_chi2_table(
     dataspecs_speclabel,
     dataspecs_groups,
     dataspecs_datasets_chi2_data,
-    dataspecs_fixed_observables_chi2_data,
     per_point_data: bool = True,
 ):
     """Same as fits_datasets_chi2_table but for arbitrary dataspecs."""
-
-    print(dataspecs_fixed_observables_chi2_data)
-
     return fits_datasets_chi2_table(
         dataspecs_speclabel,
         dataspecs_groups,
         dataspecs_datasets_chi2_data,
-        dataspecs_fixed_observables_chi2_data,
         per_point_data=per_point_data,
     )
 
@@ -1329,7 +1196,6 @@ def dataspecs_dataset_chi2_difference_table(
 
 
 each_dataset_chi2 = collect(abs_chi2_data, ("data",))
-each_fixed_observable_chi2 = collect(abs_fo_chi2_data, ("fixed_observables",))
 
 pdfs_total_chi2 = collect(total_chi2_per_point_data, ("pdfs",))
 

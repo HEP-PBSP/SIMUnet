@@ -4,6 +4,7 @@ n3fit_data_utils.py
 Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 """
 import numpy as np
+import yaml
 from validphys.fkparser import parse_cfactor
 
 from validphys.coredata import CFactorData
@@ -72,63 +73,56 @@ def fk_parser(fk, is_hadronic=False):
     }
     return dict_out
 
-def parse_bsm_fac_data_names_CF(bsm_fac_data_names_CF, cuts):
-    if bsm_fac_data_names_CF is None:
+def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_linear_combinations, cuts):
+    """
+    Returns a dictionary containing the bsm k-factor corrections 
+    to be applied to the theory predictions.
+
+    Parameters
+    ----------
+    simu_parameters_names_CF: dict or NoneType
+    simu_parameters_linear_combinations: The mapping that gives the correct linear combinations
+
+    cuts: validphys.core.InternalCutsWrapper
+
+    Returns
+    -------
+    dict
+        dictionary with (key, value) = (EFT-Order_Name-Operator, coredata.CFactorData)
+
+    """
+
+    if simu_parameters_names_CF is None:
         return None
     if hasattr(cuts, 'load'):
         cuts = cuts.load()
     name_cfac_map = {}
-    for name, path in bsm_fac_data_names_CF.items():
+    for name, path in simu_parameters_names_CF.items():
+        # load SIMU yaml file
+        with open(path, "rb") as stream:
+            cfac_file = yaml.safe_load(stream)
 
-        if name[:4] == "None":
-            # Now is the time to make a dummy BSM-factor
-            central = np.array([0.0]*len(cuts))
-            uncertainty = np.array([0.0]*len(cuts))
-            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
+        eft_order = "_".join(name.split("_")[:-1])
+        eft_operator_list = list(simu_parameters_linear_combinations[name].keys())
 
-        else:
-            with open(path, 'rb') as stream:
-                cfac = parse_cfactor(stream)
-                #TODO: Figure out a better way to handle the default
-                cfac.central_value = (cfac.central_value[cuts] - 1)
-                cfac.uncertainty = cfac.uncertainty[cuts]
-        
-        name_cfac_map[name] = cfac
-    return name_cfac_map
+        central = np.zeros(len(cuts))
+        uncertainty = np.zeros(len(cuts))
+        standard_model_prediction = np.array(cfac_file[eft_order]["SM"])[cuts]
+        for op in eft_operator_list:
+            if op in cfac_file[eft_order]:
+                central += simu_parameters_linear_combinations[name][op] * np.array(cfac_file[eft_order][op])[cuts]
 
-def parse_bsm_fac_quad_names_CF(bsm_fac_quad_names_CF, cuts):
-    if bsm_fac_quad_names_CF is None:
-        return None
-    if hasattr(cuts, 'load'):
-        cuts = cuts.load()
-    name_cfac_map = {}
-    for name, path in bsm_fac_quad_names_CF.items():
+        central = central / standard_model_prediction
 
-        if name[:4] == "None":
-            # Now is the time to make a dummy BSM-factor
-            central = np.array([0.0]*len(cuts))
-            uncertainty = np.array([0.0]*len(cuts))
-            cfac = CFactorData(description="dummy", central_value=central, uncertainty=uncertainty)
-
-        else:
-            with open(path, 'rb') as stream:
-                cfac = parse_cfactor(stream)
-                #TODO: Figure out a better way to handly the default
-                cfac.central_value = (cfac.central_value[cuts] - 1)
-                cfac.uncertainty = cfac.uncertainty[cuts]
+        cfac = CFactorData(
+                description=path,
+                central_value=central,
+                uncertainty=np.zeros(len(cuts)),
+               )
 
         name_cfac_map[name] = cfac
+
     return name_cfac_map
-
-
-def fixed_observables_with_pseudodata(replica_data, fixed_observables_data):
-    out = []
-    i = 0
-    for fo in fixed_observables_data:
-        end = i + fo.ndata
-        out.append(fo.with_central_value(replica_data[i:end]))
-        i = end
-    return out
 
 
 def common_data_reader_dataset(dataset_c, dataset_spec):
@@ -168,10 +162,8 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
         "name": dataset_c.GetSetName(),
         "frac": dataset_spec.frac,
         "ndata": dataset_c.GetNData(),
-        "bsm_fac_data_names_CF": parse_bsm_fac_data_names_CF(dataset_spec.bsm_fac_data_names_CF, cuts),
-        "bsm_fac_quad_names_CF": parse_bsm_fac_quad_names_CF(dataset_spec.bsm_fac_quad_names_CF, cuts),
-        "bsm_fac_data_names": dataset_spec.bsm_fac_data_names,
-        "bsm_fac_quad_names": dataset_spec.bsm_fac_quad_names
+        "simu_parameters_names_CF": parse_simu_parameters_names_CF(dataset_spec.simu_parameters_names_CF, dataset_spec.simu_parameters_linear_combinations, cuts),
+        "simu_parameters_names": dataset_spec.simu_parameters_names,
     }
 
     return [dataset_dict]

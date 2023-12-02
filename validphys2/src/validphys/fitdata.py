@@ -211,7 +211,7 @@ def summarise_fits(collected_fit_summaries):
 @make_argcheck
 def _check_has_bsm_facs(fit):
     """Check that the fit comes with Wilson coefficients fitted"""
-    cf = fit.as_input().get("bsm_fac_data")
+    cf = fit.as_input().get("simu_parameters")
     check(cf, f"Fit '{fit}' does not contain fitted cfactors.")
 
 
