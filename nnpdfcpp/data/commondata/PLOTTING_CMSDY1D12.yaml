@@ -1,0 +1,9 @@
+dataset_label: "CMS HM DY 8 TeV"
+x: k2
+y_label: '$d\sigma/dM_{ll}$ (pb)' 
+y_scale: log
+kinematics_override: ewk_mll_sqrt_scale
+
+experiment: "CMS"
+
+nnpdf31_process: DY

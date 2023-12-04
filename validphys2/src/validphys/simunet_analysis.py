@@ -715,7 +715,7 @@ def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
         ax_histy.grid(False)
 
         ax.set_xlabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
-        ax.set_ylabel(bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
+        ax.set_ylabel(bsm_names_to_latex[op_2] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14)
         ax.legend()
         ax.set_axisbelow(True)
 
@@ -782,7 +782,7 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
         # broadening column
         curr_len, ref_len = bound_lengths
         if ref_len > 0:
-            df['Broadening'].loc[op] = str((curr_len - ref_len) / ref_len * 100.0) + '%'
+            df['Broadening'].loc[op] = str(np.round((curr_len - ref_len) / ref_len * 100.0, decimals=2)) + '%'
         else:
             df['Broadening'].loc[op] = 'n/a'
 
@@ -1466,7 +1466,7 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
             ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, simu_parameters_names=dataset.simu_parameters_names)
-            bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, cuts=ds.cuts)
+            bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, ds.simu_parameters_linear_combinations, cuts=ds.cuts)
             central_sm = central_predictions(ds, pdf)
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
