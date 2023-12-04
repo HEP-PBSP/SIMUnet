@@ -223,7 +223,9 @@ def performfit(
                     column = np.zeros((ndat,))
                     for key in ds.simu_parameters_linear_combinations[param]:
                         if key in simu_info[model].keys():
-                            column += np.array(simu_info[model][key] * ds.simu_parameters_linear_combinations[param][key])
+                            cuts = ds.cuts.load()
+                            model_values = [simu_info[model][key][i] for i in cuts]
+                            column += np.array(model_values * ds.simu_parameters_linear_combinations[param][key])
                     columns += [column]
                 linear_bsm += [pd.DataFrame(np.array(columns).T)]
 
