@@ -25,7 +25,7 @@ from validphys.loader import Loader
 
 l = Loader()
 
-def analytic_solution(data, theorySM, theorylin, invcovmat):
+def analytic_solution(data, theorySM, theorylin, covmat):
     """
     Returns the minimum of the chi2 function:
 
@@ -35,10 +35,12 @@ def analytic_solution(data, theorySM, theorylin, invcovmat):
 
     diff = data.to_numpy() - theorySM.to_numpy()
 
-    invcovmat = invcovmat.to_numpy()
     theorylin = theorylin.to_numpy()
 
-    sol = np.linalg.inv(theorylin.T @ invcovmat @ theorylin) @ theorylin.T @ invcovmat @ diff
+    part1 = np.linalg.solve(covmat, theorylin)
+    part2 = np.linalg.solve(covmat, diff)
+
+    sol = np.linalg.solve(theorylin.T @ part1, theorylin.T @ part2)
 
     return sol
 
@@ -48,7 +50,8 @@ def analytic_solution(data, theorySM, theorylin, invcovmat):
 def performfit(
     *,
     data,
-    dataset_inputs_t0_covmat_from_systematics,
+    groups_covmat,
+    groups_index,
     n3fit_checks_action, # wrapper for all checks
     replicas, # checks specific to performfit
     replicas_nnseed_fitting_data_dict,
@@ -193,9 +196,16 @@ def performfit(
 
     exp_data = []
     for i in range(len(replicas_nnseed_fitting_data_dict[0][1])):
-        exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'])]
+        dictionary = replicas_nnseed_fitting_data_dict[0][1]
+        exp_name = dictionary[i]['name']
+        exp_index = []
+        for dataset in dictionary[i]['datasets']:
+            exp_index += [(exp_name, dataset['name'], x) for x in range(dataset['ndata'])]
+        exp_index = pd.MultiIndex.from_tuples(exp_index)
+        exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'], columns=exp_index)]
 
     exp_data = pd.concat(exp_data, axis=1).T
+    exp_data = exp_data.loc[groups_index]
 
     compute_analytic = False
     for ini in bsm_fac_initialisations:
@@ -208,9 +218,14 @@ def performfit(
         linear_bsm = []
         th_covmat = []
         for ds in data.datasets:
-            pred_values = predictions(ds, PDF(analytic_initialisation_pdf))
+            pred_values = predictions(ds, PDF(analytic_initialisation_pdf))[rep_num].to_numpy()
             ndat = len(pred_values)
-            sm_predictions += [pred_values]
+            for label in groups_index:
+                if ds.name == label[1]:
+                    group_name = label[0]
+                    break
+            new_index = pd.MultiIndex.from_tuples([(group_name, ds.name, x) for x in range(ndat)])
+            sm_predictions += [pd.DataFrame(pred_values, index=new_index)]
             simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
             nop = len(ds.simu_parameters_linear_combinations)
             if os.path.exists(simu_path):
@@ -227,7 +242,7 @@ def performfit(
                             model_values = [simu_info[model][key][i] for i in cuts]
                             column += np.array(model_values * ds.simu_parameters_linear_combinations[param][key])
                     columns += [column]
-                linear_bsm += [pd.DataFrame(np.array(columns).T)]
+                linear_bsm += [pd.DataFrame(np.array(columns).T, index=new_index)]
 
                 if use_th_covmat == True and 'theory_cov' in simu_info.keys() and len(simu_info['theory_cov']) > 0:
                     th_covmat += [np.array(simu_info['theory_cov'])]
@@ -238,16 +253,29 @@ def performfit(
                 th_covmat += [np.zeros((ndat, ndat))]
 
         # Take only the prediction corresponding to the replica we are interested in
-        sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
+        #sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
+        sm_predictions = pd.concat(sm_predictions)
         linear_bsm = pd.concat(linear_bsm)
 
-        covmat = dataset_inputs_t0_covmat_from_systematics
         th_covmat = sp.linalg.block_diag(*th_covmat)
+        th_covmat = pd.DataFrame(th_covmat)
+        th_covmat.index = sm_predictions.index
+        th_covmat = th_covmat.T
+        th_covmat.index = sm_predictions.index
+
+        # Now we need to reindex everything, because NNPDF is annoying
+        sm_predictions = sm_predictions.loc[groups_index]
+        linear_bsm = linear_bsm.loc[groups_index]
+        th_covmat = th_covmat.loc[groups_index]
+        th_covmat = th_covmat.T.loc[groups_index]
+
+        covmat = groups_covmat
+        covmat = covmat.loc[groups_index]
+        covmat = covmat.T.loc[groups_index]
 
         total_covmat = covmat + th_covmat
-        invcovmat = pd.DataFrame(np.linalg.inv(total_covmat))
 
-        analytic_initialisation = analytic_solution(exp_data, sm_predictions, linear_bsm, invcovmat) 
+        analytic_initialisation = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat) 
 
     else:
         analytic_initialisation = None
