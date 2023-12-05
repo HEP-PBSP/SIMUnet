@@ -194,19 +194,6 @@ def performfit(
 
     rep_num = replicas_nnseed_fitting_data_dict[0][0]
 
-    exp_data = []
-    for i in range(len(replicas_nnseed_fitting_data_dict[0][1])):
-        dictionary = replicas_nnseed_fitting_data_dict[0][1]
-        exp_name = dictionary[i]['name']
-        exp_index = []
-        for dataset in dictionary[i]['datasets']:
-            exp_index += [(exp_name, dataset['name'], x) for x in range(dataset['ndata'])]
-        exp_index = pd.MultiIndex.from_tuples(exp_index)
-        exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'], columns=exp_index)]
-
-    exp_data = pd.concat(exp_data, axis=1).T
-    exp_data = exp_data.loc[groups_index]
-
     compute_analytic = False
     for ini in bsm_fac_initialisations:
         if isinstance(ini, AnalyticInitialisation):
@@ -217,14 +204,16 @@ def performfit(
         sm_predictions = []
         linear_bsm = []
         th_covmat = []
+        cuts_dict = {}
         for ds in data.datasets:
+            cuts_dict[ds.name] = ds.cuts.load()
             pred_values = predictions(ds, PDF(analytic_initialisation_pdf))[rep_num].to_numpy()
             ndat = len(pred_values)
             for label in groups_index:
                 if ds.name == label[1]:
                     group_name = label[0]
                     break
-            new_index = pd.MultiIndex.from_tuples([(group_name, ds.name, x) for x in range(ndat)])
+            new_index = pd.MultiIndex.from_tuples([(group_name, ds.name, x) for x in cuts_dict[ds.name]])
             sm_predictions += [pd.DataFrame(pred_values, index=new_index)]
             simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
             nop = len(ds.simu_parameters_linear_combinations)
@@ -251,6 +240,19 @@ def performfit(
             else:
                 linear_bsm += [np.zeros((ndat, nop))]
                 th_covmat += [np.zeros((ndat, ndat))]
+
+        exp_data = []
+        for i in range(len(replicas_nnseed_fitting_data_dict[0][1])):
+            dictionary = replicas_nnseed_fitting_data_dict[0][1]
+            exp_name = dictionary[i]['name']
+            exp_index = []
+            for dataset in dictionary[i]['datasets']:
+                exp_index += [(exp_name, dataset['name'], x) for x in cuts_dict[dataset['name']]]
+            exp_index = pd.MultiIndex.from_tuples(exp_index)
+            exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'], columns=exp_index)]
+
+        exp_data = pd.concat(exp_data, axis=1).T
+        exp_data = exp_data.loc[groups_index]
 
         # Take only the prediction corresponding to the replica we are interested in
         #sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])

@@ -63,6 +63,8 @@ class CombineCfacLayer(Layer):
             index += 1
             initial_values.append(val)
 
+        num_initial = len(initial_values)
+
         self.scales = np.array(scales, dtype=np.float32)
         if num_initial > 0:
             initial_values = tf.concat(initial_values, 0)
