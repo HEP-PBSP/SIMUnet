@@ -824,7 +824,7 @@ Electroweak Precision Observables
    * - **LEP**
      - 0.250
      - Z observables
-     -
+     - 
      - 19
      - LEP_ZDATA
      - `Reference <https://arxiv.org/abs/hep-ex/0509008>`_ (Tables 2.13, 3.6, 4.3, 5.8, and 5.10)
@@ -867,7 +867,7 @@ Higgs
      - **Ref.**
    * - **ATLAS and CMS**
      - 7 and 8
-     - :math:`\mu_{H}`
+     - :math:`\mu_{H \rightarrow \mu^+ \mu^-}`
      - 5 and 20
      - 22
      - ATLAS_CMS_SSinc_RunI

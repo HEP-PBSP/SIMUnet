@@ -52,6 +52,10 @@ bibtex_reference_style = 'author_year'
 #html_theme = 'alabaster'
 html_theme = 'sphinx_book_theme'
 
+html_theme_options = {
+    'sidebar': 'none',
+}
+
 html_logo = "_static/PBSP_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
