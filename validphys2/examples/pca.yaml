@@ -1,0 +1,211 @@
+meta:
+  title: Principal component analysis test
+  author: James Moore
+  keywords: [simunet]
+
+pdf: NNPDF40_nnlo_as_01180 #221103-jmm-no_top_iterated
+
+dataset_inputs:
+# Drell - Yan
+#- {dataset: ATLASDY2D8TEV, cfac: [QCDEWK], simu_fac: "EFT_LO"}
+#- {dataset: CMSDY2D11, cfac: [QCD], simu_fac: "EFT_LO"}
+#- {dataset: ATLASZHIGHMASS49FB, cfac: [QCD], simu_fac: "EFT_LO"}
+#- {dataset: CMSDY1D12, cfac: ['QCD', 'EWK'], simu_fac: "EFT_LO"}
+#- {dataset: CMS_HMDY_13TEV, cfac: ['QCD', 'EWK'], simu_fac: "EFT_LO"}
+ #ttbar
+#- {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLASTTBARTOT8TEV, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TOPDIFF_DILEPT_8TEV_TTMNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_8TEV_LJETS_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TRAPNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTB_DIFF_8TEV_LJ_TTRAPNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_13TEV_DILEPTON_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: CMSTTBARTOT5TEV, cfac: [QCD], simu_fac: "EFT_NLO"}  
+#- {dataset: CMSTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMSTTBARTOT8TEV, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: CMS_TTBAR_2D_DIFF_MTT_TTRAP_NORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: CMSTOPDIFF8TEVTTRAPNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+#- {dataset: CMSTTBARTOT13TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_TTB_DIFF_13TEV_2016_2L_TTMNORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_TTBAR_13TEV_LJETS_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_TTBAR_13TEV_TTMNORM, cfac: [QCD], simu_fac: "EFT_NLO"} 
+# # ttbar AC
+#- {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_TTBAR_13TEV_ASY_2022, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_TTBAR_13TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_CMS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+# # # TTZ
+#- {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
+#- {dataset: ATLAS_TTBARZ_13TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_LO"}
+#- {dataset: ATLAS_TTBARZ_13TEV_PTZNORM, simu_fac: "EFT_LO"}
+#- {dataset: CMS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
+#- {dataset: CMS_TTBARZ_13TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_LO"}
+#- {dataset: CMS_TTBARZ_13TEV_PTZNORM, simu_fac: "EFT_LO"}
+# # # TTW
+#- {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
+#- {dataset: ATLAS_TTBARW_13TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_LO"}
+#- {dataset: CMS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
+#- {dataset: CMS_TTBARW_13TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_LO"}
+# # # singletop
+#- {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_7TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_DIFF_7TEV_T_RAP_NORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_DIFF_7TEV_TBAR_RAP_NORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_8TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_8TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_T_RAP_NORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_DIFF_8TEV_TBAR_RAP_NORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_SCH_8TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_13TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_TCH_13TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOP_SCH_13TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_TOT_7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_8TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_8TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_SCH_8TEV_TOTAL, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_13TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_13TEV_TB, cfac: [QCD], simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOP_TCH_13TEV_YTNORM, cfac: [QCD], simu_fac: "EFT_NLO"}
+# # # tW
+#- {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOPW_8TEV_SLEP_TOTAL, simu_fac: "EFT_NLO"}
+#- {dataset: ATLAS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOPW_13TEV_TOTAL, simu_fac: "EFT_NLO"}
+#- {dataset: CMS_SINGLETOPW_13TEV_SLEP_TOTAL, simu_fac: "EFT_NLO"}
+# Whel
+#- {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+#- {dataset: ATLAS_CMS_WHEL_8TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+# # ttgamma
+#- {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+# 4Heavy
+#- {dataset: ATLAS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: ATLAS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_4TOP_13TEV_MULTILEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_4TOP_13TEV_SLEP_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_TTBB_13TEV_ALLJET_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_TTBB_13TEV_DILEPTON_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: ATLAS_TTBB_13TEV_LJETS_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+# # tz
+#- {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: CMS_SINGLETOPZ_13TEV_PTT, simu_fac: "EFT_LO", use_fixed_predictions: True}
+
+# EWPO
+- {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_BRW, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_BHABHA, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_ALPHAEW, simu_fac: "EFT_LO", use_fixed_predictions: True}
+
+# Higgs
+#- {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+#- {dataset: CMS_SSINC_RUNII, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+#- {dataset: ATLAS_STXS_RUNII, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: ATLAS_SSINC_RUNII_ZGAM, simu_fac: "EFT_LO", use_fixed_predictions: True}
+#- {dataset: ATLAS_SSINC_RUNII_MUMU, simu_fac: "EFT_LO", use_fixed_predictions: True}
+
+# Diboson
+- {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_EEWW_189GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_EEWW_198GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: LEP_EEWW_206GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
+- {dataset: ATLAS_WW_13TEV_2016_MEMU, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_WZ_13TEV_2016_MTWZ, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: CMS_WZ_13TEV_2016_PTZ, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+- {dataset: ATLAS_ZJJ_13TEV_2016, simu_fac: "EFT_LO", use_fixed_predictions: True}
+
+simu_parameters:
+# Dipoles
+# - {name: 'OtZ', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OtW', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OtG', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# Quark Currents
+# - {name: 'Opt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O3pQ3', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'O3pq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OpQM', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OpqMi', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'Opui', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'Opdi', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# Lepton currents
+- {name: 'O3pl', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'Opl', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'Ope', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# 4 Fermions 4Q
+# - {name: 'O1qd', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'O1qu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'O1dt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O1qt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O1ut', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O11qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O13qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O8qd', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'O8qu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'O8dt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O8qt', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O8ut', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O81qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}} 
+# - {name: 'O83qq', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# 4 Fermions 4HeavyQ
+# - {name: 'OQQ1', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OQQ8', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OQt1', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OQt8', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Ott1', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# 4 Fermions 2L2Q
+# - {name: 'Oeu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Olu', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Oed', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Olq3', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Olq1', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Oqe', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Old', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# 4 Fermions 4L
+- {name: 'Oll', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# Yukawa
+# - {name: 'Omup', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Otap', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Otp', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Obp', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Ocp', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# Bosonic
+# - {name: 'OG', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OWWW', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OpG', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OpW', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'OpB', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OpWB', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+# - {name: 'Opd', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+- {name: 'OpD', scale: 0.01, initialisation: {type: uniform, minval: -1, maxval: 1}}
+
+theoryid: 200
+
+use_cuts: internal
+
+#template_text: |
+#  # Normalised Fisher information by sector, plot
+#  {@plot_fisher_information_by_sector@}
+#  # Normalised Fisher information by sector
+#  {@fisher_information_by_sector@}
+#  # Fisher information matrix
+#  {@fisher_information_matrix@}
+#  # Principal component eigenvalues
+#  {@principal_component_values@}
+#  # Principal component eigenvectors
+#  {@principal_component_vectors@}
+
+template_text: |
+  # Principal component eigenvalues
+  {@principal_component_values@}
+  # Principal component eigenvectors
+  {@principal_component_vectors@}
+
+actions_:
+  - report(main=True)
