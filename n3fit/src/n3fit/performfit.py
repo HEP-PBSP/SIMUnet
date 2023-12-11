@@ -217,7 +217,7 @@ def performfit(
             sm_predictions += [pd.DataFrame(pred_values, index=new_index)]
             simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
             nop = n_simu_parameters
-            if os.path.exists(simu_path):
+            if os.path.exists(simu_path) and ds.simu_parameters_linear_combinations is not None:
                 with open(simu_path, 'r') as f:
                      simu_info = yaml.safe_load(f)
 
