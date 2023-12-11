@@ -230,6 +230,7 @@ def performfit(
                             cuts = ds.cuts.load()
                             model_values = [simu_info[model][key][i] for i in cuts]
                             column += np.array(model_values * ds.simu_parameters_linear_combinations[param][key])
+                    column = column / simu_info[model]['SM'] * simu_info['SM_fixed']
                     columns += [column]
                 linear_bsm += [pd.DataFrame(np.array(columns).T, index=new_index)]
 
@@ -265,12 +266,7 @@ def performfit(
         #sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
         sm_predictions = pd.concat(sm_predictions)
 
-        print(linear_bsm)
-
         linear_bsm = pd.concat(linear_bsm)
-
-        print(exp_data)
-        print(linear_bsm)
 
         th_covmat = sp.linalg.block_diag(*th_covmat)
         th_covmat = pd.DataFrame(th_covmat)
