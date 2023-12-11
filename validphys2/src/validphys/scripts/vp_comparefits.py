@@ -11,7 +11,7 @@ from reportengine.colors import t
 
 from validphys.app import App
 from validphys.loader import RemoteLoader
-from validphys import comparefittemplates, compareclosuretemplates, reduced_comparefittemplates, bsm_only_comparefittemplate
+from validphys import comparefittemplates, compareclosuretemplates, reduced_comparefittemplates, bsm_only_comparefittemplate, bsm_only_with_2D_hist_comparefittemplate
 from validphys.promptutils import confirm, KeywordsWithCache
 
 log = logging.getLogger(__name__)
@@ -79,6 +79,11 @@ class CompareFitApp(App):
             '-bsm',
             '--bsmonly',
             help="Use a reduced bsm only template for the comparison.",
+            action='store_true')
+        parser.add_argument(
+            '-bsm2d',
+            '--bsmonly_2d',
+            help="Use a reduced bsm only template for the comparison, includes 2D histogram plots.",
             action='store_true')
         parser.add_argument(
             '-red',
@@ -218,6 +223,10 @@ class CompareFitApp(App):
         elif args['bsmonly']:
             log.info(f"using bsm only template.")
             args['config_yml'] = bsm_only_comparefittemplate.template_path
+        
+        elif args['bsmonly_2d']:
+            log.info(f"using bsm only template with 2D histogram plots.")
+            args['config_yml'] = bsm_only_with_2D_hist_comparefittemplate.template_path
         
         elif args['reduced']:
             log.info(f"using reduced template.")
