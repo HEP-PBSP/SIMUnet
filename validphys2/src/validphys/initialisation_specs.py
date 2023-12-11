@@ -38,6 +38,7 @@ Number = typing.Union[float, int]
 class UniformInitialisation:
 
     maxval: Number
+    minval: Number
 
     def __post_init__(self):
         if not self.minval <= self.maxval:
