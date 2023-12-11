@@ -36,7 +36,7 @@ Number = typing.Union[float, int]
 
 @dataclasses.dataclass
 class UniformInitialisation:
-
+    type: typing.Literal["uniform"]
     maxval: Number
     minval: Number
 
