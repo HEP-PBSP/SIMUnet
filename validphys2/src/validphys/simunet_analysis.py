@@ -59,13 +59,13 @@ def display_format(series):
     """
     return [format_number(x, digits=2) for x in series]
 
-BSM_FAC_DISPLAY = [
-'Opt', 'O3pQ3', 'OpQM', # currents
-'OtZ', 'OtW', 'OtG', # dipoles
-'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq', # octets
-'O1qd','O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq', # singlets
-'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1' # 4-heavy
-]
+BSM_FAC_DISPLAY = ['OtZ', 'OtW', 'OtG', 
+'Opt', 'O3pQ3', 'O3pq', 'OpQM', 'OpqMi', 'Opui', 'Opdi', 'O3pl', 'Opl', 'Ope',
+'O1qd', 'O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq',
+'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq',
+'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1', 'Oeu', 'Olu', 'Oed',
+'Olq3', 'Olq1', 'Oqe', 'Old', 'Oll',  'Omup', 'Otap', 'Otp',
+'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',]
 
 def reorder_cols(cols):
     return sorted(cols, key=BSM_FAC_DISPLAY.index)
@@ -532,7 +532,9 @@ def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     # read dataframe and round numbers
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
-    bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
+    # note that bsm_names_to_latex can be None
+    if bsm_names_to_latex:
+        bsm_facs_df.columns = [bsm_names_to_latex[col] for col in bsm_facs_df.columns]
     corr_mat = bsm_facs_df.corr()
     round(corr_mat, 1)
 
@@ -1123,7 +1125,11 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                # note that bsm_names_to_plot_scales can be None
+                if bsm_names_to_plot_scales:
+                    values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                else:
+                    values = bsm_facs_df[op]
                 mean = values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
@@ -1164,10 +1170,12 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
         ax.set_xticks(np.arange(len(all_ops)))
         bsm_latex_names = []
         for op in all_ops:
-            if bsm_names_to_plot_scales[op] != 1:
-                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
-            else:
-                bsm_latex_names += [bsm_names_to_latex[op]]
+            # note that bsm_names_to_plot_scales can be None
+            if bsm_names_to_plot_scales:
+                if bsm_names_to_plot_scales[op] != 1:
+                    bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+                else:
+                    bsm_latex_names += [bsm_names_to_latex[op]]
         ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
         # set y labels

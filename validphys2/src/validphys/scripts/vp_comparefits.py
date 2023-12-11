@@ -11,7 +11,7 @@ from reportengine.colors import t
 
 from validphys.app import App
 from validphys.loader import RemoteLoader
-from validphys import comparefittemplates, compareclosuretemplates
+from validphys import comparefittemplates, compareclosuretemplates, reduced_comparefittemplates, bsm_only_comparefittemplate, bsm_only_with_2D_hist_comparefittemplates
 from validphys.promptutils import confirm, KeywordsWithCache
 
 log = logging.getLogger(__name__)
@@ -75,7 +75,21 @@ class CompareFitApp(App):
             '--closure',
             help="Use the closure comparison template.",
             action='store_true')
-
+        parser.add_argument(
+            '-bsm',
+            '--bsmonly',
+            help="Use a reduced bsm only template for the comparison.",
+            action='store_true')
+        parser.add_argument(
+            '-bsm2d',
+            '--bsmonly_2d',
+            help="Use a reduced bsm only template for the comparison, includes 2D histogram plots.",
+            action='store_true')
+        parser.add_argument(
+            '-red',
+            '--reduced',
+            help="Use a reduced template for the comparison.",
+            action='store_true')
         parser.add_argument(
             '--norm_threshold',
             default=None,
@@ -200,12 +214,28 @@ class CompareFitApp(App):
         # This is needed because the environment wants to know how to resolve
         # the relative paths to find the templates. Best to have the template
         # look as much as possible as a runcard passed from the command line
-        if not args['closure']:
-            args['config_yml'] = comparefittemplates.template_path
-        else:
+
+        if args['closure']:
             #This doesn't print anything
             log.info(f"using closure test template.")
             args['config_yml'] = compareclosuretemplates.template_path
+
+        elif args['bsmonly']:
+            log.info(f"using bsm only template.")
+            args['config_yml'] = bsm_only_comparefittemplate.template_path
+        
+        elif args['bsmonly_2d']:
+            log.info(f"using bsm only template with 2D histogram plots.")
+            args['config_yml'] = bsm_only_with_2D_hist_comparefittemplates.template_path
+        
+        elif args['reduced']:
+            log.info(f"using reduced template.")
+            args['config_yml'] = reduced_comparefittemplates.template_path
+
+        else:
+            args['config_yml'] = comparefittemplates.template_path
+        
+            
         return args
 
     def complete_mapping(self):
