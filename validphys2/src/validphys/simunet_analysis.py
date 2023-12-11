@@ -1473,7 +1473,7 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
     bsm_factors = []
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
-            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, simu_parameters_names=dataset.simu_parameters_names)
+            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, simu_parameters_names=dataset.simu_parameters_names, simu_parameters_linear_combinations=dataset.simu_parameters_linear_combinations, use_fixed_predictions=dataset.use_fixed_predictions)
             bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, ds.simu_parameters_linear_combinations, cuts=ds.cuts)
             central_sm = central_predictions(ds, pdf)
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
