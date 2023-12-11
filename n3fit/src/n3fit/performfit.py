@@ -230,7 +230,7 @@ def performfit(
                             cuts = ds.cuts.load()
                             model_values = [simu_info[model][key][i] for i in cuts]
                             column += np.array(model_values * ds.simu_parameters_linear_combinations[param][key])
-                    column = column / simu_info[model]['SM'] * simu_info['SM_fixed']
+                    column = column / simu_info[model]['SM'] * pred_values
                     columns += [column]
                 linear_bsm += [pd.DataFrame(np.array(columns).T, index=new_index)]
 
