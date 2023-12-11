@@ -49,6 +49,7 @@ def analytic_solution(data, theorySM, theorylin, covmat):
 @n3fit.checks.can_run_multiple_replicas
 def performfit(
     *,
+    analytic_check,
     data,
     groups_covmat,
     groups_index,
@@ -198,8 +199,11 @@ def performfit(
     for ini in bsm_fac_initialisations:
         if isinstance(ini, AnalyticInitialisation):
             compute_analytic = True
+            use_analytic_initialisation = True
+        else:
+            use_analytic_initialisation = False
 
-    if compute_analytic:
+    if compute_analytic or analytic_check:
         # Compute the initialisations
         sm_predictions = []
         linear_bsm = []
@@ -289,6 +293,13 @@ def performfit(
         analytic_initialisation = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat) 
 
     else:
+        analytic_initialisation = None
+
+
+    if analytic_check:
+        log.info("The analytic solution is " + str(analytic_initialisation))
+
+    if not use_analytic_initialisation:
         analytic_initialisation = None
 
     n_models = len(replicas_nnseed_fitting_data_dict)
