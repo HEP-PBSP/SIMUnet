@@ -216,7 +216,7 @@ def performfit(
             new_index = pd.MultiIndex.from_tuples([(group_name, ds.name, x) for x in cuts_dict[ds.name]])
             sm_predictions += [pd.DataFrame(pred_values, index=new_index)]
             simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
-            nop = len(ds.simu_parameters_linear_combinations)
+            nop = n_simu_parameters
             if os.path.exists(simu_path):
                 with open(simu_path, 'r') as f:
                      simu_info = yaml.safe_load(f)
@@ -238,7 +238,7 @@ def performfit(
                 else:
                     th_covmat += [np.zeros((ndat, ndat))]
             else:
-                linear_bsm += [np.zeros((ndat, nop))]
+                linear_bsm += [pd.DataFrame(np.zeros((ndat, nop)), index=new_index)]
                 th_covmat += [np.zeros((ndat, ndat))]
 
         exp_data = []
@@ -247,17 +247,30 @@ def performfit(
             exp_name = dictionary[i]['name']
             exp_index = []
             for dataset in dictionary[i]['datasets']:
-                exp_index += [(exp_name, dataset['name'], x) for x in cuts_dict[dataset['name']]]
+                # Must apply both training mask *and* cuts
+                tr_mask = dataset['ds_tr_mask']
+                indices = [(exp_name, dataset['name'], x) for x in cuts_dict[dataset['name']]]
+                masked_indices = []
+                for s in range(len(indices)):
+                    if tr_mask[s]:
+                        masked_indices += [indices[s]] 
+                exp_index += masked_indices
             exp_index = pd.MultiIndex.from_tuples(exp_index)
             exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'], columns=exp_index)]
 
         exp_data = pd.concat(exp_data, axis=1).T
-        exp_data = exp_data.loc[groups_index]
+        index_with_cuts_and_tr = exp_data.index
 
         # Take only the prediction corresponding to the replica we are interested in
         #sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
         sm_predictions = pd.concat(sm_predictions)
+
+        print(linear_bsm)
+
         linear_bsm = pd.concat(linear_bsm)
+
+        print(exp_data)
+        print(linear_bsm)
 
         th_covmat = sp.linalg.block_diag(*th_covmat)
         th_covmat = pd.DataFrame(th_covmat)
@@ -266,14 +279,14 @@ def performfit(
         th_covmat.index = sm_predictions.index
 
         # Now we need to reindex everything, because NNPDF is annoying
-        sm_predictions = sm_predictions.loc[groups_index]
-        linear_bsm = linear_bsm.loc[groups_index]
-        th_covmat = th_covmat.loc[groups_index]
-        th_covmat = th_covmat.T.loc[groups_index]
+        sm_predictions = sm_predictions.loc[index_with_cuts_and_tr]
+        linear_bsm = linear_bsm.loc[index_with_cuts_and_tr]
+        th_covmat = th_covmat.loc[index_with_cuts_and_tr]
+        th_covmat = th_covmat.T.loc[index_with_cuts_and_tr]
 
         covmat = groups_covmat
-        covmat = covmat.loc[groups_index]
-        covmat = covmat.T.loc[groups_index]
+        covmat = covmat.loc[index_with_cuts_and_tr]
+        covmat = covmat.T.loc[index_with_cuts_and_tr]
 
         total_covmat = covmat + th_covmat
 
