@@ -475,14 +475,14 @@ def replica_training_mask(
 
     [345 rows x 1 columns]
     """
-    all_masks = np.concatenate([
-        ds_mask
-        for exp_masks in zip(exps_tr_masks)
-        for ds_mask in exp_masks
-    ], axis=1)
+    broken_cuts = [ds_mask for exp_masks in zip(exps_tr_masks) for ds_mask in exp_masks]
+    new_broken_cuts = []
+    for cuts in broken_cuts:
+        new_broken_cuts += cuts
+    new_broken_cuts = [cuts.reshape((1,len(cuts))) for cuts in new_broken_cuts]
 
     return pd.DataFrame(
-        all_masks.T,
+        np.concatenate(new_broken_cuts, axis=1).T,
         columns=[f"replica {replica}"],
         index=experiments_index
     )
