@@ -479,9 +479,10 @@ def replica_training_mask(
         ds_mask
         for exp_masks in zip(exps_tr_masks)
         for ds_mask in exp_masks
-    ])
+    ], axis=1)
+
     return pd.DataFrame(
-        all_masks,
+        all_masks.T,
         columns=[f"replica {replica}"],
         index=experiments_index
     )
