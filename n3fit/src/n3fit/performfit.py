@@ -42,7 +42,10 @@ def analytic_solution(data, theorySM, theorylin, covmat):
 
     sol = np.linalg.solve(theorylin.T @ part1, theorylin.T @ part2)
 
-    return sol
+    minval = (diff - theorylin @ sol).T @ np.linalg.solve(covmat, diff - theorylin @ sol)
+    minval = minval / len(diff)
+
+    return (sol, minval)
 
 # Action to be called by validphys
 # All information defining the NN should come here in the "parameters" dict
@@ -290,14 +293,15 @@ def performfit(
 
         total_covmat = covmat + th_covmat
 
-        analytic_initialisation = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat) 
+        analytic_initialisation, minval = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat) 
 
     else:
         analytic_initialisation = None
 
 
     if analytic_check:
-        log.info("The analytic solution is " + str(analytic_initialisation))
+        log.info("The analytic solution is " + str(analytic_initialisation.T.tolist()))
+        log.info("The minimum is achieved at chi2=" + str(minval))
 
     if not use_analytic_initialisation:
         analytic_initialisation = None
