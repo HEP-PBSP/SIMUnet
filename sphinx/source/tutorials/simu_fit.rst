@@ -1,20 +1,19 @@
 .. _simufit:
 
-How to run a simultaneous PDF-EFT fit
+Simultaneous fits
 ====================
 
-The user should perform the steps documented below in order to obtain a complete
-PDF fit using the latest release of the NNPDF fitting code: ``n3fit``.
-The fitting methodology is detailed in the `Methodology <methodology>`_ page.
+This is a basic tutorial to perform simultaneous PDF-EFT fits with SIMUnet.
+The procedure consists of 3 steps: 
 
-- `Preparing a fit runcard <#preparing-a-fit-runcard>`_
-- `Running the fitting code <#running-the-fitting-code>`_
-- `Upload and analyse the fit <#upload-and-analyse-the-fit>`_
+1. `Preparing a fit runcard <#preparing-a-fit-runcard>`_
+2. `Running the fitting code <#running-the-fitting-code>`_
+3. `Uploading and analysing the results of the fit <#upload-and-analyse-the-fit>`_
 
 .. _preparing-a-fit-runcard:
 
-Preparing a fit runcard
------------------------
+1. Preparing a fit runcard
+--------------------------
 
 The runcard is written in YAML. The runcard is the unique identifier of a fit
 and contains all required information to perform a fit, which includes the
@@ -107,8 +106,8 @@ or to directly take the trials from said hyperscan:
 
 .. _run-n3fit-fit:
 
-Running the fitting code
-------------------------
+2. Running the fitting code
+---------------------------
 
 After successfully installing the ``n3fit`` package and preparing a runcard
 following the points presented above you can proceed with a fit.
@@ -173,8 +172,8 @@ folder, which contains a number of files:
 
 .. _upload-fit:
 
-Upload and analyse the fit
---------------------------
+3. Uploading and analysing the fit
+----------------------------------
 After obtaining the fit you can proceed with the fit upload and analysis by:
 
 1. Uploading the results using ``vp-upload runcard_folder`` then install the
