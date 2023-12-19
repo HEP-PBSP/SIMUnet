@@ -68,7 +68,7 @@ class CombineCfacLayer(Layer):
         self.scales = np.array(scales, dtype=np.float32)
         if num_initial > 0:
             initial_values = tf.concat(initial_values, 0)
-            initial_values = tf.math.divide(initial_values, self.scales)
+            initial_values = tf.math.multiply(initial_values, self.scales)
 
         if num_initial > 0:
             initial_values = tf.concat(initial_values, 0)
