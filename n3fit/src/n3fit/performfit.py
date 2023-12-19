@@ -53,6 +53,7 @@ def analytic_solution(data, theorySM, theorylin, covmat):
 def performfit(
     *,
     analytic_check,
+    automatic_scale_choice,
     data,
     groups_covmat,
     groups_index,
@@ -198,6 +199,9 @@ def performfit(
 
     rep_num = replicas_nnseed_fitting_data_dict[0][0]
 
+    if automatic_scale_choice:
+        analytic_check = True
+
     compute_analytic = False
     for ini in bsm_fac_initialisations:
         if isinstance(ini, AnalyticInitialisation):
@@ -298,10 +302,12 @@ def performfit(
     else:
         analytic_initialisation = None
 
+    if automatic_scale_choice:
+        simu_parameters_scales = [1/abs(ini) for ini in analytic_initialisation.T.tolist()[0]] 
 
     if analytic_check:
-        log.info("The analytic solution is " + str(analytic_initialisation.T.tolist()))
-        log.info("The minimum is achieved at chi2=" + str(minval))
+        log.info("The analytic solution is " + str(analytic_initialisation.T.tolist()[0]))
+        log.info("The minimum is achieved at chi2=" + str(minval[0][0]))
 
     if not use_analytic_initialisation:
         analytic_initialisation = None
