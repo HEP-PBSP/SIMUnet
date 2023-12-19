@@ -6,17 +6,57 @@
 import copy
 import logging
 import numpy as np
+import scipy as sp
 import n3fit.checks
 from n3fit.vpinterface import N3PDF
 
+import yaml
+
 log = logging.getLogger(__name__)
 
+from validphys.initialisation_specs import AnalyticInitialisation
+from validphys.core import PDF
+from validphys.convolution import predictions
+
+import pandas as pd
+import os
+
+from validphys.loader import Loader
+
+l = Loader()
+
+def analytic_solution(data, theorySM, theorylin, covmat):
+    """
+    Returns the minimum of the chi2 function:
+
+      chi2 = (data - theorySM - theorylin c)^T invcovmat (data - theorySM - theorylin c),
+
+    """
+
+    diff = data.to_numpy() - theorySM.to_numpy()
+
+    theorylin = theorylin.to_numpy()
+
+    part1 = np.linalg.solve(covmat, theorylin)
+    part2 = np.linalg.solve(covmat, diff)
+
+    sol = np.linalg.solve(theorylin.T @ part1, theorylin.T @ part2)
+
+    minval = (diff - theorylin @ sol).T @ np.linalg.solve(covmat, diff - theorylin @ sol)
+    minval = minval / len(diff)
+
+    return (sol, minval)
 
 # Action to be called by validphys
 # All information defining the NN should come here in the "parameters" dict
 @n3fit.checks.can_run_multiple_replicas
 def performfit(
     *,
+    analytic_check,
+    automatic_scale_choice,
+    data,
+    groups_covmat,
+    groups_index,
     n3fit_checks_action, # wrapper for all checks
     replicas, # checks specific to performfit
     replicas_nnseed_fitting_data_dict,
@@ -28,6 +68,8 @@ def performfit(
     fitbasis,
     simu_parameters_scales,
     bsm_fac_initialisations,
+    use_th_covmat=False,
+    analytic_initialisation_pdf=None,
     fixed_pdf_fit=False,
     sum_rules=True,
     parameters,
@@ -155,6 +197,121 @@ def performfit(
     #       )
     #
 
+    rep_num = replicas_nnseed_fitting_data_dict[0][0]
+
+    if automatic_scale_choice:
+        analytic_check = True
+
+    compute_analytic = False
+    for ini in bsm_fac_initialisations:
+        if isinstance(ini, AnalyticInitialisation):
+            compute_analytic = True
+            use_analytic_initialisation = True
+        else:
+            use_analytic_initialisation = False
+
+    if compute_analytic or analytic_check:
+        # Compute the initialisations
+        sm_predictions = []
+        linear_bsm = []
+        th_covmat = []
+        cuts_dict = {}
+        for ds in data.datasets:
+            cuts_dict[ds.name] = ds.cuts.load()
+            pred_values = predictions(ds, PDF(analytic_initialisation_pdf))[rep_num].to_numpy()
+            ndat = len(pred_values)
+            for label in groups_index:
+                if ds.name == label[1]:
+                    group_name = label[0]
+                    break
+            new_index = pd.MultiIndex.from_tuples([(group_name, ds.name, x) for x in cuts_dict[ds.name]])
+            sm_predictions += [pd.DataFrame(pred_values, index=new_index)]
+            simu_path = l.datapath / ('theory_' + data.thspec.id) / 'simu_factors' / ('SIMU_' + ds.name + '.yaml')
+            nop = n_simu_parameters
+            if os.path.exists(simu_path) and ds.simu_parameters_linear_combinations is not None:
+                with open(simu_path, 'r') as f:
+                     simu_info = yaml.safe_load(f)
+
+                columns = []
+                for param in ds.simu_parameters_linear_combinations:
+                    model = '_'.join(param.split("_")[:-1])
+                    column = np.zeros((ndat,))
+                    cuts = ds.cuts.load()
+                    for key in ds.simu_parameters_linear_combinations[param]:
+                        if key in simu_info[model].keys():
+                            model_values = [simu_info[model][key][i] for i in cuts]
+                            column += np.array(model_values * ds.simu_parameters_linear_combinations[param][key])
+                    column = column / np.array([simu_info[model]['SM'][i] for i in cuts]) * pred_values
+                    columns += [column]
+                linear_bsm += [pd.DataFrame(np.array(columns).T, index=new_index)]
+
+                if use_th_covmat == True and 'theory_cov' in simu_info.keys() and len(simu_info['theory_cov']) > 0:
+                    th_covmat += [np.array(simu_info['theory_cov'])]
+                else:
+                    th_covmat += [np.zeros((ndat, ndat))]
+            else:
+                linear_bsm += [pd.DataFrame(np.zeros((ndat, nop)), index=new_index)]
+                th_covmat += [np.zeros((ndat, ndat))]
+
+        exp_data = []
+        for i in range(len(replicas_nnseed_fitting_data_dict[0][1])):
+            dictionary = replicas_nnseed_fitting_data_dict[0][1]
+            exp_name = dictionary[i]['name']
+            exp_index = []
+            for dataset in dictionary[i]['datasets']:
+                # Must apply both training mask *and* cuts
+                tr_mask = dataset['ds_tr_mask']
+                indices = [(exp_name, dataset['name'], x) for x in cuts_dict[dataset['name']]]
+                masked_indices = []
+                for s in range(len(indices)):
+                    if tr_mask[s]:
+                        masked_indices += [indices[s]] 
+                exp_index += masked_indices
+            exp_index = pd.MultiIndex.from_tuples(exp_index)
+            exp_data += [pd.DataFrame(replicas_nnseed_fitting_data_dict[0][1][i]['expdata'], columns=exp_index)]
+
+        exp_data = pd.concat(exp_data, axis=1).T
+        index_with_cuts_and_tr = exp_data.index
+
+        # Take only the prediction corresponding to the replica we are interested in
+        #sm_predictions = pd.DataFrame(pd.concat(sm_predictions).to_numpy()[:,rep_num])
+        sm_predictions = pd.concat(sm_predictions)
+
+        linear_bsm = pd.concat(linear_bsm)
+
+        th_covmat = sp.linalg.block_diag(*th_covmat)
+        th_covmat = pd.DataFrame(th_covmat)
+        th_covmat.index = sm_predictions.index
+        th_covmat = th_covmat.T
+        th_covmat.index = sm_predictions.index
+
+        # Now we need to reindex everything, because NNPDF is annoying
+        sm_predictions = sm_predictions.loc[index_with_cuts_and_tr]
+        linear_bsm = linear_bsm.loc[index_with_cuts_and_tr]
+        th_covmat = th_covmat.loc[index_with_cuts_and_tr]
+        th_covmat = th_covmat.T.loc[index_with_cuts_and_tr]
+
+        covmat = groups_covmat
+        covmat = covmat.loc[index_with_cuts_and_tr]
+        covmat = covmat.T.loc[index_with_cuts_and_tr]
+
+        total_covmat = covmat + th_covmat
+
+        analytic_initialisation, minval = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat) 
+
+    else:
+        analytic_initialisation = None
+
+    if automatic_scale_choice:
+        simu_parameters_scales = [1/abs(ini) for ini in analytic_initialisation.T.tolist()[0]] 
+
+    if analytic_check:
+        log.info("The analytic solution is " + str(analytic_initialisation.T.tolist()[0]))
+        log.info("The minimum is achieved at chi2=" + str(minval[0][0]))
+
+    if not use_analytic_initialisation:
+        analytic_initialisation = None
+
     n_models = len(replicas_nnseed_fitting_data_dict)
     if parallel_models and n_models != 1:
         replicas, replica_experiments, nnseeds = zip(*replicas_nnseed_fitting_data_dict)
@@ -207,6 +364,7 @@ def performfit(
             simu_parameters_names=simu_parameters_names, 
             simu_parameters_scales=simu_parameters_scales,
             bsm_fac_initialisations=bsm_fac_initialisations,
+            analytic_initialisation=analytic_initialisation,
             bsm_initialisation_seed=bsm_initialisation_seed,
         )
 

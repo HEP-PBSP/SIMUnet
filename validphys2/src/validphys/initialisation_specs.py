@@ -21,10 +21,13 @@ import typing
 
 import validobj
 
+import numpy as np
+
 __all__ = [
     "UniformInitialisation",
     "GaussianInitialisation",
     "ConstantInitialisation",
+    "AnalyticInitialisation",
     "Initialisation",
 ]
 
@@ -34,8 +37,8 @@ Number = typing.Union[float, int]
 @dataclasses.dataclass
 class UniformInitialisation:
     type: typing.Literal["uniform"]
-    minval: Number
     maxval: Number
+    minval: Number
 
     def __post_init__(self):
         if not self.minval <= self.maxval:
@@ -58,7 +61,10 @@ class ConstantInitialisation:
     type: typing.Literal["constant"]
     value: Number
 
+@dataclasses.dataclass
+class AnalyticInitialisation:
+    type: typing.Literal["analytic"]
 
 Initialisation = typing.Union[
-    UniformInitialisation, GaussianInitialisation, ConstantInitialisation
+    UniformInitialisation, GaussianInitialisation, ConstantInitialisation, AnalyticInitialisation
 ]
