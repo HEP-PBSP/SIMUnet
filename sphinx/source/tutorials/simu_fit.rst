@@ -20,7 +20,7 @@ and contains all required information to perform a fit, which includes the
 experimental data, the theory setup and the fitting setup.
 
 We begin by showing the user an example of a complete runcard. We will go
-into the details of each part  later. Here is a SIMUnet runcard:
+into the details of each part  later. Here is a complete SIMUnet runcard:
 
 .. code-block:: yaml
 
@@ -37,6 +37,7 @@ into the details of each part  later. Here is a SIMUnet runcard:
     # use_fixed_predictions:  if set to True it removes the PDF dependence of the dataset
     # sys: systematics treatment (see systypes)
 
+    ############################################################
     dataset_inputs:
     # HERA
     - {dataset: HERACOMBNCEP575, frac: 0.75}
@@ -184,93 +185,131 @@ into the details of each part  later. Here is a SIMUnet runcard:
     debug: false
     maxcores: 4
 
-For newcomers, it is recommended to start from an already existing runcard,
-example runcards (and runcard used in NNPDF releases) are available at
-`n3fit/runcards <https://github.com/NNPDF/nnpdf/tree/master/n3fit/runcards>`_.
-The runcards are mostly self explanatory, see for instance below an
-example of the ``parameter`` dictionary that defines the Machine Learning framework.
+The structure of the runcard is similar to the one that is used in the NNPDF methodology.
+So, in this tutorial we will mostly adress the new syntax and features of SIMUnet. 
+
+We begin by looking at the following section of the runcard:
 
 .. code-block:: yaml
 
-    # runcard example
-    parameters:
-      nodes_per_layer: [15, 10, 8]
-      activation_per_layer: ['sigmoid', 'sigmoid', 'linear']
-      initializer: 'glorot_normal'
-      optimizer:
-        optimizer_name: 'RMSprop'
-        learning_rate: 0.01
-        clipnorm: 1.0
-      epochs: 900
-      positivity:
-        multiplier: 1.05
-        threshold: 1e-5
-      stopping_patience: 0.30 # Ratio of the number of epochs
-      layer_type: 'dense'
-      dropout: 0.0
+    # Runcard for SIMUnet
+    #
+    ############################################################
+    description: "Example runcard. This one performs a simultaenous PDF-EFT fit using data from different sectors."
 
-The runcard system is designed such that the user can utilize the program without having to
-tinker with the codebase.
-One can simply modify the options in ``parameters`` to specify the
-desired architecture of the Neural Network as well as the settings for the optimization algorithm.
+    ############################################################
+    # frac: training fraction of datapoints for the PDFs
+    # QCD: apply QCD K-factors
+    # EWK: apply electroweak K-factors
+    # simu_fac: fit BSM coefficients using their K-factors in the dataset 
+    # use_fixed_predictions:  if set to True it removes the PDF dependence of the dataset
+    # sys: systematics treatment (see systypes)
 
-An important feature of ``n3fit`` is the ability to perform `hyperparameter scans <hyperoptimization>`_,
-for this we have also introduced a ``hyperscan_config`` key which specifies
-the trial ranges for the hyperparameter scan procedure.
-See the following self-explanatory example:
+It contains the description of the runcard and some short comments about new keys
+of SIMUnet. The user should always provide a useful ``description`` of the runcard as
+it will appear when running analyses and can provide information to other people studying the fit.
+
+Now we consider the following fraction of the runcard:
 
 .. code-block:: yaml
 
-    hyperscan_config:
-        stopping: # setup for stopping scan
-            min_epochs: 5e2  # minimum number of epochs
-            max_epochs: 40e2 # maximum number of epochs
-            min_patience: 0.10 # minimum stop patience
-            max_patience: 0.40 # maximum stop patience
-        positivity: # setup for the positivity scan
-            min_multiplier: 1.04 # minimum lagrange multiplier coeff.
-            max_multiplier: 1.1 # maximum lagrange multiplier coeff.
-            min_initial: 1.0 # minimum initial penalty
-            max_initial: 5.0 # maximum initial penalty
-        optimizer: # setup for the optimizer scan
-            - optimizer_name: 'Adadelta'
-              learning_rate:
-                min: 0.5
-                max: 1.5
-            - optimizer_name: 'Adam'
-              learning_rate:
-                min: 0.5
-                max: 1.5
-        architecture: # setup for the architecture scan
-            initializers: 'ALL' # Use all implemented initializers from keras
-            max_drop: 0.15 # maximum dropout probability
-            n_layers: [2,3,4] # number of layers
-            min_units: 5 # minimum number of nodes
-            max_units: 50 # maximum number of nodes
-            activations: ['sigmoid', 'tanh'] # list of activation functions
+    dataset_inputs:
+    # HERA
+    - {dataset: HERACOMBNCEP575, frac: 0.75}
+    # Drell - Yan
+    - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
+    # ttbar
+    - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+    # ttbar AC
+    - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+    # TTZ
+    - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
+    # TTW
+    - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
+    # single top
+    - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+    # tW
+    - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
+    # W helicity
+    - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+    # ttgamma
+    - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+    # tZ
+    - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+    # EWPO
+    - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
+    # Higgs
+    - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+    # Diboson
+    - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
-It is also possible to take the configuration of the hyperparameter scan from a previous
-run in the NNPDF server by using the key `from_hyperscan`:
+The ``dataset_inputs`` key contains the datasets that will be used to peform the
+simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP575`` and
+``CMSDY1D12``, are included in the same way as in a NNPDF fit, and are
+used only to fit PDFs. All the other datasets have the key ``simu_fac`` set to either
+``EFT_LO`` or ``EFT_NLO``. This means that SIMUnet will use those datasets to fit
+EFT coefficients at the desired accuracy, LO or NLO. The fit requires EFT K-factors for all
+the datasets that have the ``simu_fac`` key. Additinally, some datasets have the key ``use_fixed_predictions``
+set to ``True``. This means that the PDF dependence is removed from this dataset and, effectively,
+the dataset becomes PDF-independent.
+
+Now, we take a look of this part of the runcard:
 
 .. code-block:: yaml
 
-    hyperscan_config:
-      from_hyperscan: 'some_previous_hyperscan'
+    #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
+    #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+    analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
 
-or to directly take the trials from said hyperscan:
+These keys, if uncommented, allow the user to perform a fixed-PDF fit. This means that only
+the EFT coefficients are found during the optimisation. If ``fixed_pdf_fit: True``, the PDF weights
+are loaded from the fit ``221103-jmm-no_top_1000_iterated``. Still have to comment on the analytic
+initialisation of the PDFs.
+
+We move on to this part of the runcard:
 
 .. code-block:: yaml
 
-    hyperscan_config:
-      use_tries_from: 'some_previous_hyperscan'
+    simu_parameters:
+    # Dipoles
+    - {name: "OtG", scale: 0.01, initialisation: {type: uniform, minval: -10, maxval: 10} }
+    # Quark Currents
+    - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
+    # Lepton currents
+    - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
+    # 4 Fermions 4Q
+    - {name: 'O1qd', scale: 1.0, initialisation: {type: analytic}}
+    # linear combination
+    - name: 'Y'
+      linear_combination:
+        'Olq1 ': 1. 51606
+        'Oed ': -6. 0606
+        'Oeu ': 12. 1394
+        'Olu ': 6. 0606
+        'Old ': -3. 0394
+        'Oqe ': 3. 0394
+      scale: 1.0
+      initialisation: { type: uniform , minval: -1, maxval: 1}
+
+This block contains the EFT coefficients that are going to be fitted. Each one
+of them has a key ``name``. The name usually resembles the notation of the Warsaw
+basis, and they have to match the name of the EFT operators that were used
+to produce the K-factors of the datasets in the previous section. 
+
+Also, each EFT coefficient has a ``scale``. This scale is used to modify the size of the learning
+rate for this coefficient within the SIMUnet framework. The size of the ``scale``
+for an EFT coefficient can speed up the training and, in the case, of a big K-factor,
+the convergence to the minimum of the loss function without going over it.
+
+There are several types of initialisation.
 
 .. _run-n3fit-fit:
 
 2. Running the fitting code
 ---------------------------
 
-After successfully installing the ``n3fit`` package and preparing a runcard
-following the points presented above you can proceed with a fit.
+After preparing a SIMUnet runcard ``runcard.yml``, we are now ready to run a fit. The pipeline
+is similar to the NNPDF framework but some additional features can be included.
 
 1. Prepare the fit: ``vp-setupfit runcard.yml``. This command will generate a
     folder with the same name as the runcard (minus the file extension) in the
@@ -290,13 +329,20 @@ following the points presented above you can proceed with a fit.
    ``n3fit runcard.yml replica`` where ``replica`` goes from 1-n where n is the
    maximum number of desired replicas. Note that if you desire, for example, a 100
    replica fit you should launch more than 100 replicas (e.g. 130) because not
-   all of the replicas will pass the checks in ``postfit``
-   (`see here <postfit-selection-criteria>`_ for more info).
+   all of the replicas will pass the checks in ``postfit``.
 
-3. Wait until you have fit results. Then run the ``evolven3fit`` program once to
-   evolve all replicas using DGLAP. The arguments are ``evolven3fit runcard_folder
-   number_of_replicas``. Remember to use the total number of replicas run (130 in the
+
+3. Wait until you have fit results. In the case of a simultaneous PDF-EFT fit,
+   run the ``evolven3fit`` program once to evolve all replicas using DGLAP.
+   The arguments are ``evolven3fit runcard_folder number_of_replicas``. Remember
+   to use the total number of replicas run (130 in the
    above example), rather than the number you desire in the final fit.
+
+    .. note::
+       In the case of a fixed-PDF fit, since the PDFs have already been found,
+       the user can simply run ``vp-fakeevolve`` instead
+       of ``evolven3fit`` (using the same syntax). This will be much faster and will leave
+       the fit directory ready for the next step. 
 
 4. Wait until you have results, then use ``postfit number_of_replicas
    runcard_folder`` to finalize the PDF set by applying post selection criteria.
@@ -306,19 +352,6 @@ following the points presented above you can proceed with a fit.
    standard behaviour of ``postfit`` can be modified by using various flags.
    More information can be found at `Processing a fit <postfit>`_.
 
-It is possible to run more than one replica in one single run of ``n3fit`` by
-using the ``--replica_range`` option. Running ``n3fit`` in this way increases the
-memory usage as all replicas need to be stored in memory but decreases disk load
-as the reading of the datasets and fktables is only done once for all replicas.
-
-If you are planning to perform a hyperparameter scan just perform exactly the
-same steps by adding the ``--hyperopt number_of_trials`` argument to ``n3fit``,
-where ``number_of_trials`` is the maximum allowed value of trials required by the
-fit. Usually when running hyperparameter scan we switch-off the MC replica
-generation so different replicas will correspond to different initial points for
-the scan, this approach provides faster results. We provide the ``vp-hyperoptplot``
-script to analyse the output of the hyperparameter scan.
-
 Output of the fit
 -----------------
 Every time a replica is finalized, the output is saved to the `runcard/nnfit/replica_$replica`_
@@ -327,6 +360,7 @@ folder, which contains a number of files:
 - ``chi2exps.log``: a json log file with the χ² of the training every 100 epochs.
 - ``runcard.exportgrid``: a file containing the PDF grid.
 - ``runcard.json``: Includes information about the fit (metadata, parameters, times) in json format.
+- ``bsm_fac.csv``: Contains the values of the EFT coefficients for this replica.
 
 .. note:: The reported χ² refers always to the actual χ², i.e., without positivity loss or other penalty terms.
 
