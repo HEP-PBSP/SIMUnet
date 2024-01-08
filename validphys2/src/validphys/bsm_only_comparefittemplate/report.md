@@ -8,6 +8,11 @@ We are comparing:
   - {@ current fit @} (`{@ current fit_id @}`): {@ current description @}
   - {@ reference fit @} (`{@ reference fit_id @}`): {@ reference description @}
 
+Luminosities
+------------
+{@with Energies@}
+[Plots at {@Energytitle@}]({@lumi_report report@})
+{@endwith@}
 
 SIMUnet analysis
 ----------------
