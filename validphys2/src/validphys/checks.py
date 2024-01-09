@@ -279,3 +279,17 @@ def check_darwin_single_process(NPROC):
         raise CheckError(
             "NPROC must be set to 1 on OSX, because multithreading is not supported."
         )
+
+
+@make_argcheck
+def check_theoryID_SIMUnet(theoryid):
+    """
+    Parameters
+    ----------
+    theoryid: validphys.core.TheoryIDSpec
+        See also production rule in config.py
+    """
+    check(
+        theoryid.id == "200",
+        f"Theory ID for SIMUnet needs to be {200} and not {theoryid}",
+    )
