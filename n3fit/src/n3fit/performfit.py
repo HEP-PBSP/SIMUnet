@@ -9,11 +9,14 @@ import numpy as np
 import n3fit.checks
 from n3fit.vpinterface import N3PDF
 
+from validphys.checks import check_theoryID_SIMUnet
+
 log = logging.getLogger(__name__)
 
 
 # Action to be called by validphys
 # All information defining the NN should come here in the "parameters" dict
+@check_theoryID_SIMUnet
 @n3fit.checks.can_run_multiple_replicas
 def performfit(
     *,
