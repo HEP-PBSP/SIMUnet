@@ -290,6 +290,6 @@ def check_theoryID_SIMUnet(theoryid):
         See also production rule in config.py
     """
     check(
-        theoryid.id == "200",
-        f"Theory ID for SIMUnet needs to be {200} and not {theoryid}",
+        theoryid.id == "270",
+        f"Theory ID for SIMUnet needs to be {270} and not {theoryid}",
     )
