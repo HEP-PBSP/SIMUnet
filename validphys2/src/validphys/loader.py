@@ -32,6 +32,7 @@ from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
+from validphys.checks import check_theoryID_SIMUnet
 
 DEFAULT_NNPDF_PROFILE_PATH = f"{sys.prefix}/share/NNPDF/nnprofile.yaml"
 
@@ -484,6 +485,7 @@ class Loader(LoaderBase):
             for inp in default_filter_rules_input()
         ]
 
+    @check_theoryID_SIMUnet
     def get_simu_parameters_name_dict(self, setname, simu_parameters_names, theoryid):
         """
         Parameters
@@ -530,7 +532,7 @@ class Loader(LoaderBase):
 
         return simu_fac_names_paths
 
-   
+    @check_theoryID_SIMUnet
     def check_dataset(
         self,
         name,
