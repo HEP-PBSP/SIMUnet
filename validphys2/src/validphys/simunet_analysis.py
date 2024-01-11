@@ -947,10 +947,10 @@ def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smef
         yield fig
 
 @figuregen
-def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
+def plot_smeft_fit_comparison(fits, bsm_names_to_latex, smeft_fit_reference, bsm_names_to_plot_scales, smeft_fit_label):
     """
     Figure generator to compare bounds obtained with simunet with
-    bounds obtained by smefit.
+    bounds obtained from a reference smeft fit.
     Paramaters
     ----------
         fits: NSList of FitSpec 
@@ -981,7 +981,10 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
             paths = replica_paths(fit)
             bsm_facs_df = read_bsm_facs(paths)
             if bsm_facs_df.get([op]) is not None:
-                values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                if bsm_names_to_plot_scales:
+                    values = bsm_names_to_plot_scales[op]*bsm_facs_df[op]
+                else:
+                    values = bsm_facs_df[op]
                 mean =  values.mean()
                 std = values.std()
                 cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
@@ -997,15 +1000,23 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         bounds_dict[fit.label] = bounds
         best_fits_dict[fit.label] = best_fits
 
-    # Now extend the bounds_dict and best_fits_dict with SMEFiT stuff
+    # Now extend the bounds_dict and best_fits_dict with reference fit 
     bounds = []
     best_fits = []
+    ref_fit_ops = [smeft_fit_reference[x]['name'] for x in range(len(smeft_fit_reference))]
     for op in all_ops:
-        best_fits += [bsm_names_to_plot_scales[op]*smefit_reference[x]['best'] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
-        bounds += [[bsm_names_to_plot_scales[op]*smefit_reference[x]['lower_bound'], bsm_names_to_plot_scales[op]*smefit_reference[x]['upper_bound']] for x in range(len(smefit_reference)) if smefit_reference[x]['name'] == op]
-
-    bounds_dict[smefit_label] = bounds
-    best_fits_dict[smefit_label] = best_fits
+        if op in ref_fit_ops:
+            if bsm_names_to_plot_scales:
+                best_fits += [bsm_names_to_plot_scales[op]*smeft_fit_reference[x]['best'] for x in range(len(smeft_fit_reference)) if smeft_fit_reference[x]['name'] == op]
+                bounds += [[bsm_names_to_plot_scales[op]*smeft_fit_reference[x]['lower_bound'], bsm_names_to_plot_scales[op]*smeft_fit_reference[x]['upper_bound']] for x in range(len(smeft_fit_reference)) if smeft_fit_reference[x]['name'] == op]
+            else:
+                best_fits += [smeft_fit_reference[x]['best'] for x in range(len(smeft_fit_reference)) if smeft_fit_reference[x]['name'] == op]
+                bounds += [[smeft_fit_reference[x]['lower_bound'], smeft_fit_reference[x]['upper_bound']] for x in range(len(smeft_fit_reference)) if smeft_fit_reference[x]['name'] == op]
+        else:
+            best_fits += [float('nan')]
+            bounds += [[float('nan'),float('nan')]]
+    bounds_dict[smeft_fit_label] = bounds
+    best_fits_dict[smeft_fit_label] = best_fits
 
     # plot parameters
     scales= ['linear', 'symlog']
@@ -1018,28 +1029,30 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         # line for SM prediction
         ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
 
-        labels = [fit.label for fit in fits] + [smefit_label]
+        labels = [fit.label for fit in fits] + [smeft_fit_label]
 
         idx = 0
         for label in labels:
             bounds = bounds_dict[label]
             best_fits = best_fits_dict[label]
             x_coords = [i - 0.1 + 0.2*idx for i in range(len(all_ops))] 
+            ax.scatter(x_coords, best_fits, color=colour_key[idx])
             bounds_min = [bound[0] for bound in bounds]
             bounds_max= [bound[1] for bound in bounds]
-            ax.scatter(x_coords, best_fits, color=colour_key[idx])
             ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + label,
             color=colour_key[idx], lw=2.0)
+            #color=colour_key[idx], lw=2.0)
             idx += 1
 
         # set x positions for labels and labels
         ax.set_xticks(np.arange(len(all_ops)))
         bsm_latex_names = []
         for op in all_ops:
-            if bsm_names_to_plot_scales[op] != 1:
-                bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
-            else:
-                bsm_latex_names += [bsm_names_to_latex[op]]
+            if bsm_names_to_plot_scales:
+                if bsm_names_to_plot_scales[op] != 1:
+                    bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+                else:
+                    bsm_latex_names += [bsm_names_to_latex[op]]
         ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
 
         # set y labels
@@ -1065,7 +1078,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
             ax.set_yscale(scale)
 
         # final formatting
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.25))
         ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
@@ -1512,3 +1525,5 @@ def principal_component_vectors(fisher_information_matrix, simu_parameters_names
     _, _, vectors = np.linalg.svd(fisher)
     vectors = pd.DataFrame(vectors, columns=simu_parameters_names)
     return vectors
+
+
