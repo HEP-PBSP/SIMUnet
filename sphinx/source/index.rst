@@ -75,7 +75,7 @@ Contents
    :maxdepth: 2
 
    methodology.rst
-   results.rst
+   features.rst
    tutorials/tutorials_overview.rst
    datasets.rst
    results/overview.rst
