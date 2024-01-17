@@ -190,7 +190,7 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     debug: false
     maxcores: 4
 
-    The structure of the runcard is similar to the one that is used in the NNPDF methodology.
+The structure of the runcard is similar to the one that is used in the NNPDF methodology.
 So, in this tutorial we will mostly adress the new syntax and features of SIMUnet. 
 
 We begin by looking at the following section of the runcard:
