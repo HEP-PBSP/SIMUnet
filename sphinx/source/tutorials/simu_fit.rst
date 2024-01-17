@@ -1,5 +1,7 @@
 .. _simufit:
 
+The :math:`\text{SIMUnet}` methodology can perform simultaneous fits of PDF and EFT coefficients. 
+
 Simultaneous fits
 ====================
 
@@ -14,6 +16,9 @@ The procedure consists of 3 steps:
 
 1. Preparing a fit runcard
 --------------------------
+
+The structure of :math:`\text{SIMUnet}` runcards is similar to the ones of NNPDF, and more details can
+be found on their `website <https://docs.nnpdf.science/n3fit/runcard_detailed.html>`_.
 
 The runcard is written in YAML. The runcard is the unique identifier of a fit
 and contains all required information to perform a fit, which includes the
