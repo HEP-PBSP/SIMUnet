@@ -1,3 +1,5 @@
+.. _func_docs:
+
 **Functions documentation**
 ===========================
 
