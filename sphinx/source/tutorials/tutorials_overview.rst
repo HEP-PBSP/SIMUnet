@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 5
    
    Installation
-   runcard_n3fit
    simu_fit
    contaminated_fit
    simu_closure_test
