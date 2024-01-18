@@ -335,14 +335,10 @@ Output of the fit
 The output of the fit is stored in the ``runcard_folder``. It is identical to a normal NNPDF output.
 
 
-.. _upload-fit:
-
-3. Uploading and analysing the fit
+3. Uploading the fit
 ----------------------------------
-After obtaining the fit you can proceed with the fit upload and analysis by:
 
-1. Uploading the results using ``vp-upload runcard_folder`` then install the
-   fitted set with ``vp-get fit fit_name``.
-
-2. Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_.
-   Consider using the ``vp-comparefits`` tool.
+Once the fit is complete, the next steps involve uploading the results. This is particularly useful
+if, for example, you ran the fit on a cluster and want to make it avaiable to collaborators or download it
+from a different machine. You can upload the fit by using ``vp-upload runcard_folder`` and then fetch it
+with ``vp-get fit fit_name``.
