@@ -5,27 +5,32 @@ The :math:`\text{SIMUnet}` methodology can perform simultaneous fits of PDF and 
 Simultaneous fits
 ====================
 
-This is a basic tutorial to perform simultaneous PDF-EFT fits with SIMUnet.
+This is a basic tutorial to perform simultaneous PDF-EFT fits with :math:`\text{SIMUnet}`.
 The procedure consists of 3 steps: 
 
-1. `Preparing a fit runcard <#preparing-a-fit-runcard>`_
+1. `Preparing the runcard <#preparing-the-runcard>`_
 2. `Running the fitting code <#running-the-fitting-code>`_
 3. `Uploading and analysing the results of the fit <#upload-and-analyse-the-fit>`_
 
-.. _preparing-a-fit-runcard:
+.. _preparing-the-runcard:
 
-1. Preparing a fit runcard
+1. Preparing the runcard
 --------------------------
 
-The structure of :math:`\text{SIMUnet}` runcards is similar to the ones of NNPDF, and more details can
+The structure of :math:`\text{SIMUnet}` runcards is similar to the ones used in NNPDF, and more details can
 be found on their `website <https://docs.nnpdf.science/n3fit/runcard_detailed.html>`_.
 
-The runcard is written in YAML. The runcard is the unique identifier of a fit
-and contains all required information to perform a fit, which includes the
-experimental data, the theory setup and the fitting setup.
+The runcard, a critical component of the fitting process, is formatted using 
+YAML (YAML Ain't Markup Language), a human-readable data serialization 
+standard. As the cornerstone of each fit, the runcard uniquely identifies it 
+and encapsulates all necessary parameters. This includes the selection of 
+experimental data, the configuration of the theoretical framework, in the SM and beyond, and the 
+specifics of the fitting procedure. For those new to YAML, a comprehensive 
+guide and documentation can be found at the `official YAML website 
+<https://yaml.org/>`_.
 
 We begin by showing the user an example of a complete runcard. We will go
-into the details of each part  later. Here is a complete SIMUnet runcard:
+into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` runcard:
 
 .. code-block:: yaml
 
@@ -190,8 +195,8 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     debug: false
     maxcores: 4
 
-The structure of the runcard is similar to the one that is used in the NNPDF methodology.
-So, in this tutorial we will mostly adress the new syntax and features of SIMUnet. 
+As we said, the structure of the runcard is similar to the one that is used in the NNPDF methodology.
+So, in this tutorial we will mostly adress the new features and syntax of :math:`\text{SIMUnet}`. 
 
 We begin by looking at the following section of the runcard:
 
@@ -211,7 +216,7 @@ We begin by looking at the following section of the runcard:
     # sys: systematics treatment (see systypes)
 
 It contains the description of the runcard and some short comments about new keys
-of SIMUnet. The user should always provide a useful ``description`` of the runcard as
+of :math:`\text{SIMUnet}`. The user should always provide a useful ``description`` of the runcard as
 it will appear when running analyses and can provide information to other people studying the fit.
 
 Now we consider the following fraction of the runcard:
@@ -252,7 +257,7 @@ The ``dataset_inputs`` key contains the datasets that will be used to peform the
 simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP575`` and
 ``CMSDY1D12``, are included in the same way as in a NNPDF fit, and are
 used only to fit PDFs. All the other datasets have the key ``simu_fac`` set to either
-``EFT_LO`` or ``EFT_NLO``. This means that SIMUnet will use those datasets to fit
+``EFT_LO`` or ``EFT_NLO``. This means that :math:`\text{SIMUnet}` will use those datasets to fit
 EFT coefficients at the desired accuracy, LO or NLO. The fit requires EFT K-factors for all
 the datasets that have the ``simu_fac`` key. Additinally, some datasets have the key ``use_fixed_predictions``
 set to ``True``. This means that the PDF dependence is removed from this dataset and, effectively,
@@ -302,60 +307,47 @@ basis, and they have to match the name of the EFT operators that were used
 to produce the K-factors of the datasets in the previous section. 
 
 Also, each EFT coefficient has a ``scale``. This scale is used to modify the size of the learning
-rate for this coefficient within the SIMUnet framework. The size of the ``scale``
+rate for this coefficient within the :math:`\text{SIMUnet}` framework. The size of the ``scale``
 for an EFT coefficient can speed up the training and, in the case, of a big K-factor,
 the convergence to the minimum of the loss function without going over it.
 
-There are several types of initialisation.
+There are several types of initialisation of the EFT coefficients. The ``initialization`` key provides
+SIMUnet with instructions for setting parameter values at the start of the training. There are three ways
+of doing this:
+
+- When ``uniform`` is chosen, it initializes the parameter value to a random number within the range specified by the ``minval`` and ``maxval`` keys, which need to be set in advance.
+
+- When ``gaussian`` is selected, it sets the parameter's initial value based on a Gaussian distribution using the provided ``mean`` and ``std_dev`` keys to define its mean and standard deviation.
+
+- When ``constant`` is used, it assigns the parameter's initial value directly to the value specified by the key, eliminating the element of randomness from this step.
+
+At this points, we can now run the fitting code.
 
 .. _run-n3fit-fit:
 
 2. Running the fitting code
 ---------------------------
 
-After preparing a SIMUnet runcard ``runcard.yml``, we are now ready to run a fit. The pipeline
-is similar to the NNPDF framework but some additional features can be included.
+After preparing a :math:`\text{SIMUnet}` runcard ``runcard.yml``, we are now ready to run a fit. The pipeline
+is similar to the NNPDF framework, and the details can be found `here <https://docs.nnpdf.science/tutorials/run-fit.html>`_.
+The procedure can be summarised as follows: 
 
-1. Prepare the fit: ``vp-setupfit runcard.yml``. This command will generate a
-    folder with the same name as the runcard (minus the file extension) in the
-    current directory, which will contain a copy of the original YAML runcard.
-    The required resources (such as the theory and t0 PDF set) will be
-    downloaded automatically. Alternatively they can be obtained with the
-    ``vp-get`` tool.
+1. Start the fit with ``vp-setupfit runcard.yml``, which will create a dedicated
+   directory and fetch necessary resources. Alternatively, use ``vp-get`` for
+   manual resource acquisition of a fit.
 
-    .. note::
-       This step is not strictly necessary when producing a standard fit with
-       ``n3fit`` but it is required by :ref:`validphys <vp-index>`
-       and it should therefore always be done. Note that :ref:`vp-upload <upload-fit>`
-       will fail unless this step has been followed. If necessary, this step can
-       be done after the fit has been run.
+2. Launch the fit using ``n3fit runcard.yml replica``, specifying the replica number.
+   Initiate more replicas than needed to account for potential postfit rejections.
 
-2. The ``n3fit`` program takes a ``runcard.yml`` as input and a replica number, e.g.
-   ``n3fit runcard.yml replica`` where ``replica`` goes from 1-n where n is the
-   maximum number of desired replicas. Note that if you desire, for example, a 100
-   replica fit you should launch more than 100 replicas (e.g. 130) because not
-   all of the replicas will pass the checks in ``postfit``.
+3. Once fits are complete, use ``evolven3fit runcard_folder number_of_replicas`` to evolve replicas
+   using the DGLAP. Use the actual number of replicas with which you started.
 
+   .. note::
+      For fixed-PDF fits, ``vp-fakeevolve`` can replace ``evolven3fit``. This is much faster to run,
+      as the PDFs that are load in a fixed-PDF fit have already been evolved!
 
-3. Wait until you have fit results. In the case of a simultaneous PDF-EFT fit,
-   run the ``evolven3fit`` program once to evolve all replicas using DGLAP.
-   The arguments are ``evolven3fit runcard_folder number_of_replicas``. Remember
-   to use the total number of replicas run (130 in the
-   above example), rather than the number you desire in the final fit.
-
-    .. note::
-       In the case of a fixed-PDF fit, since the PDFs have already been found,
-       the user can simply run ``vp-fakeevolve`` instead
-       of ``evolven3fit`` (using the same syntax). This will be much faster and will leave
-       the fit directory ready for the next step. 
-
-4. Wait until you have results, then use ``postfit number_of_replicas
-   runcard_folder`` to finalize the PDF set by applying post selection criteria.
-   This will produce a set of ``number_of_replicas + 1`` replicas. This time the
-   number of replicas should be that which you desire in the final fit (100 in the
-   above example). Note that the
-   standard behaviour of ``postfit`` can be modified by using various flags.
-   More information can be found at `Processing a fit <postfit>`_.
+4. Finalise with ``postfit number_of_replicas runcard_folder``, which filters replicas
+   to yield the final PDF and EFT set. The number specified should match your desired final count.
 
 Output of the fit
 -----------------
@@ -381,5 +373,7 @@ After obtaining the fit you can proceed with the fit upload and analysis by:
 2. Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_.
    Consider using the ``vp-comparefits`` tool.
 
-SIMUnet analysis
+:math:`\text{SIMUnet}` analysis
 ----------------------
+
+Elaborate on the analysis.
