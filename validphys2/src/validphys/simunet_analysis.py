@@ -990,8 +990,8 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
                 bounds.append([cl_lower, cl_upper])
             else:
                 # if the operator is not in the fit, then assume SM
-                best_fits.append(0.0)
-                bounds.append([0.0, 0.0])
+                best_fits.append(np.nan)
+                bounds.append([np.nan, np.nan])
 
         bounds_dict[fit.label] = bounds
         best_fits_dict[fit.label] = best_fits
