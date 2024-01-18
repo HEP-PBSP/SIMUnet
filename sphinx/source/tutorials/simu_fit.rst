@@ -10,7 +10,8 @@ The procedure consists of 3 steps:
 
 1. `Preparing the runcard <#preparing-the-runcard>`_
 2. `Running the fitting code <#running-the-fitting-code>`_
-3. `Uploading and analysing the results of the fit <#upload-and-analyse-the-fit>`_
+3. `Uploading the fit <#upload-fit>`_
+3. `Analysing the fit <#analyse-fit>`_
 
 .. _preparing-the-runcard:
 
@@ -351,29 +352,38 @@ The procedure can be summarised as follows:
 
 Output of the fit
 -----------------
-Every time a replica is finalized, the output is saved to the `runcard/nnfit/replica_$replica`_
-folder, which contains a number of files:
+As in NNPDF, every time a replica is finalised, the output is saved to the `runcard/nnfit/replica_$replica`_
+folder, which contains these files:
 
-- ``chi2exps.log``: a json log file with the χ² of the training every 100 epochs.
-- ``runcard.exportgrid``: a file containing the PDF grid.
-- ``runcard.json``: Includes information about the fit (metadata, parameters, times) in json format.
-- ``bsm_fac.csv``: Contains the values of the EFT coefficients for this replica.
+- ``chi2exps.log``: a log file with the χ² of the training.
+- ``runcard.exportgrid``: the PDF grid.
+- ``runcard.json``: a json file with the information of the fit.
 
-.. note:: The reported χ² refers always to the actual χ², i.e., without positivity loss or other penalty terms.
+Additinally, in :math:`\text{SIMUnet}` you will find this file:
+
+- ``bsm_fac.csv``: file with the values of the EFT coefficients for this replica.
+
+Once the fit is complete, the next steps involve uploading and analyzing the results:
+
+1. Commence by uploading the fit data using ``vp-upload runcard_folder`` and then
+   retrieve and install the fitted PDF set with ``vp-get fit fit_name``.
 
 .. _upload-fit:
 
-3. Uploading and analysing the fit
+3. Uploading the fit
 ----------------------------------
-After obtaining the fit you can proceed with the fit upload and analysis by:
 
-1. Uploading the results using ``vp-upload runcard_folder`` then install the
-   fitted set with ``vp-get fit fit_name``.
+Once the fit is complete, the next steps involve uploading the results. This is particularly useful
+if, for example, you ran the fit on a cluster and want to make it avaiable to collaborators or download it
+from a different machine. You can upload the fit by using ``vp-upload runcard_folder`` and then fetch it
+with ``vp-get fit fit_name``.
 
-2. Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_.
-   Consider using the ``vp-comparefits`` tool.
 
-:math:`\text{SIMUnet}` analysis
-----------------------
+.. _analyse-fit:
 
-Elaborate on the analysis.
+4. Analising the fit
+--------------------
+
+Elaborate on the analysis once that the func docs are updated.
+
+Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_. Consider using the ``vp-comparefits`` tool.
