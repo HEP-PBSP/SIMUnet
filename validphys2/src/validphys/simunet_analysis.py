@@ -775,10 +775,9 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
                 bound_lengths.append(length)
             else:
                 df[fit.label].loc[op] = 'Not in fit'
-                # if the operator is not in the fit, then assume SM
-                # for best-fit value
-                best_fits.append(0.0)
-                bound_lengths.append(0.0)
+                # if the operator is not in the fit, then append None
+                best_fits.append(np.nan)
+                bound_lengths.append(np.nan)
         # best-fit shift column
         df['Best-fit shift'].loc[op] = format_number(best_fits[0] - best_fits[1], digits=2)
         # broadening column
@@ -1138,9 +1137,9 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
                 # append bounds
                 bounds.append([cl_lower, cl_upper])
             else:
-                # if the operator is not in the fit, then assume SM
-                best_fits.append(0.0)
-                bounds.append([0.0, 0.0])
+                # if the operator is not in the fit, add np.nan
+                best_fits.append(np.nan)
+                bounds.append([np.nan, np.nan])
 
         bounds_dict[fit.label] = bounds
         best_fits_dict[fit.label] = best_fits
