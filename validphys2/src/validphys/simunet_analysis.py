@@ -1613,11 +1613,6 @@ def plot_bsm_facs_68res(fits, bsm_names_to_latex):
 
     yield fig
 
-_read_pdf_cfactors = collect("read_bsm_facs", ("pdffit",))
-
-def read_pdf_cfactors(_read_pdf_cfactors, pdf):
-    return _read_pdf_cfactors[0]
-
 """
 Principal component analysis
 """
