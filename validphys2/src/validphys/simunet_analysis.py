@@ -1618,6 +1618,45 @@ _read_pdf_cfactors = collect("read_bsm_facs", ("pdffit",))
 def read_pdf_cfactors(_read_pdf_cfactors, pdf):
     return _read_pdf_cfactors[0]
 
+def dataset_inputs_scaled_fit_cfactor(data, pdf, read_pdf_cfactors, quad_cfacs):
+    """Same as :py:func:`validphys.results.dataset_scaled_fit_cfactor`
+    but for a list of dataset inputs.
+    """
+    res =  np.concatenate(
+        [dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs) for dataset in data.datasets]
+    )
+    return res
+
+def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
+    """For each replica of ``pdf``, scale the fit cfactors by
+    the best fit value.
+    Returns
+    -------
+    res: np.arrays
+        An ``ndat`` x ``nrep`` array containing the scaled fit cfactors.
+    """
+    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts)
+    if parsed_cfacs is None or not read_pdf_cfactors.values.size:
+        # We want an array of ones that ndata x nrep
+        # where ndata is the number of post cut datapoints
+        ndata = len(dataset.load().get_cv())
+        nrep = len(pdf) - 1
+        return np.ones((ndata, nrep))
+    log.debug("Scaling results using linear cfactors")
+    fit_cfac_df = pd.DataFrame(
+        {k: v.central_value.squeeze() for k, v in parsed_cfacs.items()}
+    )
+    scaled_replicas = read_pdf_cfactors.values * fit_cfac_df.values[:, np.newaxis]
+    if quad_cfacs:
+        log.debug("Scaling results using quadratic cfactors")
+        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs)
+        quad_cfac_df = pd.DataFrame(
+            {k: v.central_value.squeeze() for k, v in parsed_quads.items()}
+        )
+        scaled_replicas += (read_pdf_cfactors.values**2) * quad_cfac_df.values[:, np.newaxis]
+
+    return 1 + np.sum(scaled_replicas, axis=2)
+
 """
 Principal component analysis
 """
