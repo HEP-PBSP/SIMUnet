@@ -299,7 +299,19 @@ def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
 
         yield fig
 
+
+@make_argcheck
+def _check_two_bsm_facs(fit):
+    cf = fit.as_input().get("simu_parameters", [])
+    l = len(cf)
+    check(
+        l == 2,
+        "Exactly two elements are required in "
+        f"`simu_parameters` for fit '{fit}', but {l} found.",
+    )
+
 @figure
+#@_check_two_bsm_facs
 def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     """
     Plot two-dimensional distributions of the BSM coefficient results.
@@ -743,6 +755,7 @@ def plot_bsm_pdf_corr(
     # reorder BSM facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
     # get xplotting_grid
+    # x_grid_obj = xplotting_grid(pdf, Q, basis=Basespecs[0]["basis"])
     x_grid_obj = xplotting_grid
     if dashed_line_flavours is None:
         dashed_line_flavours = []
@@ -785,6 +798,8 @@ def plot_bsm_pdf_corr(
 
         ax.legend(loc="best")
         ax.grid(True)
+        #ax.set_axisbelow(True)
+        #ax.set_adjustable("datalim")
         yield fig, bsm_fac
 
 @figuregen
@@ -1187,6 +1202,18 @@ def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smef
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
 
+        # Load image and add it to the plot
+        #file_name = "logo_black.png"
+        #logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        #imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
+
         # frames on all sides
         ax.spines['top'].set_visible(True)
         ax.spines['right'].set_visible(True)
@@ -1332,6 +1359,18 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
+
+        # Load image and add it to the plot
+        #file_name = "logo_black.png"
+        #logo = image.imread(file_name)
+
+        #The OffsetBox is a simple container artist.
+        #The child artists are meant to be drawn at a relative position to its #parent.
+        #imagebox = OffsetImage(logo, zoom = 0.15)
+
+        #Container for the imagebox referring to a specific position *xy*.
+        #ab = AnnotationBbox(imagebox, (20, -5), frameon = False)
+        #ax.add_artist(ab)
 
         # frames on all sides
         ax.spines['top'].set_visible(True)
