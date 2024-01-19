@@ -109,6 +109,6 @@ in the fit to avoid fitting bias associated with multiplicative uncertainties.
 
 The :math:`\text{SIMUnet}` framework presents a comprehensive and innovative approach to study the PDF-EFT interplay.
 Its architecture allows for both simultaneous PDF-EFT and fixed-PDF fits, providing flexibility when it comes to assessing their interplay in different sectors.
-:math:`\text{SIMUnet}, combines neural network modeling with advanced statistical methods,
+:math:`\text{SIMUnet}`, combines neural network modeling with advanced statistical methods,
 ensuring that PDF and EFT coefficients are accurately constrained by experimental data. Additionally, it allows the user to assess if signals of new physics can
 be absorbed by the PDFs. In this way, :math:`\text{SIMUnet}` represents a robust tool for understanding the complex interplay between PDFs and EFT coefficients in high energy physics.
