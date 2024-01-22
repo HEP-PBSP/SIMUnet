@@ -11,7 +11,7 @@ The procedure consists of 3 steps:
 1. `Preparing the runcard <#preparing-the-runcard>`_
 2. `Running the fitting code <#running-the-fitting-code>`_
 3. `Uploading the fit <#upload-fit>`_
-3. `Analysing the fit <#analyse-fit>`_
+4. `Analysing the fit <#analyse-fit>`_
 
 .. _preparing-the-runcard:
 
