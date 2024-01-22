@@ -96,7 +96,7 @@ With :math:`\text{SIMUnet}`, we contaminate the data by using several values, as
     the possible contamination of the PDFs by new physics.
 
 :math:`\text{SIMUnet}` higlights an important issue that affects the search for new physics in this case.
-In the plot above, the points :math:`W = 8e-05` is beyond current bounds. The injection of this new physics
+In the plot above, the points :math:`W = 8 \times 10^{-5}` is beyond current bounds. The injection of this new physics
 does not deteriorate the fit quality in a global fit, and therefore it is not spotted. However,
 as shown in Fig. 6, the PDF luminosities shift significantly.
 
