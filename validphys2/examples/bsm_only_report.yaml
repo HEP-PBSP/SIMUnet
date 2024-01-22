@@ -1,161 +1,25 @@
-# This is the driver template for vp-comparefits. It consists on a validphys
-# runcard where some settings are missing and are to be filled by the
-# vp-comparefits script. The settings below are a sample of such settings, kept
-# for reference
-#
-# meta:
-#   title: The title of the Report
-#   keywords: [report_template]
-#   author: NNPDF Collaboration
-#
-# current:
-#   fit: {id: id_of_the_base_fit}
-#   pdf: {id: id_of_the_base_fit, label: "Current Fit"}
-#   theory:
-#     from_: fit
-#   theoryid:
-#     from_: theory
-#   speclabel: "Current Fit"
-#
-# reference:
-#   fit: {id: id_of_the_reference_fit}
-#   pdf: {id: id_of_the_reference_fit, label: "Reference Fit" }
-#   theory:
-#     from_: fit
-#   theoryid:
-#     from_: theory
-#   speclabel: "Reference Fit"
+meta:
+  title: BSM results
+  author: MNC
+  keywords: [simunet, plots, validphys]
 
-pdfs:
-  - from_: current
-  - from_: reference
+fit: 231120_lm_fixedPDF_alldata
+fits: 
+  - 231120_lm_fixedPDF_alldata
 
-fits:
-  - from_: current
-  - from_: reference
+use_cuts: fromfit
+pdf: {id: 231120_lm_fixedPDF_alldata, label: 231120_lm_fixedPDF_alldata}
 
-use_cuts: "fromfit"
-use_weights_in_covmat: False
 
-Q: 1.651
-
-Scales:
-  - Q: 1.651
-    Scaletitle: "Q = 1.65 GeV"
-  - Q: 100
-    Scaletitle: "Q = 100 GeV"
-
-PDFnormalize:
-  - Normtitle: Absolute
-
-  - normalize_to: 2
-    Normtitle: Ratio
-
-Basespecs:
-  - basis: flavour
-    Basistitle: Flavour basis
-  - basis: evolution
-    Basistitle: Evolution basis
-
-PDFscalespecs:
-  - xscale: log
-    Xscaletitle: Log
-  - xscale: linear
-    Xscaletitle: Linear
-
-Energies:
-  - sqrts: 13000
-    Energytitle: "13 TeV"
-
-lumi_channels:
-  - gg
-  - gq
-  - qq
-  - qqbar
-  - uubar
-  - ddbar
-  - udbar
-  - dubar
-
-Distspecs:
-  - ymin: 0
-    ymax: 20
-
-pos_use_kin: True
-
-dataset_report:
-  meta: Null
-  template: data.md
-
-pdf_report:
-  meta: Null
-  template: pdf.md
-
-exponents_report:
-  meta: Null
-  template: exponents.md
-
-lumi_report:
-  meta: Null
-  template: lumi.md
-
-flavour_sets:
- - flavours: [21] # gluon
- - flavours: [2] # up
- - flavours: [1] # down 
- - flavours: [3] # strange
-
-template: report.md
-
-positivity:
-  from_: fit
-
-description:
-  from_: fit
-
-dataset_inputs:
-  from_: fit
-
-dataspecs:
-  - theoryid:
-      from_: current
-    pdf:
-      from_: current
-    fit:
-      from_: current
-    speclabel:
-      from_: current
-
-  - theoryid:
-      from_: reference
-    pdf:
-      from_: reference
-    fit:
-      from_: reference
-    speclabel:
-      from_: reference
-
-Normalize:
-  normalize_to: 2
-
-Datanorm:
-  normalize_to: data
-
-DataGroups:
-  - metadata_group: nnpdf31_process
-  - metadata_group: experiment
-
-ProcessGroup:
-    metadata_group: nnpdf31_process
 
 simu_parameters:
   # Dipoles
   - {name: 'OtZ', scale: 1, latex: '$c_{tZ}$', plot_scale: 1}
-  - {name: 'OtW', scale: 1, latex: '$c_{tW}$', plot_scale: 1}
-  - {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 1}
+  - {name: 'OtW', scale: 1, latex: '$c_{tW}$', plot_scale: 100}
+  - {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 100}
   # Quark Currents
   - {name: 'Opt', scale: 1, latex: '$c_{\varphi t}$', plot_scale: 1}
-  - {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$', plot_scale: 1}
+  - {name: 'O3pQ3', scale: 1, latex: '$c_{\varphi Q}^{(3)}$', plot_scale: 10}
   - {name: 'O3pq', scale: 1, plot_scale: 1, latex: '$c_{\varphi q}^{(3)}$'}
   - {name: 'OpQM', scale: 1, latex: '$c_{\varphi Q}^{(-)}$', plot_scale: 1}
   - {name: 'OpqMi',  plot_scale: 1, scale: 1, latex: '$c_{\varphi q}^{(-)}$'}
@@ -172,7 +36,7 @@ simu_parameters:
   - {name: 'O1qt', scale: 1, latex: '$c_{qt}^{1}$', plot_scale: 1}
   - {name: 'O1ut', scale: 1, latex: '$c_{ut}^{1}$', plot_scale: 1}
   - {name: 'O11qq', scale: 1, latex: '$c_{Qq}^{1,1}$', plot_scale: 1}
-  - {name: 'O13qq', scale: 1, latex: '$c_{Qq}^{1,3}$', plot_scale: 1}
+  - {name: 'O13qq', scale: 1, latex: '$c_{Qq}^{1,3}$', plot_scale: 100}
   - {name: 'O8qd', scale: 1, latex: '$c_{Qd}^{8}$', plot_scale: 1}
   - {name: 'O8qu', scale: 1, latex: '$c_{Qu}^{8}$', plot_scale: 1}
   - {name: 'O8dt', scale: 1, latex: '$c_{dt}^{8}$', plot_scale: 1}
@@ -211,7 +75,31 @@ simu_parameters:
   - {name: 'OpWB', scale: 1, plot_scale: 1, latex: '$c_{\varphi W B}$'}
   - {name: 'Opd', scale: 1, plot_scale: 1, latex: '$c_{\varphi Box}$'}
   - {name: 'OpD', scale: 1, plot_scale: 1, latex: '$c_{\varphi D}$'}
-  
+
+# Posterior distribution binnings
+posterior_plots_settings:
+  same_bins: True
+  n_bins: 15
+  # rangex: [-0.5, 0.6]
+  # rangey: [0, 5]
+
+template_text: |
+ ### Comparison histograms of BSM factors
+  {@plot_nd_bsm_facs_fits@}
+
+ ### Plots of the bounds
+ {@plot_bsm_facs_bounds@}
+
+ ### BSM 68% residuals
+ {@plot_bsm_facs_68res@}
+
+ ### Combined 2D histograms
+ {@plot_2d_bsm_facs_fits@}
+
+ ### BSM correlations  
+ {@fits plot_bsm_corr@}
+
+
 
 actions_:
-  - report(main=true)
+  - report(main=True)

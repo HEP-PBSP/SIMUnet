@@ -341,6 +341,15 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     fit_bsm_fac_df = pd.DataFrame(
         {k: v.central_value for k, v in parsed_bsm_facs.items()}
     )
+    # note: we have a problem if the operators fitted in the fit
+    # are fewer than the operators specified in the vp-comparefit comparecard.yaml
+    # we make sure here that the operators are the same
+    cols_fit_bsm_fac_df = fit_bsm_fac_df.columns
+    cols_read_bsm_facs = read_bsm_facs.columns 
+
+    reduced_cols = [col for op in cols_read_bsm_facs for col in cols_fit_bsm_fac_df if op in col]
+
+    fit_bsm_fac_df = fit_bsm_fac_df[fit_bsm_fac_df.columns[fit_bsm_fac_df.columns.isin(reduced_cols)]]
 
     if not read_bsm_facs.empty:
         scaled_replicas = read_bsm_facs.values * fit_bsm_fac_df.values[:, np.newaxis]
