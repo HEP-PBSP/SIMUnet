@@ -51,11 +51,17 @@ Format routines
 """
 def display_format(series):
     """
-    Determines the format of the BSM factors
-    to be displayed in the tables
+    Determines the format of the BSM factors to be displayed in the tables.
+
     Parameters
     ----------
-        series: pd.Series
+    series : pd.Series
+        Series containing the BSM factors.
+
+    Returns
+    -------
+    list
+        A list of formatted numbers representing the BSM factors.
     """
     return [format_number(x, digits=2) for x in series]
 
@@ -68,20 +74,34 @@ BSM_FAC_DISPLAY = ['OtZ', 'OtW', 'OtG',
 'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',]
 
 def reorder_cols(cols):
+    """
+    Reorders columns based on predefined BSM factor display order.
+
+    Parameters
+    ----------
+    cols : list
+        List of column names to be reordered.
+
+    Returns
+    -------
+    list
+        Reordered list of columns.
+    """
     return sorted(cols, key=BSM_FAC_DISPLAY.index)
 
 def format_residuals(residuals):
     """
-    Makes a list of intervals to display
-    in the pulls. 
+    Formats residuals for display, splitting them into intervals.
+
     Parameters
     ----------
-        residuals: list[float]
-            List of mean/std for every BSM factor
+    residuals : list of float
+        List of residual values (mean/std) for BSM factors.
+
     Returns
     -------
-        new_residual: list[list]
-            List of the intervals to display
+    list of list
+        List of intervals for display of residuals.
     """
     new_residuals = []
     for residual in residuals:
@@ -97,9 +117,23 @@ def format_residuals(residuals):
 
 @figuregen
 def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings=None):
-    """Plot a histogram for each BSM coefficient.
-    The nd is used for n-dimensional, if two BSM facs 
-    are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
+    """
+    Plot a histogram for each BSM coefficient.
+    The nd is used for n-dimensional, if two BSM facs are present: use instead :py:func:`validphys.results.plot_2d_bsm_facs`
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing the BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    posterior_plots_settings : dict, optional
+        Settings for posterior plots, such as number of bins and range settings.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the histogram.
     """
     # extract settings
     if posterior_plots_settings is None:
@@ -142,8 +176,21 @@ def plot_nd_bsm_facs(read_bsm_facs, bsm_names_to_latex, posterior_plots_settings
 @figuregen
 def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=None):
     """
-    Compare histograms of BSM factors between different fits 
-    in SIMUnet
+    Compare histograms of BSM factors between different fits in SIMUnet.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to their LaTeX representations.
+    posterior_plots_settings : dict, optional
+        Dictionary containing settings for posterior plots such as 'n_bins', 'rangex', 'rangey', and 'same_bins'.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for each BSM coefficient comparison.
     """
     # extract settings
     if posterior_plots_settings is None:
@@ -223,11 +270,19 @@ def plot_nd_bsm_facs_fits(fits, bsm_names_to_latex, posterior_plots_settings=Non
 @figuregen
 def plot_kde_bsm_facs(read_bsm_facs, bsm_names_to_latex):
     """
-    Plots the kernel estimation density for a distribution
-    of BSM coefficients. 
+    Plots the kernel estimation density for a distribution of BSM coefficients.
+
     Parameters
     ----------
-        read_bsm_facs: pd.DataFrame
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing the BSM factors. 
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the KDE plot.
     """
     for label, column in read_bsm_facs.items():
         # Initialise Axes instance
@@ -259,8 +314,19 @@ def _check_two_bsm_facs(fit):
 #@_check_two_bsm_facs
 def plot_2d_bsm_facs(read_bsm_facs, replica_data):
     """
-    Plot two dimensional distributions of the BSM coefficient
-    results
+    Plot two-dimensional distributions of the BSM coefficient results.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing the BSM factors.
+    replica_data : list
+        List of FitInfo.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the 2D distribution plot.
     """
     bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns
@@ -310,9 +376,23 @@ def plot_2d_bsm_facs(read_bsm_facs, replica_data):
 
 def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pair):
     """
-    Auxiliary function to plot 2D plots
-    of pair of operators in a N-dimensional fits
-    with BSM factors
+    Auxiliary function to plot 2D plots of pair of operators in a N-dimensional fits with BSM factors.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors. 
+    replica_data : list
+        List of FitInfo.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    pair : tuple
+        Pair of operators to be plotted.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the 2D plot.
     """
     op_1, op_2 = pair
     bsm_facs_df = read_bsm_facs
@@ -379,12 +459,21 @@ def _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, pa
 @figuregen
 def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
     """
-    Plot two dimensional distributions for all pairs
-    of BSM coefficients in a fit
+    Plot two-dimensional distributions for all pairs of BSM coefficients in a fit.
+
     Parameters
     ----------
-        read_bsm_facs: pd.Dataframe 
-        replica_data : list
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of FitInfo.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for each pair of BSM coefficient combination.
     """
     bsm_facs_df = read_bsm_facs
     labels = bsm_facs_df.columns 
@@ -397,10 +486,20 @@ def plot_bsm_2d_combs(read_bsm_facs, replica_data, bsm_names_to_latex):
 @figure
 def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
     """
-    Generates bsm_fac value - chi2 scatter plots for all replicas
-    in a fit. 
-    """
+    Generates bsm_fac value - chi2 scatter plots for all replicas in a fit.
 
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of FitInfo.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        A matplotlib figure object for the chi2 scatter plot.
+    """
     chi2 = [info.chi2 for info in replica_data]
 
     for label, column in read_bsm_facs.iteritems():
@@ -428,7 +527,19 @@ def plot_chi2_bsm_facs(read_bsm_facs, replica_data):
 def plot_tr_val_epoch(fit, replica_paths):
     """
     Plot the average across replicas of training and validation chi2 
-    for a given epoch
+    for a given epoch.
+
+    Parameters
+    ----------
+    fit : FitSpec
+        Object containing the specifications of the fit.
+    replica_paths : list
+        List of paths to the replica data.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The figure object containing the plot.
     """
     paths = [p / 'chi2exps.log' for p in replica_paths]
     # initialise dataframe
@@ -455,16 +566,20 @@ def plot_tr_val_epoch(fit, replica_paths):
 @table
 def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
     """
-    Table generator to summarise information about
-    the BSM coefficient results.
-    Paramaters
+    Table generator to summarise information about the BSM coefficient results.
+
+    Parameters
     ----------
-        read_bsm_facs: pd.Dataframe
-    The returned table contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the 68% (95%) confidence level by 
-    computing mean ± std (mean ± 2*std).
-    """ 
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame summarizing the bounds and statistics of BSM coefficients.
+    """
     bsm_facs_df = read_bsm_facs
 
     # Get the numbers from the dataframe
@@ -496,7 +611,20 @@ def bsm_facs_bounds(read_bsm_facs, bsm_names_to_latex):
 
 @table
 def tabulate_bsm_corr(fit, read_bsm_facs):
-    """Same as plot_bsm_corr, but table rather than plot.
+    """
+    Generate a correlation table for BSM coefficients similar to the corresponding plot.
+
+    Parameters
+    ----------
+    fit : FitSpec
+        Object containing the specifications of the fit.
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+
+    Returns
+    -------
+    pd.DataFrame
+        The correlation matrix as a DataFrame.
     """
     bsm_facs_df = read_bsm_facs
     bsm_facs_df = bsm_facs_df.reindex(columns=reorder_cols(bsm_facs_df.columns))
@@ -508,22 +636,49 @@ def tabulate_bsm_corr(fit, read_bsm_facs):
 @figure
 def plot_2d_bsm_facs_pair(read_bsm_facs, replica_data, bsm_names_to_latex, op1, op2):
     """
-    Auxiliary function to plot 2D plots
-    of pair of operators in a N-dimensional fits
-    with BSM factors
+    Auxiliary function to plot 2D plots of a pair of operators in a N-dimensional fits with BSM factors.
+
+    Parameters
+    ----------
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    replica_data : list
+        List of FitInfo.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    op1 : str
+        The first operator name.
+    op2 : str
+        The second operator name.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the 2D plot.
     """
     return _select_plot_2d_bsm_facs(read_bsm_facs, replica_data, bsm_names_to_latex, (op1, op2))
 
 @figure
 def plot_bsm_corr(fit, read_bsm_facs, bsm_names_to_latex, corr_threshold=0.5):
     """
-    Correlation matrix to summarise information about
-    the BSM coefficient results.
-    Paramaters
-    ----------
-        read_bsm_facs: pd.Dataframe
-    """
+    Plot a correlation matrix to summarise information about the BSM coefficient results.
 
+    Parameters
+    ----------
+    fit : FitSpec
+        Object containing the specifications of the fit.
+    read_bsm_facs : pd.DataFrame
+        DataFrame containing BSM factors.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM names to LaTeX representations.
+    corr_threshold : float, optional
+        Threshold for coloration in the correlation matrix.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the correlation matrix plot.
+    """
     # figsize (11, 9) has good proportions
     fig, ax = plt.subplots(1, 1, figsize=(11, 9))
     # set background colour
@@ -564,6 +719,37 @@ def plot_bsm_pdf_corr(
     ymax: (float, type(None)) = None,
     dashed_line_flavours: (list, type(None)) = None,
 ):
+    """
+    Plot the correlation between BSM factors and a PDF.
+
+    Parameters
+    ----------
+    pdf : PDF object
+        The parton distribution function being analyzed.
+    read_bsm_facs : DataFrame or callable
+        Data or function representing BSM factors.
+    xplotting_grid : XGrid object
+        Object containing the plotting grid information.
+    Q : float
+        Momentum transfer value in GeV.
+    bsm_names_to_latex : dict
+        Mapping of BSM factor names to their LaTeX representations.
+    mark_threshold : float, optional
+        Threshold for marking significant correlations, by default 0.9.
+    ymin : float or None, optional
+        Minimum y-axis value, by default None.
+    ymax : float or None, optional
+        Maximum y-axis value, by default None.
+    dashed_line_flavours : list of str or None, optional
+        List of flavours to be plotted with dashed lines, by default None.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the plot.
+    bsm_fac : str
+        Name of the BSM factor being plotted.
+    """
     # read dataframe
     bsm_facs_df = read_bsm_facs
     # reorder BSM facs
@@ -618,6 +804,27 @@ def plot_bsm_pdf_corr(
 
 @figuregen
 def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
+    """
+    Plot correlations between BSM factors and multiple PDFs.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    pdfs : list of PDF objects
+        List of parton distribution functions corresponding to the fits.
+    xplotting_grids : list of XGrid objects
+        List of plotting grid objects corresponding to each fit.
+    Q : float
+        Momentum transfer value in GeV.
+    bsm_names_to_latex : dict
+        Mapping of BSM factor names to their LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -669,8 +876,22 @@ def plot_bsm_pdf_corr_fits(fits, pdfs, xplotting_grids, Q, bsm_names_to_latex):
 @figuregen
 def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
     """
-    Compare histograms of BSM factors between different fits
-    in SIMUnet
+    Generate 2D scatter plots and histograms comparing BSM factor values across different fits.
+
+    This function takes a set of fits and compares the BSM factors between them. For each pair
+    of BSM factors, it creates a 2D scatter plot with corresponding histograms on the x and y axes.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX string representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each pair of BSM factors.
     """
     # extract all operators in the fits
     all_ops = []
@@ -726,16 +947,27 @@ def plot_2d_bsm_facs_fits(fits, bsm_names_to_latex):
 @table
 def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
     """
-    Table generator to summarise information about
-    the BSM coefficient results.
-    Paramaters
+    Generate a table summarizing the bounds of BSM coefficients in different fits.
+
+    This function processes a list of fits, extracting the BSM coefficients and
+    summarizing their mean, standard deviation, and confidence levels. The confidence
+    levels are computed as mean ± n_sigma * std.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-    The returned table contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± n_sigma * std.
-    """ 
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+    n_sigma : int, optional
+        The multiplier for the standard deviation to define confidence level bounds, by default 2.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
+        additional metrics like 'Best-fit shift' and 'Broadening'.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -805,28 +1037,73 @@ def bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2):
 @table
 def bsm_facs_68bounds_fits(fits, bsm_names_to_latex,):
     """
-    Table generator to obtain the 68% CL
-    for BSM factors while comparing fits.
+    Generate a table summarizing the 68% confidence level (CL) bounds for BSM factors from various fits.
+
+    This function processes a list of fits and utilizes `bsm_facs_bounds_fits` to calculate and
+    return the 68% CL bounds for BSM coefficients.
+
     Parameters
     ----------
-        fits: NSList of FitSpec 
-    """ 
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the 68% CL bounds for each BSM factor in each fit.
+    """
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=1)
 
 @table
 def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
-    Table generator to obtain the 95% CL
-    for BSM factors while comparing fits.
+    Generate a table summarizing the 95% confidence level (CL) bounds for BSM factors from various fits.
+
+    This function processes a list of fits and utilizes `bsm_facs_bounds_fits` to calculate and
+    return the 95% CL bounds for BSM coefficients.
+
     Parameters
     ----------
-        fits: NSList of FitSpec 
-    """ 
+    fits : NSList
+        List of FitSpec to be compared. 
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the 95% CL bounds for each BSM factor in each fit.
+    """
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
-    """Compares two SMEFiT fits.
+    """
+    Generates comparison plots between SMEFiT fits.
+
+    This function creates plots to compare two different SMEFiT fits. It plots the best fit values
+    and the bounds for BSM (Beyond the Standard Model) coefficients, allowing for an easy comparison
+    of the two fits. It supports both linear and symmetric logarithmic scales.
+
+    Parameters
+    ----------
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    smefit_reference_1 : list of dicts
+        List of dictionaries containing BSM coefficient information for the first SMEFiT reference.
+    smefit_reference_2 : list of dicts
+        List of dictionaries containing BSM coefficient information for the second SMEFiT reference.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+    smefit_labels : list of str
+        Labels for the SMEFiT references to be used in the plot.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the comparison plot.
     """
     # extract all operators in the SMEFiT fits
     all_ops = []
@@ -948,17 +1225,31 @@ def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smef
 @figuregen
 def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names_to_plot_scales, smefit_label):
     """
-    Figure generator to compare bounds obtained with simunet with
-    bounds obtained by smefit.
-    Paramaters
+    Generates plots comparing bounds obtained from SIMUnet fits with those obtained by SMEFiT.
+
+    This function takes a set of SIMUnet fits and a SMEFiT reference, extracting BSM coefficients
+    from each. It plots the mean and standard deviation of the BSM coefficients for each fit,
+    along with confidence levels calculated as mean ± 2*std. It supports both linear and symmetric
+    logarithmic scales for the plots.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-        n_sigma: number
-    The plot contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± 2*std.
-    """ 
+    fits: NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    smefit_reference : list of dicts
+        List of dictionaries containing BSM coefficient information from a SMEFiT reference.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+    smefit_label : str
+        Label for the SMEFiT reference to be used in the plot.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the comparison plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1092,17 +1383,26 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
 @figuregen
 def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
     """
-    Figure generator to plot the bounds of
-    the BSM coefficients fitted.
-    Paramaters
+    Generates plots of the bounds for BSM coefficients from various fits.
+
+    This function takes a list of fits and generates plots showing the mean, standard deviation,
+    and confidence levels of the BSM coefficients. The confidence levels are calculated as mean ± 2*std.
+    It supports both linear and symmetric logarithmic scales for the plots.
+
+    Parameters
     ----------
-        fits: NSList of FitSpec 
-        n_sigma: number
-    The plot contains information about the mean
-    and standard deviation of the BSM coefficients in the fit, 
-    as well as showing the confidence levels by 
-    computing mean ± 2*std.
-    """ 
+    fits: NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    bsm_names_to_plot_scales : dict
+        Dictionary to scale the BSM names for plotting.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each generated plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1216,12 +1516,25 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
 @figuregen
 def plot_bsm_facs_68res(fits, bsm_names_to_latex):
     """
-    Figure generator to plot the 68% residuals
-    pulls of the BSM coefficients
+    Generates plots of the 68% residuals of BSM coefficients for various fits.
+
+    This function processes a set of fits and generates plots showing the 68% residuals of the
+    BSM (Beyond the Standard Model) coefficients. The residuals are calculated as the mean of
+    the coefficients divided by their standard deviation, providing a measure of deviation
+    from the Standard Model.
+
     Parameters
     ----------
-        fits: NSList[FitSpec] 
-    """ 
+    fits: NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for the residual plot.
+    """
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1350,11 +1663,57 @@ Principal component analysis
 
 @table
 def fisher_information_matrix(dataset_inputs, groups_index, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the full Fisher information matrix for the BSM parameters.
+    """
+    Obtains the full Fisher information matrix for the BSM parameters.
+
+    This function computes the Fisher information matrix for Beyond the Standard Model (BSM) parameters
+    given a dataset. It utilizes an internal function `_compute_fisher_information_matrix` to perform the computation.
+
+    Parameters
+    ----------
+    dataset_inputs : array-like
+        The inputs from the dataset used for computing the Fisher information matrix.
+    groups_index : array-like
+        Indexes representing different groups in the dataset.
+    theoryid : array-like
+        Array of theory identifiers.
+    groups_covmat : array-like
+        Covariance matrices for the groups in the dataset.
+    simu_parameters_names : list
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    array-like
+        The computed Fisher information matrix.
     """
     return _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    """
+    Truncates a colormap to a specific range.
+
+    This function creates a new colormap based on a given colormap but truncated to the range specified
+    by minval and maxval. This is useful for adjusting the range of colors used in a plot.
+
+    Parameters
+    ----------
+    cmap : matplotlib.colors.Colormap
+        The original colormap to be truncated.
+    minval : float, optional
+        The minimum value of the new colormap, by default 0.0.
+    maxval : float, optional
+        The maximum value of the new colormap, by default 1.0.
+    n : int, optional
+        The number of discrete colors in the new colormap, by default 100.
+
+    Returns
+    -------
+    matplotlib.colors.LinearSegmentedColormap
+        The truncated colormap.
+    """
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
         cmap(np.linspace(minval, maxval, n)))
@@ -1362,7 +1721,26 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 @figure
 def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to_latex, bsm_sectors_to_latex):
-    """Produces a nice plot from the table fisher_information_by_sector.
+    """
+    Produces a heatmap plot from the Fisher information by sector table.
+
+    This function creates a heatmap visualizing the Fisher information matrix, where rows correspond to BSM coefficients
+    and columns correspond to different sectors. This visualization helps in understanding the impact of various
+    sectors on the coefficients.
+
+    Parameters
+    ----------
+    fisher_information_by_sector : pandas.DataFrame
+        The Fisher information matrix with sectors as columns and BSM coefficients as rows.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX representations.
+    bsm_sectors_to_latex : dict
+        Dictionary mapping sector names to their LaTeX representations.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The figure object containing the heatmap plot of the Fisher information.
     """
     f = fisher_information_by_sector
 
@@ -1403,9 +1781,34 @@ def plot_fisher_information_by_sector(fisher_information_by_sector, bsm_names_to
 
 @table
 def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Obtains the Fisher information matrices for each of the BSM sectors.
     """
-    
+    Obtains the Fisher information matrices for each of the BSM sectors.
+
+    This function computes the Fisher information matrix for each sector in a dataset, providing a
+    measure of the amount of information each sector contributes to the parameters. The function
+    accumulates datasets by sectors, calculates the reduced covariance matrices for each sector,
+    and computes the Fisher information matrices. The diagonal elements of these matrices are
+    extracted and normalized to provide a comparative view across sectors.
+
+    Parameters
+    ----------
+    dataset_inputs : list of Dataset objects
+        The datasets used for computing the Fisher information matrices.
+    theoryid : int or array-like
+        Theory identifier(s) associated with the datasets.
+    groups_covmat : pd.DataFrame
+        Covariance matrices for the groups in the datasets.
+    simu_parameters_names : list of str
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame with the normalized diagonal elements of the Fisher information matrices,
+        indexed by simulation parameters and with sectors as columns.
+    """
     # First, get the names of the BSM sectors.
 
     bsm_dataset_inputs_sectors = {} 
@@ -1467,7 +1870,31 @@ def fisher_information_by_sector(dataset_inputs, theoryid, groups_covmat, simu_p
     return df
 
 def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, simu_parameters_names, pdf):
-    """Computes a Fisher information matrix.
+    """
+    Computes the Fisher information matrix for a given set of datasets and simulation parameters.
+
+    This function calculates the Fisher information matrix, which quantifies the amount of information
+    that an observable random variable carries about an unknown parameter upon which the probability
+    of the random variable depends. It takes into account the datasets, theory IDs, groups covariance
+    matrix, simulation parameters, and the parton distribution function (PDF).
+
+    Parameters
+    ----------
+    dataset_inputs : list of Dataset objects
+        The datasets used for computing the Fisher information matrix.
+    theoryid : int or array-like
+        Theory identifier(s) associated with the datasets.
+    groups_covmat : pd.DataFrame
+        Covariance matrices for the groups in the datasets.
+    simu_parameters_names : list of str
+        List of names of the simulation parameters.
+    pdf : PDF object
+        The parton distribution function object.
+
+    Returns
+    -------
+    pd.DataFrame
+        The computed Fisher information matrix as a pandas DataFrame.
     """
     bsm_factors = []
     if dataset_inputs is not None:
@@ -1494,7 +1921,22 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
 
 @table
 def principal_component_values(fisher_information_matrix):
-    """Returns the eigenvalues corresponding to the various principal directions
+    """
+    Returns the eigenvalues corresponding to the various principal directions.
+
+    This function performs a principal component analysis (PCA) on the Fisher information matrix
+    to return the eigenvalues. These eigenvalues represent the variance of the data along the
+    principal components, which can be used to understand the dominant directions in the data.
+
+    Parameters
+    ----------
+    fisher_information_matrix : pd.DataFrame
+        The Fisher information matrix.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the eigenvalues of the Fisher information matrix.
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
@@ -1504,7 +1946,24 @@ def principal_component_values(fisher_information_matrix):
 
 @table
 def principal_component_vectors(fisher_information_matrix, simu_parameters_names):
-    """Performs a principal component analysis to obtain the flat directions
+    """
+    Performs a principal component analysis to obtain the principal directions (vectors).
+
+    This function calculates the principal component vectors from the Fisher information matrix,
+    providing insights into the flat directions of the parameter space. These directions can
+    indicate combinations of parameters that are less constrained by the data.
+
+    Parameters
+    ----------
+    fisher_information_matrix : pd.DataFrame
+        The Fisher information matrix.
+    simu_parameters_names : list of str
+        Names of the simulation parameters.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the principal component vectors, indexed by the simulation parameters.
     """
     fisher = fisher_information_matrix.to_numpy()
     fisher = fisher - fisher.mean(axis=0)
