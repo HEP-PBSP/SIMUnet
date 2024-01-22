@@ -110,7 +110,7 @@ as shown in Fig. 6, the PDF luminosities shift significantly.
     Shift in the PDF luminosities with different values of new physics.
 
 In this way, :math:`\text{SIMUnet}` determines that there is enough flexibility in the fit to absorb the
-:math:`W=8e-05` value in the PDFs. Using these 'contaminated' PDFs can lead to biased predictions and, in extreme cases,
+:math:`W = 8 \times 10^{-5}` value in the PDFs. Using these 'contaminated' PDFs can lead to biased predictions and, in extreme cases,
 detects new physics where there is none. In Fig. 7, we show the predictions for :math:`W^{+} H` production, which
 is not affected by the injection of new physics, obtained using the contaminated PDF set.
 
