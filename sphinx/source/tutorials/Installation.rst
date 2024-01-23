@@ -33,7 +33,7 @@ The SIMUnet code can be downloaded from github:
 
     mkdir simunet_git
     cd simunet_git
-    git clone git@github.com:LucaMantani/simunet_release.git
+    git clone https://github.com/HEP-PBSP/simunet_release.git
     git clone https://github.com/scarrazza/apfel.git
 
 The code can then be compiled and installed with the following commands:
