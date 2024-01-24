@@ -257,10 +257,10 @@ Now we consider the following fraction of the runcard:
 The ``dataset_inputs`` key contains the datasets that will be used to peform the
 simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP575`` and
 ``CMSDY1D12``, are included in the same way as in a NNPDF fit, and are
-used only to fit PDFs. All the other datasets have the key ``simu_fac`` set to either
+used only to fit the PDF parameters. All the other datasets have the key ``simu_fac`` set to either
 ``EFT_LO`` or ``EFT_NLO``. This means that :math:`\text{SIMUnet}` will use those datasets to fit
 EFT coefficients at the desired accuracy, LO or NLO. The fit requires EFT K-factors for all
-the datasets that have the ``simu_fac`` key. Additinally, some datasets have the key ``use_fixed_predictions``
+the datasets that have the ``simu_fac`` key. Additionally, some datasets have the key ``use_fixed_predictions``
 set to ``True``. This means that the PDF dependence is removed from this dataset and, effectively,
 the dataset becomes PDF-independent.
 
