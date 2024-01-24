@@ -290,9 +290,7 @@ document.write(`
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</label>
+
 </div></div>
       
     </div>
@@ -308,15 +306,6 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-documentation-of-a-specific-function-from-the-file-simunet-analysis-py">Example 1: documentation of a specific function from the file ‘simunet_analysis.py’”</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2">Example 2:</a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -326,35 +315,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="functions-documentation">
-<span id="func-docs"></span><h1><strong>Functions documentation</strong><a class="headerlink" href="#functions-documentation" title="Permalink to this heading">#</a></h1>
-<section id="example-1-documentation-of-a-specific-function-from-the-file-simunet-analysis-py">
-<h2>Example 1: documentation of a specific function from the file ‘simunet_analysis.py’”<a class="headerlink" href="#example-1-documentation-of-a-specific-function-from-the-file-simunet-analysis-py" title="Permalink to this heading">#</a></h2>
-<p>Using ‘autofunction’, we can document a specific function:</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="validphys.simunet_analysis.plot_nd_bsm_facs">
-<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_nd_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posterior_plots_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#validphys.simunet_analysis.plot_nd_bsm_facs" title="Permalink to this definition">#</a></dt>
-<dd><p>Plot a histogram for each BSM coefficient.
-The nd is used for n-dimensional, if two BSM facs are present: use instead <code class="xref py py-func docutils literal notranslate"><span class="pre">validphys.results.plot_2d_bsm_facs()</span></code></p>
-<dl class="simple">
-<dt>read_bsm_facs<span class="classifier">pd.DataFrame</span></dt><dd><p>DataFrame containing the BSM factors.</p>
-</dd>
-<dt>bsm_names_to_latex<span class="classifier">dict</span></dt><dd><p>Dictionary mapping BSM names to LaTeX representations.</p>
-</dd>
-<dt>posterior_plots_settings<span class="classifier">dict, optional</span></dt><dd><p>Settings for posterior plots, such as number of bins and range settings.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>fig<span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>A matplotlib figure object for the histogram.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="example-2">
-<h2>Example 2:<a class="headerlink" href="#example-2" title="Permalink to this heading">#</a></h2>
-<p>Using ‘automodule’, we can document all functions from simunet_analysis at once:</p>
-<span class="target" id="module-validphys.simunet_analysis"></span><p>Plots and analysis tools for SIMUnet.</p>
+  <section id="module-validphys.simunet_analysis">
+<span id="functions-documentation"></span><span id="func-docs"></span><h1><strong>Functions documentation</strong><a class="headerlink" href="#module-validphys.simunet_analysis" title="Permalink to this heading">#</a></h1>
+<p>Plots and analysis tools for SIMUnet.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="validphys.simunet_analysis.bsm_facs_68bounds_fits">
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">bsm_facs_68bounds_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#validphys.simunet_analysis.bsm_facs_68bounds_fits" title="Permalink to this definition">#</a></dt>
@@ -779,8 +742,8 @@ sectors on the coefficients.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_nd_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posterior_plots_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="validphys.simunet_analysis.plot_nd_bsm_facs">
+<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_nd_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posterior_plots_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#validphys.simunet_analysis.plot_nd_bsm_facs" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot a histogram for each BSM coefficient.
 The nd is used for n-dimensional, if two BSM facs are present: use instead <code class="xref py py-func docutils literal notranslate"><span class="pre">validphys.results.plot_2d_bsm_facs()</span></code></p>
 <dl class="simple">
@@ -972,7 +935,6 @@ by minval and maxval. This is useful for adjusting the range of colors used in a
 </dd></dl>
 
 </section>
-</section>
 
 
                 </article>
@@ -1009,21 +971,6 @@ by minval and maxval. This is useful for adjusting the range of colors used in a
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-documentation-of-a-specific-function-from-the-file-simunet-analysis-py">Example 1: documentation of a specific function from the file ‘simunet_analysis.py’”</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2">Example 2:</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
