@@ -1,4 +1,0 @@
-**Bibliography**
-================
-
-.. bibliography:: simunet.bib
