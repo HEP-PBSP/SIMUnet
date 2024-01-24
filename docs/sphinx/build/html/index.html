@@ -1,0 +1,541 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>SIMUnet &#8212; SIMUnet  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Methodology" href="methodology.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/PBSP_logo.png" class="logo__image only-light" alt="SIMUnet  documentation - Home"/>
+    <script>document.write(`<img src="_static/PBSP_logo.png" class="logo__image only-dark" alt="SIMUnet  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="methodology.html"><strong>Methodology</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html"><strong>Features</strong></a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/tutorials_overview.html"><strong>Tutorials</strong></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/Installation.html">Installing SIMUnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/simu_fit.html">Simultaneous fits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/contaminated_fit.html">Contaminated fits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/simu_closure_test.html">SIMUnet closure test:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html"><strong>Dataset selection</strong></a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="results/overview.html"><strong>Results</strong></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="results/drellyan.html">The Drell-Yan sector</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="results/top.html">The Top Sector</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="results/top_sm.html">SM PDF fits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results/top_smeft.html">SMEFT-only fit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results/top_simultaneous.html">Simultaneous SMEFT and PDF fits</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simunet_analysis.html"><strong>Functions documentation</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html"><strong>Bibliography</strong></a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/index.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>SIMUnet</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">SIMUnet</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-code">The code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation-policy">Citation policy</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pbsp">PBSP</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pbsp-team">The PBSP team</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="simunet">
+<h1>SIMUnet<a class="headerlink" href="#simunet" title="Permalink to this heading">#</a></h1>
+<p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> is a machine-learning based framework to explore
+the interplay between the Parton Distribution Functions (PDFs) of the proton and possible signs of
+New Physics that might appear in the experimental data at hadron colliders.
+<span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> builds upon the first tagged version of the <a class="reference external" href="https://docs.nnpdf.science/">NNPDF code</a> by adding
+the fitting and analysis features that allow users to simultaneously determine the PDFs and the Wilson Coefficients of an EFT
+expansion and to perform Closure Tests with New Physics signals injected into the data, to check whether PDFs can absorb the signs
+of New Physics associated to any given New Physics model.</p>
+<section id="the-code">
+<h2>The code<a class="headerlink" href="#the-code" title="Permalink to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> is released as an open-source, flexible code that allows users to explore the interplay between PDFs and
+New Physics. Users can use SIMUnet to perform simultaneous PDF and SMEFT fits and fixed-PDF SMEFT fits using a global set of data
+from hadron and lepton colliders.
+It also provides analysis tools to evaluate different metrics of these fits, including quality metrics,
+uncertainties, PDF and SMEFT correlations, etc.</p>
+</section>
+<section id="citation-policy">
+<h2>Citation policy<a class="headerlink" href="#citation-policy" title="Permalink to this heading">#</a></h2>
+<p>We encourage all who use the <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> code for a scientific publication to cite the following relevant publications:</p>
+<ul class="simple">
+<li><p><span id="id1">[<a class="reference internal" href="bibliography.html#id2" title="Mark Costantini, Elie Hammou, Maeve Madigan, Luca Mantani, James Moore, Manuel Morales Alvarado, and Maria Ubiali. SIMUnet: an open-source tool for simultaneous global fits of EFT Wilson coefficients and PDFs. :. arXiv:2401.xxxxx, doi:.">Costantini <em>et al.</em>, n.d.</a>]</span>: Manual and release paper</p></li>
+<li><p><span id="id2">[<a class="reference internal" href="bibliography.html#id5" title="Richard D. Ball and others. An open-source machine learning framework for global analyses of parton distributions. Eur. Phys. J. C, 81(10):958, 2021. arXiv:2109.02671, doi:10.1140/epjc/s10052-021-09747-9.">Ball and others, 2021</a>]</span>: NNPDF open-source code release paper</p></li>
+<li><p><span id="id3">[<a class="reference internal" href="bibliography.html#id3" title="Shayan Iranipour and Maria Ubiali. A new generation of simultaneous fits to LHC data using deep learning. JHEP, 05:032, 2022. arXiv:2201.07240, doi:10.1007/JHEP05(2022)032.">Iranipour and Ubiali, 2022</a>]</span>: Seminal paper presenting the methodology and applying it to high invariant mass Drell-Yan distributions</p></li>
+<li><p><span id="id4">[<a class="reference internal" href="bibliography.html#id12" title="Zahari Kassabov, Maeve Madigan, Luca Mantani, James Moore, Manuel Morales Alvarado, Juan Rojo, and Maria Ubiali. The top quark legacy of the LHC Run II for PDF and SMEFT analyses. JHEP, 05:205, 2023. arXiv:2303.06159, doi:10.1007/JHEP05(2023)205.">Kassabov <em>et al.</em>, 2023</a>]</span>: Application of the <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> methodology to a global fit of Run-II top quark data</p></li>
+<li><p><span id="id5">[<a class="reference internal" href="bibliography.html#id14" title="Elie Hammou, Zahari Kassabov, Maeve Madigan, Michelangelo L. Mangano, Luca Mantani, James Moore, Manuel Morales Alvarado, and Maria Ubiali. Hide and seek: how PDFs can conceal new physics. JHEP, 11:090, 2023. arXiv:2307.10370, doi:10.1007/JHEP11(2023)090.">Hammou <em>et al.</em>, 2023</a>]</span>: Closure test with New Physics injection and methodology to assess whether New Physics signals can be fitted away by the PDFs.</p></li>
+</ul>
+</section>
+</section>
+<section id="pbsp">
+<h1>PBSP<a class="headerlink" href="#pbsp" title="Permalink to this heading">#</a></h1>
+<p>SIMUnet is the first public tool provided by the <a class="reference external" href="https://www.pbsp.org.uk/">PBSP</a> (Physics Beyond the Standard Proton) collaboration.
+PBSP is an ERC-funded project based at the Department of Applied Mathematics
+and Theoretical Physics at the University of Cambridge.
+The projects focuses on the global interpretation of the LHC data in terms of indirect searches for New Physics,
+by providing a robust framework to globally interpret all subtle deviations from the SM predictions that might arise at
+colliders and characterising their interplay with the Parton Distribution Fuctions (PDFs) of the proton.</p>
+<section id="the-pbsp-team">
+<h2>The PBSP team<a class="headerlink" href="#the-pbsp-team" title="Permalink to this heading">#</a></h2>
+<p>The team is led by P.I. Maria Ubiali and is currently composed by the following members:</p>
+<ul class="simple">
+<li><p>Mark Costantini - University of Cambridge</p></li>
+<li><p>Elie Hammou - University of Cambridge</p></li>
+<li><p>Maeve Madigan - University of Heidelberg</p></li>
+<li><p>Luca Mantani - University of Cambridge</p></li>
+<li><p>James Moore - University of Cambridge</p></li>
+<li><p>Manuel Morales-Alvarado - University of Cambridge</p></li>
+<li><p>Maria Ubiali - University of Cambridge</p></li>
+</ul>
+<p>We thank the former members: Shayan Iranipour, Zahari Kassabov and Cameron Voisey. Without their work and dedication the
+outcome that we present here would have not been achieved.</p>
+<section id="contents">
+<h3>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">#</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="methodology.html"><strong>Methodology</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="methodology.html#the-simunet-framework">The SIMUnet framework</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features.html"><strong>Features</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features.html#pdf-and-smeft-fits">PDF and SMEFT fits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#can-pdfs-absorb-new-physics">Can PDFs absorb new physics?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorials_overview.html"><strong>Tutorials</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/tutorials_overview.html#contents">Contents:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html"><strong>Dataset selection</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#top-sector">Top sector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#drell-yan">Drell-Yan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#w-helicity">W helicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#electroweak-precision-observables">Electroweak Precision Observables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#higgs">Higgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#diboson">Diboson</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="results/overview.html"><strong>Results</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="results/overview.html#contents">Contents:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simunet_analysis.html"><strong>Functions documentation</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html"><strong>Bibliography</strong></a></li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="methodology.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><strong>Methodology</strong></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">SIMUnet</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-code">The code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation-policy">Citation policy</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pbsp">PBSP</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pbsp-team">The PBSP team</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contents">Contents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By PBSP
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, PBSP.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
