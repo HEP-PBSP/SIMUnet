@@ -4,7 +4,7 @@ meta:
   keywords: [simunet]
 
 fits:
- - {id: 231220_lm_fixedPDF_alldata, label: 'SIMUnet fixed PDF fit'} 
+ - {id: 240123_lm_fixedPDF_alldata, label: 'SIMUnet fixed PDF fit'} 
 
 
 simu_parameters:
