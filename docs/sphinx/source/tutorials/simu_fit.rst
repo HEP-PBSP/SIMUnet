@@ -77,16 +77,19 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
     # Diboson
     - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
+
+    ############################################################
     # Uncomment to perform fixed-PDF fit
     #fixed_pdf_fit: True
     #load_weights_from_fit: 221103-jmm-no_top_1000_iterated
 
+    ############################################################
+    # Analytic initialisation features
     analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
-
-    analytic_check: True
-
+    analytic_check: False
     automatic_scale_choice: False
 
+    ############################################################
     simu_parameters:
     # Dipoles
     - {name: "OtG", scale: 0.01, initialisation: {type: uniform, minval: -10, maxval: 10} }
@@ -94,8 +97,6 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
     - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
     # Lepton currents
     - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
-    # 4 Fermions 4Q
-    - {name: 'O1qd', scale: 1.0, initialisation: {type: analytic}}
     # linear combination
     - name: 'Y'
       linear_combination:
@@ -134,7 +135,7 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
         clipnorm: 6.073e-6
         learning_rate: 2.621e-3
         optimizer_name: Nadam
-      epochs: 1
+      epochs: 30000
       positivity:
         initial: 184.8
         multiplier:
@@ -212,37 +213,37 @@ Now we consider the following fraction of the runcard:
 .. code-block:: yaml
 
     dataset_inputs:
-    # HERA
-    - {dataset: HERACOMBNCEP575, frac: 0.75}
-    # Drell - Yan
+    # # DIS
+    - {dataset: HERACOMBNCEP460, frac: 0.75}
+    # # Drell - Yan
     - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
-    # ttbar
+    # # ttbar
     - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # ttbar AC
+    # # ttbar AC
     - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # TTZ
+    # # TTZ
     - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # TTW
+    # # TTW
     - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # single top
+    # # single top
     - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # tW
+    # # tW
     - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-    # W helicity
+    # # W helicity
     - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
-    # ttgamma
+    # # tt gamma
     - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # tZ
+    # # tZ
     - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # EWPO
+    # # EWPO
     - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # Higgs
+    #  Higgs
     - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
     # Diboson
     - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
 The ``dataset_inputs`` key contains the datasets that will be used to peform the
-simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP575`` and
+simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP460`` and
 ``CMSDY1D12``, are included in the same way as in a NNPDF fit, and are
 used only to fit the PDF parameters. All the other datasets have the key ``simu_fac`` set to either
 ``EFT_LO`` or ``EFT_NLO``. This means that :math:`\text{SIMUnet}` will use those datasets to fit
@@ -251,18 +252,36 @@ the datasets that have the ``simu_fac`` key. Additionally, some datasets have th
 set to ``True``. This means that the PDF dependence is removed from this dataset and, effectively,
 the dataset becomes PDF-independent.
 
-Now, we take a look of this part of the runcard:
+   .. note::
+      This tutorial describes how to perform a simultaenous PDF-EFT. So, as an aside, we will briefly comment this part of the runcard (which,
+      obviously, becomes relevant only if uncommented):
+
+      .. code-block:: yaml
+
+          #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
+          #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+
+      These keys, if uncommented, allow the user to perform a fixed-PDF fit. This means that only
+      the EFT coefficients are found during the optimisation. If ``fixed_pdf_fit: True``, the PDF weights
+      are loaded from the fit ``221103-jmm-no_top_1000_iterated``.
+
+We now check:
 
 .. code-block:: yaml
 
-    #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
-    #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+    # Analytic initialisation features
     analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
+    analytic_check: False
+    automatic_scale_choice: False
 
-These keys, if uncommented, allow the user to perform a fixed-PDF fit. This means that only
-the EFT coefficients are found during the optimisation. If ``fixed_pdf_fit: True``, the PDF weights
-are loaded from the fit ``221103-jmm-no_top_1000_iterated``. Still have to comment on the analytic
-initialisation of the PDFs.
+Each EFT coefficient has a ``scale`` parameter that quantifies its effective learning rate during the training. The
+The optimal scale is usually determined a posteriori after performing a first iteration of the fit, and it should be of
+the size of the EFT coefficient's best-fit value. However, :math:`\text{SIMUnet}` can also assist by proposing an automatic
+scale choice. The way to understand the code above is by first discussing the ``automatic_scale_choice`` feature. If set to ``True``,
+the code will first compute the analytical solution of the EFT coefficient by minimising the loss function. This minimum obviously depends
+on the theory prediction, which is calculated using the PDF set given in ``analytic_initialisation_pdf``. The key ``analytic_check``, is set to ``True``,
+prints the value of the analytic solution of the EFT coefficient found using a fixed-PDF setting. In this particula runcard, the analytic initialisation
+features are simply not used.
 
 We move on to this part of the runcard:
 
@@ -275,17 +294,15 @@ We move on to this part of the runcard:
     - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
     # Lepton currents
     - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
-    # 4 Fermions 4Q
-    - {name: 'O1qd', scale: 1.0, initialisation: {type: analytic}}
     # linear combination
     - name: 'Y'
       linear_combination:
-        'Olq1 ': 1. 51606
-        'Oed ': -6. 0606
-        'Oeu ': 12. 1394
-        'Olu ': 6. 0606
-        'Old ': -3. 0394
-        'Oqe ': 3. 0394
+        'Olq1 ': 1.51606
+        'Oed ': -6.0606
+        'Oeu ': 12.1394
+        'Olu ': 6.0606
+        'Old ': -3.0394
+        'Oqe ': 3.0394
       scale: 1.0
       initialisation: { type: uniform , minval: -1, maxval: 1}
 
