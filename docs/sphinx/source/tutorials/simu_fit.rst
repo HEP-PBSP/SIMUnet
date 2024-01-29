@@ -388,6 +388,9 @@ with ``vp-get fit fit_name``.
 4. Analising the fit
 --------------------
 
-Elaborate on the analysis once that the func docs are updated.
+:math:`\text{SIMUnet}` has different functionalities that allow the user to analyse their results. 
+The code inherits functions from `NNPDF <https://docs.nnpdf.science/>`_ and, on their website, the user can find further details and instructions
+on how to `analyse results <https://docs.nnpdf.science/tutorials/index.html#analysing-results>`_ when it comes to the PDFs.
 
-Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_. Consider using the ``vp-comparefits`` tool.
+:math:`\text{SIMUnet}`, additionally, contains a complete set of functions that allow the user to analyse the EFT space, and the interplay between the PDFs
+and the EFT coefficients. The complete documentation can be found on the Functions documentation tab.
