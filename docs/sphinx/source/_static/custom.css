@@ -1,9 +1,7 @@
-/* To apply full justification to the entire body text */
 body {
-    text-align: justify;
+    background-color: #ffffff; /* Light background */
+    color: #000000; /* Dark text */
 }
 
-/* To apply center alignment to headings */
-/*h1, h2, h3, h4, h5, h6 {
-    text-align: center;
-}
+/* Add other selectors and properties as needed to enforce light theme styles */
+
