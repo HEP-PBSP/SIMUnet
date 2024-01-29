@@ -1,6 +1,6 @@
 body {
-    background-color: #ffffff; /* Light background */
-    color: #000000; /* Dark text */
+    background-color: #ffffff !important; /* Light background */
+    color: #000000 !important; /* Dark text */
 }
 
 /* Add other selectors and properties as needed to enforce light theme styles */
