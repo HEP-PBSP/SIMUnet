@@ -1,6 +1,6 @@
 .. _simu_closure_test:
 
-SIMUnet closure test:
+SIMUnet closure test
 =====================
 
 A SIMUnet closure test corresponds to running a BSM contaminated PDF fit and a simultaneous PDF-EFT fit at the same time. 
