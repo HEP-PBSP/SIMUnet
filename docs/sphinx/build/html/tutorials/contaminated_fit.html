@@ -47,7 +47,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/contaminated_fit';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="SIMUnet closure test:" href="simu_closure_test.html" />
+    <link rel="next" title="SIMUnet closure test" href="simu_closure_test.html" />
     <link rel="prev" title="Simultaneous fits" href="simu_fit.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -149,7 +149,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Installation.html">Installing SIMUnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simu_fit.html">Simultaneous fits</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Contaminated fits</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simu_closure_test.html">SIMUnet closure test:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simu_closure_test.html">SIMUnet closure test</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html"><strong>Dataset selection</strong></a></li>
@@ -361,7 +361,7 @@ into the details of each part  later. Here is a complete SIMUnet runcard:</p>
 <span class="c1">############################################################</span>
 <span class="nt">dataset_inputs</span><span class="p">:</span>
 
-<span class="c1">### &#39;Vanilla&#39; datasets ###</span>
+<span class="c1">### &#39;Standard&#39; datasets ###</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMCPD_dw_ite</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMC</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">SLACP_dwsh</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
@@ -517,7 +517,7 @@ So, in this tutorial we will mostly adress the new syntax and features of SIMUne
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">############################################################</span>
 <span class="nt">dataset_inputs</span><span class="p">:</span>
 
-<span class="c1">### &#39;Vanilla&#39; datasets ###</span>
+<span class="c1">### &#39;Standard&#39; datasets ###</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMCPD_dw_ite</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMC</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">SLACP_dwsh</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
@@ -541,7 +541,7 @@ So, in this tutorial we will mostly adress the new syntax and features of SIMUne
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">dataset_inputs</span></code> key contains the datasets that will be used to peform the PDF fit.
-The <code class="docutils literal notranslate"><span class="pre">'Vanilla'</span> <span class="pre">datasets</span></code> are included in the same way as in a NNPDF fit. The <code class="docutils literal notranslate"><span class="pre">'Contaminated'</span> <span class="pre">datasets</span></code>
+The <code class="docutils literal notranslate"><span class="pre">'Standard'</span> <span class="pre">datasets</span></code> are included in the same way as in a NNPDF fit. The <code class="docutils literal notranslate"><span class="pre">'Contaminated'</span> <span class="pre">datasets</span></code>
 are datasets that are contaminated with BSM physics. The contamination is activated by the <code class="docutils literal notranslate"><span class="pre">contamination_parameters</span></code> key.
 The actual BSM contamination is defined in the next section of the runcard:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1">###########################################################</span>
@@ -689,7 +689,7 @@ with <code class="docutils literal notranslate"><span class="pre">vp-get</span> 
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">SIMUnet closure test:</p>
+        <p class="prev-next-title">SIMUnet closure test</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

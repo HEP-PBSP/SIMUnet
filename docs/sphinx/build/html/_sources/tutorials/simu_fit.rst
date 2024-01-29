@@ -39,50 +39,55 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
     #
     ############################################################
     description: "Example runcard. This one performs a simultaenous PDF-EFT fit using data from different sectors."
-
     ############################################################
     # frac: training fraction of datapoints for the PDFs
     # QCD: apply QCD K-factors
     # EWK: apply electroweak K-factors
-    # simu_fac: fit BSM coefficients using their K-factors in the dataset 
+    # simu_fac: fit BSM coefficients using their K-factors in the dataset
     # use_fixed_predictions:  if set to True it removes the PDF dependence of the dataset
     # sys: systematics treatment (see systypes)
 
-    ############################################################
     dataset_inputs:
-    # HERA
-    - {dataset: HERACOMBNCEP575, frac: 0.75}
-    # Drell - Yan
+    # # DIS
+    - {dataset: HERACOMBNCEP460, frac: 0.75}
+    # # Drell - Yan
     - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
-    # ttbar
+    # # ttbar
     - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # ttbar AC
+    # # ttbar AC
     - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # TTZ
+    # # TTZ
     - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # TTW
+    # # TTW
     - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # single top
+    # # single top
     - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # tW
+    # # tW
     - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-    # W helicity
+    # # W helicity
     - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
-    # ttgamma
+    # # tt gamma
     - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # tZ
+    # # tZ
     - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # EWPO
+    # # EWPO
     - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # Higgs
+    #  Higgs
     - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
     # Diboson
     - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
+
     ############################################################
-    #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
-    #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+    # Uncomment to perform fixed-PDF fit
+    #fixed_pdf_fit: True
+    #load_weights_from_fit: 221103-jmm-no_top_1000_iterated
+
+    ############################################################
+    # Analytic initialisation features
     analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
+    analytic_check: False
+    automatic_scale_choice: False
 
     ############################################################
     simu_parameters:
@@ -92,29 +97,27 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
     - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
     # Lepton currents
     - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
-    # 4 Fermions 4Q
-    - {name: 'O1qd', scale: 1.0, initialisation: {type: analytic}}
     # linear combination
     - name: 'Y'
       linear_combination:
-        'Olq1 ': 1. 51606
-        'Oed ': -6. 0606
-        'Oeu ': 12. 1394
-        'Olu ': 6. 0606
-        'Old ': -3. 0394
-        'Oqe ': 3. 0394
+        'Olq1 ': 1.51606
+        'Oed ': -6.0606
+        'Oeu ': 12.1394
+        'Olu ': 6.0606
+        'Old ': -3.0394
+        'Oqe ': 3.0394
       scale: 1.0
-      initialisation: { type: uniform , minval: -1, maxval: 1}
+      initialisation: {type: uniform , minval: -1, maxval: 1}
 
     ############################################################
     datacuts:
-    t0pdfset: 221103-jmm-no_top_1000_iterated # PDF set to generate t0 covmat
-    q2min: 3.49                        # Q2 minimum
-    w2min: 12.5                        # W2 minimum
+      t0pdfset: 221103-jmm-no_top_1000_iterated # PDF set to generate t0 covmat
+      q2min: 3.49                        # Q2 minimum
+      w2min: 12.5                        # W2 minimum
 
     ############################################################
     theory:
-    theoryid: 200     # database id
+      theoryid: 200     # database id
 
     ############################################################
     trvlseed: 475038818
@@ -125,72 +128,57 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
 
     ############################################################
     parameters: # This defines the parameter dictionary that is passed to the Model Trainer
-    nodes_per_layer: [25, 20, 8]
-    activation_per_layer: [tanh, tanh, linear]
-    initializer: glorot_normal
-    optimizer:
+      nodes_per_layer: [25, 20, 8]
+      activation_per_layer: [tanh, tanh, linear]
+      initializer: glorot_normal
+      optimizer:
         clipnorm: 6.073e-6
         learning_rate: 2.621e-3
         optimizer_name: Nadam
-    epochs: 1000
-    positivity:
+      epochs: 30000
+      positivity:
         initial: 184.8
         multiplier:
-    integrability:
+      integrability:
         initial: 184.8
         multiplier:
-    stopping_patience: 1.0
-    layer_type: dense
-    dropout: 0.0
-    threshold_chi2: 3.5
+      stopping_patience: 0.2
+      layer_type: dense
+      dropout: 0.0
+      threshold_chi2: 3.5
 
     fitting:
     # EVOL(QED) = sng=0,g=1,v=2,v3=3,v8=4,t3=5,t8=6,(pht=7)
     # EVOLS(QED)= sng=0,g=1,v=2,v8=4,t3=4,t8=5,ds=6,(pht=7)
     # FLVR(QED) = g=0, u=1, ubar=2, d=3, dbar=4, s=5, sbar=6, (pht=7)
-    fitbasis: EVOL  # EVOL (7), EVOLQED (8), etc.
-    basis:
-    - {fl: sng, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        1.093, 1.121], largex: [1.486, 3.287]}
-    - {fl: g, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.8329, 1.071], largex: [3.084, 6.767]}
-    - {fl: v, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.5202, 0.7431], largex: [1.556, 3.639]}
-    - {fl: v3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.1205, 0.4839], largex: [1.736, 3.622]}
-    - {fl: v8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.5864, 0.7987], largex: [1.559, 3.569]}
-    - {fl: t3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        -0.5019, 1.126], largex: [1.754, 3.479]}
-    - {fl: t8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.6305, 0.8806], largex: [1.544, 3.481]}
-    - {fl: t15, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        1.087, 1.139], largex: [1.48, 3.365]}
+      fitbasis: EVOL  # EVOL (7), EVOLQED (8), etc.
+      basis:
+      - {fl: sng, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          1.093, 1.121], largex: [1.486, 3.287]}
+      - {fl: g, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          0.8329, 1.071], largex: [3.084, 6.767]}
+      - {fl: v, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          0.5202, 0.7431], largex: [1.556, 3.639]}
+      - {fl: v3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          0.1205, 0.4839], largex: [1.736, 3.622]}
+      - {fl: v8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          0.5864, 0.7987], largex: [1.559, 3.569]}
+      - {fl: t3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          -0.5019, 1.126], largex: [1.754, 3.479]}
+      - {fl: t8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          0.6305, 0.8806], largex: [1.544, 3.481]}
+      - {fl: t15, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+          1.087, 1.139], largex: [1.48, 3.365]}
 
     ############################################################
     positivity:
-    posdatasets:
-    - {dataset: POSF2U, maxlambda: 1e6}        # Positivity Lagrange Multiplier
-    - {dataset: POSF2DW, maxlambda: 1e6}
-    - {dataset: POSF2S, maxlambda: 1e6}
-    - {dataset: POSFLL, maxlambda: 1e6}
-    - {dataset: POSDYU, maxlambda: 1e10}
-    - {dataset: POSDYD, maxlambda: 1e10}
-    - {dataset: POSDYS, maxlambda: 1e10}
-    - {dataset: POSF2C, maxlambda: 1e6}
-    - {dataset: POSXUQ, maxlambda: 1e6}        # Positivity of MSbar PDFs
-    - {dataset: POSXUB, maxlambda: 1e6}
-    - {dataset: POSXDQ, maxlambda: 1e6}
-    - {dataset: POSXDB, maxlambda: 1e6}
-    - {dataset: POSXSQ, maxlambda: 1e6}
-    - {dataset: POSXSB, maxlambda: 1e6}
-    - {dataset: POSXGL, maxlambda: 1e6}
+      posdatasets:
+      - {dataset: POSF2U, maxlambda: 1e6}
 
     ############################################################
     integrability:
-    integdatasets:
-    - {dataset: INTEGXT8, maxlambda: 1e2}
-    - {dataset: INTEGXT3, maxlambda: 1e2}
+      integdatasets:
+      - {dataset: INTEGXT8, maxlambda: 1e2}
 
     ############################################################
     debug: false
@@ -225,37 +213,37 @@ Now we consider the following fraction of the runcard:
 .. code-block:: yaml
 
     dataset_inputs:
-    # HERA
-    - {dataset: HERACOMBNCEP575, frac: 0.75}
-    # Drell - Yan
+    # # DIS
+    - {dataset: HERACOMBNCEP460, frac: 0.75}
+    # # Drell - Yan
     - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
-    # ttbar
+    # # ttbar
     - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # ttbar AC
+    # # ttbar AC
     - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # TTZ
+    # # TTZ
     - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # TTW
+    # # TTW
     - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # single top
+    # # single top
     - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # tW
+    # # tW
     - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-    # W helicity
+    # # W helicity
     - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
-    # ttgamma
+    # # tt gamma
     - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # tZ
+    # # tZ
     - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # EWPO
+    # # EWPO
     - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # Higgs
+    #  Higgs
     - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
     # Diboson
     - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
 The ``dataset_inputs`` key contains the datasets that will be used to peform the
-simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP575`` and
+simultaneous PDF-EFT fit. The first two datasets, ``HERACOMBNCEP460`` and
 ``CMSDY1D12``, are included in the same way as in a NNPDF fit, and are
 used only to fit the PDF parameters. All the other datasets have the key ``simu_fac`` set to either
 ``EFT_LO`` or ``EFT_NLO``. This means that :math:`\text{SIMUnet}` will use those datasets to fit
@@ -264,18 +252,36 @@ the datasets that have the ``simu_fac`` key. Additionally, some datasets have th
 set to ``True``. This means that the PDF dependence is removed from this dataset and, effectively,
 the dataset becomes PDF-independent.
 
-Now, we take a look of this part of the runcard:
+   .. note::
+      This tutorial describes how to perform a simultaenous PDF-EFT. So, as an aside, we will briefly comment this part of the runcard (which,
+      obviously, becomes relevant only if uncommented):
+
+      .. code-block:: yaml
+
+          #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
+          #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+
+      These keys, if uncommented, allow the user to perform a fixed-PDF fit. This means that only
+      the EFT coefficients are found during the optimisation. If ``fixed_pdf_fit: True``, the PDF weights
+      are loaded from the fit ``221103-jmm-no_top_1000_iterated``.
+
+We now check:
 
 .. code-block:: yaml
 
-    #fixed_pdf_fit: True # If this is uncommented the PDFs are fixed during the fit and only the EFT coefficients are optimised
-    #load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If the line above is uncommented, the weights of the PDF are loaded from here
+    # Analytic initialisation features
     analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
+    analytic_check: False
+    automatic_scale_choice: False
 
-These keys, if uncommented, allow the user to perform a fixed-PDF fit. This means that only
-the EFT coefficients are found during the optimisation. If ``fixed_pdf_fit: True``, the PDF weights
-are loaded from the fit ``221103-jmm-no_top_1000_iterated``. Still have to comment on the analytic
-initialisation of the PDFs.
+Each EFT coefficient has a ``scale`` parameter that quantifies its effective learning rate during the training. The
+The optimal scale is usually determined a posteriori after performing a first iteration of the fit, and it should be of
+the size of the EFT coefficient's best-fit value. However, :math:`\text{SIMUnet}` can also assist by proposing an automatic
+scale choice. The way to understand the code above is by first discussing the ``automatic_scale_choice`` feature. If set to ``True``,
+the code will first compute the analytical solution of the EFT coefficient by minimising the loss function. This minimum obviously depends
+on the theory prediction, which is calculated using the PDF set given in ``analytic_initialisation_pdf``. The key ``analytic_check``, is set to ``True``,
+prints the value of the analytic solution of the EFT coefficient found using a fixed-PDF setting. In this particula runcard, the analytic initialisation
+features are simply not used.
 
 We move on to this part of the runcard:
 
@@ -288,17 +294,15 @@ We move on to this part of the runcard:
     - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
     # Lepton currents
     - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
-    # 4 Fermions 4Q
-    - {name: 'O1qd', scale: 1.0, initialisation: {type: analytic}}
     # linear combination
     - name: 'Y'
       linear_combination:
-        'Olq1 ': 1. 51606
-        'Oed ': -6. 0606
-        'Oeu ': 12. 1394
-        'Olu ': 6. 0606
-        'Old ': -3. 0394
-        'Oqe ': 3. 0394
+        'Olq1 ': 1.51606
+        'Oed ': -6.0606
+        'Oeu ': 12.1394
+        'Olu ': 6.0606
+        'Old ': -3.0394
+        'Oqe ': 3.0394
       scale: 1.0
       initialisation: { type: uniform , minval: -1, maxval: 1}
 
@@ -384,6 +388,9 @@ with ``vp-get fit fit_name``.
 4. Analising the fit
 --------------------
 
-Elaborate on the analysis once that the func docs are updated.
+:math:`\text{SIMUnet}` has different functionalities that allow the user to analyse their results. 
+The code inherits functions from `NNPDF <https://docs.nnpdf.science/>`_ and, on their website, the user can find further details and instructions
+on how to `analyse results <https://docs.nnpdf.science/tutorials/index.html#analysing-results>`_ when it comes to the PDFs.
 
-Analysing the results with ``validphys``, see the `vp-guide <../vp/index>`_. Consider using the ``vp-comparefits`` tool.
+:math:`\text{SIMUnet}`, additionally, contains a complete set of functions that allow the user to analyse the EFT space, and the interplay between the PDFs
+and the EFT coefficients. The complete documentation can be found on the Functions documentation tab.
