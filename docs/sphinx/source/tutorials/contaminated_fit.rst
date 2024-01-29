@@ -41,7 +41,7 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     ############################################################
     dataset_inputs:
 
-    ### 'Vanilla' datasets ###
+    ### 'Standard' datasets ###
     - {dataset: NMCPD_dw_ite, frac: 0.75}
     - {dataset: NMC, frac: 0.75}
     - {dataset: SLACP_dwsh, frac: 0.75}
@@ -200,7 +200,7 @@ We begin by looking at the following section of the runcard:
     ############################################################
     dataset_inputs:
 
-    ### 'Vanilla' datasets ###
+    ### 'Standard' datasets ###
     - {dataset: NMCPD_dw_ite, frac: 0.75}
     - {dataset: NMC, frac: 0.75}
     - {dataset: SLACP_dwsh, frac: 0.75}
@@ -223,7 +223,7 @@ We begin by looking at the following section of the runcard:
     - {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
 
 The ``dataset_inputs`` key contains the datasets that will be used to peform the PDF fit. 
-The ``'Vanilla' datasets`` are included in the same way as in a NNPDF fit. The ``'Contaminated' datasets`` 
+The ``'Standard' datasets`` are included in the same way as in a NNPDF fit. The ``'Contaminated' datasets`` 
 are datasets that are contaminated with BSM physics. The contamination is activated by the ``contamination_parameters`` key. 
 The actual BSM contamination is defined in the next section of the runcard:
 
