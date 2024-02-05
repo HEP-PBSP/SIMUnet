@@ -367,10 +367,7 @@ Additinally, in :math:`\text{SIMUnet}` you will find this file:
 
 - ``bsm_fac.csv``: file with the values of the EFT coefficients for this replica.
 
-Once the fit is complete, the next steps involve uploading and analyzing the results:
-
-1. Commence by uploading the fit data using ``vp-upload runcard_folder`` and then
-   retrieve and install the fitted PDF set with ``vp-get fit fit_name``.
+Once the fit is complete, the next steps involve uploading and analysing the results.
 
 .. _upload-fit:
 

@@ -44,6 +44,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/simu_closure_test';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -317,7 +318,15 @@ document.write(`
                   
   <section id="simunet-closure-test">
 <span id="simu-closure-test"></span><h1>SIMUnet closure test<a class="headerlink" href="#simunet-closure-test" title="Permalink to this heading">#</a></h1>
-<p>A SIMUnet closure test corresponds to running a BSM contaminated PDF fit and a simultaneous PDF-EFT fit at the same time.
+<p>Closure tests serve as a mechanism to assess the reliability of fits of PDFs and physical parameters in general, and the robustness of the methodologies involved.</p>
+<p>The <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> code extends the capacity of the NNPDF closure test to run contaminated fits and closure tests probing the fit quality of both PDFs and
+physical parameters.</p>
+<p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> can produce BSM contaminated fits by injecting New Physics into the generated pseudodata
+while the fit is done assuming the Standard Model. With this functionality, any user
+can test the robustness of any New Physics scenario against being fitted away in a PDF fit.
+In this context, <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> can perform closure tests for both PDFs and physical parameters, giving surety of the reliability of the <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span>
+methodology.</p>
+<p>A <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> closure test corresponds to running a BSM contaminated PDF fit and a simultaneous PDF-EFT fit at the same time.
 For details about each process see each tutorial. Here is an example runcard:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Runcard for contaminated PDF fit with SIMUnet</span>
 <span class="c1">#</span>
@@ -336,7 +345,7 @@ For details about each process see each tutorial. Here is an example runcard:</p
 <span class="c1">############################################################</span>
 <span class="nt">dataset_inputs</span><span class="p">:</span>
 
-<span class="c1">### &#39;Vanilla&#39; datasets ###</span>
+<span class="c1">### &#39;Standard&#39; datasets ###</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMCPD_dw_ite</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">NMC</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">dataset</span><span class="p">:</span><span class="w"> </span><span class="nv">SLACP_dwsh</span><span class="p p-Indicator">,</span><span class="nt"> frac</span><span class="p">:</span><span class="w"> </span><span class="nv">0.75</span><span class="p p-Indicator">}</span>
