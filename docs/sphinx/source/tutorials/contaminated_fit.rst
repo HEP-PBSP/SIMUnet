@@ -341,4 +341,4 @@ The output of the fit is stored in the ``runcard_folder``. It is identical to a 
 Once the fit is complete, the next steps involve uploading the results. This is particularly useful
 if, for example, you ran the fit on a cluster and want to make it avaiable to collaborators or download it
 from a different machine. You can upload the fit by using ``vp-upload runcard_folder`` and then fetch it
-with ``vp-get fit fit_name``.
+with ``vp-get fit fit_name``. Note that, to upload the fit, appropriate credentials are required.

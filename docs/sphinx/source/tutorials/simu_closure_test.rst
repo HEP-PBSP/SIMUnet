@@ -3,7 +3,18 @@
 SIMUnet closure test
 =====================
 
-A SIMUnet closure test corresponds to running a BSM contaminated PDF fit and a simultaneous PDF-EFT fit at the same time. 
+Closure tests serve as a mechanism to assess the reliability of fits of PDFs and physical parameters in general, and the robustness of the methodologies involved.
+
+The :math:`\text{SIMUnet}` code extends the capacity of the NNPDF closure test to run contaminated fits and closure tests probing the fit quality of both PDFs and
+physical parameters.
+
+:math:`\text{SIMUnet}` can produce BSM contaminated fits by injecting New Physics into the generated pseudodata 
+while the fit is done assuming the Standard Model. With this functionality, any user
+can test the robustness of any New Physics scenario against being fitted away in a PDF fit.
+In this context, :math:`\text{SIMUnet}` can perform closure tests for both PDFs and physical parameters, giving surety of the reliability of the :math:`\text{SIMUnet}`
+methodology.
+
+A :math:`\text{SIMUnet}` closure test corresponds to running a BSM contaminated PDF fit and a simultaneous PDF-EFT fit at the same time. 
 For details about each process see each tutorial. Here is an example runcard:
 
 .. code-block:: yaml
@@ -25,7 +36,7 @@ For details about each process see each tutorial. Here is an example runcard:
     ############################################################
     dataset_inputs:
 
-    ### 'Vanilla' datasets ###
+    ### 'Standard' datasets ###
     - {dataset: NMCPD_dw_ite, frac: 0.75}
     - {dataset: NMC, frac: 0.75}
     - {dataset: SLACP_dwsh, frac: 0.75}

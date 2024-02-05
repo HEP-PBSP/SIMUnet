@@ -5,6 +5,26 @@
 
 Here is the list of the datasets we implemented in SIMUnet to fit SMEFT coefficients. For each dataset, we indicate the experiment, the centre of mass energy :math:`\sqrt{s}`, the final-state channel, the observable(s) used in the fit, the integrated luminosity :math:`\mathcal{L}` in inverse femtobarns, and the number of data points :math:`n_{\rm dat}`, together with the corresponding publication reference. The datasets are organised by physical sectors, namely top, Drell-Yan, W helicity, EW precision observables, Higgs and Diboson.
 
+The user can easily include any of the following datasets to perform a fit with :math:`\text{SIMUnet}`. This 
+is done by adding the corresponding ``Dataset name`` with its corresponding configuration keys to the ``dataset_input`` in the runcard,
+as shown in the example below:
+
+.. code-block:: yaml
+
+    dataset_inputs:
+    - {dataset: NMC, frac: 0.75}
+    - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+    - {dataset: CMS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+
+The dataset ``NMC`` is a NNPDF dataset, and it is included as it would be on an NNPDF4.0 runcard.
+:math:`\text{SIMUnet}` recognises it as a standard dataset with no need for SMEFT modifications.
+
+In contrast, the dataset ``ATLASTTBARTOT7TEV`` includes the additional key ``simu_fac``,
+which instructs :math:`\text{SIMUnet}` to calculate theory predictions for this dataset using SMEFT NLO K-factor, as it is clear from its ``EFT_NLO`` value.
+
+The third dataset, ``CMS_SINGLETOPW_8TEV_TOTAL``, includes two keys: ``simu_fac``, which has already been discussed, and ``use_fixed_predictions``. The ``use_fixed_predictions`` key, when set to True,
+effectively removes the PDF dependence of the dataset. This approach is appropriate for observables that are either independent of the PDFs (like EWPO or W-helicities in top decays, for example) or are only weakly influenced by them,
+and therefore a full computation of FK-tables would be too computationally taxing.
 
 ================================
 Top sector
