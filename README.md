@@ -27,7 +27,7 @@ See the [SIMUnet installation tutorial](https://hep-pbsp.github.io/SIMUnet/sphin
 
 ## Cite
 
-The SIMUnet code has been developed in [the original paper](https://inspirehep.net/literature/2013000):
+The SIMUnet code has been developed in [the original paper](https://inspirehep.net/literature/2013000)
 
 ```
 @article{Iranipour:2022iak,
@@ -44,7 +44,21 @@ The SIMUnet code has been developed in [the original paper](https://inspirehep.n
 }
 ```
 
-and the [official release](pending). 
+and the [official release](https://inspirehep.net/literature/2755426) 
+
+```
+@article{Costantini:2024xae,
+    author = "Costantini, Mark N. and Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mantani, Luca and Morales Alvarado, Manuel and Moore, James M. and Ubiali, Maria",
+    title = "{SIMUnet: an open-source tool for simultaneous global fits of EFT Wilson coefficients and PDFs}",
+    eprint = "2402.03308",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    month = "2",
+    year = "2024"
+}
+```
+
+so please cite these references if you use the code.
 
 ## Bugs and contributions
 
