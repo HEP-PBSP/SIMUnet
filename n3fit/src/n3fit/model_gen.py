@@ -13,6 +13,11 @@ from dataclasses import dataclass, field
 from importlib.util import spec_from_loader
 import numpy as np
 import tensorflow as tf
+import yaml
+
+import os
+
+import scipy as sp
 
 from validphys import bsmnames
 
@@ -24,6 +29,8 @@ from n3fit.backends import operations as op
 from n3fit.backends import MetaLayer, Lambda
 from n3fit.backends import base_layer_selector, regularizer_selector
 from n3fit.layers.CombineCfac import CombineCfacLayer
+
+from validphys.loader import _get_nnpdf_profile
 
 import logging
 log = logging.getLogger(__name__)
@@ -148,7 +155,12 @@ class ObservableWrapper:
 
 
 def observable_generator(
-    spec_dict, positivity_initial=1.0, integrability=False, post_observable=None
+    spec_dict, 
+    positivity_initial=1.0, 
+    integrability=False, 
+    post_observable=None, 
+    use_th_covmat=False,
+    theoryid=None,
 ):  # pylint: disable=too-many-locals
     """
     This function generates the observable model for each experiment.
@@ -317,6 +329,29 @@ def observable_generator(
     else:
         obsrot_tr = None
         obsrot_vl = None
+
+    if use_th_covmat:
+        data_path = str(_get_nnpdf_profile()['data_path']) + 'theory_' + theoryid.id + '/simu_factors'
+        # If using the theory covariance matrix, we must build it here.
+        th_covmats = []
+        for ds in spec_dict.get("datasets"):
+            simu_fac_path = data_path + '/SIMU_' + ds['name'] + '.yaml'
+            if os.path.exists(simu_fac_path):
+                with open(simu_fac_path, 'rb') as file:
+                    simu_file = yaml.safe_load(file)
+                if 'theory_cov' in simu_file.keys():
+                    th_covmats += [simu_file['theory_cov']]
+                else:
+                    th_covmats += [np.zeros((ds['ndata'],ds['ndata']))]
+            else:
+                th_covmats += [np.zeros((ds['ndata'],ds['ndata']))]
+
+        th_covmat = sp.linalg.block_diag(*th_covmats)
+
+        if not np.all((th_covmat == 0.0)):
+            covmat = th_covmat + spec_dict["covmat"]
+            invcovmat = np.linalg.inv(covmat)
+            spec_dict["invcovmat"] = invcovmat 
 
     out_tr = ObservableWrapper(
         spec_name,

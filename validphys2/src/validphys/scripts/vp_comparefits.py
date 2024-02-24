@@ -262,6 +262,9 @@ class CompareFitApp(App):
             },
             'bsm_sector_data': {
                 'from_': 'fit'
+            },
+            'use_th_covmat': {
+                'from_': 'fit'
             }
         }
         refmap = {'id': args['reference_fit'], 'label': args['reference_fit_label']}
@@ -279,6 +282,9 @@ class CompareFitApp(App):
                 'from_': 'fit'
             },
             'bsm_sector_data': {
+                'from_': 'fit'
+            },
+            'use_th_covmat': {
                 'from_': 'fit'
             }
         }

@@ -131,6 +131,8 @@ class ModelTrainer:
         model_file=None,
         sum_rules=None,
         parallel_models=1,
+        use_th_covmat=False,
+        theoryid=None,
     ):
         """
         Parameters
@@ -190,6 +192,8 @@ class ModelTrainer:
         self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
         self.replicas = replicas
+        self.use_th_covmat = use_th_covmat
+        self.theoryid = theoryid
 
         # Initialise internal variables which define behaviour
         if debug:
@@ -522,7 +526,7 @@ class ModelTrainer:
             if not self.mode_hyperopt:
                 log.info("Generating layers for experiment %s", exp_dict["name"])
 
-            exp_layer = model_gen.observable_generator(exp_dict, post_observable=combiner)
+            exp_layer = model_gen.observable_generator(exp_dict, post_observable=combiner, use_th_covmat=self.use_th_covmat, theoryid=self.theoryid)
 
             # Save the input(s) corresponding to this experiment
             self.input_list += exp_layer["inputs"]
