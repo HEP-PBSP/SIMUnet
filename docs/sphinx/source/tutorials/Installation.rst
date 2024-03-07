@@ -47,8 +47,8 @@ The code can then be compiled and installed with the following commands:
     make
     make install
 
-
-
-
-
-        
+The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce `theoretical predictions <https://docs.nnpdf.science/theory/index.html>`_,
+requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in ``simu_fac`` files, which
+exists for each dataset in the SIMUnet methodology. For a given dataset, the ``simu_fac`` file includes the SM theory prediction, and the SMEFT
+theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF ``theory_270`` folder, which will be automatically
+downloaded when required by the user's runcard.
