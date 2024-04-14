@@ -87,14 +87,14 @@ def new_fk_parser(fkspec, is_hadronic=False):
             - 'basis'
             - 'fktable'
     """
-    fktable = load_fktable(fkspec)
-    ndata = fktable.ndata
-    xgrid = fktable.xgrid
+    fktable_data = load_fktable(fkspec)
+    ndata = fktable_data.ndata
+    xgrid = fktable_data.xgrid
     # n of active flavours
-    nbasis = len(fktable.sigma.columns)
-    basis = fktable.sigma.columns.to_numpy()
+    basis = fktable_data.luminosity_mapping
+    nbasis = len(basis)
     nx = len(xgrid)
-    fktable = fktable.get_np_fktable()
+    fktable = fktable_data.get_np_fktable()
 
     dict_out = {
         "ndata": ndata,

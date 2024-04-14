@@ -140,6 +140,24 @@ class FKTableData:
             fktable = fk_raw.reshape((nx, nbasis, ndata)).T
 
         return fktable
+    
+    
+    @property
+    def luminosity_mapping(self):
+        """Return the flavour combinations that contribute to the fktable
+        in the form of a single array
+
+        The return shape is:
+            (nbasis,) for DIS
+            (nbasis*2,) for hadronic
+        """
+        basis = self.sigma.columns.to_numpy()
+        if self.hadronic:
+            ret = np.zeros(14 * 14, dtype=bool)
+            ret[basis] = True
+            basis = np.array(np.where(ret.reshape(14, 14))).T.reshape(-1)
+        return basis
+
 
 
 @dataclasses.dataclass(eq=False)
