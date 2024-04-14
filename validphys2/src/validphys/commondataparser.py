@@ -13,6 +13,8 @@ import pandas as pd
 from validphys.core import peek_commondata_metadata
 from validphys.coredata import CommonData
 
+EXT = "pineappl.lz4"
+
 def load_commondata(spec):
     """
     Load the data corresponding to a CommonDataSpec object.
