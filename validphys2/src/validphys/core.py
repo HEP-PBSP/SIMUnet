@@ -572,12 +572,27 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None, metadata=None):
         self.fkpath = fkpath
-        self.cfactors = cfactors
+        self.cfactors = cfactors if cfactors is not None else []
+        self.legacy = False
         self.use_fixed_predictions = use_fixed_predictions
         self.fixed_predictions_path = fixed_predictions_path
-        super().__init__(fkpath, cfactors)
+
+        if not isinstance(fkpath, (tuple, list)):
+            self.legacy = True
+        else:
+            fkpath = tuple(fkpath)
+        
+        self.metadata = metadata
+
+        # For non-legacy theory, add the metadata since it defines how the theory is to be loaded
+        # and thus, it should also define the hash of the class
+        if not self.legacy:
+            super().__init__(fkpath, cfactors, self.metadata)
+        else:
+            super().__init__(fkpath, cfactors)
+        
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
     #to reuse the loaded one fails after it gets deleted.
