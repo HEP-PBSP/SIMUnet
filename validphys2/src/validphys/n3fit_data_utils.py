@@ -74,7 +74,7 @@ def fk_parser(fk, is_hadronic=False):
 
     return dict_out
 
-def new_fk_parser(fkspec, is_hadronic=False):
+def new_fk_parser(fkspec, cuts, is_hadronic=False):
     """
     # Arguments:
         - `fkspec`: fkspec object
@@ -87,15 +87,15 @@ def new_fk_parser(fkspec, is_hadronic=False):
             - 'basis'
             - 'fktable'
     """
-    fktable_data = load_fktable(fkspec)
+    if cuts:
+        fktable_data = load_fktable(fkspec).with_cuts(cuts)
+    else:
+        fktable_data = load_fktable(fkspec)
     ndata = fktable_data.ndata
     xgrid_flat = fktable_data.xgrid
     nx = len(xgrid_flat)
 
-    if is_hadronic:
-        xgrid = xgrid_flat.reshape(1, nx)
-    else:
-        xgrid = xgrid_flat.reshape(1, nx)
+    xgrid = xgrid_flat.reshape(1, nx)
         
     # n of active flavours
     basis = fktable_data.luminosity_mapping
@@ -194,7 +194,7 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
     how_many = dataset_c.GetNSigma()
     dict_fktables = []
     for fkspec in dataset_spec.fkspecs:
-        dict_fktables.append(new_fk_parser(fkspec, dataset_c.IsHadronic()))
+        dict_fktables.append(new_fk_parser(fkspec, cuts, dataset_c.IsHadronic()))
 
     # for i in range(how_many):
     #     fktable = dataset_c.GetFK(i)
@@ -241,7 +241,7 @@ def positivity_reader(pos_spec):
 
     # assuming that all positivity sets have only one fktable
     # parsed_set = [fk_parser(pos_c, pos_c.IsHadronic())]
-    parsed_set = [new_fk_parser(pos_spec.fkspecs[0], pos_c.IsHadronic())]
+    parsed_set = [new_fk_parser(pos_spec.fkspecs[0], cuts=False, is_hadronic=pos_c.IsHadronic())]
 
     pos_sets = [
         {
