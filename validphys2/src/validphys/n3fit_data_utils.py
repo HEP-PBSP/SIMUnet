@@ -5,7 +5,7 @@ Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 """
 import numpy as np
 import yaml
-from validphys.fkparser import parse_cfactor
+from validphys.fkparser import parse_cfactor, load_fktable
 
 from validphys.coredata import CFactorData
 
@@ -71,7 +71,42 @@ def fk_parser(fk, is_hadronic=False):
         "xgrid": xgrid,
         "fktable": fktable,
     }
+
     return dict_out
+
+def new_fk_parser(fkspec, is_hadronic=False):
+    """
+    # Arguments:
+        - `fkspec`: fkspec object
+
+    # Return:
+        - `dict_out`: dictionary with all information about the fktable
+            - 'xgrid'
+            - 'nx'
+            - 'ndata'
+            - 'basis'
+            - 'fktable'
+    """
+    fktable = load_fktable(fkspec)
+    ndata = fktable.ndata
+    xgrid = fktable.xgrid
+    # n of active flavours
+    nbasis = len(fktable.sigma.columns)
+    basis = fktable.sigma.columns.to_numpy()
+    nx = len(xgrid)
+    fktable = fktable.get_np_fktable()
+
+    dict_out = {
+        "ndata": ndata,
+        "nbasis": nbasis,
+        "nonzero": nbasis,
+        "basis": basis,
+        "nx": nx,
+        "xgrid": xgrid,
+        "fktable": fktable,
+    }
+    return dict_out
+
 
 def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_linear_combinations, cuts):
     """
@@ -151,9 +186,12 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
     cuts = dataset_spec.cuts
     how_many = dataset_c.GetNSigma()
     dict_fktables = []
-    for i in range(how_many):
-        fktable = dataset_c.GetFK(i)
-        dict_fktables.append(fk_parser(fktable, dataset_c.IsHadronic()))
+    for fkspec in dataset_spec.fkspecs:
+        dict_fktables.append(new_fk_parser(fkspec, dataset_c.IsHadronic()))
+
+    # for i in range(how_many):
+    #     fktable = dataset_c.GetFK(i)
+    #     dict_fktables.append(fk_parser(fktable, dataset_c.IsHadronic()))
 
     dataset_dict = {
         "fktables": dict_fktables,
@@ -194,7 +232,9 @@ def positivity_reader(pos_spec):
     pos_c = pos_spec.load()
     ndata = pos_c.GetNData()
 
-    parsed_set = [fk_parser(pos_c, pos_c.IsHadronic())]
+    # assuming that all positivity sets have only one fktable
+    # parsed_set = [fk_parser(pos_c, pos_c.IsHadronic())]
+    parsed_set = [new_fk_parser(pos_spec.fkspecs[0], pos_c.IsHadronic())]
 
     pos_sets = [
         {
