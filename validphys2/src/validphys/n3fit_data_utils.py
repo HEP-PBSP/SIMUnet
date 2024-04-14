@@ -87,7 +87,10 @@ def new_fk_parser(fkspec, cuts, is_hadronic=False):
             - 'basis'
             - 'fktable'
     """
-    if cuts:
+    # for fixed predictions the same fake fktable is always loaded
+    if fkspec.use_fixed_predictions:
+        fktable_data = load_fktable(fkspec)
+    elif cuts:
         fktable_data = load_fktable(fkspec).with_cuts(cuts)
     else:
         fktable_data = load_fktable(fkspec)

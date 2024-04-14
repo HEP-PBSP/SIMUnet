@@ -180,11 +180,20 @@ def _mask_fk_tables(dataset_dicts, tr_masks):
         vl_fks = []
         ex_fks = []
         vl_mask = ~tr_mask
+        
         for fktable_dict in dataset_dict["fktables"]:
-            tr_fks.append(fktable_dict["fktable"][tr_mask])
-            vl_fks.append(fktable_dict["fktable"][vl_mask])
-            ex_fks.append(fktable_dict.get("fktable"))
-            dataset_dict['ds_tr_mask'] = tr_mask
+            if not dataset_dict["use_fixed_predictions"]:
+                tr_fks.append(fktable_dict["fktable"][tr_mask])
+                vl_fks.append(fktable_dict["fktable"][vl_mask])
+                ex_fks.append(fktable_dict.get("fktable"))
+                dataset_dict['ds_tr_mask'] = tr_mask
+            # note: fixed observables have a fake fktable
+            else:
+                tr_fks.append(fktable_dict["fktable"])
+                vl_fks.append([])
+                ex_fks.append(fktable_dict.get("fktable"))
+                dataset_dict['ds_tr_mask'] = tr_mask
+
         dataset_dict["tr_fktables"] = tr_fks
         dataset_dict["vl_fktables"] = vl_fks
         dataset_dict["ex_fktables"] = ex_fks
