@@ -89,11 +89,18 @@ def new_fk_parser(fkspec, is_hadronic=False):
     """
     fktable_data = load_fktable(fkspec)
     ndata = fktable_data.ndata
-    xgrid = fktable_data.xgrid
+    xgrid_flat = fktable_data.xgrid
+    nx = len(xgrid_flat)
+
+    if is_hadronic:
+        xgrid = xgrid_flat.reshape(1, nx)
+    else:
+        xgrid = xgrid_flat.reshape(1, nx)
+        
     # n of active flavours
     basis = fktable_data.luminosity_mapping
     nbasis = len(basis)
-    nx = len(xgrid)
+    
     fktable = fktable_data.get_np_fktable()
 
     dict_out = {
