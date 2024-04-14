@@ -97,6 +97,50 @@ class FKTableData:
         newsigma = self.sigma.loc[cuts]
         return dataclasses.replace(self, ndata=newndata, sigma=newsigma)
 
+    def get_np_fktable(self):
+        """Returns the fktable as a dense numpy array that can be directly
+        manipulated with numpy
+
+        The return shape is:
+            (ndata, nx, nbasis) for DIS
+            (ndata, nx, nx, nbasis) for hadronic
+        where nx is the length of the xgrid
+        and nbasis the number of flavour contributions that contribute
+        """
+        # Read up the shape of the output table
+        ndata = self.ndata
+        nx = len(self.xgrid)
+        nbasis = self.sigma.shape[1]
+
+        if ndata == 0:
+            if self.hadronic:
+                return np.zeros((ndata, nbasis, nx, nx))
+            return np.zeros((ndata, nbasis, nx))
+
+        # Make the dataframe into a dense numpy array
+
+        # First get the data index out of the way
+        # this is necessary because cuts/shifts and for performance reasons
+        # otherwise we will be putting things in a numpy array in very awkward orders
+        ns = self.sigma.unstack(level=("data",), fill_value=0)
+        x1 = ns.index.get_level_values(0)
+
+        if self.hadronic:
+            x2 = ns.index.get_level_values(1)
+            fk_raw = np.zeros((nx, nx, ns.shape[1]))
+            fk_raw[x2, x1, :] = ns.values
+
+            # The output is (ndata, basis, x1, x2)
+            fktable = fk_raw.reshape((nx, nx, nbasis, ndata)).T
+        else:
+            fk_raw = np.zeros((nx, ns.shape[1]))
+            fk_raw[x1, :] = ns.values
+
+            # The output is (ndata, basis, x1)
+            fktable = fk_raw.reshape((nx, nbasis, ndata)).T
+
+        return fktable
+
 
 @dataclasses.dataclass(eq=False)
 class CFactorData:
