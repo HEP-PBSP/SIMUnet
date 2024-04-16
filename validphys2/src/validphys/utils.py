@@ -12,6 +12,7 @@ import tempfile
 import numpy as np
 
 from validobj import parse_input, ValidationError
+from reportengine.compat import yaml
 
 
 def parse_yaml_inp(inp, spec, path):
@@ -219,3 +220,107 @@ def scale_from_grid(grid):
     Returns ``'linear'`` if the scale of the grid object is linear,
     and otherwise ``' log'``."""
     return 'linear' if grid.scale == 'linear' else 'log'
+
+
+def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, path_systype=None, write_to_file=True):
+    """
+    Convert the new style uncertainty yaml file to the old style systype.
+    Writes 
+
+    Parameters
+    ----------
+    path_uncertainty_yaml : str, or Path
+        Path to the new style uncertainty yaml file to be converted
+    
+    path_systype : str, or Path, optional
+        path to the output systype file
+    
+    Returns
+    -------
+    n_sys : int
+        Number of systematics in the systype file
+    """
+    # open the uncertainty yaml file
+    with open(path_uncertainty_yaml) as f:
+        uncertainty = yaml.safe_load(f)
+    
+    # get uncertainty definitions
+    uncertainty_definitions = uncertainty['definitions']
+
+    # check whether path_systype is provided else save it in the same directory in which the uncertainty yaml file is
+    if path_systype is None:
+        if isinstance(path_uncertainty_yaml, str):
+            path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
+        path_systype = path_uncertainty_yaml.parent / f"SYSTYPE_{name_dataset}_DEFAULT.dat"
+    else:
+        path_systype = pathlib.Path(path_systype) / f"SYSTYPE_{name_dataset}_DEFAULT.dat"
+    
+    # get number of sys (note: stat is not included in the sys)
+    if 'stat' in uncertainty_definitions.keys():
+        n_sys = len(uncertainty_definitions.keys()) - 1
+    else:
+        n_sys = len(uncertainty_definitions.keys())
+
+    if write_to_file:
+        # open the systype file for writing
+        with open(path_systype, 'w') as stream:
+            
+            # header: number of sys 
+            stream.write(f"{n_sys}\n")
+
+            # write the systype treatments
+
+            # remove stat from the uncertainty definitions
+            uncertainty_definitions.pop('stat', None)
+            
+            for i, (_, sys_dict) in enumerate(uncertainty_definitions.items()):
+                # four spaces seems to be the standard format (has to be checked for other datasets than CMS_1JET_8TEV)
+                stream.write(f"{i+1}    {sys_dict['treatment']}    {sys_dict['type']}\n")
+
+    return n_sys
+
+
+def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, name_dataset, path_DATA=None):
+    """
+    Convert the new data format into the old data format
+    """
+
+    # open the data yaml file
+    with open(path_data_yaml) as f:
+        data = yaml.safe_load(f)
+    
+    # open the uncertainty yaml file
+    with open(path_uncertainty_yaml) as f:
+        uncertainty = yaml.safe_load(f)
+    
+    # get uncertainty definitions and values
+    uncertainty_definitions = uncertainty['definitions']
+    uncertainty_values = uncertainty['bins']
+    n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, write_to_file=False)
+
+    # get data values
+    data_values = data['data_central']
+    
+    # check whether path_DATA is provided else save it in the same directory in which the uncertainty yaml file is
+    if path_DATA is None:
+        if isinstance(path_uncertainty_yaml, str):
+            path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
+        path_DATA = path_uncertainty_yaml.parent / f"DATA_{name_dataset}.dat"
+    else:
+        path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}.dat"
+
+    # open the DATA file for writing
+    with open(path_DATA, 'w') as stream:
+        
+        # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
+        stream.write(f"{name_dataset} {n_sys} {len(data_values)}\n")
+
+        # TODO write the rest of the lines of the DATA file
+
+        
+
+if __name__ == '__main__':
+    path_unc_file = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/uncertainties_legacy_PTY.yaml"
+    path_data_yaml = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/data.yaml"
+    uncertainty_yaml_to_systype(path_unc_file, name_dataset="CMS_1JET_8TEV")
+    convert_new_data_to_old(path_data_yaml, path_unc_file, name_dataset="CMS_1JET_8TEV", path_DATA=None)
