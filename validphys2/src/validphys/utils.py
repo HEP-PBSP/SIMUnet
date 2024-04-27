@@ -280,10 +280,14 @@ def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, path_systyp
     return n_sys
 
 
-def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, name_dataset, path_DATA=None):
+def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinematics, path_metadata, name_dataset, path_DATA=None):
     """
     Convert the new data format into the old data format
     """
+
+    # open the metadata yaml file
+    with open(path_metadata) as f:
+        metadata = yaml.safe_load(f)
 
     # open the data yaml file
     with open(path_data_yaml) as f:
@@ -292,11 +296,16 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, name_dataset,
     # open the uncertainty yaml file
     with open(path_uncertainty_yaml) as f:
         uncertainty = yaml.safe_load(f)
+
+    # open the kinematics yaml file
+    with open(path_kinematics) as f:
+        kinematics = yaml.safe_load(f)
     
     # get uncertainty definitions and values
     uncertainty_definitions = uncertainty['definitions']
     uncertainty_values = uncertainty['bins']
     n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, write_to_file=False)
+    stats = np.array([entr['stat'] for entr in uncertainty_values])
 
     # get data values
     data_values = data['data_central']
@@ -309,18 +318,44 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, name_dataset,
     else:
         path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}.dat"
 
+    kin_names = list(kinematics['bins'][0].keys())
     # open the DATA file for writing
     with open(path_DATA, 'w') as stream:
         
         # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
         stream.write(f"{name_dataset} {n_sys} {len(data_values)}\n")
+        
+        
+        for i, (data_value, stat) in enumerate(zip(data_values, stats)):
+            cd_line = f"{i+1}\t {metadata['implemented_observables'][0]['process_type']}\t {kin_names[0]}\t {kin_names[1]}\t {kin_names[2]}\t {data_value}\t {stat}\t"
 
-        # TODO write the rest of the lines of the DATA file
+            for j, sys in enumerate(uncertainty_values):
+                
+                for k, (sys_name, sys_val) in enumerate(sys.items()):
+                    if sys_name == 'stat':
+                        continue
+
+                    if uncertainty_definitions[sys_name]['treatment'] == "ADD":
+                        add_sys = sys_val
+                        mult_sys = add_sys * 100.0 / data_value if data_value != 0.0 else 0.0
+                    
+                    elif uncertainty_definitions[sys_name]['treatment'] == "MULT":
+                        mult_sys = sys_val
+                        add_sys = mult_sys * data_value / 100.0
+
+                    if k == len(sys)-1:
+                        cd_line += f"{add_sys}\t {mult_sys}\n"
+                    else:
+                        cd_line += f"{add_sys}\t {mult_sys}\t"
+
+            stream.write(cd_line)
 
         
 
 if __name__ == '__main__':
     path_unc_file = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/uncertainties_legacy_PTY.yaml"
     path_data_yaml = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/data.yaml"
+    path_kin = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/kinematics.yaml"
+    path_metadata = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/metadata.yaml"
     uncertainty_yaml_to_systype(path_unc_file, name_dataset="CMS_1JET_8TEV")
-    convert_new_data_to_old(path_data_yaml, path_unc_file, name_dataset="CMS_1JET_8TEV", path_DATA=None)
+    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset="CMS_1JET_8TEV", path_DATA=None)
