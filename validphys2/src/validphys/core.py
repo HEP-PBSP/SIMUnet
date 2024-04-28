@@ -319,12 +319,18 @@ class CommonDataSpec(TupleComp):
 
     def load_commondata(self, cuts=None):
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9701a5960 (added export method to CommonData -> allows to use _filter_real_data python only)
         """
         Loads a coredata.CommonData object from a core.CommonDataSetSpec object
         cuts are applied if provided.
         """
+<<<<<<< HEAD
 =======
 >>>>>>> 32a2891c1 (added load_commondata method to CommonDataSpec)
+=======
+>>>>>>> 9701a5960 (added export method to CommonData -> allows to use _filter_real_data python only)
         # import here to avoid circular imports
         from validphys.commondataparser import load_commondata
         cd = load_commondata(self)
