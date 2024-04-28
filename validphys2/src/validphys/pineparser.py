@@ -9,11 +9,87 @@ import logging
 
 import numpy as np
 import pandas as pd
+import dataclasses
+import yaml
 
 from validphys.commondataparser import EXT
 from validphys.coredata import FKTableData
 
 log = logging.getLogger(__name__)
+
+
+@dataclasses.dataclass(frozen=True)
+class TheoryMeta:
+    """Contains the necessary information to load the associated fktables
+
+    The theory metadata must always contain a key ``FK_tables`` which defines
+    the fktables to be loaded.
+    The ``FK_tables`` is organized as a double list such that:
+
+    The inner list is concatenated
+    In practice these are different fktables that might refer to the same observable but
+    that are divided in subgrids for practical reasons.
+    The outer list instead are the operands for whatever operation needs to be computed
+    in order to match the experimental data.
+
+    In addition there are other flags that can affect how the fktables are read or used:
+    - operation: defines the operation to apply to the outer list
+    - shifts: mapping with the single fktables and their respective shifts
+              useful to create "gaps" so that the fktables and the respective experimental data
+              are ordered in the same way (for instance, when some points are missing from a grid)
+
+    This class is inmutable, what is read from the commondata metadata should be considered final
+
+    Example
+    -------
+    >>> from validphys.commondataparser import TheoryMeta
+    ... from validobj import parse_input
+    ... from reportengine.compat import yaml
+    ... theory_raw = '''
+    ... FK_tables:
+    ...   - - fk1
+    ...   - - fk2
+    ...     - fk3
+    ... operation: ratio
+    ... '''
+    ... theory = yaml.safe_load(theory_raw)
+    ... parse_input(theory, TheoryMeta)
+    TheoryMeta(FK_tables=[['fk1'], ['fk2', 'fk3']], operation='RATIO', shifts = None, conversion_factor=1.0, comment=None, normalization=None))
+    """
+
+    FK_tables: list[tuple]
+    operation: str
+    conversion_factor: float
+    shifts: None
+    normalization: None
+    comment: None
+
+
+def parse_theory_meta(metadata_path, observable_name):
+    """
+    From the metadata.yaml file parses something similar to validphys.commondataparser.TheoryMeta.
+    This is then needed by the FKspec taken by the pineappl_reader function.
+    """
+    
+    with open(metadata_path, "r") as f:
+        meta_card = yaml.safe_load(f)
+    
+    # Get the theory metadata
+    for obs in meta_card['implemented_observables']:
+        if obs['observable_name'] == observable_name:
+            obs_metadata = obs
+    
+    # TODO: still figure out how to fill shifts and normalization
+    th_meta = TheoryMeta(
+        FK_tables= obs_metadata['theory']['FK_tables'],
+        operation=obs_metadata['theory']['operation'],
+        conversion_factor=obs_metadata['theory']['conversion_factor'],
+        shifts=None,
+        normalization=None,
+        comment=None
+    )
+    
+    return th_meta
 
 
 def _pinelumi_to_columns(pine_luminosity, hadronic):
@@ -127,8 +203,8 @@ def pineappl_reader(fkspec):
     # normalization instead {fktable_name: normalization to apply}
     # since this parser doesn't know about operations, we need to convert it to a list
     # then we just iterate over the fktables and apply the shift in the right order
-    shifts = fkspec.metadata.shifts
-    normalization_per_fktable = fkspec.metadata.normalization
+    shifts = fkspec.theory_meta.shifts
+    normalization_per_fktable = fkspec.theory_meta.normalization
     fknames = [i.name.replace(f".{EXT}", "") for i in fkspec.fkpath]
     if cfactors is not None:
         cfactors = dict(zip(fknames, cfactors))
@@ -168,7 +244,7 @@ def pineappl_reader(fkspec):
             if hadronic:
                 raw_fktable = np.insert(raw_fktable, miss_index, 0.0, axis=3)
         # Check conversion factors and remove the x* from the fktable
-        raw_fktable *= fkspec.metadata.conversion_factor / xdivision
+        raw_fktable *= fkspec.theory_meta.conversion_factor / xdivision
 
         # Create the multi-index for the dataframe
         # for optimized pineappls different grids can potentially have different indices
@@ -191,9 +267,9 @@ def pineappl_reader(fkspec):
     sigma = pd.concat(partial_fktables, sort=True, copy=False).fillna(0.0)
 
     # Check whether this is a 1-point normalization fktable and, if that's the case, protect!
-    if fkspec.metadata.operation == "RATIO" and len(pines) == 1:
+    if fkspec.theory_meta.operation == "RATIO" and len(pines) == 1:
         # it _might_ be, check whether it is the divisor fktable
-        divisor = fkspec.metadata.FK_tables[-1][0]
+        divisor = fkspec.theory_meta.FK_tables[-1][0]
         name = fkspec.fkpath[0].name.replace(f".{EXT}", "")
 
         if np.allclose(sigma.loc[1:], 0.0):
@@ -211,8 +287,7 @@ def pineappl_reader(fkspec):
         sigma=sigma,
         ndata=ndata,
         Q0=Q0,
-        metadata=fkspec.metadata,
+        metadata=fkspec.theory_meta,
         hadronic=hadronic,
         xgrid=xgrid,
-        protected=protected,
     )
