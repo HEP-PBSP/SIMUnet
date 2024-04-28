@@ -252,13 +252,9 @@ def fitting_data_dict(
     # TODO: Plug in the python data loading when available. Including but not
     # limited to: central values, ndata, replica generation, covmat construction
     if data.datasets:
-        try:
-            spec_c = data.load()
-        except:
-            breakpoint()
-        ndata = spec_c.GetNData()
-        expdata_true = spec_c.get_cv().reshape(1, ndata)
-        datasets = common_data_reader_experiment(spec_c, data)
+        ndata = sum([ds.commondata.load_commondata(cuts=ds.cuts).ndata for ds in data.datasets])
+        expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
+        datasets = common_data_reader_experiment(data)
         for i in range(len(data.datasets)):
             if data.datasets[i].use_fixed_predictions:
                 datasets[i]['use_fixed_predictions'] = True

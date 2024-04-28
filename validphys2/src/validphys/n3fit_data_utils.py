@@ -170,7 +170,7 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_lin
     return name_cfac_map
 
 
-def common_data_reader_dataset(dataset_c, dataset_spec):
+def common_data_reader_dataset(dataset_spec):
     """
     Import fktable, common data and experimental data for the given data_name
 
@@ -194,22 +194,28 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
     instead of the dictionary object that model_gen needs
     """
     cuts = dataset_spec.cuts
-    how_many = dataset_c.GetNSigma()
     dict_fktables = []
+    
+    hadronic = load_fktable(dataset_spec.fkspecs[0]).hadronic
+    # check that all fkspecs have the same hadronicity
     for fkspec in dataset_spec.fkspecs:
-        dict_fktables.append(new_fk_parser(fkspec, cuts, dataset_c.IsHadronic()))
-
+        if hadronic != load_fktable(fkspec).hadronic:
+            raise ValueError("All fkspecs in a dataset must have the same hadronicity")
+    
+    for fkspec in dataset_spec.fkspecs:
+        dict_fktables.append(new_fk_parser(fkspec, cuts, hadronic))
+    
     # for i in range(how_many):
     #     fktable = dataset_c.GetFK(i)
     #     dict_fktables.append(fk_parser(fktable, dataset_c.IsHadronic()))
 
     dataset_dict = {
         "fktables": dict_fktables,
-        "hadronic": dataset_c.IsHadronic(),
+        "hadronic": hadronic,
         "operation": dataset_spec.op,
-        "name": dataset_c.GetSetName(),
+        "name": str(dataset_spec),
         "frac": dataset_spec.frac,
-        "ndata": dataset_c.GetNData(),
+        "ndata": dataset_spec.commondata.load_commondata(cuts=dataset_spec.cuts).ndata,
         "simu_parameters_names_CF": parse_simu_parameters_names_CF(dataset_spec.simu_parameters_names_CF, dataset_spec.simu_parameters_linear_combinations, cuts),
         "simu_parameters_names": dataset_spec.simu_parameters_names,
     }
@@ -217,21 +223,20 @@ def common_data_reader_dataset(dataset_c, dataset_spec):
     return [dataset_dict]
 
 
-def common_data_reader_experiment(experiment_c, experiment_spec):
+def common_data_reader_experiment(experiment_spec):
     """
     Wrapper around the experiments. Loop over all datasets in an experiment,
     calls common_data_reader on them and return a list with the content.
 
     # Arguments:
-        - `experiment_c`: c representation of the experiment object
         - `experiment_spec`: python representation of the experiment object
 
     # Returns:
         - `[parsed_datasets]`: a list of dictionaries output from `common_data_reader_dataset`
     """
     parsed_datasets = []
-    for dataset_c, dataset_spec in zip(experiment_c.DataSets(), experiment_spec.datasets):
-        parsed_datasets += common_data_reader_dataset(dataset_c, dataset_spec)
+    for dataset_spec in experiment_spec.datasets:
+        parsed_datasets += common_data_reader_dataset(dataset_spec)
     return parsed_datasets
 
 
