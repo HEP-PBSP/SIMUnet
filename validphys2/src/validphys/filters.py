@@ -164,7 +164,7 @@ def _filter_real_data(filter_path, data):
         nfull, ncut = _write_ds_cut_data(path, dataset)
         total_data_points += nfull
         total_cut_data_points += ncut
-        dataset.load().Export(str(path))
+        dataset.commondata.load_commondata(cuts=dataset.cuts).export(path)
     return total_data_points, total_cut_data_points
 
 

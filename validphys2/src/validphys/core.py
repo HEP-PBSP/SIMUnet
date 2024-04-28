@@ -317,6 +317,10 @@ class CommonDataSpec(TupleComp):
         return CommonData.ReadFile(str(self.datafile), str(self.sysfile))
 
     def load_commondata(self, cuts=None):
+        """
+        Loads a coredata.CommonData object from a core.CommonDataSetSpec object
+        cuts are applied if provided.
+        """
         # import here to avoid circular imports
         from validphys.commondataparser import load_commondata
         cd = load_commondata(self)
