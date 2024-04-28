@@ -316,6 +316,14 @@ class CommonDataSpec(TupleComp):
         #TODO: Use better path handling in python 3.6
         return CommonData.ReadFile(str(self.datafile), str(self.sysfile))
 
+    def load_commondata(self, cuts=None):
+        # import here to avoid circular imports
+        from validphys.commondataparser import load_commondata
+        cd = load_commondata(self)
+        if cuts is not None:
+            cd = cd.with_cuts(cuts)
+        return cd
+    
     @property
     def plot_kinlabels(self):
         return get_plot_kinlabels(self)
