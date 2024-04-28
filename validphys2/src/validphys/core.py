@@ -585,7 +585,7 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None, metadata=None, legacy=True):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None, theory_meta=None, legacy=True):
         self.fkpath = fkpath
         self.cfactors = cfactors if cfactors is not None else []
         self.legacy = legacy
@@ -599,7 +599,7 @@ class FKTableSpec(TupleComp):
         
         if not self.legacy:
             fkpath = tuple([fkpath])
-        self.metadata = metadata
+        self.theory_meta = theory_meta
 
         # For non-legacy theory, add the metadata since it defines how the theory is to be loaded
         # and thus, it should also define the hash of the class

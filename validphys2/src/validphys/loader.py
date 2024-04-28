@@ -32,6 +32,7 @@ from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
+from validphys.pineparser import parse_theory_meta
 
 DEFAULT_NNPDF_PROFILE_PATH = f"{sys.prefix}/share/NNPDF/nnprofile.yaml"
 
@@ -379,14 +380,21 @@ class Loader(LoaderBase):
 
         cfactors = self.check_cfactor(theoryID, setname, cfac)
         if new_commondata:
-            # load metadata into dataclass and pass it to FKTableSpec
-            metadata_path = theopath/ 'fastkernel' / f'{setname}_metadata.yaml'
+            # Need to pass a TheoryMeta object to FKTableSpec
+            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
+            # get observable name from the setname
+            with open(path_metadata, 'r') as f:
+                metadata = yaml.safe_load(f)
             
-            # load yaml metadata file into dict
-            with open(metadata_path, 'r') as stream:
-                metadata = yaml.safe_load(stream)
+            common_prefix = os.path.commonprefix([metadata['setname'], setname])
             
-            return FKTableSpec(fkpath, cfactors, metadata=metadata, legacy=False)
+            observable_name = setname[len(common_prefix):]
+            if observable_name.startswith('_'):
+                observable_name = observable_name[1:]
+            
+            theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)        
+           
+            return FKTableSpec(fkpath, cfactors, theory_meta=theory_meta, legacy=False)
         else:
             return FKTableSpec(fkpath, cfactors)
 
