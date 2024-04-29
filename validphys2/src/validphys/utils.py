@@ -319,16 +319,15 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
         path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}.dat"
 
     kin_names = list(kinematics['bins'][0].keys())
+    kin_values = kinematics['bins']
     # open the DATA file for writing
     with open(path_DATA, 'w') as stream:
         
         # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
         stream.write(f"{name_dataset} {n_sys} {len(data_values)}\n")
-        
-        
-        for i, (data_value, stat) in enumerate(zip(data_values, stats)):
-            cd_line = f"{i+1}\t {metadata['implemented_observables'][0]['process_type']}\t {kin_names[0]}\t {kin_names[1]}\t {kin_names[2]}\t {data_value}\t {stat}\t"
 
+        for i, (data_value, stat) in enumerate(zip(data_values, stats)):
+            cd_line = f"{i+1}\t {metadata['implemented_observables'][0]['process_type']}\t {kin_values[i][kin_names[2]]['mid']}\t {kin_values[i][kin_names[1]]['mid']}\t {kin_values[i][kin_names[0]]['mid']}\t {data_value}\t {stat}\t"
             for j, sys in enumerate(uncertainty_values):
                 
                 for k, (sys_name, sys_val) in enumerate(sys.items()):
