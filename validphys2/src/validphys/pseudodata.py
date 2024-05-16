@@ -248,7 +248,7 @@ def level0_commondata_wc(data, fakepdf):
 
     data : validphys.core.DataGroupSpec
 
-    fakepdf: str
+    fakepdf: validphys.core.PDF
 
     Returns
     -------
@@ -269,7 +269,7 @@ def level0_commondata_wc(data, fakepdf):
 
     # argument fakepdf is passed as str
     # generate a core.PDF object with name equal to fakepdf argument
-    fakepdf = PDF(name=fakepdf)
+    # fakepdf = PDF(name=fakepdf)
 
     for dataset in data.datasets:
         commondata_wc = dataset.commondata.load_commondata()
