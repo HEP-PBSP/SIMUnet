@@ -38,6 +38,7 @@ from validphys.core import (
     MatchedCuts,
     SimilarCuts,
     ThCovMatSpec,
+    PDF,
 )
 from validphys.fitdata import fitted_replica_indexes, num_fitted_replicas
 from validphys.loader import (
@@ -171,6 +172,10 @@ class CoreConfig(configparser.Config):
         except NotImplementedError as e:
             raise ConfigError(str(e))
         return pdf
+    
+    def parse_fakepdf(self, name: str) -> PDF:
+        """PDF set used to generate the fake data in a closure test."""
+        return self.parse_pdf(name)
 
     def parse_load_weights_from_fit(self, name: str):
         """A fit in the results folder, containing at least a valid filter result."""
