@@ -9,16 +9,21 @@ import hashlib
 
 import numpy as np
 import pandas as pd
+import os
+import yaml
 
 from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
 
-from validphys.core import PDF
+from validphys.convolution import central_predictions
+from validphys.loader import Loader
 
 from reportengine import collect
 
 FILE_PREFIX = "datacuts_theory_fitting_"
 
 log = logging.getLogger(__name__)
+
+l = Loader()
 
 DataTrValSpec = namedtuple('DataTrValSpec', ['pseudodata', 'tr_idx', 'val_idx'])
 
@@ -237,7 +242,10 @@ def indexed_make_replica(groups_index, make_replica):
     return pd.DataFrame(make_replica, index=groups_index, columns=["data"])
 
 
-def level0_commondata_wc(data, fakepdf):
+def level0_commondata_wc(
+        data,
+        fakepdf
+    ):
     """
     Given a validphys.core.DataGroupSpec object, load commondata and
     generate a new commondata instance with central values replaced
@@ -260,33 +268,35 @@ def level0_commondata_wc(data, fakepdf):
     Example
     -------
     >>> from validphys.api import API
-    >>> API.level0_commondata_wc(dataset_inputs=[{"dataset":"NMC"}], use_cuts="internal", theoryid=200, fakepdf="NNPDF40_nnlo_as_01180")
+    >>> API.level0_commondata_wc(dataset_inputs=[{"dataset":"NMC"}],
+                                 use_cuts="internal",
+                                 theoryid=200,
+                                 fakepdf="NNPDF40_nnlo_as_01180")
 
     [CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]
     """
 
     level0_commondata_instances_wc = []
 
-    # argument fakepdf is passed as str
-    # generate a core.PDF object with name equal to fakepdf argument
-    # fakepdf = PDF(name=fakepdf)
+    # import IPython; IPython.embed()
 
     for dataset in data.datasets:
+            
         commondata_wc = dataset.commondata.load_commondata()
         if dataset.cuts is not None:
             cuts = dataset.cuts.load()
-            commondata_wc = commondata_wc.with_cuts(cuts)
+            commondata_wc = commondata_wc.with_cuts(cuts=cuts)
+        
         # == Generate a new CommonData instance with central value given by Level 0 data generated with fakepdf ==#
-        t0_prediction = dataset_t0_predictions(
-            dataset=dataset, t0set=fakepdf
-        )  # N.B. cuts already applied to th. pred.
+        t0_prediction = dataset_t0_predictions(dataset=dataset,
+                                               t0set=fakepdf)
+        # N.B. cuts already applied to th. pred.
         level0_commondata_instances_wc.append(commondata_wc.with_central_value(t0_prediction))
 
     return level0_commondata_instances_wc
 
 
 def make_level1_data(
-        # data,
         level0_commondata_wc,
         filterseed,
         data_index):
@@ -317,8 +327,6 @@ def make_level1_data(
     Parameters
     ----------
 
-    REMOVE: data : validphys.core.DataGroupSpec
-
     level0_commondata_wc : list
                         list of validphys.coredata.CommonData instances corresponding to
                         all datasets within one experiment. The central value is replaced
@@ -340,32 +348,20 @@ def make_level1_data(
     -------
 
     >>> from validphys.api import API
-    >>> dataset='NMC'
-    >>> l1_cd = API.make_level1_data(dataset_inputs = [{"dataset":dataset}],use_cuts="internal", theoryid=200,
-                             fakepdf = "NNPDF40_nnlo_as_01180", filterseed=1, data_index)
-    >>> l1_cd
+    >>> API.make_level1_data(dataset_inputs=[{"dataset": "NMC"}],
+                             use_cuts="internal",
+                             theoryid=200,
+                             fakepdf="NNPDF40_nnlo_as_01180",
+                             filterseed=0,
+                             data_index)
     [CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]
     """
 
-    # from validphys.covmats import dataset_inputs_covmat_from_systematics
-
-    # dataset_input_list = list(data.dsinputs)
-
-    # covmat = dataset_inputs_covmat_from_systematics(
-    #     level0_commondata_wc,
-    #     dataset_input_list,
-    #     use_weights_in_covmat=False,
-    #     norm_threshold=None,
-    #     _list_of_central_values=None,
-    # )
-
     # ================== generation of Level1 data ======================#
-    level1_data = make_replica(
-        level0_commondata_wc,
-        filterseed,
-        # covmat,
-        genrep=True
-    )
+    level1_data = make_replica(level0_commondata_wc,
+                               filterseed,
+                               genrep=True,
+                               )
 
     indexed_level1_data = indexed_make_replica(data_index, level1_data)
 
@@ -384,6 +380,244 @@ def make_level1_data(
 
     return level1_commondata_instances_wc
 
+
+def make_level1_list_data(
+    level0_commondata_wc,
+    filterseed,
+    n_samples,
+    data_index,
+):
+    """
+    Given a list of validphys.coredata.CommonData instances with central
+    values replaced with `fakepdf` predictions with cuts applied
+    generate a list of level 1 data from such instances
+
+    Parameters
+    ----------
+
+    level0_commondata:_wc: list of validphys.coredata.CommonData instances
+                           where the central value is replaced by level 0 
+                           `fakepdf` predictions
+
+    filterseed: int starting seed used to make different replicas
+
+    n_samples: int number of replicas
+
+    data_index: pandas.MultiIndex providing information on the experiment,
+                the dataset, and the cut index
+
+    Returns
+    -------
+    list
+        list of lists of validphys.coredata.CommonData instances corresponding
+        to all datasets within one experiment. The central value is replaced
+        by Level 1 fake data.
+
+    Example
+    -------
+    >>> from validphys.api import API
+    >>> from validphys.loader import Loader
+    >>> from validphys.results import data_index
+    >>> l = Loader()
+    >>> dataset = l.check_dataset(name="NMC", theoryid=200)
+    >>> experiment = l.check_experiment(name="data", datasets=[dataset])
+    >>> lv0_cd_wc = API.level0_commondata_wc(dataset_inputs=[{"dataset":"NMC"}],
+                                             use_cuts="internal",
+                                             theoryid=200,
+                                             fakepdf="NNPDF40_nnlo_as_01180"
+                                             )
+    >>> API.make_level1_list_data(level0_commondata_wc=lv0_cd_wc,
+                                  filterseed=0,
+                                  n_samples=1,
+                                  data_index=data_index(experiment)
+                                  )
+
+    [[CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]]
+    """
+    samples = [make_level1_data(level0_commondata_wc=level0_commondata_wc,
+                                    filterseed=filterseed+i,
+                                    data_index=data_index) for i in range(n_samples)]
+
+    return samples
+
+
+def sm_predictions(
+        dataset_inputs,
+        pdf,
+        theoryid
+    ):
+
+    """
+    Parameters
+    ----------
+    dataset_inputs: NSList of core.DataSetInput objects
+
+    pdf: core.PDF object
+
+    theoryid: TheoryIDSpec
+
+    Returns
+    -------
+
+    dict
+        dictionary of standard model predictions for the
+        given dataset_input, pdf, and theory
+
+    """
+    
+    sm_dict = {}
+
+    for dataset in dataset_inputs:
+        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid)
+
+        sm_dict[dataset.name] = central_predictions(data, pdf)
+
+    return sm_dict
+
+
+def load_contamination(
+        contamination_parameters,
+        theoryid,
+        dataset_inputs
+    ):
+
+    """
+    Parameters
+    ----------
+
+    contamination_parameters: dict with 
+
+    theoryid: TheoryIDSpec
+
+    dataset_inputs: NSList of DataSetInput objects
+
+    Returns
+    -------
+
+    dict
+        dictionary of BSM k-factors to apply on certain datasets
+    
+    """
+
+    cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
+
+    cont_name = contamination_parameters["name"]
+    cont_value = contamination_parameters["value"]
+    cont_lin_comb = contamination_parameters["linear_combination"]
+
+    bsm_dict = {}
+
+    for dataset in dataset_inputs:
+        
+        bsmfile = cont_path / f"SIMU_{dataset.name}.yaml"
+
+        cont_order = dataset.contamination
+
+        if cont_order == None:
+            log.warning(
+                f"{dataset.name} is not contaminated. Is it right?"
+            )
+            bsm_dict[dataset.name] = np.array([1.])
+        elif not os.path.exists(bsmfile):
+            log.error(
+                f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"
+            )
+            bsm_dict[dataset.name] = np.array([1.])
+        else:
+            log.info(
+                f"Loading {dataset.name}"
+            )
+            with open(bsmfile, "r+") as stream:
+                simu_card = yaml.safe_load(stream)
+            stream.close()
+
+            k_factors = np.zeros(len(simu_card["SM_fixed"]))
+            for op in cont_lin_comb:
+                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+            k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
+
+            bsm_dict[dataset.name] = k_factors
+
+    return bsm_dict
+
+
+def compute_chi2(
+        make_level1_list_data,
+        sm_predictions,
+        groups_covmat,
+        load_contamination
+    ):
+    
+    """
+    Parameters
+    ----------
+
+    make_level1_list_data
+
+    sm_predictions
+
+    groups_covmat
+
+    load_contamination
+
+    Returns
+    -------
+
+    dict
+        dictionary of lists of chi2 per dataset
+
+    """
+
+    covmat = groups_covmat
+    samples = make_level1_list_data
+    bsm_factors = load_contamination
+
+    chi2_dict = {dataset.setname: [] for dataset in samples[0]}
+
+    for sample in samples:
+        
+        for dataset in sample:
+            data_name = dataset.setname
+            bsm_fac = bsm_factors[data_name]
+            
+            if bsm_fac.shape[0] == 1:
+                data_values = dataset.central_values * bsm_fac
+            else:
+                cuts = dataset.cuts
+                data_values = dataset.central_values * bsm_fac[cuts]
+                
+            num_data = dataset.ndata
+
+            covmat_dataset = (
+                covmat.xs(data_name, level=1, drop_level=False)
+                .T.xs(data_name, level=1, drop_level=False)
+                .values
+            )
+
+            theory = sm_predictions[data_name].values.squeeze()
+            
+            diff = (data_values - theory).squeeze()
+
+            if diff.size == 1:
+                chi2 = diff**2 / covmat_dataset[0,0] / num_data
+            else:
+                chi2 = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) / num_data
+
+            chi2_dict[data_name].append(chi2)
+
+    return chi2_dict
+
+
+def write_chi2(pdf, compute_chi2, level0_commondata_wc):
+
+    ndata = {dataset.setname: [dataset.ndata] for dataset in level0_commondata_wc}
+
+    df_ndat = pd.DataFrame(ndata)
+    df_chi2 = pd.DataFrame(compute_chi2)
+
+    chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
+
+    chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
 
 _group_recreate_pseudodata = collect('indexed_make_replica', ('group_dataset_inputs_by_experiment',))
 _recreate_fit_pseudodata = collect('_group_recreate_pseudodata', ('fitreplicas', 'fitenvironment'))
