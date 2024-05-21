@@ -199,7 +199,7 @@ def check_normalize_to(ns, **kwargs):
 #TODO: This interface is horrible. We need to think how to adapt libnnpdf
 #to make this use case easier
 def _plot_fancy_impl(results, commondata, cutlist,
-               normalize_to:(int,type(None)) = None, labellist=None): # type: ignore
+               normalize_to:(int,type(None)) = None, labellist=None):
 
     """Implementation of the data-theory comparison plots. Providers are
     supposed to call (yield from) this.
@@ -383,7 +383,7 @@ def _plot_fancy_impl(results, commondata, cutlist,
 @check_normalize_to
 @figuregen
 def plot_fancy(one_or_more_results, commondata, cuts,
-               normalize_to: (int, str, type(None)) = None): # type: ignore
+               normalize_to: (int, str, type(None)) = None):
     """
     Read the PLOTTING configuration for the dataset and generate the
     corrspondig data theory plot.
@@ -439,7 +439,7 @@ def plot_fancy_dataspecs(
     dataspecs_commondata,
     dataspecs_cuts,
     dataspecs_speclabel,
-    normalize_to: (str, int, type(None)) = None, # type: ignore
+    normalize_to: (str, int, type(None)) = None,
 ):
     """
     General interface for data-theory comparison plots.
@@ -1069,7 +1069,7 @@ def plot_xq2(
     display_cuts:bool=True,
     marker_by:str='process type',
     highlight_label:str='highlight',
-    highlight_datasets:(Sequence,type(None))=None, # type: ignore
+    highlight_datasets:(Sequence,type(None))=None,
     aspect:str='landscape',
 ):
     """Plot the (x,Q²) coverage based of the data based on some LO

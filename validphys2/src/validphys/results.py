@@ -12,8 +12,6 @@ import logging
 import numpy as np
 import pandas as pd
 import scipy.linalg as la
-import os
-import yaml
 
 from NNPDF import CommonData
 from reportengine.checks import require_one, remove_outer, check_not_empty
@@ -40,13 +38,13 @@ from validphys.convolution import (
     PredictionsRequireCutsError,
 )
 from validphys.plotoptions.core import get_info
-from validphys.loader import Loader
+
 
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 
 
 log = logging.getLogger(__name__)
-l = Loader()
+
 
 class Result:
     pass
@@ -361,16 +359,16 @@ def group_result_table_68cl(
     return res
 
 
-def dataset_inputs_bsm_factor(data, pdf, read_bsm_facs, contamination_parameters=None, theoryid=None):
+def dataset_inputs_bsm_factor(data, pdf, read_bsm_facs):
     """Same as :py:func:`validphys.results.dataset_bsm_factor`
     but for a list of dataset inputs.
     """
     res =  np.concatenate(
-        [dataset_bsm_factor(dataset, pdf, read_bsm_facs, contamination_parameters, theoryid) for dataset in data.datasets]
+        [dataset_bsm_factor(dataset, pdf, read_bsm_facs) for dataset in data.datasets]
     )
     return res
 
-def dataset_bsm_factor(dataset, pdf, read_bsm_facs, contamination_parameters=None, theoryid=None):
+def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     """For each replica of ``pdf``, scale the fitted BSM-factors by
     the best fit value.
     Returns
@@ -384,54 +382,12 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs, contamination_parameters=Non
                                                     dataset.cuts
                                                     )
 
-    ndata = len(dataset.load().get_cv())
-    nrep = len(pdf)
-
-
-    if parsed_bsm_facs is None and dataset.contamination is None:
+    if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
+        ndata = len(dataset.load().get_cv())
+        nrep = len(pdf)
         return np.ones((ndata, nrep))
-    
-
-    # after running a contamination fit we do not get fitted bsm factors in a csv
-    # hence, to produce a comparison between the data used for the fitting and the 
-    # theory prediction of such fit, we must load k-factors in another way
-    # we write the contamination name, value (e.g. zhat), and linear combination
-    # in the yaml file, and if the `contamination` keyword is present in the dataset_input
-    # we access the `SIMU_` file of the desired dataset, and load the k-factors
-    if dataset.contamination:
-
-        cont_order = dataset.contamination
-        bsm_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
-       
-        if contamination_parameters is None:
-            log.warning("No Contamination parameters provided")
-            return np.ones((ndata, nrep))
-        
-        else:
-            bsm_file = bsm_path / f"SIMU_{dataset.name}.yaml"
-            if not os.path.exists(bsm_file):
-                log.error(f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?")
-                return np.ones((ndata, nrep))
-            
-            log.info(f"Loading {dataset.name}")
-
-            cont_name = contamination_parameters["name"]
-            cont_value = contamination_parameters["value"]
-            cont_lin_comb = contamination_parameters["linear_combination"]
-
-            with open(bsm_file, "r+") as stream:
-                simu_card = yaml.safe_load(stream)
-            stream.close()
-
-            k_factors = np.zeros(len(simu_card["SM_fixed"]))
-            for op in cont_lin_comb:
-                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
-            k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
-
-            cuts = dataset.cuts.load()
-            return np.array([k_factors[cuts]] * nrep).T
 
     fit_bsm_fac_df = pd.DataFrame(
         {k: v.central_value for k, v in parsed_bsm_facs.items()}
