@@ -636,7 +636,7 @@ def write_chi2(
 
     chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
 
-    chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+    chi2.to_csv(f"output/tables/{pdf}_chi2_dist.csv", index=False)
 
 _group_recreate_pseudodata = collect('indexed_make_replica', ('group_dataset_inputs_by_experiment',))
 _recreate_fit_pseudodata = collect('_group_recreate_pseudodata', ('fitreplicas', 'fitenvironment'))
