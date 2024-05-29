@@ -1,0 +1,48 @@
+meta:
+    title: TTBAR_13TEV_TTMNORM data/theory comparison baseline
+    keywords: [contamination, ttbar, zhat]
+    author: Francesco Merlotti
+
+pdfs:
+  - {id: 240516_fm_cont_ttbar_zhat_nojets_08, label: Contaminated fit (Z=8e-4)}
+
+pdf: 240516_fm_cont_ttbar_zhat_nojets_08
+
+fit: 240516_fm_base_zhat_nojets_lv0
+
+use_fitcommondata: True
+
+theoryid: 270
+
+use_cuts: internal
+
+dataset_inputs:
+  - {dataset: ATLAS_TTBAR_13TEV_TTMNORM, cfac: [QCD], contamination: EFT_LO}
+  - {dataset: CMS_TTBAR_13TEV_TTMNORM, cfac: [QCD], contamination: EFT_LO}
+
+contamination_parameters: 
+  name: Z
+  value: 0.0008
+  linear_combination:
+    OtG:    0.
+    O8qd:   -173.42
+    O1qd:   0.
+    O1qu:   0.
+    O8qu:   -173.42
+    O1dt:   0.
+    O8dt:   -173.42
+    O1qt:   0.
+    O8qt:   -173.42
+    O1ut:   0.
+    O8ut:   -173.42
+    O11qq:  0.
+    O13qq:  0.
+    O81qq:  -173.42
+    O83qq:  0.
+
+template_text: |
+  {@ dataset_inputs plot_fancy@}
+  {@ dataset_inputs::pdfs plot_fancy(normalize_to=data)@}
+
+actions_:
+  - report(main=true)
