@@ -1635,7 +1635,7 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the scaled fit cfactors.
     """
-    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts)
+    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts) # type: ignore
     if parsed_cfacs is None or not read_pdf_cfactors.values.size:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
@@ -1649,7 +1649,7 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
     scaled_replicas = read_pdf_cfactors.values * fit_cfac_df.values[:, np.newaxis]
     if quad_cfacs:
         log.debug("Scaling results using quadratic cfactors")
-        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs)
+        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs) # type: ignore
         quad_cfac_df = pd.DataFrame(
             {k: v.central_value.squeeze() for k, v in parsed_quads.items()}
         )
