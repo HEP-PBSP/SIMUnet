@@ -326,9 +326,8 @@ class CommonData:
         return add_table.loc[:, add_table.columns != "SKIP"]
 
     @property
-    def cuts(self):
-        indices = self.commondata_table.index
-        return slice(indices[0]-1, indices[-1])
+    def commondata_table_indices(self):
+        return self.commondata_table.index - 1
 
     def systematic_errors(self, central_values=None):
         """Returns all systematic errors as absolute uncertainties, with a
