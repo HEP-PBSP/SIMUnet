@@ -2082,8 +2082,8 @@ def compute_datasets_chi2_dist(
             if bsm_fac.shape[0] == 1:
                 data_values = dataset.central_values * bsm_fac
             else:
-                cuts = dataset.cuts
-                data_values = dataset.central_values * bsm_fac[cuts]
+                indices = dataset.commondata_table_indices
+                data_values = dataset.central_values * bsm_fac[indices]
                 
             num_data = dataset.ndata
 
