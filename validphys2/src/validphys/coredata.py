@@ -7,6 +7,8 @@ wrappers.
 import dataclasses
 from typing import Dict
 
+from validphys.commondatawriter import write_commondata_to_file, write_systype_to_file
+
 import numpy as np
 import pandas as pd
 
@@ -221,7 +223,6 @@ class CommonData:
             self, ndata=newndata, commondata_table=new_commondata_table
         )
 
-
     @property
     def central_values(self):
         return self.commondata_table["data"]
@@ -302,3 +303,18 @@ class CommonData:
         tb = self.commondata_table.copy()
         tb["data"] = cv
         return dataclasses.replace(self, commondata_table=tb)
+
+    def export(self, path):
+        """Export the data, and error types
+         Use the same format as libNNPDF:
+
+        - A DATA_<dataset>.dat file with the dataframe of accepted points
+        - A systypes/STYPES_<dataset>.dat file with the error types
+        """
+
+        dat_path = path / f"DATA_{self.setname}.dat"
+        sys_path = path / "systypes" / f"SYSTYPE_{self.setname}_DEFAULT.dat"
+        sys_path.parent.mkdir(exist_ok=True)
+
+        write_systype_to_file(self, sys_path)
+        write_commondata_to_file(self, dat_path)
