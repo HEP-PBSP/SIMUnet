@@ -32,6 +32,7 @@ from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner
 from validphys import lhaindex
+from validphys.pineparser import parse_theory_meta
 
 DEFAULT_NNPDF_PROFILE_PATH = f"{sys.prefix}/share/NNPDF/nnprofile.yaml"
 
@@ -351,7 +352,7 @@ class Loader(LoaderBase):
         return cd.load()
 
     #   @functools.lru_cache()
-    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False):
+    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False, new_commondata=False):
         _, theopath = self.check_theoryID(theoryID)
 
         if use_fixed_predictions:
@@ -362,14 +363,40 @@ class Loader(LoaderBase):
             fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
             cfactors = self.check_cfactor(theoryID, setname, cfac)
             return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
+        
+        # use different file name for the FK table if the commondata is new
+        if new_commondata:
+            fkpath = tuple([theopath/ 'fastkernel' / (f'{setname}.pineappl.lz4')])
+            for path in fkpath:
+                if not path.exists():
+                    raise FKTableNotFound(("Could not find FKTable for set '%s'. "
+                    "File '%s' not found") % (setname, path) )
+        else:
+            fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
 
-        fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
-        if not fkpath.exists():
-          raise FKTableNotFound(("Could not find FKTable for set '%s'. "
-          "File '%s' not found") % (setname, fkpath) )
+            if not fkpath.exists():
+                raise FKTableNotFound(("Could not find FKTable for set '%s'. "
+                "File '%s' not found") % (setname, fkpath) )
 
         cfactors = self.check_cfactor(theoryID, setname, cfac)
-        return FKTableSpec(fkpath, cfactors)
+        if new_commondata:
+            # Need to pass a TheoryMeta object to FKTableSpec
+            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
+            # get observable name from the setname
+            with open(path_metadata, 'r') as f:
+                metadata = yaml.safe_load(f)
+            
+            common_prefix = os.path.commonprefix([metadata['setname'], setname])
+            
+            observable_name = setname[len(common_prefix):]
+            if observable_name.startswith('_'):
+                observable_name = observable_name[1:]
+            
+            theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)        
+           
+            return FKTableSpec(fkpath, cfactors, theory_meta=theory_meta, legacy=False)
+        else:
+            return FKTableSpec(fkpath, cfactors)
 
     def check_compound(self, theoryID, setname, cfac):
         thid, theopath = self.check_theoryID(theoryID)
@@ -549,6 +576,7 @@ class Loader(LoaderBase):
         use_fixed_predictions=False,
         contamination=None,
         contamination_data=None,
+        new_commondata=False,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
@@ -561,7 +589,7 @@ class Loader(LoaderBase):
         try:
             fkspec, op = self.check_compound(theoryno, name, cfac)
         except CompoundNotFound:
-            fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions)
+            fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions, new_commondata=new_commondata)
             op = None
 
         #Note this is simply for convenience when scripting. The config will
