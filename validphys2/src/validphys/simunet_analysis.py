@@ -20,6 +20,8 @@ import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
+import yaml
+import os
 
 from reportengine.figure import figure, figuregen
 from reportengine.checks import make_check, CheckError, make_argcheck, check
@@ -715,9 +717,9 @@ def plot_bsm_pdf_corr(
     Q,
     bsm_names_to_latex,
     mark_threshold: float = 0.9,
-    ymin: (float, type(None)) = None,
-    ymax: (float, type(None)) = None,
-    dashed_line_flavours: (list, type(None)) = None,
+    ymin: (float, type(None)) = None, # type: ignore
+    ymax: (float, type(None)) = None, # type: ignore
+    dashed_line_flavours: (list, type(None)) = None, # type: ignore
 ):
     """
     Plot the correlation between BSM factors and a PDF.
@@ -1635,7 +1637,7 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
     res: np.arrays
         An ``ndat`` x ``nrep`` array containing the scaled fit cfactors.
     """
-    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts)
+    parsed_cfacs = parse_fit_cfac(dataset.fit_cfac, dataset.cuts) # type: ignore
     if parsed_cfacs is None or not read_pdf_cfactors.values.size:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
@@ -1649,7 +1651,7 @@ def dataset_scaled_fit_cfactor(dataset, pdf, read_pdf_cfactors, quad_cfacs):
     scaled_replicas = read_pdf_cfactors.values * fit_cfac_df.values[:, np.newaxis]
     if quad_cfacs:
         log.debug("Scaling results using quadratic cfactors")
-        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs)
+        parsed_quads = parse_quad_cfacs(dataset.fit_cfac, dataset.cuts, quad_cfacs) # type: ignore
         quad_cfac_df = pd.DataFrame(
             {k: v.central_value.squeeze() for k, v in parsed_quads.items()}
         )
@@ -1970,3 +1972,167 @@ def principal_component_vectors(fisher_information_matrix, simu_parameters_names
     _, _, vectors = np.linalg.svd(fisher)
     vectors = pd.DataFrame(vectors, columns=simu_parameters_names)
     return vectors
+
+
+def load_datasets_contamination(
+        contamination_parameters,
+        theoryid,
+        dataset_inputs
+    ):
+
+    """
+    Parameters
+    ----------
+
+    contamination_parameters: dict with 
+
+    theoryid: TheoryIDSpec
+
+    dataset_inputs: NSList of DataSetInput objects
+
+    Returns
+    -------
+
+    dict
+        dictionary of BSM k-factors to apply on certain datasets
+    
+    """
+
+    cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
+
+    cont_name = contamination_parameters["name"]
+    cont_value = contamination_parameters["value"]
+    cont_lin_comb = contamination_parameters["linear_combination"]
+
+    bsm_dict = {}
+
+    for dataset in dataset_inputs:
+        
+        bsmfile = cont_path / f"SIMU_{dataset.name}.yaml"
+
+        cont_order = dataset.contamination
+
+        if cont_order == None:
+            log.warning(
+                f"{dataset.name} is not contaminated. Is it right?"
+            )
+            bsm_dict[dataset.name] = np.array([1.])
+        elif not os.path.exists(bsmfile):
+            log.error(
+                f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"
+            )
+            bsm_dict[dataset.name] = np.array([1.])
+        else:
+            log.info(
+                f"Loading {dataset.name}"
+            )
+            with open(bsmfile, "r+") as stream:
+                simu_card = yaml.safe_load(stream)
+            stream.close()
+
+            k_factors = np.zeros(len(simu_card["SM_fixed"]))
+            for op in cont_lin_comb:
+                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+            k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
+
+            bsm_dict[dataset.name] = k_factors
+
+    return bsm_dict
+
+
+def compute_datasets_chi2_dist(
+        make_level1_list_data,
+        sm_predictions,
+        groups_covmat,
+        load_datasets_contamination
+    ):
+    
+    """
+    Parameters
+    ----------
+
+    make_level1_list_data
+
+    sm_predictions
+
+    groups_covmat
+
+    load_contamination
+
+    Returns
+    -------
+
+    dict
+        dictionary of lists of chi2 per dataset
+
+    """
+
+    covmat = groups_covmat
+    samples = make_level1_list_data
+    bsm_factors = load_datasets_contamination
+
+    chi2_dict = {dataset.setname: [] for dataset in samples[0]}
+
+    for sample in samples:
+        
+        for dataset in sample:
+            data_name = dataset.setname
+            bsm_fac = bsm_factors[data_name]
+            
+            if bsm_fac.shape[0] == 1:
+                data_values = dataset.central_values * bsm_fac
+            else:
+                indices = dataset.commondata_table_indices
+                data_values = dataset.central_values * bsm_fac[indices]
+                
+            num_data = dataset.ndata
+
+            covmat_dataset = (
+                covmat.xs(data_name, level=1, drop_level=False)
+                .T.xs(data_name, level=1, drop_level=False)
+                .values
+            )
+
+            theory = sm_predictions[data_name].values.squeeze()
+            
+            diff = (data_values - theory).squeeze()
+
+            if diff.size == 1:
+                chi2 = diff**2 / covmat_dataset[0,0] / num_data
+            else:
+                chi2 = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) / num_data
+
+            chi2_dict[data_name].append(chi2)
+
+    return chi2_dict
+
+
+def write_datasets_chi2_dist_csv(
+        pdf,
+        compute_datasets_chi2_dist,
+        level0_commondata_wc
+    ):
+
+    """
+    Parameters
+    ----------
+
+    pdf: core.PDF
+
+    compute_chi2
+
+    level0_commondata_wc
+
+    Returns
+    -------
+    
+    """
+
+    ndata = {dataset.setname: [dataset.ndata] for dataset in level0_commondata_wc}
+
+    df_ndat = pd.DataFrame(ndata)
+    df_chi2 = pd.DataFrame(compute_datasets_chi2_dist)
+
+    chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
+
+    chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
