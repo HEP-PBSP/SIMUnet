@@ -30,6 +30,14 @@ from reportengine.namespaces import NSList
 from reportengine import report
 from reportengine.compat import yaml
 
+from validphys.filters import (
+            Rule,
+            FilterRule,
+            AddedFilterRule,
+            RuleProcessingError,
+            default_filter_rules_input,
+        )
+
 from validphys.core import (
     DataGroupSpec,
     DataSetInput,
@@ -186,7 +194,7 @@ class CoreConfig(configparser.Config):
 
     @element_of("theoryids")
     @_id_with_label
-    def parse_theoryid(self, theoryID: (str, int)):
+    def parse_theoryid(self, theoryID: (str, int)): # type: ignore
         """A number corresponding to the database theory ID where the
         corresponding theory folder is installed in te data directory."""
         try:
@@ -199,7 +207,7 @@ class CoreConfig(configparser.Config):
                 display_alternatives="all",
             )
 
-    def parse_use_cuts(self, use_cuts: (bool, str)):
+    def parse_use_cuts(self, use_cuts: (bool, str)): # type: ignore # type: ignore
         """Whether to filter the points based on the cuts applied in the fit,
         or the whole data in the dataset. The possible options are:
 
@@ -237,7 +245,7 @@ class CoreConfig(configparser.Config):
         return NSList(range(1, nreplica+1), nskey="replica")
 
     def produce_inclusive_use_scalevar_uncertainties(self, use_scalevar_uncertainties: bool = False,
-                                        point_prescription: (str, None) = None):
+                                        point_prescription: (str, None) = None): # type: ignore
         """Whether to use a scale variation uncertainty theory covmat.
         Checks whether a point prescription is included in the runcard and if so 
         assumes scale uncertainties are to be used."""
@@ -1204,7 +1212,7 @@ class CoreConfig(configparser.Config):
         return res
 
     def produce_fitthcovmat(
-        self, use_thcovmat_if_present: bool = False, fit: (str, type(None)) = None
+        self, use_thcovmat_if_present: bool = False, fit: (str, type(None)) = None # type: ignore
     ):
         """If a `fit` is specified and `use_thcovmat_if_present` is `True` then returns the
         corresponding covariance matrix for the given fit if it exists. If the fit doesn't have a
@@ -1258,7 +1266,7 @@ class CoreConfig(configparser.Config):
             fit_theory_covmat = None
         return fit_theory_covmat
 
-    def parse_speclabel(self, label: (str, type(None))):
+    def parse_speclabel(self, label: (str, type(None))): # type: ignore
         """A label for a dataspec. To be used in some plots"""
         return label
 
@@ -1292,7 +1300,7 @@ class CoreConfig(configparser.Config):
             )
         return grouping
 
-    def parse_norm_threshold(self, val: (numbers.Number, type(None))):
+    def parse_norm_threshold(self, val: (numbers.Number, type(None))): # type: ignore
         """The threshold to use for covariance matrix normalisation, sets
         the maximum l2 norm of the inverse covariance matrix, by clipping
         smallest eigenvalues
@@ -1315,7 +1323,7 @@ class CoreConfig(configparser.Config):
         return {"norm_threshold": None}
 
     @configparser.record_from_defaults
-    def parse_default_filter_rules(self, spec: (str, type(None))):
+    def parse_default_filter_rules(self, spec: (str, type(None))): # type: ignore
         return spec
 
     def load_default_default_filter_rules(self, spec):
@@ -1339,7 +1347,7 @@ class CoreConfig(configparser.Config):
                 display_alternatives="all",
             )
 
-    def parse_filter_rules(self, filter_rules: (list, type(None))):
+    def parse_filter_rules(self, filter_rules: (list, type(None))): # type: ignore
         """A list of filter rules. See https://docs.nnpdf.science/vp/filters.html
         for details on the syntax"""
         log.warning("Overwriting filter rules")
@@ -1351,6 +1359,13 @@ class CoreConfig(configparser.Config):
         it reportengine detects a conflict in the `dataset` key.
         """
         return spec
+    
+    def parse_added_filter_rules(self, rules: (list, type(None)) = None): # type: ignore
+        """
+        Returns a tuple of AddedFilterRule objects. Rules are immutable after parsing.
+        AddedFilterRule objects inherit from FilterRule objects.
+        """
+        return tuple(AddedFilterRule(**rule) for rule in rules) if rules else None
 
     def produce_rules(
         self,
@@ -1360,14 +1375,8 @@ class CoreConfig(configparser.Config):
         default_filter_rules=None,
         filter_rules=None,
         default_filter_rules_recorded_spec_=None,
+        added_filter_rules=None,
     ):
-
-        """Produce filter rules based on the user defined input and defaults."""
-        from validphys.filters import (
-            Rule,
-            RuleProcessingError,
-            default_filter_rules_input,
-        )
 
         theory_parameters = theoryid.get_description()
 
@@ -1392,11 +1401,25 @@ class CoreConfig(configparser.Config):
             ]
         except RuleProcessingError as e:
             raise ConfigError(f"Error Processing filter rules: {e}") from e
+        
+        if added_filter_rules:
+            for i, rule in enumerate(added_filter_rules):
+                try:
+                    rule_list.append(
+                        Rule(
+                            initial_data=rule,
+                            defaults=defaults,
+                            theory_parameters=theory_parameters,
+                            loader=self.loader,
+                        )
+                    )
+                except RuleProcessingError as e:
+                    raise ConfigError(f"Error processing added rule {i+1}: {e}") from e
 
-        return rule_list
+        return tuple(rule_list)
 
     @configparser.record_from_defaults
-    def parse_default_filter_settings(self, spec: (str, type(None))):
+    def parse_default_filter_settings(self, spec: (str, type(None))): # type: ignore
         return spec
 
     def load_default_default_filter_settings(self, spec):
@@ -1420,7 +1443,7 @@ class CoreConfig(configparser.Config):
                 display_alternatives="all",
             )
 
-    def parse_filter_defaults(self, filter_defaults: (dict, type(None))):
+    def parse_filter_defaults(self, filter_defaults: (dict, type(None))): # type: ignore
         """A mapping containing the default kinematic limits to be used when
         filtering data (when using internal cuts).
         Currently these limits are ``q2min`` and ``w2min``.
@@ -1500,8 +1523,8 @@ class CoreConfig(configparser.Config):
 
     def _parse_data_input_from_(
         self,
-        parse_from_value: (str, type(None)),
-        additional_context: (dict, type(None)) = None,
+        parse_from_value: (str, type(None)), # type: ignore
+        additional_context: (dict, type(None)) = None, # type: ignore
     ):
         """Function which parses the ``data_input`` from a namespace. Usage
         is similar to :py:meth:`self.parse_from_` except this function bridges
