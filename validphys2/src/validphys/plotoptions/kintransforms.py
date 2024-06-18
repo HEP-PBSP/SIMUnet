@@ -188,12 +188,6 @@ class HQQPTXQ2MapMixin:
         Q = (np.sqrt(QQMASS2+k1*k1)+k1)
         return Q/k3, Q*Q
 
-class HQQMQQXQ2MapMixin:
-    def xq2map(self, k1, k2, k3, **extra_labels):
-        """in inv mass Experiments k1 is the mttbar, k2 is mu, and k3 is sqrt(s)"""
-        Q = k1 / 4
-        return Q / k3, Q*Q
-
 
 class dyp_sqrt_scale(SqrtScaleMixin, DYXQ2MapMixin):
     qlabel = '$M (GeV)$'
@@ -263,9 +257,8 @@ class ewk_rap_sqrt_scale(SqrtScaleMixin,DYXQ2MapMixin): # EWK_RAP -> DY okay
 class hig_rap_sqrt_scale(SqrtScaleMixin,DYXQ2MapMixin): #okay, but it does not exist
     qlabel = '$M_H (GeV)$'
 
-class hqp_mqq_sqrt_scale(SqrtScaleMixin,HQQMQQXQ2MapMixin): # HQP_MQQ -> DYM okay
-    # qlabel = r'$\mu (GeV)$'
-    qlabel = r'$M^{QQ} (GeV) / 4$'
+class hqp_mqq_sqrt_scale(SqrtScaleMixin,DYMXQ2MapMixin): # HQP_MQQ -> DYM okay
+    qlabel = r'$\mu (GeV)$'
 
 class hqp_ptq_sqrt_scale(SqrtScaleMixin,HQPTXQ2MapMixin): # HQP_PTQ -> HQPT okay
     qlabel = r'$\mu (GeV)$'
