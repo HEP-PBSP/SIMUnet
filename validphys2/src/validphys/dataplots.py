@@ -1066,6 +1066,8 @@ def plot_xq2(
     dataset_inputs_by_groups_xq2map,
     use_cuts,
     data_input,
+    Q2min=None,
+    Q2max=None,
     display_cuts:bool=True,
     marker_by:str='process type',
     highlight_label:str='highlight',
@@ -1300,4 +1302,13 @@ def plot_xq2(
     ax.set_ylabel(r'$Q^2$ (GeV$^2$)')
     ax.set_xscale('log')
     ax.set_yscale('log')
+
+    _, curr_Q2max = ax.get_ylim()
+    if Q2min:
+        ax.set_ylim(Q2min, curr_Q2max)
+
+    curr_Q2min, _ = ax.get_ylim()
+    if Q2max:
+        ax.set_ylim(curr_Q2min, Q2max)
+
     return fig
