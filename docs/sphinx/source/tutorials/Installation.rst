@@ -31,7 +31,7 @@ The dependencies need by to be installed via conda:
 
 .. _simunet-compilation-label-linux:
 
-Linux Code compilation
+Code compilation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The SIMUnet code can be downloaded from GitHub:
