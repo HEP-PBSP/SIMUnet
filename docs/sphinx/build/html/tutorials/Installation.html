@@ -3,13 +3,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Installing SIMUnet &#8212; SIMUnet  documentation</title>
+    <title>SIMUnet installation guide &#8212; SIMUnet  documentation</title>
   
   
   
@@ -19,32 +19,37 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/theme_logo_switcher.js"></script>
+    <script src="../_static/no_sidebar_overlap.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/Installation';</script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Simultaneous fits" href="simu_fit.html" />
@@ -59,15 +64,6 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
-
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -121,11 +117,9 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-
   
 
 <a class="navbar-brand logo" href="../index.html">
-  
   
   
   
@@ -135,8 +129,8 @@
       
     
     
-    <img src="../_static/PBSP_logo.png" class="logo__image only-light" alt="SIMUnet  documentation - Home"/>
-    <script>document.write(`<img src="../_static/PBSP_logo.png" class="logo__image only-dark" alt="SIMUnet  documentation - Home"/>`);</script>
+    <img src="../_static/PBSP_white_line.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/PBSP_white_line.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -146,7 +140,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../methodology.html"><strong>Methodology</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features.html"><strong>Features</strong></a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials_overview.html"><strong>Tutorials</strong></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Installing SIMUnet</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">SIMUnet installation guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simu_fit.html">Simultaneous fits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contaminated_fit.html">Contaminated fits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simu_closure_test.html">SIMUnet closure test</a></li>
@@ -271,22 +265,20 @@
 </button>
 
 
-
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
 `);
 </script>
 
-
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+    <i class="fa-solid fa-magnifying-glass"></i>
   </button>
 `);
 </script>
@@ -303,7 +295,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Installing SIMUnet</h1>
+    <h1>SIMUnet installation guide</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -313,8 +305,16 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-installation">Dependencies installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-compilation">Code compilation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-installation">Dependencies installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-compilation">Code compilation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#m1-m2-m3-macos">M1/M2/M3 MacOS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-label-macos">Dependencies installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simunet-compilation-label-macos">Code compilation</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -326,44 +326,431 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="installing-simunet">
-<span id="simu-installation"></span><h1>Installing SIMUnet<a class="headerlink" href="#installing-simunet" title="Permalink to this heading">#</a></h1>
-<p>The installation process for SIMUnet is very similar to the one for NNPDF, more details can be found on their <a class="reference external" href="https://docs.nnpdf.science/get-started/installation.html">website</a>. The only difference is that you need to clone the SIMUnet repository instead of the NNPDF one. The following instructions have been tested on a Linux system.</p>
+  <section id="simunet-installation-guide">
+<span id="simu-installation"></span><h1>SIMUnet installation guide<a class="headerlink" href="#simunet-installation-guide" title="Permalink to this heading">#</a></h1>
+<p>The installation process for SIMUnet is very similar to the one for NNPDF, more details can be found on their <a class="reference external" href="https://docs.nnpdf.science/get-started/installation.html">website</a>. The only difference is that you need to clone the SIMUnet repository instead of the NNPDF one.</p>
+<section id="linux">
+<span id="linux-installation"></span><h2>Linux<a class="headerlink" href="#linux" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><p>The following instructions have been tested on a Linux system.</p>
+</div></blockquote>
 <section id="dependencies-installation">
-<span id="dependencies-label"></span><h2>Dependencies installation<a class="headerlink" href="#dependencies-installation" title="Permalink to this heading">#</a></h2>
+<span id="dependencies-label-linux"></span><h3>Dependencies installation<a class="headerlink" href="#dependencies-installation" title="Permalink to this heading">#</a></h3>
 <p>The dependencies need by to be installed via conda:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">conda create -n simunet</span>
-<span class="l l-Scalar l-Scalar-Plain">conda activate simunet</span>
-<span class="l l-Scalar l-Scalar-Plain">conda install --only-deps nnpdf=4.0.5</span>
-<span class="l l-Scalar l-Scalar-Plain">conda install gxx_linux-64</span>
-<span class="l l-Scalar l-Scalar-Plain">conda install pkg-config swig cmake</span>
-<span class="l l-Scalar l-Scalar-Plain">conda install sysroot_linux-64=2.17</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>simunet
+conda<span class="w"> </span>activate<span class="w"> </span>simunet
+conda<span class="w"> </span>install<span class="w"> </span>--only-deps<span class="w"> </span><span class="nv">nnpdf</span><span class="o">=</span><span class="m">4</span>.0.5
+conda<span class="w"> </span>install<span class="w"> </span>gxx_linux-64
+conda<span class="w"> </span>install<span class="w"> </span>pkg-config<span class="w"> </span>swig<span class="w"> </span>cmake
+conda<span class="w"> </span>install<span class="w"> </span>sysroot_linux-64<span class="o">=</span><span class="m">2</span>.17
 </pre></div>
 </div>
 </section>
 <section id="code-compilation">
-<span id="simunet-compilation-label"></span><h2>Code compilation<a class="headerlink" href="#code-compilation" title="Permalink to this heading">#</a></h2>
-<p>The SIMUnet code can be downloaded from github:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">mkdir simunet_git</span>
-<span class="l l-Scalar l-Scalar-Plain">cd simunet_git</span>
-<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/HEP-PBSP/SIMUnet.git</span>
-<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/scarrazza/apfel.git</span>
+<span id="simunet-compilation-label-linux"></span><h3>Code compilation<a class="headerlink" href="#code-compilation" title="Permalink to this heading">#</a></h3>
+<p>The SIMUnet code can be downloaded from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>simunet_git
+<span class="nb">cd</span><span class="w"> </span>simunet_git
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/HEP-PBSP/SIMUnet.git
 </pre></div>
 </div>
 <p>The code can then be compiled and installed with the following commands:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">simunet_git$ cd simunet_release</span>
-<span class="l l-Scalar l-Scalar-Plain">mkdir conda-bld</span>
-<span class="l l-Scalar l-Scalar-Plain">cd conda-bld</span>
-<span class="l l-Scalar l-Scalar-Plain">cmake .. -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX</span>
-<span class="l l-Scalar l-Scalar-Plain">make</span>
-<span class="l l-Scalar l-Scalar-Plain">make install</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>simunet_git$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>simunet_release
+mkdir<span class="w"> </span>conda-bld
+<span class="nb">cd</span><span class="w"> </span>conda-bld
+cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$CONDA_PREFIX</span>
+make
+make<span class="w"> </span>install
 </pre></div>
 </div>
-<p>The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce <a class="reference external" href="https://docs.nnpdf.science/theory/index.html">theoretical predictions</a>,
-requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> files, which
-exists for each dataset in the SIMUnet methodology. For a given dataset, the <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> file includes the SM theory prediction, and the SMEFT
-theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF <code class="docutils literal notranslate"><span class="pre">theory_270</span></code> folder, which will be automatically
-downloaded when required by the user’s runcard.</p>
+<p>The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce <a class="reference external" href="https://docs.nnpdf.science/theory/index.html">theoretical predictions</a>, requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> files, which exists for each dataset in the SIMUnet methodology. For a given dataset, the <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> file includes the SM theory prediction, and the SMEFT theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF <code class="docutils literal notranslate"><span class="pre">theory_270</span></code> folder, which will be automatically downloaded when required by the user’s runcard.</p>
+</section>
+</section>
+<section id="m1-m2-m3-macos">
+<span id="macos-arm-installation"></span><h2>M1/M2/M3 MacOS<a class="headerlink" href="#m1-m2-m3-macos" title="Permalink to this heading">#</a></h2>
+<p>The following instructions have been tested on MacOS systems with <code class="docutils literal notranslate"><span class="pre">arm</span></code> processors like M1, M2, and M3.</p>
+<section id="dependencies-label-macos">
+<span id="id1"></span><h3>Dependencies installation<a class="headerlink" href="#dependencies-label-macos" title="Permalink to this heading">#</a></h3>
+<p>In order to install SIMUnet on arm64 MacOS machines using <code class="docutils literal notranslate"><span class="pre">conda</span></code>, we must create an environment which is able to accomodate a C++ compiler, e.g. <code class="docutils literal notranslate"><span class="pre">clangxx_osx-64</span></code> as we will see later. We must create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment setting the <code class="docutils literal notranslate"><span class="pre">CONDA_SUBDIR=osx-64</span></code> since we want a <code class="docutils literal notranslate"><span class="pre">x86_64</span></code> environment, moreover, we will use the following <code class="docutils literal notranslate"><span class="pre">yml</span></code> file to build the environment with the right dependencies:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simunet</span>
+<span class="nt">channels</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">anaconda</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://packages.nnpdf.science/public</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defaults</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">_tflow_select=2.2.0=eigen</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">abseil-cpp=20220623.0=hddbf539_6</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">absl-py=1.4.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">accessible-pygments=0.0.4=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aiohttp=3.8.3=py310h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aiosignal=1.2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alabaster=0.7.12=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">anyio=3.5.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apfel=3.0.6.3=h8d2ef1a_9</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">appdirs=1.4.4=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">appnope=0.1.2=py310hecd8cb5_1001</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argon2-cffi=20.1.0=py310hca72f7f_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asttokens=2.0.5=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">astunparse=1.6.3=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">async-timeout=4.0.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">babel=2.11.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">backcall=0.2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">banana-hep=0.6.8=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">beautifulsoup4=4.12.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blas=1.0=openblas</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bleach=4.1.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blessings=1.7=py310hecd8cb5_1002</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blinker=1.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bokeh=2.4.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bottleneck=1.3.5=py310h4e76f89_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brotli=1.0.9=hca72f7f_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brotli-bin=1.0.9=hca72f7f_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brotlipy=0.7.0=py310hca72f7f_1002</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bzip2=1.0.8=h1de35cc_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">c-ares=1.19.0=h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ca-certificates=2023.08.22=hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cachetools=4.2.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cctools=949.0.1=h9abeeb2_25</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cctools_osx-64=949.0.1=hc7db93f_25</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">certifi=2023.11.17=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cffi=1.15.1=py310h6c40b1e_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chardet=4.0.0=py310hecd8cb5_1003</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">charset-normalizer=2.0.4=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clang=14.0.6=hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clang-14=14.0.6=default_hd95374b_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clang_osx-64=14.0.6=hb1e4b1b_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clangxx=14.0.6=default_hd95374b_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">clangxx_osx-64=14.0.6=hd8b9576_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">click=8.0.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cloudpickle=2.2.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmake=3.22.1=hbfa4a85_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">colorama=0.4.6=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">comm=0.1.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">commonmark=0.9.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">compiler-rt=14.0.6=hda8b6b8_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">compiler-rt_osx-64=14.0.6=h8d5cb93_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda=22.11.1=py310h2ec42d9_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-build=3.27.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-index=0.3.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-package-handling=2.2.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-package-streaming=0.9.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">contourpy=1.0.5=py310haf03e11_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cryptography=39.0.1=py310hf6deb26_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curio=1.4=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cycler=0.11.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cytoolz=0.12.0=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dask=2023.4.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dask-core=2023.4.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataclasses=0.8=pyh6d0b6a4_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">debugpy=1.6.7=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">decorator=5.1.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defusedxml=0.7.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">distributed=2023.4.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docutils=0.18.1=py310hecd8cb5_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eko=0.13.5=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exceptiongroup=1.2.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executing=0.8.3=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">expat=2.4.9=he9d5cce_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fiatlux=0.1.2=py310h0eb4f65_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">filelock=3.9.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flatbuffers=22.12.06=hf0c8a7f_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fonttools=4.25.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">freetype=2.12.1=hd8bbffd_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">frozenlist=1.3.3=py310h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fsspec=2023.9.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">future=0.18.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gast=0.4.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">giflib=5.2.1=h6c40b1e_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google-auth=2.6.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google-auth-oauthlib=0.4.4=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google-pasta=0.2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">greenlet=2.0.1=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grpc-cpp=1.51.1=h88f4db0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grpcio=1.51.1=py310hdfcfac3_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gsl=2.7.1=hdbe807d_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">h5py=3.7.0=py310h6c517f8_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hdf5=1.10.6=h10fe05b_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">heapdict=1.0.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hyperopt=0.2.7=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">icu=70.1=h96cf925_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">idna=3.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">imagesize=1.4.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">importlib-metadata=6.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">importlib_metadata=6.0.0=hd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ipykernel=6.25.0=py310h20db666_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ipython=8.12.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ipython_genutils=0.2.0=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ipywidgets=8.0.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jedi=0.18.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jinja2=3.1.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jpeg=9e=h6c40b1e_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jsonschema=4.17.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter=1.0.0=pyhd8ed1ab_10</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter_client=8.6.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter_console=6.6.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter_core=5.5.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter_server=1.23.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyterlab_pygments=0.2.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyterlab_widgets=3.0.9=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keras=2.11.0=py310_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">keras-preprocessing=1.1.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kiwisolver=1.4.4=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">krb5=1.20.1=h428f121_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latexcodec=2.0.1=pyh9f0ad1d_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lcms2=2.12=hf1fd2bf_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ld64=530=h20443b4_25</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ld64_osx-64=530=h70f3046_25</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ldid=2.1.5=hc58f1be_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lerc=3.0=he9d5cce_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lhapdf=6.5.0=py310ha23aa8a_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libabseil=20220623.0=cxx17_h844d122_6</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libarchive=3.4.2=ha0e9c3a_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libbrotlicommon=1.0.9=hca72f7f_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libbrotlidec=1.0.9=hca72f7f_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libbrotlienc=1.0.9=hca72f7f_7</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libclang-cpp14=14.0.6=default_hd95374b_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libcurl=8.1.1=hf20ceda_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libcxx=14.0.6=h9765a3e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libdeflate=1.17=hb664fd8_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libedit=3.1.20221030=h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libev=4.33=h9ed2024_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libffi=3.4.4=hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libgfortran=5.0.0=11_3_0_hecd8cb5_28</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libgfortran5=11.3.0=h9dfd629_28</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libgrpc=1.51.1=h1ddfa78_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libiconv=1.16=hca72f7f_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">liblief=0.12.3=hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libllvm14=14.0.6=h91fad77_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libnghttp2=1.52.0=h9beae6a_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libopenblas=0.3.21=h54e7dc3_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libpng=1.6.39=h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libprotobuf=3.21.12=hbc0c0cd_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libsodium=1.0.18=h1de35cc_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libsqlite=3.42.0=h58db7d2_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libssh2=1.10.0=h04015c4_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libtiff=4.5.0=hcec6c5f_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libuv=1.44.2=h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libwebp=1.2.4=hf6ce154_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libwebp-base=1.2.4=h6c40b1e_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libxml2=2.9.14=hea49891_4</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libzlib=1.2.13=h8a1eda9_5</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llvm-openmp=14.0.6=h0dcd299_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llvm-tools=14.0.6=he0576d7_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llvmlite=0.40.0=py310hfff2838_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">locket=1.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lz4=4.3.2=py310h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lz4-c=1.9.4=hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">markdown=3.4.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">markupsafe=2.1.1=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matplotlib=3.7.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matplotlib-base=3.7.1=py310ha533b9c_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">matplotlib-inline=0.1.6=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mistune=2.0.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">more-itertools=8.12.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">msgpack-python=1.0.3=py310haf03e11_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">multidict=6.0.2=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">munkres=1.1.4=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mypy_extensions=1.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nbclassic=1.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nbclient=0.8.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nbconvert=7.10.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nbformat=5.9.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ncurses=6.4=hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nest-asyncio=1.5.6=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networkx=2.8.4=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notebook=6.5.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notebook-shim=0.2.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numba=0.57.0=py310h3ea8b11_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numexpr=2.8.4=py310he50c29a_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numpy=1.24.3=py310he50c29a_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">numpy-base=1.24.3=py310h992e150_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">oauthlib=3.2.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openssl=3.0.12=hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">opt_einsum=3.3.0=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">packaging=23.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pandas=1.5.3=py310h3ea8b11_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pandoc=2.12=hecd8cb5_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pandocfilters=1.5.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">parso=0.8.3=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">partd=1.4.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">patch=2.7.6=h1de35cc_1001</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pcre=8.45=h23ab428_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pendulum=2.1.2=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pexpect=4.8.0=pyhd3eb1b0_3</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pickleshare=0.7.5=pyhd3eb1b0_1003</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pillow=9.4.0=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pineappl=0.6.0=py310h3461e44_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip=23.1.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pkg-config=0.29.2=h3efe00b_8</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pkginfo=1.9.6=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platformdirs=3.10.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pluggy=1.0.0=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pooch=1.4.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prometheus_client=0.14.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prompt-toolkit=3.0.36=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prompt_toolkit=3.0.36=hd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">protobuf=4.21.12=py310h7a76584_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">psutil=5.9.0=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ptyprocess=0.7.0=pyhd3eb1b0_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pure_eval=0.2.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">py-lief=0.12.3=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">py4j=0.10.9.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyasn1=0.4.8=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyasn1-modules=0.2.8=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pybtex=0.24.0=pyhd8ed1ab_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pybtex-docutils=1.0.2=py310h2ec42d9_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pycosat=0.6.6=py310h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pycparser=2.21=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pydata-sphinx-theme=0.13.3=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pygments=2.15.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyjwt=2.4.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyopenssl=23.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyparsing=3.0.9=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyrsistent=0.18.0=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pysocks=1.7.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python=3.10.9=he7542f4_0_cpython</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python-dateutil=2.8.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python-fastjsonschema=2.16.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python-flatbuffers=2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python-libarchive-c=2.9=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python-lmdb=1.4.1=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_abi=3.10=2_cp310</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytz=2022.7=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytzdata=2020.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyyaml=6.0=py310h6c40b1e_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyzmq=25.1.0=py310hcec6c5f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qtconsole-base=5.5.1=pyha770c72_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qtpy=2.4.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">re2=2023.02.01=hf0c8a7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">readline=8.2=hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">recommonmark=0.6.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reportengine=0.30.28=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requests=2.29.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">requests-oauthlib=1.3.0=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rhash=1.4.3=h04015c4_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rich=12.5.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rsa=4.7.2=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruamel.yaml=0.17.21=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruamel.yaml.clib=0.2.7=py310h6729b98_2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruamel_yaml=0.15.100=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scipy=1.10.1=py310ha516a68_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">seaborn=0.12.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">send2trash=1.8.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">setuptools=67.8.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">six=1.16.0=pyhd3eb1b0_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snappy=1.1.9=he9d5cce_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sniffio=1.2.0=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">snowballstemmer=2.2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sortedcontainers=2.4.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">soupsieve=2.4=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinx=5.0.2=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinx-book-theme=1.0.1=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinx_rtd_theme=1.1.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-applehelp=1.0.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-bibtex=2.5.0=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-devhelp=1.0.2=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-htmlhelp=2.0.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-jsmath=1.0.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-qthelp=1.0.3=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinxcontrib-serializinghtml=1.1.5=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sqlalchemy=1.4.39=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sqlite=3.41.2=h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stack_data=0.2.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">swig=4.0.2=he9d5cce_4</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tapi=1000.10.8=ha1b3eb9_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tbb=2021.8.0=ha357a0b_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tblib=1.7.0=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorboard=2.11.0=py310_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorboard-data-server=0.6.1=py310h7242b5c_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorboard-plugin-wit=1.6.0=py_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorflow=2.11.0=cpu_py310h22f808f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorflow-base=2.11.0=cpu_py310h760b059_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tensorflow-estimator=2.11.0=cpu_py310h5e669bb_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">termcolor=2.1.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">terminado=0.17.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tinycss2=1.2.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tk=8.6.12=h5d9f67b_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tomli=2.0.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">toolz=0.12.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tornado=6.2=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tqdm=4.65.0=py310h20db666_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traitlets=5.7.1=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">typing_extensions=4.6.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tzdata=2023c=h04d1e81_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">urllib3=1.26.16=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">validobj=1.0=pyhd8ed1ab_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wcwidth=0.2.5=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">webencodings=0.5.1=py310hecd8cb5_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">websocket-client=0.58.0=py310hecd8cb5_4</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">werkzeug=2.2.3=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wheel=0.35.1=pyhd3eb1b0_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">widgetsnbextension=4.0.5=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrapt=1.14.1=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xz=5.2.10=h6c40b1e_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml=0.2.5=haf1e3a3_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yaml-cpp=0.7.0=he9d5cce_1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">yarl=1.8.1=py310hca72f7f_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zeromq=4.3.4=h23ab428_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zict=3.0.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zipp=3.11.0=py310hecd8cb5_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zlib=1.2.13=h8a1eda9_5</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zstandard=0.19.0=py310h6c40b1e_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zstd=1.5.5=hc035e20_0</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">pip</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">attrs==23.2.0</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">black==24.4.0</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hypothesis==6.100.1</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pathspec==0.12.1</span>
+<span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;path_to_root_conda_directory&gt;/envs/simunet</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&lt;path_to_root_conda_directory&gt;</span></code> can be obtained using the following command line when the <code class="docutils literal notranslate"><span class="pre">(base)</span></code> environment is activated, in particular, we will obtain the absolute path to the <code class="docutils literal notranslate"><span class="pre">(base)</span></code> environment, <cite>e.g.</cite> the <code class="docutils literal notranslate"><span class="pre">miniconda3</span></code> folder if we use it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="nv">$CONDA_PREFIX</span>
+</pre></div>
+</div>
+<p>Then, as we anticipated, we must set the <code class="docutils literal notranslate"><span class="pre">CONDA_SUBDIR=osx-64</span></code>, create the environment from the <code class="docutils literal notranslate"><span class="pre">yml</span></code> file, and activate it</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CONDA_SUBDIR</span><span class="o">=</span>osx-64<span class="w"> </span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>simunet.yml
+conda<span class="w"> </span>activate<span class="w"> </span>simunet
+</pre></div>
+</div>
+<p>Another important step is installing a previous version of the MacOSX Software Development Kit (SDK), we can download the chosen version from <a class="reference external" href="https://github.com/phracker/MacOSX-SDKs/releases/">this link</a>, we suggest <code class="docutils literal notranslate"><span class="pre">MacOSX10.9.sdk.tar.xz</span></code>, which has been tested.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-L<span class="w"> </span>-O<span class="w"> </span>https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
+</pre></div>
+</div>
+<p>once we have downloaded the <code class="docutils literal notranslate"><span class="pre">tar.xz</span></code> file we must untar it into the <code class="docutils literal notranslate"><span class="pre">(base)</span></code> environment folder</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tar<span class="w"> </span>xfz<span class="w"> </span>MacOSX10.9.sdk.tar.xz<span class="w"> </span>-C<span class="w"> </span>&lt;path_to_root_conda_directory&gt;
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&lt;path_to_root_conda_directory&gt;</span></code> is the same we obtained before. Then we must run the following command line to set the right path for the SDK that will be used during the installation of the SIMUnet C++ code</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CONDA_BUILD_SYSROOT</span><span class="o">=</span>&lt;path_to_root_conda_directory&gt;/MacOSX10.9.sdk
+</pre></div>
+</div>
+</section>
+<section id="simunet-compilation-label-macos">
+<span id="id2"></span><h3>Code compilation<a class="headerlink" href="#simunet-compilation-label-macos" title="Permalink to this heading">#</a></h3>
+<p>The SIMUnet code can be downloaded from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>simunet_git
+<span class="nb">cd</span><span class="w"> </span>simunet_git
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/HEP-PBSP/SIMUnet.git
+</pre></div>
+</div>
+<p>The code can then be compiled and installed with the following commands, first we have to move into the folder downloaded using <code class="docutils literal notranslate"><span class="pre">git</span></code>, then we must create and place ourselves in the build folder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>SIMUnet
+mkdir<span class="w"> </span>conda-bld
+<span class="nb">cd</span><span class="w"> </span>conda-bld
+</pre></div>
+</div>
+<p>Finally, we can complete the installation with the following three steps:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$CONDA_PREFIX</span>
+make
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Note that if your CPU has more than one core, which is the case for M1/M2/M3 Macs, the option <code class="docutils literal notranslate"><span class="pre">-j4</span></code> can be used to speed up the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p>
+<p>Moreover, the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> command will raise some non-stopping errors, which do invalidated the installation.</p>
+<p>The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce <a class="reference external" href="https://docs.nnpdf.science/theory/index.html">theoretical predictions</a>, requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> files, which exists for each dataset in the SIMUnet methodology. For a given dataset, the <code class="docutils literal notranslate"><span class="pre">simu_fac</span></code> file includes the SM theory prediction, and the SMEFT theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF <code class="docutils literal notranslate"><span class="pre">theory_270</span></code> folder, which will be automatically downloaded when required by the user’s runcard.</p>
+</section>
 </section>
 </section>
 
@@ -373,10 +760,11 @@ downloaded when required by the user’s runcard.</p>
 
               
               
-              
-              
-                <footer class="prev-next-footer">
+                <footer class="bd-footer-article">
                   
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="tutorials_overview.html"
@@ -396,7 +784,10 @@ downloaded when required by the user’s runcard.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -411,8 +802,16 @@ downloaded when required by the user’s runcard.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-installation">Dependencies installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-compilation">Code compilation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-installation">Dependencies installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-compilation">Code compilation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#m1-m2-m3-macos">M1/M2/M3 MacOS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies-label-macos">Dependencies installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simunet-compilation-label-macos">Code compilation</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -434,7 +833,6 @@ By PBSP
   
   <div class="footer-item">
     
-
   <p class="copyright">
     
       © Copyright 2023, PBSP.
@@ -461,8 +859,8 @@ By PBSP
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

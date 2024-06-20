@@ -29,9 +29,12 @@ author = 'PBSP'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ["sphinx.ext.autodoc",
+              'sphinx.ext.napoleon',
+              'sphinx.ext.viewcode',
               "sphinxcontrib.bibtex",
               "sphinx.ext.autosummary",
-              "sphinx_copybutton"]
+              "sphinx_copybutton",
+              ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -56,10 +59,17 @@ bibtex_reference_style = 'author_year'
 html_theme = 'sphinx_book_theme'
 
 html_theme_options = {
-    'sidebar': 'none',
+    # 'sidebar': 'none',
+    # 'sidebar_align': 'right',
+    'collapse_navigation': False,
+    # 'sticky_navigation': True,
+    'navigation_depth': 4,
+    # 'includehidden': True,
+    # 'titles_only': False
 }
 
-html_logo = "_static/PBSP_logo.png"
+html_logo = "_static/PBSP_white_line.png"
+html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -67,3 +77,8 @@ html_logo = "_static/PBSP_logo.png"
 #html_static_path = ['_static']
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+
+html_js_files = [
+    'theme_logo_switcher.js',
+    'no_sidebar_overlap.js'
+]

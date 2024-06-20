@@ -7,3 +7,26 @@ body {
 /*h1, h2, h3, h4, h5, h6 {
     text-align: center;
 }
+
+/* Ensure images are responsive */
+img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Ensure tables are responsive */
+  table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  /* Ensure code blocks are responsive */
+  div.highlight pre {
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  }
+  
