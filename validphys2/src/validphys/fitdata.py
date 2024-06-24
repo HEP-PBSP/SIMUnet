@@ -232,7 +232,7 @@ def read_bsm_facs(replica_paths):
     paths = [p / BSM_FAC_FILE for p in replica_paths]
     try:
         bsm_fac_results = pd.concat([pd.read_csv(i, index_col=0) for i in paths])
-    except:
+    except FileNotFoundError:
         bsm_fac_results = pd.DataFrame(index=[0]*len(paths))
 
     rows, _columns = bsm_fac_results.shape
