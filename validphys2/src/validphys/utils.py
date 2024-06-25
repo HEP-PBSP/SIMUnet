@@ -326,35 +326,46 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
         # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
         stream.write(f"{name_dataset} {n_sys} {len(data_values)}\n")
 
-        for i, (data_value, stat) in enumerate(zip(data_values, stats)):
-            cd_line = f"{i+1}\t {metadata['implemented_observables'][0]['process_type']}\t {kin_values[i][kin_names[2]]['mid']}\t {kin_values[i][kin_names[1]]['mid']}\t {kin_values[i][kin_names[0]]['mid']}\t {data_value}\t {stat}\t"
-            for j, sys in enumerate(uncertainty_values):
+        for i, data_value in enumerate(data_values):
+            cd_line = f"{i+1:6}\t{metadata['implemented_observables'][0]['process_type']:6}\t"
+
+            for index in [2, 1, 0]:
+                if kin_values[i][kin_names[index]]['mid'] == None:
+                    kin_values[i][kin_names[index]]['mid'] = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
+                cd_line += f"{kin_values[i][kin_names[index]]['mid']:20.12e}\t"
+
+            cd_line += f"\t{data_value:20.12e}\t{stats[i]:20.12e}\t"
+
+            # for j, sys in enumerate(uncertainty_values):
+            sys = uncertainty_values[i]
+            for j, (sys_name, sys_val) in enumerate(sys.items()):
+                if sys_name == 'stat':
+                    continue
+
+                if uncertainty_definitions[sys_name]['treatment'] == "ADD":
+                    add_sys = sys_val
+                    mult_sys = add_sys * 100.0 / data_value if data_value != 0.0 else 0.0
                 
-                for k, (sys_name, sys_val) in enumerate(sys.items()):
-                    if sys_name == 'stat':
-                        continue
+                elif uncertainty_definitions[sys_name]['treatment'] == "MULT":
+                    mult_sys = sys_val
+                    add_sys = mult_sys * data_value / 100.0
 
-                    if uncertainty_definitions[sys_name]['treatment'] == "ADD":
-                        add_sys = sys_val
-                        mult_sys = add_sys * 100.0 / data_value if data_value != 0.0 else 0.0
-                    
-                    elif uncertainty_definitions[sys_name]['treatment'] == "MULT":
-                        mult_sys = sys_val
-                        add_sys = mult_sys * data_value / 100.0
-
-                    if k == len(sys)-1:
-                        cd_line += f"{add_sys}\t {mult_sys}\n"
-                    else:
-                        cd_line += f"{add_sys}\t {mult_sys}\t"
+                if j == len(sys)-1:
+                    cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\n"
+                else:
+                    cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\t"
 
             stream.write(cd_line)
 
         
 
 if __name__ == '__main__':
-    path_unc_file = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/uncertainties_legacy_PTY.yaml"
-    path_data_yaml = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/data.yaml"
-    path_kin = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/kinematics.yaml"
-    path_metadata = "/Users/markcostantini/codes/nnpdfgit/nnpdf/nnpdf_data/nnpdf_data/new_commondata/CMS_1JET_8TEV/metadata.yaml"
-    uncertainty_yaml_to_systype(path_unc_file, name_dataset="CMS_1JET_8TEV")
-    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset="CMS_1JET_8TEV", path_DATA=None)
+    new_commondata    = "/Users/teto/Software/nnpdf_git/nnpdf/nnpdf_data/nnpdf_data/new_commondata"
+    test_dir          = "/Users/teto/Software/simunet_git/SIMUnet/validphys2/src/validphys/test_utils"
+    name_dataset      = "ATLAS_1JET_13TEV_DIF"
+    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties.yaml"
+    path_data_yaml    = new_commondata+"/"+name_dataset+"/data.yaml"
+    path_kin          = new_commondata+"/"+name_dataset+"/kinematics.yaml"
+    path_metadata     = new_commondata+"/"+name_dataset+"/metadata.yaml"
+    uncertainty_yaml_to_systype(path_unc_file, name_dataset=name_dataset, path_systype=test_dir)
+    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset=name_dataset, path_DATA=test_dir)
