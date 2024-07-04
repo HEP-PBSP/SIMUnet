@@ -305,7 +305,11 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     uncertainty_definitions = uncertainty['definitions']
     uncertainty_values = uncertainty['bins']
     n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, write_to_file=False)
-    stats = np.array([entr['stat'] for entr in uncertainty_values])
+    stats = []
+    for entr in uncertainty_values:
+        try: stats.append(entr["stat"])
+        except KeyError: stats.append(0.)
+    stats = np.array(stats)
 
     # get data values
     data_values = data['data_central']
@@ -332,7 +336,10 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
             for index in [2, 1, 0]:
                 if kin_values[i][kin_names[index]]['mid'] == None:
                     kin_values[i][kin_names[index]]['mid'] = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
-                cd_line += f"{kin_values[i][kin_names[index]]['mid']:20.12e}\t"
+                if kin_names[index] == "pT":
+                    cd_line += f"{kin_values[i][kin_names[index]]['mid']**2:20.12e}\t"
+                else:
+                    cd_line += f"{kin_values[i][kin_names[index]]['mid']:20.12e}\t"
 
             cd_line += f"\t{data_value:20.12e}\t{stats[i]:20.12e}\t"
 
@@ -342,13 +349,11 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
                 if sys_name == 'stat':
                     continue
 
-                if uncertainty_definitions[sys_name]['treatment'] == "ADD":
-                    add_sys = sys_val
-                    mult_sys = add_sys * 100.0 / data_value if data_value != 0.0 else 0.0
-                
-                elif uncertainty_definitions[sys_name]['treatment'] == "MULT":
-                    mult_sys = sys_val
-                    add_sys = mult_sys * data_value / 100.0
+                add_sys = sys_val
+                if data_value != 0.0:
+                    mult_sys = add_sys * 100.0 / data_value 
+                else:
+                    mult_sys = 0.0
 
                 if j == len(sys)-1:
                     cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\n"
@@ -362,10 +367,10 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
 if __name__ == '__main__':
     new_commondata    = "/Users/teto/Software/nnpdf_git/nnpdf/nnpdf_data/nnpdf_data/new_commondata"
     test_dir          = "/Users/teto/Software/simunet_git/SIMUnet/validphys2/src/validphys/test_utils"
-    name_dataset      = "ATLAS_1JET_13TEV_DIF"
-    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties.yaml"
-    path_data_yaml    = new_commondata+"/"+name_dataset+"/data.yaml"
-    path_kin          = new_commondata+"/"+name_dataset+"/kinematics.yaml"
+    name_dataset      = "CMS_1JET_13TEV_DIF"
+    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties_r04.yaml"
+    path_data_yaml    = new_commondata+"/"+name_dataset+"/data_r04.yaml"
+    path_kin          = new_commondata+"/"+name_dataset+"/kinematics_r04.yaml"
     path_metadata     = new_commondata+"/"+name_dataset+"/metadata.yaml"
     uncertainty_yaml_to_systype(path_unc_file, name_dataset=name_dataset, path_systype=test_dir)
     convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset=name_dataset, path_DATA=test_dir)
