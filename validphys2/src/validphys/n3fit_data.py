@@ -253,7 +253,11 @@ def fitting_data_dict(
     # limited to: central values, ndata, replica generation, covmat construction
     if data.datasets:
         ndata = sum([ds.commondata.load_commondata(cuts=ds.cuts).ndata for ds in data.datasets])
-        expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
+        expdata_true = np.array([])
+        for ds in data.datasets:
+            expdata_true = np.append(expdata_true, ds.commondata.load_commondata(cuts=ds.cuts).central_values)
+        expdata_true = expdata_true.reshape(1, ndata)
+        # expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
         datasets = common_data_reader_experiment(data)
         for i in range(len(data.datasets)):
             if data.datasets[i].use_fixed_predictions:

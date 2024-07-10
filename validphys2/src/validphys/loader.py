@@ -366,7 +366,17 @@ class Loader(LoaderBase):
         
         # use different file name for the FK table if the commondata is new
         if new_commondata:
-            fkpath = tuple([theopath/ 'fastkernel' / (f'{setname}.pineappl.lz4')])
+            # Need to pass a TheoryMeta object to FKTableSpec
+            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
+            if not path_metadata.exists():
+                raise InconsistentMetaDataError(f"Could not find '_metadata.yaml' file for set {setname}."
+                                                f"File '{path_metadata}' not found.")
+            # get observable name from the setname
+            with open(path_metadata, 'r') as f:
+                metadata = yaml.safe_load(f)
+            # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
+            fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
+            fkpath = tuple([theopath/ 'fastkernel' / (f'{fktable}.pineappl.lz4') for fktable in fktables])
             for path in fkpath:
                 if not path.exists():
                     raise FKTableNotFound(("Could not find FKTable for set '%s'. "
@@ -380,11 +390,6 @@ class Loader(LoaderBase):
 
         cfactors = self.check_cfactor(theoryID, setname, cfac)
         if new_commondata:
-            # Need to pass a TheoryMeta object to FKTableSpec
-            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
-            # get observable name from the setname
-            with open(path_metadata, 'r') as f:
-                metadata = yaml.safe_load(f)
             
             common_prefix = os.path.commonprefix([metadata['setname'], setname])
             
