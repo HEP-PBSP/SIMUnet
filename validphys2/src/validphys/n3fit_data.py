@@ -271,7 +271,11 @@ def fitting_data_dict(
             pdf = l.check_pdf(name=fixed_predictions_pdf)
 =======
         ndata = sum([ds.commondata.load_commondata(cuts=ds.cuts).ndata for ds in data.datasets])
-        expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
+        expdata_true = np.array([])
+        for ds in data.datasets:
+            expdata_true = np.append(expdata_true, ds.commondata.load_commondata(cuts=ds.cuts).central_values)
+        expdata_true = expdata_true.reshape(1, ndata)
+        # expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
         datasets = common_data_reader_experiment(data)
 >>>>>>> e69ac9366 (common_data_reader_dataset and experiment in n3fit_data_utils now only depend on dataset spec and not C++)
         for i in range(len(data.datasets)):
