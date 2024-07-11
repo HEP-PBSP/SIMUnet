@@ -222,7 +222,7 @@ def scale_from_grid(grid):
     return 'linear' if grid.scale == 'linear' else 'log'
 
 
-def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, path_systype=None, write_to_file=True):
+def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable, path_systype=None, write_to_file=True):
     """
     Convert the new style uncertainty yaml file to the old style systype.
     Writes 
@@ -251,9 +251,9 @@ def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, path_systyp
     if path_systype is None:
         if isinstance(path_uncertainty_yaml, str):
             path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
-        path_systype = path_uncertainty_yaml.parent / f"SYSTYPE_{name_dataset}_DEFAULT.dat"
+        path_systype = path_uncertainty_yaml.parent / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
     else:
-        path_systype = pathlib.Path(path_systype) / f"SYSTYPE_{name_dataset}_DEFAULT.dat"
+        path_systype = pathlib.Path(path_systype) / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
     
     # get number of sys (note: stat is not included in the sys)
     if 'stat' in uncertainty_definitions.keys():
@@ -280,7 +280,7 @@ def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, path_systyp
     return n_sys
 
 
-def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinematics, path_metadata, name_dataset, path_DATA=None):
+def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinematics, path_metadata, name_dataset, observable, path_DATA=None):
     """
     Convert the new data format into the old data format
     """
@@ -304,7 +304,7 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     # get uncertainty definitions and values
     uncertainty_definitions = uncertainty['definitions']
     uncertainty_values = uncertainty['bins']
-    n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, write_to_file=False)
+    n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable, write_to_file=False)
     stats = []
     for entr in uncertainty_values:
         try: stats.append(entr["stat"])
@@ -318,9 +318,9 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     if path_DATA is None:
         if isinstance(path_uncertainty_yaml, str):
             path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
-        path_DATA = path_uncertainty_yaml.parent / f"DATA_{name_dataset}.dat"
+        path_DATA = path_uncertainty_yaml.parent / f"DATA_{name_dataset}_{observable}.dat"
     else:
-        path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}.dat"
+        path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}_{observable}.dat"
 
     kin_names = list(kinematics['bins'][0].keys())
     kin_values = kinematics['bins']
@@ -328,7 +328,7 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     with open(path_DATA, 'w') as stream:
         
         # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
-        stream.write(f"{name_dataset} {n_sys} {len(data_values)}\n")
+        stream.write(f"{name_dataset}_{observable} {n_sys} {len(data_values)}\n")
 
         for i, data_value in enumerate(data_values):
             cd_line = f"{i+1:6}\t{metadata['implemented_observables'][0]['process_type']:6}\t"
@@ -367,10 +367,11 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
 if __name__ == '__main__':
     new_commondata    = "/Users/teto/Software/nnpdf_git/nnpdf/nnpdf_data/nnpdf_data/new_commondata"
     test_dir          = "/Users/teto/Software/simunet_git/SIMUnet/validphys2/src/validphys/test_utils"
-    name_dataset      = "CMS_1JET_13TEV_DIF"
-    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties_r04.yaml"
-    path_data_yaml    = new_commondata+"/"+name_dataset+"/data_r04.yaml"
-    path_kin          = new_commondata+"/"+name_dataset+"/kinematics_r04.yaml"
+    name_dataset      = "ATLAS_1JET_13TEV_DIF"
+    observable        = "PT-Y"
+    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties.yaml"
+    path_data_yaml    = new_commondata+"/"+name_dataset+"/data.yaml"
+    path_kin          = new_commondata+"/"+name_dataset+"/kinematics.yaml"
     path_metadata     = new_commondata+"/"+name_dataset+"/metadata.yaml"
-    uncertainty_yaml_to_systype(path_unc_file, name_dataset=name_dataset, path_systype=test_dir)
-    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset=name_dataset, path_DATA=test_dir)
+    uncertainty_yaml_to_systype(path_unc_file, name_dataset=name_dataset, observable=observable, path_systype=test_dir)
+    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset=name_dataset, observable=observable, path_DATA=test_dir)
