@@ -56,7 +56,6 @@ def parse_yaml_inp(inp, spec, path):
             current_exc = current_exc.__cause__
         raise ValidationError('\n'.join(error_text_lines)) from e
 
-        
 @contextlib.contextmanager
 def tempfile_cleaner(root, exit_func, exc, prefix=None, **kwargs):
     """A context manager to handle temporary directory creation and
