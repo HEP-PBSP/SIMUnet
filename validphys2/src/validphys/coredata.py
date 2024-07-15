@@ -7,8 +7,6 @@ wrappers.
 import dataclasses
 import yaml
 
-from validphys.commondatawriter import write_commondata_to_file, write_systype_to_file
-
 import numpy as np
 import pandas as pd
 from validphys.commondatawriter import write_commondata_to_file, write_systype_to_file
@@ -284,6 +282,7 @@ class CommonData:
         return dataclasses.replace(
             self, ndata=newndata, commondata_table=new_commondata_table
         )
+
 
     @property
     def central_values(self):
