@@ -327,7 +327,7 @@ class CommonDataSpec(TupleComp):
         if cuts is not None:
             cd = cd.with_cuts(cuts)
         return cd
-    
+
     @property
     def plot_kinlabels(self):
         return get_plot_kinlabels(self)
