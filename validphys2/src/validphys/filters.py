@@ -93,8 +93,8 @@ def prepare_nnpdf_rng(filterseed:int, rngalgo:int, seed:int):
     RandomGenerator.InitRNG(rngalgo, seed)
     RandomGenerator.GetRNG().SetSeed(filterseed)
 
-@check_positive('errorsize')
-def filter_closure_data(filter_path, data, t0pdfset, fakenoise, errorsize, prepare_nnpdf_rng):
+# @check_positive('errorsize')
+def filter_closure_data(filter_path, data, t0pdfset, fakenoise, filterseed, data_index, prepare_nnpdf_rng):
     """Filter closure data. In addition to cutting data points, the data is
     generated from an underlying ``t0pdfset``, applying a shift to the data
     if ``fakenoise`` is ``True``, which emulates the experimental central values
@@ -103,12 +103,12 @@ def filter_closure_data(filter_path, data, t0pdfset, fakenoise, errorsize, prepa
     """
     log.info('Filtering closure-test data.')
     return _filter_closure_data(
-        filter_path, data, t0pdfset, fakenoise, errorsize)
+        filter_path, data, t0pdfset, fakenoise, filterseed, data_index)
 
 
-@check_positive("errorsize")
+# @check_positive("errorsize")
 def filter_closure_data_by_experiment(
-    filter_path, experiments_data, t0pdfset, fakenoise, errorsize, prepare_nnpdf_rng,
+    filter_path, experiments_data, t0pdfset, fakenoise, filterseed, data_index, prepare_nnpdf_rng,
 ):
     """
     Like :py:func:`filter_closure_data` except filters data by experiment.
@@ -119,10 +119,21 @@ def filter_closure_data_by_experiment(
     not reproducible.
 
     """
-    return [
-        _filter_closure_data(filter_path, exp, t0pdfset, fakenoise, errorsize)
-        for exp in experiments_data
-    ]
+
+    res = []
+    for exp in experiments_data:
+        experiment_index = data_index[data_index.isin([exp.name], level=0)]
+        res.append(
+            _filter_closure_data(
+                filter_path,
+                exp,
+                t0pdfset,
+                fakenoise,
+                filterseed,
+                experiment_index,
+            )
+        )
+    return res
 
 
 def filter_real_data(filter_path, data):
@@ -168,24 +179,35 @@ def _filter_real_data(filter_path, data):
     return total_data_points, total_cut_data_points
 
 
-def _filter_closure_data(filter_path, data, fakepdfset, fakenoise, errorsize):
+def _filter_closure_data(filter_path, data, fakepdfset, fakenoise, filterseed, data_index):
     """Filter closure test data."""
     total_data_points = 0
     total_cut_data_points = 0
-    fakeset = fakepdfset.legacy_load()
-    # Load data, don't cache result
-    loaded_data = data.load.__wrapped__(data)
-    # generate level 1 shift if fakenoise
-    loaded_data.MakeClosure(fakeset, fakenoise)
-    for j, dataset in enumerate(data.datasets):
+
+    # circular import in validphys.core
+    from validphys.pseudodata import level0_commondata_wc, make_level1_data
+
+    closure_data = level0_commondata_wc(data, fakepdfset)
+    all_raw_commondata = {}
+
+    for dataset in data.datasets:
         path = filter_path / dataset.name
         nfull, ncut = _write_ds_cut_data(path, dataset)
         total_data_points += nfull
         total_cut_data_points += ncut
-        loaded_ds = loaded_data.GetSet(j)
-        if errorsize != 1.0:
-            loaded_ds.RescaleErrors(errorsize)
-        loaded_ds.Export(str(path))
+        all_raw_commondata[dataset.name] = dataset.commondata.load_commondata()
+    
+
+    if fakenoise:
+        closure_data = make_level1_data(closure_data, filterseed, data_index)
+        log.info("Writing Level1 data")
+    else:
+        log.info("Writing Level0 data")
+
+    for cd in closure_data:
+        path = filter_path / cd.setname
+        cd.export(path)
+
     return total_data_points, total_cut_data_points
 
 
