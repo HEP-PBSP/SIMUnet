@@ -55,7 +55,7 @@ def parse_commondata(commondatafile, systypefile, setname):
     commondatatable.columns = commondataheader
     commondatatable.set_index("entry", inplace=True)
     ndata = len(commondatatable)
-    commondataproc = commondatatable["process"][1]
+    commondataproc = commondatatable["process"].iloc[0]
     # Check for consistency with commondata metadata
     cdmetadata =  peek_commondata_metadata(commondatafile)
     if (setname, nsys, ndata) != attrgetter('name', 'nsys', 'ndata')(cdmetadata):
