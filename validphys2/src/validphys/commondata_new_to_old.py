@@ -47,17 +47,21 @@ for c in conversion:
 conversion_ds = []
 for ds in datasets:
     if ds["dataset"] in old_format_names:
-        conversion_ds.append(conversion[ds["dataset"]])
+        d = conversion[ds["dataset"]]
+        d["name"] = ds["dataset"]
+        conversion_ds.append(d)
     elif ds["dataset"] in new_format_names:
-        conversion_ds.append({"dataset": ds["dataset"], "variant": "legacy"})
+        conversion_ds.append({"dataset": ds["dataset"], "variant": "legacy", "name": ds["dataset"]})
     else:
-        conversion_ds.append({"dataset": ds["dataset"], "variant": None})
+        conversion_ds.append({"dataset": ds["dataset"], "variant": None, "name": ds["dataset"]})
 
 # separate the dataset & the observable names
 for ds in conversion_ds:
     s = ds["dataset"]
     ds["dataset"] = s[:s.rfind("_")]
     ds["obs"] = s[s.rfind("_")+1:]
+    n = ds["name"]
+    ds["name"] = n[:n.rfind("_")]
 
 # convert
 for i, ds in enumerate(conversion_ds):
@@ -78,8 +82,9 @@ for i, ds in enumerate(conversion_ds):
     # load metadata file
     path_metadata = new_commondata+"/"+ds["dataset"]+f"/metadata.yaml"
     # write uncertainty files
+
     uncertainty_yaml_to_systype(path_unc_file,
-                                name_dataset=ds["dataset"],
+                                name_dataset=ds["name"],
                                 observable=ds["obs"],
                                 path_systype=test_dir)
     # write commondata files
@@ -87,11 +92,11 @@ for i, ds in enumerate(conversion_ds):
                             path_unc_file,
                             path_kin,
                             path_metadata,
-                            name_dataset=ds["dataset"],
+                            name_dataset=ds["name"],
                             observable=ds["obs"],
                             path_DATA=test_dir)
     # output
-    name = ds["dataset"]+"_"+ds["obs"] 
+    name = ds["name"]+"_"+ds["obs"] 
     print(f"{i+1:>2}. {name:>40} converted!")
 
 # write check runcard
