@@ -123,9 +123,19 @@ class CombineCfacLayer(Layer):
                 dtype=np.float32,
             )
             linear = self._compute_linear(linear_values)
+<<<<<<< HEAD
             linear = tf.cast(linear, tf.float32)
             inputs = tf.cast(inputs, tf.float32)
 
             return (1 + linear) * inputs
+=======
+            inputs = tf.cast(inputs, tf.float64)
+
+            try:
+                answer = (1 + linear) * inputs 
+            except:
+                import IPython; IPython.embed()
+            return answer
+>>>>>>> 62d335175 (Fixed issues with floats)
 
         return inputs
