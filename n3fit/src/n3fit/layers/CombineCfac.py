@@ -55,7 +55,7 @@ class CombineCfacLayer(Layer):
                 tf.random.set_seed(seed)
                 val = tf.random.normal([1], ini.mean, ini.std_dev, tf.float32)
             elif isinstance(ini, initialisation_specs.AnalyticInitialisation):
-                val = float(analytic_initialisation[index])
+                val = np.array([float(analytic_initialisation[index])])
             else:
                 raise RuntimeError(
                     "Invalid initialisation: choose form constant, uniform or Gaussian."
@@ -67,7 +67,10 @@ class CombineCfacLayer(Layer):
 
         self.scales = np.array(scales, dtype=np.float32)
         if num_initial > 0:
-            initial_values = tf.concat(initial_values, 0)
+            try:
+                initial_values = tf.concat(initial_values, 0)
+            except:
+                import IPython; IPython.embed()
             initial_values = tf.math.multiply(initial_values, self.scales)
 
         if num_initial > 0:
@@ -123,6 +126,12 @@ class CombineCfacLayer(Layer):
                 dtype=np.float32,
             )
             linear = self._compute_linear(linear_values)
-            return (1 + linear) * inputs
+            inputs = tf.cast(inputs, tf.float64)
+
+            try:
+                answer = (1 + linear) * inputs 
+            except:
+                import IPython; IPython.embed()
+            return answer
 
         return inputs
