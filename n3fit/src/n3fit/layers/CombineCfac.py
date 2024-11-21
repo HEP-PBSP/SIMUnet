@@ -6,6 +6,7 @@ import hashlib
 
 from validphys import initialisation_specs
 
+
 class CombineCfacLayer(Layer):
     """
     Creates the combination layer of SIMUnet.
@@ -40,11 +41,13 @@ class CombineCfacLayer(Layer):
         assert len(initialisations) == len(linear_names)
         index = 0
         for ini, name in zip(initialisations, linear_names):
-            hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (10 ** 18)
+            hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (
+                10**18
+            )
             seed = np.int32((initialisation_seed + replica_number) ^ hash_value)
 
             if isinstance(ini, initialisation_specs.ConstantInitialisation):
-                val = tf.constant(ini.value, dtype='float32', shape=(1,))
+                val = tf.constant(ini.value, dtype="float32", shape=(1,))
             elif isinstance(ini, initialisation_specs.UniformInitialisation):
                 val = tf.random_uniform_initializer(
                     minval=ini.minval,
@@ -67,10 +70,7 @@ class CombineCfacLayer(Layer):
 
         self.scales = np.array(scales, dtype=np.float32)
         if num_initial > 0:
-            try:
-                initial_values = tf.concat(initial_values, 0)
-            except:
-                import IPython; IPython.embed()
+            initial_values = tf.concat(initial_values, 0)
             initial_values = tf.math.multiply(initial_values, self.scales)
 
         if num_initial > 0:
@@ -90,7 +90,7 @@ class CombineCfacLayer(Layer):
         self.linear_names = linear_names
 
     def _compute_linear(self, linear_values):
-        scaled_values = linear_values/self.scales[:, np.newaxis]
+        scaled_values = linear_values / self.scales[:, np.newaxis]
         return tf.reduce_sum(self.w[:, tf.newaxis] * scaled_values, axis=0)
 
     def call(self, inputs, linear_values):
@@ -128,10 +128,6 @@ class CombineCfacLayer(Layer):
             linear = self._compute_linear(linear_values)
             inputs = tf.cast(inputs, tf.float64)
 
-            try:
-                answer = (1 + linear) * inputs 
-            except:
-                import IPython; IPython.embed()
-            return answer
+            return (1 + linear) * inputs
 
         return inputs
