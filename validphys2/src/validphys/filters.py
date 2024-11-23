@@ -499,6 +499,7 @@ class Rule:
         ns = self._make_kinematics_dict(dataset, idat)
 
         for key, value in self._local_variables_code.items():
+            import IPython; IPython.embed()
             ns[key] = eval(value, {**self.numpy_functions, **ns})
         return ns
 
