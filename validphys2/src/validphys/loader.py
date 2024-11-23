@@ -375,7 +375,12 @@ class Loader(LoaderBase):
             with open(path_metadata, 'r') as f:
                 metadata = yaml.safe_load(f)
             # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
-            fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
+            fk_operation = metadata["implemented_observables"][0]["theory"]["operation"]
+            if fk_operation.lower() == "ratio":
+                fktables = [metadata["implemented_observables"][0]["theory"]["FK_tables"][0][0],
+                            metadata["implemented_observables"][0]["theory"]["FK_tables"][1][0]]
+            else:
+                fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
             fkpath = tuple([theopath/ 'fastkernel' / (f'{fktable}.pineappl.lz4') for fktable in fktables])
             for path in fkpath:
                 if not path.exists():
@@ -587,7 +592,7 @@ class Loader(LoaderBase):
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
 
-        theoryno, _ = theoryid
+        theoryno, theopath = theoryid
 
         commondata = self.check_commondata(
             name, sysnum, use_fitcommondata=use_fitcommondata, fit=fit)
@@ -596,6 +601,12 @@ class Loader(LoaderBase):
         except CompoundNotFound:
             fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions, new_commondata=new_commondata)
             op = None
+        
+        if new_commondata:
+            path_metadata = theopath / 'fastkernel' / f'{name}_metadata.yaml'
+            with open(path_metadata, "r") as stream:
+                metadata_card = yaml.safe_load(stream=stream)
+            op = metadata_card["implemented_observables"][0]["theory"]["operation"]
 
         #Note this is simply for convenience when scripting. The config will
         #construct the actual Cuts object by itself
