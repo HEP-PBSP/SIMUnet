@@ -32,7 +32,7 @@ from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             InternalCutsWrapper, HyperscanSpec)
 from validphys.utils import tempfile_cleaner, yaml_safe
 from validphys import lhaindex
-from validphys.pineparser import parse_theory_meta
+from validphys.pineparser import parse_theory_meta, TheoryMeta
 
 DEFAULT_NNPDF_PROFILE_PATH = f"{sys.prefix}/share/NNPDF/nnprofile.yaml"
 
@@ -352,7 +352,7 @@ class Loader(LoaderBase):
         return cd.load()
 
     #   @functools.lru_cache()
-    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False, new_commondata=False):
+    def check_fktable(self, theoryID, setname, cfac, use_fixed_predictions=False, new_commondata=False, is_compound=False):
         _, theopath = self.check_theoryID(theoryID)
 
         if use_fixed_predictions:
@@ -363,6 +363,8 @@ class Loader(LoaderBase):
             fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
             cfactors = self.check_cfactor(theoryID, setname, cfac)
             return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
+        
+        cfactors = self.check_cfactor(theoryID, setname, cfac)
         
         # use different file name for the FK table if the commondata is new
         if new_commondata:
@@ -375,42 +377,40 @@ class Loader(LoaderBase):
             with open(path_metadata, 'r') as f:
                 metadata = yaml.safe_load(f)
             # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
-            fk_operation = metadata["implemented_observables"][0]["theory"]["operation"]
-            if fk_operation.lower() == "ratio":
-                fktables = [metadata["implemented_observables"][0]["theory"]["FK_tables"][0][0],
-                            metadata["implemented_observables"][0]["theory"]["FK_tables"][1][0]]
-            else:
-                fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
+            fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
             fkpath = tuple([theopath/ 'fastkernel' / (f'{fktable}.pineappl.lz4') for fktable in fktables])
             for path in fkpath:
                 if not path.exists():
                     raise FKTableNotFound(("Could not find FKTable for set '%s'. "
                     "File '%s' not found") % (setname, path) )
+                
+            common_prefix = os.path.commonprefix([metadata['setname'], setname])
+            
+            observable_name = setname[len(common_prefix):]
+            if observable_name.startswith('_'):
+                observable_name = observable_name[1:]
+            if is_compound:
+                theory_meta = TheoryMeta(FK_tables=[fkpath], operation="NULL", conversion_factor=1., shifts=None, normalization=None, comment=None)
+            else:
+                theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)
+            
+            return FKTableSpec(fkpath, cfactors, 
+                               theory_meta=theory_meta,
+                               legacy=False)
         else:
             fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
 
             if not fkpath.exists():
                 raise FKTableNotFound(("Could not find FKTable for set '%s'. "
                 "File '%s' not found") % (setname, fkpath) )
-
-        cfactors = self.check_cfactor(theoryID, setname, cfac)
-        if new_commondata:
             
-            common_prefix = os.path.commonprefix([metadata['setname'], setname])
-            
-            observable_name = setname[len(common_prefix):]
-            if observable_name.startswith('_'):
-                observable_name = observable_name[1:]
-            
-            theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)        
-           
-            return FKTableSpec(fkpath, cfactors, theory_meta=theory_meta, legacy=False)
-        else:
             return FKTableSpec(fkpath, cfactors)
+            
 
-    def check_compound(self, theoryID, setname, cfac):
+    def check_compound(self, theoryID, setname, cfac, new_commondata=False):
         thid, theopath = self.check_theoryID(theoryID)
         compound_spec_path = theopath / 'compound' / ('FK_%s-COMPOUND.dat' % setname)
+<<<<<<< HEAD
         try:
             with compound_spec_path.open() as f:
                 #Drop first line with comment
@@ -433,6 +433,45 @@ class Loader(LoaderBase):
                     f"Incorrect COMPOUND file '{compound_spec_path}'. "
                     f"Searching for non-existing FKTable:\n{e}") from e
         op = data['OP']
+=======
+        if new_commondata:
+            # Need to pass a TheoryMeta object to FKTableSpec
+            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
+            if not path_metadata.exists():
+                raise InconsistentMetaDataError(f"Could not find '_metadata.yaml' file for set {setname}."
+                                                f"File '{path_metadata}' not found.")
+            # get observable name from the setname
+            with open(path_metadata, 'r') as f:
+                metadata = yaml.safe_load(f)
+            op = metadata["implemented_observables"][0]["theory"]["operation"]
+            if op.upper() == "NULL":
+                raise CompoundNotFound
+            names = [tab[0] for tab in metadata["implemented_observables"][0]["theory"]["FK_tables"]]
+            tables = [self.check_fktable(theoryID, name, cfac, new_commondata=new_commondata, is_compound=True) for name in names]
+        else:
+            try:
+                with compound_spec_path.open() as f:
+                    #Drop first line with comment
+                    next(f)
+                    txt = f.read()
+            except FileNotFoundError as e:
+                msg = ("Could not find COMPOUND set '%s' for theory %d: %s" %
+                       (setname, int(thid), e))
+                raise CompoundNotFound(msg)
+            #This is a little bit funny, but is the least amount of thinking...
+            yaml_format = 'FK:\n' + re.sub('FK:', ' - ', txt)
+            data = yaml.safe_load(yaml_format)
+            #we have to split out 'FK_' the extension to get a name consistent
+            #with everything else
+            try:
+                tables = [self.check_fktable(theoryID, name[3:-4], cfac)
+                      for name in data['FK']]
+            except FKTableNotFound as e:
+                raise LoadFailedError(
+                        f"Incorrect COMPOUND file '{compound_spec_path}'. "
+                        f"Searching for non-existing FKTable:\n{e}") from e
+            op = data['OP']
+>>>>>>> 1ecbc0b60 (added new_commondata to check_compound in loader)
         return tuple(tables), op
 
 
@@ -597,7 +636,7 @@ class Loader(LoaderBase):
         commondata = self.check_commondata(
             name, sysnum, use_fitcommondata=use_fitcommondata, fit=fit)
         try:
-            fkspec, op = self.check_compound(theoryno, name, cfac)
+            fkspec, op = self.check_compound(theoryno, name, cfac, new_commondata=new_commondata)
         except CompoundNotFound:
             fkspec = self.check_fktable(theoryno, name, cfac, use_fixed_predictions=use_fixed_predictions, new_commondata=new_commondata)
             op = None

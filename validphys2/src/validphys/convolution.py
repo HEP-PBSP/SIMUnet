@@ -111,7 +111,7 @@ def _predictions(dataset, pdf, fkfunc):
     all replicas, central, etc) according to the provided ``fkfunc``, which
     should have the same interface as e.g. ``fk_predictions``.
     """
-    opfunc = OP[dataset.op]
+    opfunc = OP[dataset.op.upper()]
     if dataset.cuts is None:
         raise PredictionsRequireCutsError(
             "FKTables do not always generate predictions for some datapoints "
@@ -128,6 +128,7 @@ def _predictions(dataset, pdf, fkfunc):
         if not fk.use_fixed_predictions:
             all_predictions.append(fkfunc(load_fktable(fk).with_cuts(cuts), pdf))
         else:
+<<<<<<< HEAD
             with open(fk.fixed_predictions_path, "rb") as f:
                 fixed_predictions = np.array(yaml_safe.load(f)["SM_fixed"])
             # Now need to reshape it according it to the expected number of predictions
@@ -143,6 +144,16 @@ def _predictions(dataset, pdf, fkfunc):
                         columns=[i for i in range(pdf.get_members())],
                     )
                 )
+=======
+            with open(fk.fixed_predictions_path, 'rb') as f:
+                fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+            # Now need to reshape it according it to the expected number of predictions
+            if fkfunc == central_fk_predictions:
+                all_predictions.append(pd.DataFrame(fixed_predictions, columns=['data']))
+            elif fkfunc == fk_predictions:
+                fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), 1))
+                all_predictions.append(pd.DataFrame(fixed_predictions.T, columns=[i for i in range(pdf.get_members())]))
+>>>>>>> 1ecbc0b60 (added new_commondata to check_compound in loader)
 
     return opfunc(*all_predictions)
 
