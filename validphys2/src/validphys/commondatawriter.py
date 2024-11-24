@@ -1,3 +1,4 @@
+import numpy as np
 """
 This module contains functions to write commondata and systypes
 tables to files
@@ -33,7 +34,8 @@ def write_commondata_data(commondata, buffer):
     """
     header = f"{commondata.setname} {commondata.nsys} {commondata.ndata}\n"
     buffer.write(header)
-    commondata.commondata_table.to_csv(buffer, sep="\t", header=None)
+    commondata.commondata_table.index = np.arange(1, len(commondata.commondata_table)+1)
+    commondata.commondata_table.to_csv(buffer, float_format="%20.12e", sep="\t", header=None)
 
 
 def write_commondata_to_file(commondata, path):
