@@ -23,10 +23,10 @@ cd_errors, cm_errors = [], []
 # loop over the selected datasets
 for i, ds in enumerate(datasets):
     # dataset name, observable name, and dataset variant
-    setname, observable, variant = ds["dataset"], ds["obs"], ds["variant"]
+    setname, name, observable, variant = ds["dataset"], ds["name"], ds["obs"], ds["variant"]
     # old commondata
-    cd_old = load_commondata_old(commondatafile=f"test_utils/DATA_{setname}_{observable}.dat",
-                                 systypefile=f"test_utils/SYSTYPE_{setname}_{observable}_DEFAULT.dat",
+    cd_old = load_commondata_old(commondatafile=f"test_utils/DATA_{name}_{observable}.dat",
+                                 systypefile=f"test_utils/SYSTYPE_{name}_{observable}_DEFAULT.dat",
                                  setname=setname)
     # load metadata of the new commondata
     metadata = parse_set_metadata(metadata_file=f"{nnpdf_path}/nnpdf_data/nnpdf_data/commondata/{setname}/metadata.yaml")

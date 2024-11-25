@@ -350,7 +350,7 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
         for i, data_value in enumerate(data_values):
             cd_line = f"{i+1:6}\t{metadata['implemented_observables'][0]['process_type']:6}\t"
 
-            for index in [2, 1, 0]:
+            for index in [0, 1, 2]:
                 if kin_values[i][kin_names[index]]['mid'] == None:
                     kin_values[i][kin_names[index]]['mid'] = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
                 if kin_names[index] == "pT":
