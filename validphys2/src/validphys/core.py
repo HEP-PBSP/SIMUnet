@@ -642,7 +642,7 @@ class FKTableSpec(TupleComp):
             with open(c, "rb") as f:
                 cfacs.append(parse_cfactor(f))
             f.close()    
-        return cfacs
+        return [cfacs]
     
 class PositivitySetSpec(DataSetSpec):
     """Extends DataSetSpec to work around the particularities of the positivity datasets"""
