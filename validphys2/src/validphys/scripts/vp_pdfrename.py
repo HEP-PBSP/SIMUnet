@@ -21,7 +21,7 @@ import tempfile
 import lhapdf
 
 from reportengine import colors
-from reportengine.compat import yaml
+from ruamel.yaml import YAML
 
 from validphys.renametools import rename_pdf
 
@@ -81,7 +81,7 @@ def fixup_ref(pdf_path: pathlib.Path, field_dict):
     infopath = pdf_path / f"{pdf_name}.info"
 
     with open(infopath) as f:
-        y = yaml.YAML()
+        y = YAML()
         res = y.load(f)
 
     # If a field entry is not provided, then we revert to the existing

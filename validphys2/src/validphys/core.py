@@ -23,7 +23,8 @@ import numpy as np
 
 from reportengine import namespaces
 from reportengine.baseexceptions import AsInputError
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
+from ruamel.yaml import YAMLError
 
 from NNPDF import (LHAPDFSet as libNNPDF_LHAPDFSet,
     CommonData,
@@ -525,7 +526,7 @@ class DataSetSpec(TupleComp):
             # pseudodata with.
             simu_fac_path = str(self.fkspecs[0].fkpath).split('fastkernel')[0] + "simu_factors/SIMU_" + cd.GetSetName() + ".yaml"
             with open(simu_fac_path, 'rb') as file:
-                simu_file = yaml.safe_load(file)
+                simu_file = yaml_safe.load(file)
             contamination_values = np.array([0.0]*cd.GetNData())
             if self.contamination_data:
                 for parameter in self.contamination_data:
@@ -689,8 +690,8 @@ class FitSpec(TupleComp):
         log.debug('Reading input from fit configuration %s' , p)
         try:
             with p.open() as f:
-                d = yaml.safe_load(f)
-        except (yaml.YAMLError, FileNotFoundError) as e:
+                d = yaml_safe.load(f)
+        except (YAMLError, FileNotFoundError) as e:
             raise AsInputError(str(e)) from e
         d['pdf'] = {'id': self.name, 'label': self.label}
 

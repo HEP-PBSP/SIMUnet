@@ -12,7 +12,7 @@ import glob
 import fnmatch
 from functools import lru_cache
 
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 import lhapdf
 
 
@@ -112,7 +112,7 @@ def infofilename(name):
 @lru_cache()
 def parse_info(name):
     with open(infofilename(name)) as infofile:
-        result = yaml.safe_load(infofile)
+        result = yaml_safe.load(infofile)
     return result
 
 def get_lha_paths():
