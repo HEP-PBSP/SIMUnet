@@ -6,7 +6,7 @@ import logging
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
 
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 from reportengine.colors import t
 
 from validphys.app import App
@@ -298,7 +298,7 @@ class CompareFitApp(App):
         with open(self.args['config_yml']) as f:
             #TODO: Ideally this would load round trip but needs
             #to be fixed in reportengine.
-            c = yaml.safe_load(f)
+            c = yaml_safe.load(f)
         c.update(self.complete_mapping())
         return self.config_class(c, environment=self.environment)
 

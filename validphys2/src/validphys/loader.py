@@ -23,14 +23,14 @@ from functools import cached_property
 from typing import List
 
 import requests
-from reportengine.compat import yaml
+from ruamel.yaml import YAMLError
 from reportengine import filefinder
 
 from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             PositivitySetSpec, DataSetSpec, PDF, Cuts, DataGroupSpec,
                             peek_commondata_metadata, CutsPolicy,
                             InternalCutsWrapper, HyperscanSpec)
-from validphys.utils import tempfile_cleaner
+from validphys.utils import tempfile_cleaner, yaml_safe
 from validphys import lhaindex
 
 DEFAULT_NNPDF_PROFILE_PATH = f"{sys.prefix}/share/NNPDF/nnprofile.yaml"
@@ -94,8 +94,8 @@ def _get_nnpdf_profile(profile_path=None):
     mpath = pathlib.Path(profile_path)
     try:
         with mpath.open() as f:
-            profile_dict = yaml.safe_load(f)
-    except (OSError, yaml.YAMLError) as e:
+            profile_dict = yaml_safe.load(f)
+    except (OSError, YAMLError) as e:
         raise LoaderError(f"Could not parse profile file {mpath}: {e}") from e
     return profile_dict
 
@@ -385,7 +385,7 @@ class Loader(LoaderBase):
             raise CompoundNotFound(msg)
         #This is a little bit funny, but is the least amount of thinking...
         yaml_format = 'FK:\n' + re.sub('FK:', ' - ', txt)
-        data = yaml.safe_load(yaml_format)
+        data = yaml_safe.load(yaml_format)
         #we have to split out 'FK_' the extension to get a name consistent
         #with everything else
         try:
@@ -516,7 +516,7 @@ class Loader(LoaderBase):
         
         # test whether all the mandatory keys are present
         with open(simufactorpath, 'rb') as stream:
-            cfac_file = yaml.safe_load(stream)
+            cfac_file = yaml_safe.load(stream)
         
         if "metadata" not in cfac_file:
                 raise KeyError(f"The 'metadata' key is not present in the SIMU file at {simufactorpath}.")
