@@ -7,9 +7,10 @@ import yaml
 from numpy import allclose
 from validphys.commondataparser import parse_set_metadata, load_commondata_new, load_commondata_old
 from validphys.covmats import covmat_from_systematics
+from matplotlib.pyplot import matshow, show
 
 # nnpdf path
-nnpdf_path = "/Users/teto/Software/nnpdf_git/nnpdf"
+nnpdf_path = "/home/ubunteto/Software/nnpdf"
 # open the yaml file created by commondata_new_to_old script
 with open("test_utils/check_commondata_new_to_old.yaml", "rb") as stream:
     datasets = yaml.safe_load(stream)
@@ -41,6 +42,8 @@ for i, ds in enumerate(datasets):
     covmat_new = covmat_from_systematics(loaded_commondata_with_cuts=cd_new,
                                          dataset_input=inp,
                                          use_weights_in_covmat=False)
+    matshow(covmat_new - covmat_old)
+    show()
     # test central values
     ds["commondata"] = allclose(cd_old.central_values, cd_new.central_values)
     if not ds["commondata"]:
