@@ -1,7 +1,7 @@
 from validphys.app import App
 from validphys.loader import Loader, HyperscanNotFound
 from validphys import hyperplottemplates
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 import pwd
 import os
 
@@ -104,7 +104,7 @@ class HyperoptPlotApp(App):
             hyperop_folder = hyperop_folder[:-1]
 
         with open(hyperopt_filter) as f:
-            filtercard = yaml.safe_load(f)
+            filtercard = yaml_safe.load(f)
 
         folder_path = hyperop_folder
         index_slash = folder_path.rfind("/") + 1
@@ -148,7 +148,7 @@ class HyperoptPlotApp(App):
         with open(self.args['config_yml']) as f:
             # TODO: Ideally this would load round trip but needs
             # to be fixed in reportengine.
-            c = yaml.safe_load(f)
+            c = yaml_safe.load(f)
         c.update(self.complete_mapping())
         return self.config_class(c, environment=self.environment)
 

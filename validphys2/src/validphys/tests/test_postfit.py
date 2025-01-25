@@ -10,7 +10,7 @@ import shutil
 
 from validphys.loader import FallbackLoader as Loader
 from validphys.tests.conftest import FIT
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 
 def test_postfit(tmp):
@@ -80,7 +80,7 @@ def test_postfit(tmp):
         ]
         for file in files:
             with open(file, "r") as f:
-                data = yaml.safe_load_all(f)
+                data = yaml_safe.load_all(f)
                 metadata = next(data)
                 repnos.add(metadata["FromMCReplica"])
         assert (
@@ -91,7 +91,7 @@ def test_postfit(tmp):
     # Check that number of PDF members is written correctly
     infopath = postfitpath / f"{TMPFIT}/{TMPFIT}.info"
     with open(infopath, "r") as f:
-        data = yaml.safe_load(f)
+        data = yaml_safe.load(f)
         # Add one to nrep to account for replica 0
         assert (
             data["NumMembers"] == nrep + 1

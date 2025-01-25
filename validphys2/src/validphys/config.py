@@ -28,7 +28,7 @@ from reportengine.configparser import (
 from reportengine.helputils import get_parser_type
 from reportengine.namespaces import NSList
 from reportengine import report
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from validphys.core import (
     DataGroupSpec,
@@ -1323,7 +1323,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_filters.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1404,7 +1404,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_defaults.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1701,7 +1701,7 @@ class CoreConfig(configparser.Config):
         pp = point_prescription
         th = theoryid.id
 
-        lsv = yaml.safe_load(
+        lsv = yaml_safe.load(
             read_text(validphys.scalevariations, "scalevariationtheoryids.yaml")
         )
 
@@ -1720,7 +1720,7 @@ class CoreConfig(configparser.Config):
             )
 
         # Find scales that correspond to this point prescription
-        pp_scales_dict = yaml.safe_load(
+        pp_scales_dict = yaml_safe.load(
             read_text(validphys.scalevariations, "pointprescriptions.yaml")
         )
 
