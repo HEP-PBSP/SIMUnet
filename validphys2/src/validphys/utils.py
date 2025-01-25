@@ -12,7 +12,6 @@ import tempfile
 import numpy as np
 
 from validobj import parse_input, ValidationError
-from reportengine.compat import yaml
 
 from ruamel.yaml import YAML
 
@@ -246,17 +245,23 @@ def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable,
         Number of systematics in the systype file
     """
     # open the uncertainty yaml file
-    with open(path_uncertainty_yaml) as f:
-        uncertainty = yaml.safe_load(f)
-    
+    with open(path_uncertainty_yaml[0]) as f:
+        uncertainty = yaml_safe.load(f)
+    for path in path_uncertainty_yaml[1:]:
+        with open(path) as f:
+            loaded_file = yaml_safe.load(f)
+            for k in loaded_file["definitions"]:
+                uncertainty["definitions"][k] = loaded_file["definitions"][k]
+            assert(len(uncertainty["bins"]) == len(loaded_file["bins"]))
+            for i,k in enumerate(loaded_file["bins"]):
+                uncertainty["bins"][i].update(k)
     # get uncertainty definitions
     uncertainty_definitions = uncertainty['definitions']
 
     # check whether path_systype is provided else save it in the same directory in which the uncertainty yaml file is
     if path_systype is None:
-        if isinstance(path_uncertainty_yaml, str):
-            path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
-        path_systype = path_uncertainty_yaml.parent / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
+        path = pathlib.Path(path_uncertainty_yaml[0]).parent
+        path_systype = path / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
     else:
         path_systype = pathlib.Path(path_systype) / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
     
@@ -292,19 +297,27 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
 
     # open the metadata yaml file
     with open(path_metadata) as f:
-        metadata = yaml.safe_load(f)
+        metadata = yaml_safe.load(f)
 
     # open the data yaml file
     with open(path_data_yaml) as f:
-        data = yaml.safe_load(f)
+        data = yaml_safe.load(f)
     
     # open the uncertainty yaml file
-    with open(path_uncertainty_yaml) as f:
-        uncertainty = yaml.safe_load(f)
+    with open(path_uncertainty_yaml[0]) as f:
+        uncertainty = yaml_safe.load(f)
+    for path in path_uncertainty_yaml[1:]:
+        with open(path) as f:
+            loaded_file = yaml_safe.load(f)
+            for k in loaded_file["definitions"]:
+                uncertainty["definitions"][k] = loaded_file["definitions"][k]
+            assert(len(uncertainty["bins"]) == len(loaded_file["bins"]))
+            for i,k in enumerate(loaded_file["bins"]):
+                uncertainty["bins"][i].update(k)
 
     # open the kinematics yaml file
     with open(path_kinematics) as f:
-        kinematics = yaml.safe_load(f)
+        kinematics = yaml_safe.load(f)
     
     # get uncertainty definitions and values
     uncertainty_definitions = uncertainty['definitions']
@@ -321,9 +334,8 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     
     # check whether path_DATA is provided else save it in the same directory in which the uncertainty yaml file is
     if path_DATA is None:
-        if isinstance(path_uncertainty_yaml, str):
-            path_uncertainty_yaml = pathlib.Path(path_uncertainty_yaml)
-        path_DATA = path_uncertainty_yaml.parent / f"DATA_{name_dataset}_{observable}.dat"
+        path = pathlib.Path(path_uncertainty_yaml[0]).parent
+        path_DATA = path / f"DATA_{name_dataset}_{observable}.dat"
     else:
         path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}_{observable}.dat"
 

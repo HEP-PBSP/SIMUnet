@@ -26,7 +26,7 @@ if not os.path.isdir(test_dir):
     os.mkdir(test_dir)
 
 # changed by the user
-nnpdf_path = "/Users/teto/Software/nnpdf_git/nnpdf"
+nnpdf_path = "/home/ubunteto/Software/nnpdf"
 # new commondata path
 new_commondata = f"{nnpdf_path}/nnpdf_data/nnpdf_data/commondata"
 # open conversion dictionary
@@ -65,36 +65,35 @@ for ds in conversion_ds:
 
 # convert
 for i, ds in enumerate(conversion_ds):
-    var_int, obs_ind = "variant", "obs"
+    var_ind, obs_ind = "variant", "obs"
     # load metadata file
     path_metadata = new_commondata+"/"+ds["dataset"]+f"/metadata.yaml"
     with open(path_metadata, "r") as stream:
         metadata = yaml.safe_load(stream)
     for o in metadata["implemented_observables"]:
         if o["observable_name"] == ds[obs_ind]:
-            data_file_name, unc_file_name, kin_file_name = o["data_central"], o["data_uncertainties"][0], o["kinematics"]["file"]
+            data_file_name, unc_file_names, kin_file_name = o["data_central"], o["data_uncertainties"], o["kinematics"]["file"]
     # if only in the new format
-    if not ds[var_int]:
+    if not ds[var_ind]:
         path_data_yaml = new_commondata+"/"+ds["dataset"]+f"/{data_file_name}"
-        path_unc_file = new_commondata+"/"+ds["dataset"]+f"/{unc_file_name}"
         path_kin = new_commondata+"/"+ds["dataset"]+f"/{kin_file_name}"
+        path_unc_files = [new_commondata+"/"+ds["dataset"]+f"/{unc_file_name}" for unc_file_name in unc_file_names]
     # if also in the old format (legacy variants)
     else:
-        if os.path.isfile(new_commondata+"/"+ds["dataset"]+f"/data_{ds[var_int]}_{ds[obs_ind]}.yaml"):
-            path_data_yaml = new_commondata+"/"+ds["dataset"]+f"/data_{ds[var_int]}_{ds[obs_ind]}.yaml"
+        if os.path.isfile(new_commondata+"/"+ds["dataset"]+f"/data_{ds[var_ind]}_{ds[obs_ind]}.yaml"):
+            path_data_yaml = new_commondata+"/"+ds["dataset"]+f"/data_{ds[var_ind]}_{ds[obs_ind]}.yaml"
         else:
             path_data_yaml = new_commondata+"/"+ds["dataset"]+f"/data_legacy_{ds[obs_ind]}.yaml"
-        path_unc_file = new_commondata+"/"+ds["dataset"]+f"/uncertainties_{ds[var_int]}_{ds[obs_ind]}.yaml"
+        path_unc_file = new_commondata+"/"+ds["dataset"]+f"/uncertainties_{ds[var_ind]}_{ds[obs_ind]}.yaml"
         path_kin = new_commondata+"/"+ds["dataset"]+f"/kinematics_{ds[obs_ind]}.yaml"
     # write uncertainty files
-
-    uncertainty_yaml_to_systype(path_unc_file,
+    uncertainty_yaml_to_systype(path_unc_files,
                                 name_dataset=ds["name"],
                                 observable=ds["obs"],
                                 path_systype=test_dir)
     # write commondata files
     convert_new_data_to_old(path_data_yaml,
-                            path_unc_file,
+                            path_unc_files,
                             path_kin,
                             path_metadata,
                             name_dataset=ds["name"],

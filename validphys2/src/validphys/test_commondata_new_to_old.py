@@ -42,8 +42,8 @@ for i, ds in enumerate(datasets):
     covmat_new = covmat_from_systematics(loaded_commondata_with_cuts=cd_new,
                                          dataset_input=inp,
                                          use_weights_in_covmat=False)
-    matshow(covmat_new - covmat_old)
-    show()
+    # matshow(covmat_new - covmat_old)
+    # show()
     # test central values
     ds["commondata"] = allclose(cd_old.central_values, cd_new.central_values)
     if not ds["commondata"]:
