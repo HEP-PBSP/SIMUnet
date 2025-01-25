@@ -224,3 +224,171 @@ def scale_from_grid(grid):
     Returns ``'linear'`` if the scale of the grid object is linear,
     and otherwise ``' log'``."""
     return 'linear' if grid.scale == 'linear' else 'log'
+
+
+def uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable, path_systype=None, write_to_file=True):
+    """
+    Convert the new style uncertainty yaml file to the old style systype.
+    Writes 
+
+    Parameters
+    ----------
+    path_uncertainty_yaml : str, or Path
+        Path to the new style uncertainty yaml file to be converted
+    
+    path_systype : str, or Path, optional
+        path to the output systype file
+    
+    Returns
+    -------
+    n_sys : int
+        Number of systematics in the systype file
+    """
+    # open the uncertainty yaml file
+    with open(path_uncertainty_yaml[0]) as f:
+        uncertainty = yaml_safe.load(f)
+    for path in path_uncertainty_yaml[1:]:
+        with open(path) as f:
+            loaded_file = yaml_safe.load(f)
+            for k in loaded_file["definitions"]:
+                uncertainty["definitions"][k] = loaded_file["definitions"][k]
+            assert(len(uncertainty["bins"]) == len(loaded_file["bins"]))
+            for i,k in enumerate(loaded_file["bins"]):
+                uncertainty["bins"][i].update(k)
+    # get uncertainty definitions
+    uncertainty_definitions = uncertainty['definitions']
+
+    # check whether path_systype is provided else save it in the same directory in which the uncertainty yaml file is
+    if path_systype is None:
+        path = pathlib.Path(path_uncertainty_yaml[0]).parent
+        path_systype = path / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
+    else:
+        path_systype = pathlib.Path(path_systype) / f"SYSTYPE_{name_dataset}_{observable}_DEFAULT.dat"
+    
+    # get number of sys (note: stat is not included in the sys)
+    if 'stat' in uncertainty_definitions.keys():
+        n_sys = len(uncertainty_definitions.keys()) - 1
+    else:
+        n_sys = len(uncertainty_definitions.keys())
+
+    if write_to_file:
+        # open the systype file for writing
+        with open(path_systype, 'w') as stream:
+            
+            # header: number of sys 
+            stream.write(f"{n_sys}\n")
+
+            # write the systype treatments
+
+            # remove stat from the uncertainty definitions
+            uncertainty_definitions.pop('stat', None)
+            
+            for i, (_, sys_dict) in enumerate(uncertainty_definitions.items()):
+                # four spaces seems to be the standard format (has to be checked for other datasets than CMS_1JET_8TEV)
+                stream.write(f"{i+1}    {sys_dict['treatment']}    {sys_dict['type']}\n")
+
+    return n_sys
+
+
+def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinematics, path_metadata, name_dataset, observable, path_DATA=None):
+    """
+    Convert the new data format into the old data format
+    """
+
+    # open the metadata yaml file
+    with open(path_metadata) as f:
+        metadata = yaml_safe.load(f)
+
+    # open the data yaml file
+    with open(path_data_yaml) as f:
+        data = yaml_safe.load(f)
+    
+    # open the uncertainty yaml file
+    with open(path_uncertainty_yaml[0]) as f:
+        uncertainty = yaml_safe.load(f)
+    for path in path_uncertainty_yaml[1:]:
+        with open(path) as f:
+            loaded_file = yaml_safe.load(f)
+            for k in loaded_file["definitions"]:
+                uncertainty["definitions"][k] = loaded_file["definitions"][k]
+            assert(len(uncertainty["bins"]) == len(loaded_file["bins"]))
+            for i,k in enumerate(loaded_file["bins"]):
+                uncertainty["bins"][i].update(k)
+
+    # open the kinematics yaml file
+    with open(path_kinematics) as f:
+        kinematics = yaml_safe.load(f)
+    
+    # get uncertainty definitions and values
+    uncertainty_definitions = uncertainty['definitions']
+    uncertainty_values = uncertainty['bins']
+    n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable, write_to_file=False)
+    stats = []
+    for entr in uncertainty_values:
+        try: stats.append(entr["stat"])
+        except KeyError: stats.append(0.)
+    stats = np.array(stats)
+
+    # get data values
+    data_values = data['data_central']
+    
+    # check whether path_DATA is provided else save it in the same directory in which the uncertainty yaml file is
+    if path_DATA is None:
+        path = pathlib.Path(path_uncertainty_yaml[0]).parent
+        path_DATA = path / f"DATA_{name_dataset}_{observable}.dat"
+    else:
+        path_DATA = pathlib.Path(path_DATA) / f"DATA_{name_dataset}_{observable}.dat"
+
+    kin_names = list(kinematics['bins'][0].keys())
+    kin_values = kinematics['bins']
+    # open the DATA file for writing
+    with open(path_DATA, 'w') as stream:
+        
+        # write the header: Dataset name, number of sys errors, and number of data points, whitespace separated
+        stream.write(f"{name_dataset}_{observable} {n_sys} {len(data_values)}\n")
+
+        for i, data_value in enumerate(data_values):
+            cd_line = f"{i+1:6}\t{metadata['implemented_observables'][0]['process_type']:6}\t"
+
+            for index in [2, 1, 0]:
+                if kin_values[i][kin_names[index]]['mid'] == None:
+                    kin_values[i][kin_names[index]]['mid'] = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
+                if kin_names[index] == "pT":
+                    cd_line += f"{kin_values[i][kin_names[index]]['mid']**2:20.12e}\t"
+                else:
+                    cd_line += f"{kin_values[i][kin_names[index]]['mid']:20.12e}\t"
+
+            cd_line += f"\t{data_value:20.12e}\t{stats[i]:20.12e}\t"
+
+            # for j, sys in enumerate(uncertainty_values):
+            sys = uncertainty_values[i]
+            for j, (sys_name, sys_val) in enumerate(sys.items()):
+                if sys_name == 'stat':
+                    continue
+
+                add_sys = sys_val
+                if data_value != 0.0:
+                    mult_sys = add_sys * 100.0 / data_value 
+                else:
+                    mult_sys = 0.0
+
+                if j == len(sys)-1:
+                    cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\n"
+                else:
+                    cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\t"
+
+            stream.write(cd_line)
+
+        
+
+if __name__ == '__main__':
+    new_commondata    = "/Users/teto/Software/nnpdf_git/nnpdf/nnpdf_data/nnpdf_data/new_commondata"
+    test_dir          = "/Users/teto/Software/simunet_git/SIMUnet/validphys2/src/validphys/test_utils"
+    name_dataset      = "ATLAS_1JET_13TEV_DIF"
+    observable        = "PT-Y"
+    path_unc_file     = new_commondata+"/"+name_dataset+"/uncertainties.yaml"
+    path_data_yaml    = new_commondata+"/"+name_dataset+"/data.yaml"
+    path_kin          = new_commondata+"/"+name_dataset+"/kinematics.yaml"
+    path_metadata     = new_commondata+"/"+name_dataset+"/metadata.yaml"
+    uncertainty_yaml_to_systype(path_unc_file, name_dataset=name_dataset, observable=observable, path_systype=test_dir)
+    convert_new_data_to_old(path_data_yaml, path_unc_file, path_kin, path_metadata, name_dataset=name_dataset, observable=observable, path_DATA=test_dir)

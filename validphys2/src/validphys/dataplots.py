@@ -866,7 +866,11 @@ def plot_smpdf(pdf, dataset, obs_pdf_correlations, mark_threshold:float=0.9):
     """
     info = get_info(dataset)
 
-    table = kitable(dataset, info)
+    try:
+        table = kitable(dataset, info)
+    except:
+        log.warning(f"Problems with kitable loading {dataset.name}")
+        table = kitable(dataset.commondata, info)
     figby = sane_groupby_iter(table, info.figure_by)
 
     basis = obs_pdf_correlations.basis
@@ -880,7 +884,9 @@ def plot_smpdf(pdf, dataset, obs_pdf_correlations, mark_threshold:float=0.9):
     plotting_var = info.get_xcol(table)
 
     #TODO: vmin vmax should be global or by figure?
-    vmin,vmax = min(plotting_var), max(plotting_var)
+    vmin, vmax = min(plotting_var), max(plotting_var)
+    if type(vmin) == str or type(vmax) == str:
+        vmin, vmax = 0, 1
     if info.x_scale == 'log':
         norm = mcolors.LogNorm(vmin, vmax)
     else:
@@ -889,7 +895,7 @@ def plot_smpdf(pdf, dataset, obs_pdf_correlations, mark_threshold:float=0.9):
     sm = cm.ScalarMappable(cmap=cm.viridis, norm=norm)
 
     for same_vals, fb in figby:
-        grid = fullgrid[ np.asarray(fb.index),...]
+        grid = fullgrid[np.arange(len(fb.index)), ...]
 
 
         #Use the maximum absolute correlation for plotting purposes
@@ -906,9 +912,13 @@ def plot_smpdf(pdf, dataset, obs_pdf_correlations, mark_threshold:float=0.9):
         h*=2.5
         fig,axes = plt.subplots(nrows=nf ,sharex=True, figsize=(w,h), sharey=True)
         fig.suptitle(title)
-        colors = sm.to_rgba(info.get_xcol(fb))
+        if np.vectorize(isinstance)(info.get_xcol(fb), str).any():
+            temp = np.linspace(start=0, stop=1, num=len(info.get_xcol(fb)))
+            colors = sm.to_rgba(temp)
+        else:
+            colors = sm.to_rgba(info.get_xcol(fb))
         for flindex, (ax, fl) in enumerate(zip(axes, fls)):
-            for i,color in enumerate(colors):
+            for i, color in enumerate(colors):
                 ax.plot(x, grid[i,flindex,:].T, color=color)
 
 
