@@ -278,8 +278,6 @@ def level0_commondata_wc(
 
     level0_commondata_instances_wc = []
 
-    # import IPython; IPython.embed()
-
     for dataset in data.datasets:
             
         commondata_wc = dataset.commondata.load_commondata()
@@ -290,6 +288,31 @@ def level0_commondata_wc(
         # == Generate a new CommonData instance with central value given by Level 0 data generated with fakepdf ==#
         t0_prediction = dataset_t0_predictions(dataset=dataset,
                                                t0set=fakepdf)
+        # Contamination
+        if dataset.contamination:
+            theoryid = dataset.thspec.id
+            cont_path = l.datapath / f"theory_{theoryid}" / "simu_factors" / f"SIMU_{dataset.name}.yaml"
+            # load contamination parameters
+            cont_params = dataset.contamination_data
+            # load simu_card file
+            with open(cont_path, "r+") as stream:
+                simu_card = yaml.safe_load(stream)
+            stream.close()
+            # K-factors loading
+            k_factor = np.zeros(len(t0_prediction))
+            for param in cont_params:
+                # load the k_fac value
+                value = param["value"]
+                # load the linear combination coefficients
+                lin_comb = param["linear_combination"]
+                # load the BMS cross-section
+                bsm_xs = np.zeros(len(t0_prediction))
+                for op in lin_comb:
+                    bsm_xs += lin_comb[op] * np.array(simu_card[dataset.contamination][op])[cuts]
+                # compute the K-factor correction
+                k_factor += value * bsm_xs / np.array(simu_card[dataset.contamination]["SM"])[cuts]
+            # update t0 prediction to BSM t0 prediction
+            t0_prediction *= (1. + k_factor)
         # N.B. cuts already applied to th. pred.
         level0_commondata_instances_wc.append(commondata_wc.with_central_value(t0_prediction))
 
