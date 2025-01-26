@@ -7,7 +7,7 @@
 import os
 import json
 import numpy as np
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 import validphys
 import n3fit
 from n3fit import vpinterface
@@ -272,4 +272,4 @@ def storefit(
     }
 
     with open(f"{replica_path}/{fitname}.exportgrid", "w") as fs:
-        yaml.dump(data, fs)
+        yaml_safe.dump(data, fs)

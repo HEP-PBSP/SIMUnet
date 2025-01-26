@@ -23,7 +23,7 @@ import logging
 import prompt_toolkit
 
 from reportengine import colors
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from validphys.api import API
 
@@ -125,7 +125,7 @@ def main():
         preproc_lims = PREPROCESSING_LIMS
         log.info(
             "The following constraints will be used for preprocessing ranges, \n%s",
-            yaml.dump(preproc_lims),
+            yaml_safe.dump(preproc_lims),
         )
     else:
         # don't enforce any limits.

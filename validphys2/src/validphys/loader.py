@@ -23,14 +23,14 @@ from functools import cached_property
 from typing import List
 
 import requests
-from reportengine.compat import yaml
+from ruamel.yaml import YAMLError
 from reportengine import filefinder
 
 from validphys.core import (CommonDataSpec, FitSpec, TheoryIDSpec, FKTableSpec,
                             PositivitySetSpec, DataSetSpec, PDF, Cuts, DataGroupSpec,
                             peek_commondata_metadata, CutsPolicy,
                             InternalCutsWrapper, HyperscanSpec)
-from validphys.utils import tempfile_cleaner
+from validphys.utils import tempfile_cleaner, yaml_safe
 from validphys import lhaindex
 from validphys.pineparser import parse_theory_meta, TheoryMeta
 
@@ -95,8 +95,8 @@ def _get_nnpdf_profile(profile_path=None):
     mpath = pathlib.Path(profile_path)
     try:
         with mpath.open() as f:
-            profile_dict = yaml.safe_load(f)
-    except (OSError, yaml.YAMLError) as e:
+            profile_dict = yaml_safe.load(f)
+    except (OSError, YAMLError) as e:
         raise LoaderError(f"Could not parse profile file {mpath}: {e}") from e
     return profile_dict
 
@@ -375,7 +375,7 @@ class Loader(LoaderBase):
                                                 f"File '{path_metadata}' not found.")
             # get observable name from the setname
             with open(path_metadata, 'r') as f:
-                metadata = yaml.safe_load(f)
+                metadata = yaml_safe.load(f)
             # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
             fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
             fkpath = tuple([theopath/ 'fastkernel' / (f'{fktable}.pineappl.lz4') for fktable in fktables])
@@ -418,7 +418,7 @@ class Loader(LoaderBase):
                                                 f"File '{path_metadata}' not found.")
             # get observable name from the setname
             with open(path_metadata, 'r') as f:
-                metadata = yaml.safe_load(f)
+                metadata = yaml_safe.load(f)
             op = metadata["implemented_observables"][0]["theory"]["operation"]
             if op.upper() == "NULL":
                 raise CompoundNotFound
@@ -436,7 +436,7 @@ class Loader(LoaderBase):
                 raise CompoundNotFound(msg)
             #This is a little bit funny, but is the least amount of thinking...
             yaml_format = 'FK:\n' + re.sub('FK:', ' - ', txt)
-            data = yaml.safe_load(yaml_format)
+            data = yaml_safe.load(yaml_format)
             #we have to split out 'FK_' the extension to get a name consistent
             #with everything else
             try:
@@ -567,7 +567,7 @@ class Loader(LoaderBase):
         
         # test whether all the mandatory keys are present
         with open(simufactorpath, 'rb') as stream:
-            cfac_file = yaml.safe_load(stream)
+            cfac_file = yaml_safe.load(stream)
         
         if "metadata" not in cfac_file:
                 raise KeyError(f"The 'metadata' key is not present in the SIMU file at {simufactorpath}.")
@@ -619,7 +619,7 @@ class Loader(LoaderBase):
         if new_commondata:
             path_metadata = theopath / 'fastkernel' / f'{name}_metadata.yaml'
             with open(path_metadata, "r") as stream:
-                metadata_card = yaml.safe_load(stream=stream)
+                metadata_card = yaml_safe.load(stream=stream)
             op = metadata_card["implemented_observables"][0]["theory"]["operation"]
 
         #Note this is simply for convenience when scripting. The config will
