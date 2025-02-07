@@ -22,7 +22,7 @@ import hashlib
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
 
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 from reportengine.colors import t
 from validphys.loader import RemoteLoader, Loader
 from validphys.renametools import Spinner
@@ -370,7 +370,7 @@ def interactive_meta(path):
 
     meta_dict = {"title": title, "author": author, "keywords": keywords}
     with open(path / "meta.yaml", "w") as stream:
-        yaml.safe_dump(meta_dict, stream)
+        yaml_safe.dump(meta_dict, stream)
 
 
 def check_input(path):

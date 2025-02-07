@@ -3,7 +3,7 @@ meta:
   author: James Moore
   keywords: [simunet]
 
-pdf: 221103-jmm-no_top_iterated
+pdf: NNPDF40_nnlo_as_01180 #221103-jmm-no_top_iterated
 
 dataset_inputs:
 # Drell - Yan

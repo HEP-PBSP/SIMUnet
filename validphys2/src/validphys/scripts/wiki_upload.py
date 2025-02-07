@@ -50,7 +50,7 @@ def edit_settings(d):
 
 def handle_meta_interactive(output):
     metapath = output / 'meta.yaml'
-    from reportengine.compat import yaml
+    from validphys.utils import yaml_rt
     #The yaml lexer is broken. Use something else.
     lex = pygments.lexers.get_lexer_by_name('pkgconfig')
     fmt = pygments.formatters.TerminalFormatter()
@@ -66,7 +66,7 @@ def handle_meta_interactive(output):
         edit = not confirm(msg, default=True)
 
         if edit:
-            d = yaml.load(content, yaml.RoundTripLoader)
+            d = yaml_rt.load(content)
         else:
             return
 
@@ -82,7 +82,7 @@ def handle_meta_interactive(output):
         print("Metadata:")
 
         s = io.StringIO()
-        yaml.dump(d, s, yaml.RoundTripDumper)
+        yaml_rt.dump(d, s)
         metastr = s.getvalue()
         print(pygments.highlight(metastr, lex, fmt))
 
