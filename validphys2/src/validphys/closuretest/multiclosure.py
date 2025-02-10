@@ -37,7 +37,7 @@ SAMPLING_INTERVAL = 5
 @check_use_t0
 @check_t0pdfset_matches_multiclosure_law
 def internal_multiclosure_dataset_loader(
-    dataset, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics
+    dataset, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics, dataset_bsm_factor
 ):
     """Internal function for loading multiple theory predictions for a given
     dataset and a single covariance matrix using underlying law as t0 PDF,
@@ -80,12 +80,13 @@ def internal_multiclosure_dataset_loader(
     typically used in these studies.
 
     """
+    
     fits_dataset_predictions = [
-        ThPredictionsResult.from_convolution(pdf, dataset)
+        ThPredictionsResult.from_convolution(pdf, dataset, bsm_factor=dataset_bsm_factor)
         for pdf in fits_pdf
     ]
     fits_underlying_predictions = ThPredictionsResult.from_convolution(
-        multiclosure_underlyinglaw, dataset
+        multiclosure_underlyinglaw, dataset, bsm_factor=dataset_bsm_factor
     )
 
     sqrt_covmat = la.cholesky(dataset_inputs_t0_covmat_from_systematics, lower=True)
@@ -100,11 +101,11 @@ def internal_multiclosure_dataset_loader(
 @check_t0pdfset_matches_multiclosure_law
 @check_use_t0
 def internal_multiclosure_data_loader(
-    data, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics
+    data, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics, dataset_inputs_bsm_factor
 ):
     """Like `internal_multiclosure_dataset_loader` except for all data"""
     return internal_multiclosure_dataset_loader(
-        data, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics
+        data, fits_pdf, multiclosure_underlyinglaw, fits, dataset_inputs_t0_covmat_from_systematics, dataset_inputs_bsm_factor
     )
 
 

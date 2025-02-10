@@ -9,14 +9,21 @@ import hashlib
 
 import numpy as np
 import pandas as pd
+import os
+import yaml
 
-from validphys.covmats import INTRA_DATASET_SYS_NAME
+from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
+
+from validphys.convolution import central_predictions
+from validphys.loader import Loader
 
 from reportengine import collect
 
 FILE_PREFIX = "datacuts_theory_fitting_"
 
 log = logging.getLogger(__name__)
+
+l = Loader()
 
 DataTrValSpec = namedtuple('DataTrValSpec', ['pseudodata', 'tr_idx', 'val_idx'])
 
@@ -233,6 +240,239 @@ def indexed_make_replica(groups_index, make_replica):
     """
 
     return pd.DataFrame(make_replica, index=groups_index, columns=["data"])
+
+
+def level0_commondata_wc(
+        data,
+        fakepdf
+    ):
+    """
+    Given a validphys.core.DataGroupSpec object, load commondata and
+    generate a new commondata instance with central values replaced
+    by fakepdf prediction
+
+    Parameters
+    ----------
+
+    data : validphys.core.DataGroupSpec
+
+    fakepdf: validphys.core.PDF
+
+    Returns
+    -------
+    list
+        list of validphys.coredata.CommonData instances corresponding to
+        all datasets within one experiment. The central value is replaced
+        by Level 0 fake data.
+
+    Example
+    -------
+    >>> from validphys.api import API
+    >>> API.level0_commondata_wc(dataset_inputs=[{"dataset":"NMC"}],
+                                 use_cuts="internal",
+                                 theoryid=200,
+                                 fakepdf="NNPDF40_nnlo_as_01180")
+
+    [CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]
+    """
+
+    level0_commondata_instances_wc = []
+
+    # import IPython; IPython.embed()
+
+    for dataset in data.datasets:
+            
+        commondata_wc = dataset.commondata.load_commondata()
+        if dataset.cuts is not None:
+            cuts = dataset.cuts.load()
+            commondata_wc = commondata_wc.with_cuts(cuts=cuts)
+        
+        # == Generate a new CommonData instance with central value given by Level 0 data generated with fakepdf ==#
+        t0_prediction = dataset_t0_predictions(dataset=dataset,
+                                               t0set=fakepdf)
+        # N.B. cuts already applied to th. pred.
+        level0_commondata_instances_wc.append(commondata_wc.with_central_value(t0_prediction))
+
+    return level0_commondata_instances_wc
+
+
+def make_level1_data(
+        level0_commondata_wc,
+        filterseed,
+        data_index):
+    """
+    Given a list of Level 0 commondata instances, return the
+    same list with central values replaced by Level 1 data.
+
+    Level 1 data is generated using validphys.make_replica.
+    The covariance matrix, from which the stochastic Level 1
+    noise is sampled, is built from Level 0 commondata
+    instances (level0_commondata_wc). This, in particular,
+    means that the multiplicative systematics are generated
+    from the Level 0 central values.
+
+    Note that the covariance matrix used to generate Level 2
+    pseudodata is consistent with the one used at Level 1
+    up to corrections of the order eta * eps, where eta and
+    eps are defined as shown below:
+
+    Generate L1 data: L1 = L0 + eta, eta ~ N(0,CL0)
+    Generate L2 data: L2_k = L1 + eps_k, eps_k ~ N(0,CL1)
+
+    where CL0 and CL1 means that the multiplicative entries
+    have been constructed from Level 0 and Level 1 central
+    values respectively.
+
+
+    Parameters
+    ----------
+
+    level0_commondata_wc : list
+                        list of validphys.coredata.CommonData instances corresponding to
+                        all datasets within one experiment. The central value is replaced
+                        by Level 0 fake data. Cuts already applied.
+
+    filterseed : int
+                random seed used for the generation of Level 1 data
+
+    data_index : pandas.MultiIndex
+
+    Returns
+    -------
+    list
+        list of validphys.coredata.CommonData instances corresponding to
+        all datasets within one experiment. The central value is replaced
+        by Level 1 fake data.
+
+    Example
+    -------
+
+    >>> from validphys.api import API
+    >>> API.make_level1_data(dataset_inputs=[{"dataset": "NMC"}],
+                             use_cuts="internal",
+                             theoryid=200,
+                             fakepdf="NNPDF40_nnlo_as_01180",
+                             filterseed=0,
+                             data_index)
+    [CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]
+    """
+
+    # ================== generation of Level1 data ======================#
+    level1_data = make_replica(level0_commondata_wc,
+                               filterseed,
+                               genrep=True,
+                               )
+
+    indexed_level1_data = indexed_make_replica(data_index, level1_data)
+
+    dataset_order = {cd.setname: i for i, cd in enumerate(level0_commondata_wc)}
+
+    # ===== create commondata instances with central values given by pseudo_data =====#
+    level1_commondata_dict = {c.setname: c for c in level0_commondata_wc}
+    level1_commondata_instances_wc = []
+
+    for xx, grp in indexed_level1_data.groupby('dataset'):
+        level1_commondata_instances_wc.append(
+            level1_commondata_dict[xx].with_central_value(grp.values)
+        )
+    # sort back so as to mantain same order as in level0_commondata_wc
+    level1_commondata_instances_wc.sort(key=lambda x: dataset_order[x.setname])
+
+    return level1_commondata_instances_wc
+
+
+def make_level1_list_data(
+    level0_commondata_wc,
+    filterseed,
+    n_samples,
+    data_index,
+):
+    """
+    Given a list of validphys.coredata.CommonData instances with central
+    values replaced with `fakepdf` predictions with cuts applied
+    generate a list of level 1 data from such instances
+
+    Parameters
+    ----------
+
+    level0_commondata:_wc: list of validphys.coredata.CommonData instances
+                           where the central value is replaced by level 0 
+                           `fakepdf` predictions
+
+    filterseed: int starting seed used to make different replicas
+
+    n_samples: int number of replicas
+
+    data_index: pandas.MultiIndex providing information on the experiment,
+                the dataset, and the cut index
+
+    Returns
+    -------
+    list
+        list of lists of validphys.coredata.CommonData instances corresponding
+        to all datasets within one experiment. The central value is replaced
+        by Level 1 fake data.
+
+    Example
+    -------
+    >>> from validphys.api import API
+    >>> from validphys.loader import Loader
+    >>> from validphys.results import data_index
+    >>> l = Loader()
+    >>> dataset = l.check_dataset(name="NMC", theoryid=200)
+    >>> experiment = l.check_experiment(name="data", datasets=[dataset])
+    >>> lv0_cd_wc = API.level0_commondata_wc(dataset_inputs=[{"dataset":"NMC"}],
+                                             use_cuts="internal",
+                                             theoryid=200,
+                                             fakepdf="NNPDF40_nnlo_as_01180"
+                                             )
+    >>> API.make_level1_list_data(level0_commondata_wc=lv0_cd_wc,
+                                  filterseed=0,
+                                  n_samples=1,
+                                  data_index=data_index(experiment)
+                                  )
+
+    [[CommonData(setname='NMC', ndata=204, commondataproc='DIS_NCE', nkin=3, nsys=16)]]
+    """
+    samples = [make_level1_data(level0_commondata_wc=level0_commondata_wc,
+                                    filterseed=filterseed+i,
+                                    data_index=data_index) for i in range(n_samples)]
+
+    return samples
+
+
+def sm_predictions(
+        dataset_inputs,
+        pdf,
+        theoryid
+    ):
+
+    """
+    Parameters
+    ----------
+    dataset_inputs: NSList of core.DataSetInput objects
+
+    pdf: core.PDF object
+
+    theoryid: TheoryIDSpec
+
+    Returns
+    -------
+
+    dict
+        dictionary of standard model predictions for the
+        given dataset_input, pdf, and theory
+
+    """
+    
+    sm_dict = {}
+
+    for dataset in dataset_inputs:
+        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid)
+
+        sm_dict[dataset.name] = central_predictions(data, pdf)
+
+    return sm_dict
 
 
 _group_recreate_pseudodata = collect('indexed_make_replica', ('group_dataset_inputs_by_experiment',))

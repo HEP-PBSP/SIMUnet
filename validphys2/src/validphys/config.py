@@ -28,7 +28,7 @@ from reportengine.configparser import (
 from reportengine.helputils import get_parser_type
 from reportengine.namespaces import NSList
 from reportengine import report
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from validphys.core import (
     DataGroupSpec,
@@ -38,6 +38,7 @@ from validphys.core import (
     MatchedCuts,
     SimilarCuts,
     ThCovMatSpec,
+    PDF,
 )
 from validphys.fitdata import fitted_replica_indexes, num_fitted_replicas
 from validphys.loader import (
@@ -171,6 +172,10 @@ class CoreConfig(configparser.Config):
         except NotImplementedError as e:
             raise ConfigError(str(e))
         return pdf
+    
+    def parse_fakepdf(self, name: str) -> PDF:
+        """PDF set used to generate the fake data in a closure test."""
+        return self.parse_pdf(name)
 
     def parse_load_weights_from_fit(self, name: str):
         """A fit in the results folder, containing at least a valid filter result."""
@@ -1318,7 +1323,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_filters.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1399,7 +1404,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_defaults.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1696,7 +1701,7 @@ class CoreConfig(configparser.Config):
         pp = point_prescription
         th = theoryid.id
 
-        lsv = yaml.safe_load(
+        lsv = yaml_safe.load(
             read_text(validphys.scalevariations, "scalevariationtheoryids.yaml")
         )
 
@@ -1715,7 +1720,7 @@ class CoreConfig(configparser.Config):
             )
 
         # Find scales that correspond to this point prescription
-        pp_scales_dict = yaml.safe_load(
+        pp_scales_dict = yaml_safe.load(
             read_text(validphys.scalevariations, "pointprescriptions.yaml")
         )
 

@@ -16,7 +16,7 @@ import prompt_toolkit
 import shutil
 
 from reportengine import colors
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from validphys.api import API
 
@@ -40,7 +40,7 @@ def main():
     input_dir = pathlib.Path(input_fit)
 
     with open(input_dir / "filter.yml", 'r') as file:
-        input_info = yaml.safe_load(file)
+        input_info = yaml_safe.load(file)
 
     fixed_fit = input_info['load_weights_from_fit']
     l = Loader()
