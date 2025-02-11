@@ -36,6 +36,7 @@ allowing to account for information on COMPOUND predictions and cuts. A lower
 level interface which operates with :py:class:`validphys.coredata.FKTableData`
 objects is also available.
 """
+
 import operator
 import functools
 
@@ -78,11 +79,13 @@ def _asy(a, b):
 def _smn(a, b, c, d):
     return (a + b) / (c + d)
 
+
 def _com(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t):
     return (a + b + c + d + e + f + g + h + i + j) / ( k + l + m + n + o + p + q + r + s + t)
 
 def _smt(a, b, c, d, e, f, g, h, i, j):
-    return (a + b + c + d + e + f + g + h + i + j)
+    return a + b + c + d + e + f + g + h + i + j
+
 
 def _id(a):
     return a
@@ -98,7 +101,10 @@ OP = {
     "NULL": _id,
 }
 
-class PredictionsRequireCutsError(Exception): pass
+
+class PredictionsRequireCutsError(Exception):
+    pass
+
 
 def _predictions(dataset, pdf, fkfunc):
     """Combine data on all the FKTables in the database according to the
@@ -120,23 +126,30 @@ def _predictions(dataset, pdf, fkfunc):
     # predictions instead.
     all_predictions = []
     for fk in dataset.fkspecs:
-         if not fk.use_fixed_predictions:
-             all_predictions.append(fkfunc(load_fktable(fk).with_cuts(cuts), pdf))
-         else:
-             with open(fk.fixed_predictions_path, 'rb') as f:
-                 fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
-             # Now need to reshape it according it to the expected number of predictions
-             if fkfunc == central_fk_predictions:
-                 all_predictions.append(pd.DataFrame(fixed_predictions, columns=['data']))
-             elif fkfunc == fk_predictions:
-                 fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), 1))
-                 all_predictions.append(pd.DataFrame(fixed_predictions.T, columns=[i for i in range(pdf.get_members())]))
+        if not fk.use_fixed_predictions:
+            all_predictions.append(fkfunc(load_fktable(fk).with_cuts(cuts), pdf))
+        else:
+            with open(fk.fixed_predictions_path, "rb") as f:
+                fixed_predictions = np.array(yaml_safe.load(f)["SM_fixed"])
+            # Now need to reshape it according it to the expected number of predictions
+            if fkfunc == central_fk_predictions:
+                all_predictions.append(
+                    pd.DataFrame(fixed_predictions, columns=["data"])
+                )
+            elif fkfunc == fk_predictions:
+                fixed_predictions = np.tile(fixed_predictions, (pdf.get_members(), 1))
+                all_predictions.append(
+                    pd.DataFrame(
+                        fixed_predictions.T,
+                        columns=[i for i in range(pdf.get_members())],
+                    )
+                )
 
     return opfunc(*all_predictions)
 
 
 def predictions(dataset, pdf):
-    """"Compute theory predictions for a given PDF and dataset. Information
+    """ "Compute theory predictions for a given PDF and dataset. Information
     regading the dataset, on cuts, CFactors and combinations of FKTables is
     taken into account to construct the predictions.
 
