@@ -15,6 +15,7 @@ import traceback
 from collections import ChainMap, defaultdict
 
 import ruamel_yaml as yaml
+from validphys.utils import yaml_safe
 from bs4 import BeautifulSoup
 #TODO: Move the thumbnail logic somewhere
 import skimage.transform
@@ -70,7 +71,7 @@ def meta_from_path(p):
     if yaml_meta.exists():
         with yaml_meta.open() as f:
             try:
-                yaml_res = yaml.safe_load(f)
+                yaml_res = yaml_safe.load(f)
             except yaml.YAMLError as e:
                 print(f"Error processing {yaml_meta}: {e}", file=sys.stderr)
     index = p/'index.html'

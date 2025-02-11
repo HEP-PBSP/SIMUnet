@@ -20,7 +20,8 @@ import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
-import yaml
+
+from validphys.utils import yaml_safe
 import os
 
 from reportengine.figure import figure, figuregen
@@ -2027,7 +2028,7 @@ def load_datasets_contamination(
                 f"Loading {dataset.name}"
             )
             with open(bsmfile, "r+") as stream:
-                simu_card = yaml.safe_load(stream)
+                simu_card = yaml_safe.load(stream)
             stream.close()
 
             k_factors = np.zeros(len(simu_card["SM_fixed"]))
