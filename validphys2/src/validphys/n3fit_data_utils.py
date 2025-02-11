@@ -5,6 +5,7 @@ Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 """
 import numpy as np
 import yaml
+from validphys.utils import yaml_safe
 from validphys.fkparser import parse_cfactor
 
 from validphys.coredata import CFactorData
@@ -100,7 +101,7 @@ def parse_simu_parameters_names_CF(simu_parameters_names_CF, simu_parameters_lin
     for name, path in simu_parameters_names_CF.items():
         # load SIMU yaml file
         with open(path, "rb") as stream:
-            cfac_file = yaml.safe_load(stream)
+            cfac_file = yaml_safe.load(stream)
 
         eft_order = "_".join(name.split("_")[:-1])
         eft_operator_list = list(simu_parameters_linear_combinations[name].keys())
