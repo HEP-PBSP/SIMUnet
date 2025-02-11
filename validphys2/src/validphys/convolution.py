@@ -43,7 +43,6 @@ import functools
 import pandas as pd
 import numpy as np
 
-import yaml
 from validphys.utils import yaml_safe
 
 from validphys.pdfbases import evolution

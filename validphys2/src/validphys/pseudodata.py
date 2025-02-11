@@ -10,7 +10,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 import os
-import yaml
+
 
 from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
 

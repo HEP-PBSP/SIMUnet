@@ -20,7 +20,7 @@ import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
-import yaml
+
 from validphys.utils import yaml_safe
 import os
 

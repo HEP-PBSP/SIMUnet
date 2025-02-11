@@ -14,7 +14,6 @@ import logging
 import numpy as np
 import pandas as pd
 
-import yaml
 from validphys.utils import yaml_safe
 
 from reportengine import collect

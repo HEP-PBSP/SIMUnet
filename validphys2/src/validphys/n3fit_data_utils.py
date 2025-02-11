@@ -4,7 +4,6 @@ n3fit_data_utils.py
 Library of helper functions to n3fit_data.py for reading libnnpdf objects.
 """
 import numpy as np
-import yaml
 from validphys.utils import yaml_safe
 from validphys.fkparser import parse_cfactor
 
