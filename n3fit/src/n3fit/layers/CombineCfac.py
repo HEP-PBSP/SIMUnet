@@ -72,9 +72,6 @@ class CombineCfacLayer(Layer):
         if num_initial > 0:
             initial_values = tf.concat(initial_values, 0)
             initial_values = tf.math.multiply(initial_values, self.scales)
-
-        if num_initial > 0:
-            initial_values = tf.concat(initial_values, 0)
             initial_values = tf.reshape(initial_values, (num_initial,))
             self.w = tf.Variable(
                 initial_value=initial_values,
