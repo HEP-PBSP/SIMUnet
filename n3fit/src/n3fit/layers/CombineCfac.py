@@ -70,12 +70,6 @@ class CombineCfacLayer(Layer):
 
         self.scales = np.array(scales, dtype=np.float32)
         if num_initial > 0:
-<<<<<<< HEAD
-=======
-            initial_values = tf.concat(initial_values, 0)
-            initial_values = tf.math.multiply(initial_values, self.scales)
-        if num_initial > 0:
->>>>>>> ad767c85b (Reformatted with black)
             initial_values = tf.concat(initial_values, 0)
             initial_values = tf.math.multiply(initial_values, self.scales)
             initial_values = tf.reshape(initial_values, (num_initial,))
@@ -129,23 +123,9 @@ class CombineCfacLayer(Layer):
                 dtype=np.float32,
             )
             linear = self._compute_linear(linear_values)
-<<<<<<< HEAD
             linear = tf.cast(linear, tf.float32)
             inputs = tf.cast(inputs, tf.float32)
 
             return (1 + linear) * inputs
-=======
-            inputs = tf.cast(inputs, tf.float64)
-
-<<<<<<< HEAD
-            try:
-                answer = (1 + linear) * inputs 
-            except:
-                import IPython; IPython.embed()
-            return answer
->>>>>>> 62d335175 (Fixed issues with floats)
-=======
-            return (1 + linear) * inputs
->>>>>>> ad767c85b (Reformatted with black)
 
         return inputs
