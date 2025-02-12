@@ -124,6 +124,7 @@ class ModelTrainer:
         simu_parameters_names=None,
         simu_parameters_scales=None,
         bsm_fac_initialisations=None,
+        analytic_initialisation=None,
         bsm_initialisation_seed=0,
         debug=False,
         kfold_parameters=None,
@@ -187,6 +188,7 @@ class ModelTrainer:
         self.simu_parameters_names=simu_parameters_names
         self.simu_parameters_scales = simu_parameters_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
+        self.analytic_initialisation = analytic_initialisation
         self.bsm_initialisation_seed = bsm_initialisation_seed
         self.fixed_pdf = fixed_pdf
         self.replicas = replicas
@@ -511,6 +513,7 @@ class ModelTrainer:
             scales=np.array(self.simu_parameters_scales, dtype=np.float32),
             linear_names=self.simu_parameters_names,
             initialisations=self.bsm_fac_initialisations,
+            analytic_initialisation=self.analytic_initialisation,
             initialisation_seed=self.bsm_initialisation_seed,
             replica_number=self.replicas[0],
         )
