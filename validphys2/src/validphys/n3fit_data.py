@@ -14,7 +14,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-import yaml
+from validphys.utils import yaml_safe
 
 from reportengine import collect
 from reportengine.table import table
@@ -260,7 +260,7 @@ def fitting_data_dict(
                     prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
                     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
                 with open(path, 'rb') as f:
-                    fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+                    fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
                 datasets[i]['fixed_predictions'] = fixed_predictions
             else:
                 datasets[i]['use_fixed_predictions'] = False
