@@ -1,7 +1,8 @@
 # Configuration file for NNPDF++
 #
 ############################################################
-description: "Runcard template. This one performs a simultaenous fit with some top operators. The fit was performed as a check to verify that the renaming to simu_fac and simu_parameters has been successfull. NNPDF4.0 methodology."
+description: "Runcard template. This one performs a simultaenous fit with some top operators. The fit was performed as a check to verify that
+ the renaming to simu_fac and simu_parameters has been successfull. NNPDF4.0 methodology. Used to produce Figure 4.7 of https://arxiv.org/pdf/2402.03308"
 
 ############################################################
 # frac: training fraction
