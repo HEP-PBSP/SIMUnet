@@ -121,7 +121,7 @@ class N3FitConfig(Config):
                 # booleans.
                 # The floating point parsing yields warnings everywhere, which
                 # we suppress.
-                file_content = yaml_safe.load(o, version="1.1")
+                file_content = yaml_safe.load(o)
         except YAMLError as e:
             raise ConfigError(f"Failed to parse yaml file: {e}")
         if not isinstance(file_content, dict):
