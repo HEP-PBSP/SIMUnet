@@ -123,6 +123,7 @@ class CombineCfacLayer(Layer):
                 dtype=np.float32,
             )
             linear = self._compute_linear(linear_values)
+            linear = tf.cast(linear, tf.float32)
             inputs = tf.cast(inputs, tf.float32)
 
             return (1 + linear) * inputs
