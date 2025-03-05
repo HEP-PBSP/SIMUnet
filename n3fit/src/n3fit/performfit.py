@@ -52,8 +52,6 @@ def analytic_solution(data, theorySM, theorylin, covmat):
 @n3fit.checks.can_run_multiple_replicas
 def performfit(
     *,
-    analytic_check,
-    automatic_scale_choice,
     data,
     groups_covmat,
     groups_index,
@@ -86,6 +84,8 @@ def performfit(
     parallel_models=False, 
     simu_parameters_names=None,
     bsm_initialisation_seed=0,
+    automatic_scale_choice=False,
+    analytic_check=False,
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -203,12 +203,11 @@ def performfit(
         analytic_check = True
 
     compute_analytic = False
+    use_analytic_initialisation = False
     for ini in bsm_fac_initialisations:
         if isinstance(ini, AnalyticInitialisation):
             compute_analytic = True
             use_analytic_initialisation = True
-        else:
-            use_analytic_initialisation = False
 
     if compute_analytic or analytic_check:
         # Compute the initialisations
