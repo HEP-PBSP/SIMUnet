@@ -300,17 +300,18 @@ def level0_commondata_wc(
             stream.close()
             # K-factors loading
             k_factor = np.zeros(len(t0_prediction))
-            for param in cont_params:
-                # load the k_fac value
-                value = param["value"]
-                # load the linear combination coefficients
-                lin_comb = param["linear_combination"]
-                # load the BMS cross-section
-                bsm_xs = np.zeros(len(t0_prediction))
-                for op in lin_comb:
-                    bsm_xs += lin_comb[op] * np.array(simu_card[dataset.contamination][op])[cuts]
-                # compute the K-factor correction
-                k_factor += value * bsm_xs / np.array(simu_card[dataset.contamination]["SM"])[cuts]
+            if cont_params:
+                for param in cont_params:
+                    # load the k_fac value
+                    value = param["value"]
+                    # load the linear combination coefficients
+                    lin_comb = param["linear_combination"]
+                    # load the BMS cross-section
+                    bsm_xs = np.zeros(len(t0_prediction))
+                    for op in lin_comb:
+                        bsm_xs += lin_comb[op] * np.array(simu_card[dataset.contamination][op])[cuts]
+                    # compute the K-factor correction
+                    k_factor += value * bsm_xs / np.array(simu_card[dataset.contamination]["SM"])[cuts]
             # update t0 prediction to BSM t0 prediction
             t0_prediction *= (1. + k_factor)
         # N.B. cuts already applied to th. pred.
@@ -491,7 +492,7 @@ def sm_predictions(
     sm_dict = {}
 
     for dataset in dataset_inputs:
-        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid)
+        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid, new_commondata=dataset.new_commondata)
 
         sm_dict[dataset.name] = central_predictions(data, pdf)
 
