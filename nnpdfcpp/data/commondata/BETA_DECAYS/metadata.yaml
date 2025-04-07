@@ -1,0 +1,7 @@
+implemented_observables:
+- observable_name: Beta_Decay_Obs
+  observable:
+    description: 
+    label: 
+    units: ''
+  ndata: 43
