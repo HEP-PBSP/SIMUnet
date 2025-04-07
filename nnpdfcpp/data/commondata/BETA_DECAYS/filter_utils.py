@@ -46,9 +46,9 @@ def get_kinematics():
 
     for i in range(num_of_bins):
         kin_value = {
-            'abs_eta': {'min': None, 'mid': None, 'max': None},
-            'm_W2': {'min': None, 'mid': None, 'max': None},
-            'sqrts': {'min': None, 'mid': None, 'max': None},
+            'abs_eta': {'min': None, 'mid': 1 ,'max': None},
+            'm_W2': {'min': None, 'mid': 1, 'max': None},
+            'sqrts': {'min': None, 'mid': 1, 'max': None},
         }
         kin.append(kin_value)
 
