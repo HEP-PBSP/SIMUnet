@@ -377,7 +377,7 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
                 else:
                     cd_line += f"{add_sys:20.12e}\t {mult_sys:20.12e}\t"
 
-            stream.write(cd_line)
+            stream.write(cd_line + '\n')
 
         
 
