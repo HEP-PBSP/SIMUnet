@@ -4,5 +4,5 @@ implemented_observables:
     description: 
     label: 
     units: ''
-  process_type: BETA #Change this
+  process_type: INC #Change this
   ndata: 43
