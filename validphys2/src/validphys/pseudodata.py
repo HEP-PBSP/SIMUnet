@@ -173,7 +173,12 @@ def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genr
             pseudodata += (cd.stat_errors.to_numpy() * rng.normal(size=cd.ndata))
 
             # ~~~ ADDITIVE ERRORS  ~~~
-            add_errors = cd.additive_errors
+            if cd.nsys:
+                add_errors = cd.additive_errors
+            else:
+                add_errors = pd.DataFrame(
+                    np.zeros((cd.ndata, 0)), index=cd.central_values.index
+                )
             add_uncorr_errors = add_errors.loc[:, add_errors.columns=="UNCORR"].to_numpy()
 
             pseudodata += (add_uncorr_errors * rng.normal(size=add_uncorr_errors.shape)).sum(axis=1)
@@ -189,7 +194,12 @@ def make_replica(groups_dataset_inputs_loaded_cd_with_cuts, replica_mcseed, genr
                 add_errors.loc[:, ~add_errors.columns.isin(INTRA_DATASET_SYS_NAME)]
             )
             # ~~~ MULTIPLICATIVE ERRORS ~~~
-            mult_errors = cd.multiplicative_errors
+            if cd.nsys:
+                mult_errors = cd.multiplicative_errors
+            else:
+                mult_errors = pd.DataFrame(
+                    np.ones((cd.ndata, 0)), index=cd.central_values.index
+                )
             mult_uncorr_errors = mult_errors.loc[:, mult_errors.columns == "UNCORR"].to_numpy()
             # convert to from percent to fraction
             mult_shift = (
