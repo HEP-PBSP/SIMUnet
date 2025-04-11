@@ -42,11 +42,19 @@ def filter_BETA_DECAYS_get_systematics():
     counter_1 = 1
     counter_2 = 0
     for sys in systematics:
-        error_definitions[sys[0]['name']] = {
-                "description": "Uncorrelated statistical uncertainties",
-                "treatment": "ADD",
-                "type": "UNCORR",
-            }
+        if sys[0]['name'] == 'stat':
+            error_definitions[sys[0]['name']] = {
+                    "description": "Uncorrelated statistical uncertainties",
+                    "treatment": "ADD",
+                    "type": "UNCORR",
+                }
+        elif sys[0]['name'] == 'uncor':
+            error_definitions[sys[0]['name']] = {
+                    "description": "Dummy Sys",
+                    "treatment": "ADD",
+                    "type": "UNCORR",
+                }
+
 
     for i in range(metadata['implemented_observables'][0]['ndata']):
         error_value = {}

@@ -76,6 +76,7 @@ def get_uncertainties():
                 stats.append(unc)
    
     uncertainties.append([{"name": 'stat', "values": stats}])
+    uncertainties.append([{"name":'uncor',"values": np.zeros(43)}])
 
     return uncertainties
 
