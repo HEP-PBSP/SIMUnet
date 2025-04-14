@@ -263,7 +263,7 @@ def fitting_data_dict(
             if data.datasets[i].use_fixed_predictions:
                 datasets[i]['use_fixed_predictions'] = True
                 if fixed_predictions_pdf:
-                    log.info(msg=f"Generatig fixed prediction for {data.datasets[i].name}")
+                    log.info(msg=f"Generating fixed prediction for {data.datasets[i].name}")
                     cfactors = [cfac.name.split("_")[1] for cfac in data.datasets[i].fkspecs[0].cfactors]
                     fktable = l.check_fktable(theoryID=data.datasets[i].thspec,
                                               setname=data.datasets[i].name,
