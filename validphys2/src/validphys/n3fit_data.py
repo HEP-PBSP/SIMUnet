@@ -26,7 +26,7 @@ from validphys.n3fit_data_utils import (
 
 from validphys.loader import Loader
 from validphys.fkparser import load_fktable
-from validphys.convolution import _predictions, fk_predictions
+from validphys.convolution import fk_predictions
 
 from validphys.fkparser import parse_cfactor
 
