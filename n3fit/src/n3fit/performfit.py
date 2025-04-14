@@ -86,7 +86,6 @@ def performfit(
     bsm_initialisation_seed=0,
     automatic_scale_choice=False,
     analytic_check=False,
-    fixed_prediction_pdf: str = "",
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
