@@ -24,6 +24,9 @@ from validphys.n3fit_data_utils import (
     positivity_reader,
 )
 
+from validphys.core import PDF
+from validphys.convolution import central_predictions
+
 from validphys.fkparser import parse_cfactor
 
 from pathlib import Path
@@ -198,6 +201,7 @@ def fitting_data_dict(
     tr_masks,
     kfold_masks,
     diagonal_basis=None,
+    fixed_predictions_pdf: str = "",
 ):
     """
     Provider which takes  the information from validphys ``data``.
@@ -250,17 +254,20 @@ def fitting_data_dict(
         ndata = spec_c.GetNData()
         expdata_true = spec_c.get_cv().reshape(1, ndata)
         datasets = common_data_reader_experiment(spec_c, data)
+        if fixed_predictions_pdf:
+            pdf = PDF(name=fixed_predictions_pdf)
         for i in range(len(data.datasets)):
             if data.datasets[i].use_fixed_predictions:
                 datasets[i]['use_fixed_predictions'] = True
                 # Access the fixed_predictions
                 # Prepare the fixed observable path
-                path = ""
-                if str(data.datasets[i].fkspecs[0].fkpath).endswith('fastkernel/FK_FAKEKTABLE.dat'):
-                    prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
-                    path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
-                with open(path, 'rb') as f:
-                    fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
+                # path = ""
+                # if str(data.datasets[i].fkspecs[0].fkpath).endswith('fastkernel/FK_FAKEKTABLE.dat'):
+                #     prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
+                #     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
+                # with open(path, 'rb') as f:
+                #     fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
+                fixed_predictions = central_predictions(dataset=data.datasets[i], pdf=pdf).to_numpy().flatten()
                 cuts = data.datasets[i].cuts.load()
                 datasets[i]['fixed_predictions'] = fixed_predictions[cuts]
             else:
