@@ -16,6 +16,7 @@ from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
 
 from validphys.convolution import central_predictions
 from validphys.loader import Loader
+from validphys.utils import yaml_safe
 
 from reportengine import collect
 
@@ -287,7 +288,7 @@ def level0_commondata_wc(
         
         # == Generate a new CommonData instance with central value given by Level 0 data generated with fakepdf ==#
         t0_prediction = dataset_t0_predictions(dataset=dataset,
-                                               t0set=fakepdf)
+                                               t0set=fakepdf)[cuts]
         # Contamination
         if dataset.contamination:
             theoryid = dataset.thspec.id
@@ -296,7 +297,7 @@ def level0_commondata_wc(
             cont_params = dataset.contamination_data
             # load simu_card file
             with open(cont_path, "r+") as stream:
-                simu_card = yaml.safe_load(stream)
+                simu_card = yaml_safe.load(stream)
             stream.close()
             # K-factors loading
             k_factor = np.zeros(len(t0_prediction))

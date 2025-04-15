@@ -410,30 +410,6 @@ class Loader(LoaderBase):
     def check_compound(self, theoryID, setname, cfac, new_commondata=False):
         thid, theopath = self.check_theoryID(theoryID)
         compound_spec_path = theopath / 'compound' / ('FK_%s-COMPOUND.dat' % setname)
-<<<<<<< HEAD
-        try:
-            with compound_spec_path.open() as f:
-                #Drop first line with comment
-                next(f)
-                txt = f.read()
-        except FileNotFoundError as e:
-            msg = ("Could not find COMPOUND set '%s' for theory %d: %s" %
-                   (setname, int(thid), e))
-            raise CompoundNotFound(msg)
-        #This is a little bit funny, but is the least amount of thinking...
-        yaml_format = 'FK:\n' + re.sub('FK:', ' - ', txt)
-        data = yaml_safe.load(yaml_format)
-        #we have to split out 'FK_' the extension to get a name consistent
-        #with everything else
-        try:
-            tables = [self.check_fktable(theoryID, name[3:-4], cfac)
-                  for name in data['FK']]
-        except FKTableNotFound as e:
-            raise LoadFailedError(
-                    f"Incorrect COMPOUND file '{compound_spec_path}'. "
-                    f"Searching for non-existing FKTable:\n{e}") from e
-        op = data['OP']
-=======
         if new_commondata:
             # Need to pass a TheoryMeta object to FKTableSpec
             path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
@@ -471,7 +447,6 @@ class Loader(LoaderBase):
                         f"Incorrect COMPOUND file '{compound_spec_path}'. "
                         f"Searching for non-existing FKTable:\n{e}") from e
             op = data['OP']
->>>>>>> 1ecbc0b60 (added new_commondata to check_compound in loader)
         return tuple(tables), op
 
 

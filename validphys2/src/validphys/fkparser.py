@@ -69,7 +69,9 @@ def load_fktable(spec):
     for cf in spec.cfactors:
         with open(cf, "rb") as f:
             cfdata = parse_cfactor(f)
-        if len(cfdata.central_value) != ndata:
+        if spec.use_fixed_predictions:
+            cfprod = np.ones(len(cfdata.central_value))
+        elif len(cfdata.central_value) != ndata:
             raise BadCFactorError(
                 f"Length of cfactor data {cf} does not match the length of the fktable {spec}."
             )

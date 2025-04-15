@@ -318,30 +318,17 @@ class CommonDataSpec(TupleComp):
         return CommonData.ReadFile(str(self.datafile), str(self.sysfile))
 
     def load_commondata(self, cuts=None):
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9701a5960 (added export method to CommonData -> allows to use _filter_real_data python only)
         """
         Loads a coredata.CommonData object from a core.CommonDataSetSpec object
         cuts are applied if provided.
         """
-<<<<<<< HEAD
-=======
->>>>>>> 32a2891c1 (added load_commondata method to CommonDataSpec)
-=======
->>>>>>> 9701a5960 (added export method to CommonData -> allows to use _filter_real_data python only)
         # import here to avoid circular imports
         from validphys.commondataparser import load_commondata
         cd = load_commondata(self)
         if cuts is not None:
             cd = cd.with_cuts(cuts)
         return cd
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 32a2891c1 (added load_commondata method to CommonDataSpec)
     @property
     def plot_kinlabels(self):
         return get_plot_kinlabels(self)
