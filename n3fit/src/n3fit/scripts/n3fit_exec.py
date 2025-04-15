@@ -260,7 +260,6 @@ class N3FitApp(App):
 
 def main():
     a = N3FitApp()
-    import IPython; IPython.embed()
     a.main()
 
 
