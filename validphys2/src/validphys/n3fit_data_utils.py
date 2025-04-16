@@ -87,6 +87,8 @@ def new_fk_parser(fkspec, is_hadronic=False):
             - 'basis'
             - 'fktable'
     """
+    if fkspec.legacy:
+        return fk_parser(fk=fkspec.load(), is_hadronic=is_hadronic)
     fktable = load_fktable(fkspec)
     ndata = fktable.ndata
     xgrid = fktable.xgrid
