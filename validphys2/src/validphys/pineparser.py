@@ -10,7 +10,7 @@ import logging
 import numpy as np
 import pandas as pd
 import dataclasses
-import yaml
+from validphys.utils import yaml_safe
 
 from validphys.commondataparser import EXT
 from validphys.coredata import FKTableData
@@ -52,7 +52,7 @@ class TheoryMeta:
     ...     - fk3
     ... operation: ratio
     ... '''
-    ... theory = yaml.safe_load(theory_raw)
+    ... theory = yaml_safe.load(theory_raw)
     ... parse_input(theory, TheoryMeta)
     TheoryMeta(FK_tables=[['fk1'], ['fk2', 'fk3']], operation='RATIO', shifts = None, conversion_factor=1.0, comment=None, normalization=None))
     """
@@ -72,7 +72,7 @@ def parse_theory_meta(metadata_path, observable_name):
     """
     
     with open(metadata_path, "r") as f:
-        meta_card = yaml.safe_load(f)
+        meta_card = yaml_safe.load(f)
     
     # Get the theory metadata
     for obs in meta_card['implemented_observables']:
