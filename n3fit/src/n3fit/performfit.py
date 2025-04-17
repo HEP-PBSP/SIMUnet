@@ -10,7 +10,7 @@ import scipy as sp
 import n3fit.checks
 from n3fit.vpinterface import N3PDF
 
-import yaml
+from validphys.utils import yaml_safe
 
 log = logging.getLogger(__name__)
 
@@ -86,6 +86,7 @@ def performfit(
     bsm_initialisation_seed=0,
     automatic_scale_choice=False,
     analytic_check=False,
+    fixed_prediction_pdf: str = "",
 ):
     """
         This action will (upon having read a validcard) process a full PDF fit
@@ -229,7 +230,7 @@ def performfit(
             nop = n_simu_parameters
             if os.path.exists(simu_path) and ds.simu_parameters_linear_combinations is not None:
                 with open(simu_path, 'r') as f:
-                     simu_info = yaml.safe_load(f)
+                     simu_info = yaml_safe.load(f)
 
                 columns = []
                 for param in ds.simu_parameters_linear_combinations:

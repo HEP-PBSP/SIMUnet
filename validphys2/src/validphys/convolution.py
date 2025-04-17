@@ -111,7 +111,7 @@ def _predictions(dataset, pdf, fkfunc):
     all replicas, central, etc) according to the provided ``fkfunc``, which
     should have the same interface as e.g. ``fk_predictions``.
     """
-    opfunc = OP[dataset.op]
+    opfunc = OP[dataset.op.upper()]
     if dataset.cuts is None:
         raise PredictionsRequireCutsError(
             "FKTables do not always generate predictions for some datapoints "
