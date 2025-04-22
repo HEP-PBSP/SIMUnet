@@ -22,7 +22,7 @@ import hashlib
 import prompt_toolkit
 from prompt_toolkit.completion import WordCompleter
 
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 from reportengine.colors import t
 from validphys.loader import RemoteLoader, Loader
 from validphys.renametools import Spinner

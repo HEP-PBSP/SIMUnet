@@ -10,7 +10,7 @@ import pathlib
 
 import numpy as np
 import pandas as pd
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from reportengine import collect
 from reportengine.table import table
@@ -377,7 +377,7 @@ def _get_fitted_index(pdf, i):
     """Return the nnfit index for the replica i"""
     p = pdf.infopath.with_name(f'{pdf.name}_{i:04d}.dat')
     with open(p) as f:
-        it = yaml.safe_load_all(f)
+        it = yaml_safe.load_all(f)
         metadata = next(it)
     return metadata['FromMCReplica']
 

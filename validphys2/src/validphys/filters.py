@@ -13,7 +13,7 @@ import numpy as np
 
 from NNPDF import CommonData
 from reportengine.checks import make_argcheck, check, check_positive, make_check
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 import validphys.cuts
 
 log = logging.getLogger(__name__)
@@ -92,14 +92,14 @@ def default_filter_settings_input():
     """Return a dictionary with the default hardcoded filter settings.
     These are defined in ``defaults.yaml`` in the ``validphys.cuts`` module.
     """
-    return yaml.safe_load(read_text(validphys.cuts, "defaults.yaml"))
+    return yaml_safe.load(read_text(validphys.cuts, "defaults.yaml"))
 
 
 def default_filter_rules_input():
     """Return a dictionary with the input settings.
     These are defined in ``filters.yaml`` in the ``validphys.cuts`` module.
     """
-    return yaml.safe_load(read_text(validphys.cuts, "filters.yaml"))
+    return yaml_safe.load(read_text(validphys.cuts, "filters.yaml"))
 
 
 @make_argcheck

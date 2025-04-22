@@ -16,7 +16,7 @@ import numbers
 from validobj import ValidationError
 
 from reportengine.floatformatting import format_number
-from reportengine.compat import yaml
+from validphys.utils import yaml_rt
 from reportengine.utils import get_functions, ChainMap
 
 from NNPDF import CommonData, DataSet
@@ -160,7 +160,7 @@ class PlotInfo:
         if commondata.plotfiles:
             for file in commondata.plotfiles:
                 with open(file) as f:
-                    processed_input = yaml.round_trip_load(f)
+                    processed_input = yaml_rt.load(f)
                     pf = parse_yaml_inp(processed_input, PlottingFile, file)
                     config_params = dataclasses.asdict(pf, dict_factory=dict_factory)
                 plot_params = plot_params.new_child(config_params)

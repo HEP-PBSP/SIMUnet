@@ -13,6 +13,10 @@ import numpy as np
 
 from validobj import parse_input, ValidationError
 
+from ruamel.yaml import YAML
+
+yaml_safe = YAML(typ="safe")
+yaml_rt = YAML(typ="rt")
 
 def parse_yaml_inp(inp, spec, path):
     """Helper function to parse yaml using the `validobj` library and print
