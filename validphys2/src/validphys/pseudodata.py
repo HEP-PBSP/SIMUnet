@@ -310,7 +310,12 @@ def level0_commondata_wc(
                     # load the BMS cross-section
                     bsm_xs = np.zeros(len(t0_prediction))
                     for op in lin_comb:
-                        bsm_xs += lin_comb[op] * np.array(simu_card[dataset.contamination][op])[cuts]
+                        # Check if the operator exists in simu_card[dataset.contamination]
+                        if op in simu_card[dataset.contamination]:
+                            bsm_xs += lin_comb.get(op, 0) * np.array(simu_card[dataset.contamination][op])[cuts]
+                        else:
+                            # Log a warning or handle the missing operator
+                            log.warning(f"Operator '{op}' not found for {dataset.name}. Setting K-factor to zero.")
                     # compute the K-factor correction
                     k_factor += value * bsm_xs / np.array(simu_card[dataset.contamination]["SM"])[cuts]
             # update t0 prediction to BSM t0 prediction
