@@ -10,7 +10,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 import os
-import yaml
+from validphys.utils import yaml_safe
 
 from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
 
@@ -296,7 +296,7 @@ def level0_commondata_wc(
             cont_params = dataset.contamination_data
             # load simu_card file
             with open(cont_path, "r+") as stream:
-                simu_card = yaml.safe_load(stream)
+                simu_card = yaml_safe.load(stream)
             stream.close()
             # K-factors loading
             k_factor = np.zeros(len(t0_prediction))
