@@ -26,7 +26,7 @@ from validphys.n3fit_data_utils import (
 
 from validphys.loader import Loader
 from validphys.fkparser import load_fktable
-from validphys.convolution import fk_predictions
+from validphys.convolution import central_fk_predictions
 
 from validphys.fkparser import parse_cfactor
 
@@ -277,7 +277,7 @@ def fitting_data_dict(
                     fktable = l.check_fktable(theoryID=data.datasets[i].thspec,
                                               setname=data.datasets[i].name,
                                               cfac=cfactors)
-                    fixed_predictions = fk_predictions(loaded_fk=load_fktable(fktable), pdf=pdf)[0].to_numpy().flatten()
+                    fixed_predictions = central_fk_predictions(loaded_fk=load_fktable(fktable), pdf=pdf).to_numpy().flatten()
                 else:
                     # Access the fixed_predictions
                     # Prepare the fixed observable path
