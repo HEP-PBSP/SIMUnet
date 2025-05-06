@@ -203,7 +203,7 @@ def dataset_inputs_covmat_from_systematics(
     for cd, dsinp, central_values in zip(
         dataset_inputs_loaded_cd_with_cuts, data_input, _list_of_central_values
     ):
-        sys_errors = cd.systematic_errors(central_values)
+        sys_errors = cd.systematic_errors(central_values[cd.commondata_table_indices])
         stat_errors = cd.stat_errors.to_numpy()
         weights.append(np.full_like(stat_errors, dsinp.weight))
         # separate out the special uncertainties which can be correlated across
