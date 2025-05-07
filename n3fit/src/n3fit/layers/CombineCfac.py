@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
+from keras.constraints import NonNeg
 
 import numpy as np
 import hashlib
@@ -18,6 +19,7 @@ class CombineCfacLayer(Layer):
         initialisations,
         initialisation_seed,
         replica_number,
+        positive=False,
     ):
         """
         Parameters
@@ -66,11 +68,13 @@ class CombineCfacLayer(Layer):
             self.w = tf.Variable(
                 initial_value=initial_values,
                 trainable=True,
+                constraint=NonNeg() if positive else None,
             )
         else:
             self.w = tf.Variable(
                 initial_value=tf.zeros(shape=(len(initial_values),), dtype="float32"),
                 trainable=True,
+                constraint=NonNeg() if positive else None,
             )
         self.scales = np.array(scales, dtype=np.float32)
         self.linear_names = linear_names

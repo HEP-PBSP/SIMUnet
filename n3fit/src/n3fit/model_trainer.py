@@ -125,6 +125,7 @@ class ModelTrainer:
         simu_parameters_scales=None,
         bsm_fac_initialisations=None,
         bsm_initialisation_seed=0,
+        positive_bsm=False,
         debug=False,
         kfold_parameters=None,
         max_cores=None,
@@ -188,6 +189,7 @@ class ModelTrainer:
         self.simu_parameters_scales = simu_parameters_scales
         self.bsm_fac_initialisations = bsm_fac_initialisations
         self.bsm_initialisation_seed = bsm_initialisation_seed
+        self.positive_bsm = positive_bsm
         self.fixed_pdf = fixed_pdf
         self.replicas = replicas
 
@@ -513,6 +515,7 @@ class ModelTrainer:
             initialisations=self.bsm_fac_initialisations,
             initialisation_seed=self.bsm_initialisation_seed,
             replica_number=self.replicas[0],
+            positive=self.positive_bsm,
         )
 
         log.info(f"Using bsm_factor scales: {self.simu_parameters_scales}")
