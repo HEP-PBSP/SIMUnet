@@ -261,7 +261,8 @@ def fitting_data_dict(
                     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
                 with open(path, 'rb') as f:
                     fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
-                datasets[i]['fixed_predictions'] = fixed_predictions
+                cuts = data.datasets[i].cuts.load()
+                datasets[i]['fixed_predictions'] = fixed_predictions[cuts]
             else:
                 datasets[i]['use_fixed_predictions'] = False
     else:
