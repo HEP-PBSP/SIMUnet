@@ -60,7 +60,7 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-build
+#build
 
 ### JupyterNotebook ###
 .ipynb_checkpoints
@@ -305,7 +305,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+#build/
 develop-eggs/
 dist/
 downloads/
@@ -355,7 +355,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+#docs/_build/
 
 # PyBuilder
 target/
