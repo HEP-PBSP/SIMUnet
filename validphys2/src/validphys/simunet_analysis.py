@@ -68,12 +68,18 @@ def display_format(series):
     return [format_number(x, digits=2) for x in series]
 
 BSM_FAC_DISPLAY = ['OtZ', 'OtW', 'OtG', 
-'Opt', 'O3pQ3', 'O3pq', 'OpQM', 'OpqMi', 'Opui', 'Opdi', 'O3pl', 'Opl', 'Ope',
-'O1qd', 'O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq',
-'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq',
-'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1', 'Oeu', 'Olu', 'Oed',
-'Olq3', 'Olq1', 'Oqe', 'Old', 'Oll',  'Omup', 'Otap', 'Otp',
-'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',]
+                   'Opt', 'O3pQ3', 'O3pq', 'OpQM', 'OpqMi', 'Opui', 'Opdi', 'O3pl', 'Opl', 'Ope',
+                   'O1qd', 'O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq',
+                   'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq',
+                   'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1', 'Oeu', 'Olu', 'Oed',
+                   'Olq3', 'Olq1', 'Oqe', 'Old', 'Oll',  'Omup', 'Otap', 'Otp',
+                   'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',
+                   'O1uu', 'O8uu', 'O1dd', 'O8dd', 'O1ud', 'O8ud', 'OEuu', 'OEdd',                          # 4 RH quarks
+                   'O1ju', 'O8ju', 'O1jd', 'O8jd',                                                          # 2 LH 2 RH quarks
+                   'O11jj', 'O81jj', 'O13jj', 'O83jj', 'O1Ejj', 'O3Ejj',                                    # 4 LH quarks
+                   'O1LHO', 'OVEC', 'OAXI',                                                                 # CMS
+                   'Z',                                                                                     # Zhat
+                   ]
 
 def reorder_cols(cols):
     """
@@ -1080,6 +1086,224 @@ def bsm_facs_95bounds_fits(fits, bsm_names_to_latex):
     """
     return bsm_facs_bounds_fits(fits, bsm_names_to_latex, n_sigma=2)
 
+@table
+def bsm_facs_nsigma_fits(fits, n_sigma_bounds=2):
+    """
+    Generate a table summarizing the bounds of BSM coefficients in different fits and nsigma deviations.
+
+    This function processes a list of fits, extracting the BSM coefficients and
+    summarizing their mean, standard deviation, and confidence levels. The confidence
+    levels are computed as mean ± n_sigma * std.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+    n_sigma : int, optional
+        The multiplier for the standard deviation to define confidence level bounds, by default 2.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
+        additional metrics like 'Best-fit shift' and 'Broadening'.
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.extend(bsm_fac_ops)
+    all_ops = list(dict.fromkeys(all_ops))
+
+    fit_names = [fit.label for fit in fits]
+
+    # Initialise df
+    df = pd.DataFrame(index=fit_names, columns=all_ops)
+
+    # plot all operators
+    for op in all_ops:
+        best_fits = []
+        bound_lengths = []
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                mean = values.mean()
+                std = values.std()
+                cl_lower, cl_upper = (
+                    mean - n_sigma_bounds * std,
+                    mean + n_sigma_bounds * std,
+                )
+                n_sigma_deviation = format_number(abs(mean) / std, digits=2)
+                lower_dis = format_number(cl_lower, digits=2)
+                upper_dis = format_number(cl_upper, digits=2)
+                # df[fit.label].loc[op] = f"({lower_dis}, {upper_dis})"
+                df[op].loc[fit.label] = n_sigma_deviation
+                # best-fit value
+                best_fits.append(mean)
+                # calculate bound length
+                length = cl_upper - cl_lower
+                bound_lengths.append(length)
+            else:
+                df[op].loc[fit.label] = "Not in fit"
+                # if the operator is not in the fit, then append None
+                best_fits.append(np.nan)
+                bound_lengths.append(np.nan)
+
+    # # formatting columns
+    # for column in df.columns[:2]:
+    #     if n_sigma_bounds == 1:
+    #         df = df.rename(columns={column: f"68% CL - {column}"})
+    #     elif n_sigma_bounds == 2:
+    #         df = df.rename(columns={column: f"95% CL - {column}"})
+    # df.columns = [bsm_names_to_latex[i] for i in df.columns]
+
+    return df
+
+
+@table
+def bsm_facs_means_fits(fits):
+    """
+    Generate a table summarizing the bounds of BSM coefficients in different fits and nsigma deviations.
+
+    This function processes a list of fits, extracting the BSM coefficients and
+    summarizing their mean, standard deviation, and confidence levels. The confidence
+    levels are computed as mean ± n_sigma * std.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+    n_sigma : int, optional
+        The multiplier for the standard deviation to define confidence level bounds, by default 2.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
+        additional metrics like 'Best-fit shift' and 'Broadening'.
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.extend(bsm_fac_ops)
+    all_ops = list(dict.fromkeys(all_ops))
+
+    fit_names = [fit.label for fit in fits]
+
+    # Initialise df
+    df = pd.DataFrame(index=fit_names, columns=all_ops)
+
+    # plot all operators
+    for op in all_ops:
+        best_fits = []
+        bound_lengths = []
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                mean = values.mean()
+                truncated_mean = float(f"{mean:.4f}")
+                # df[fit.label].loc[op] = f"({lower_dis}, {upper_dis})"
+                df[op].loc[fit.label] = truncated_mean
+                # best-fit value
+                best_fits.append(mean)
+            else:
+                df[op].loc[fit.label] = "Not in fit"
+                # if the operator is not in the fit, then append None
+                best_fits.append(np.nan)
+                bound_lengths.append(np.nan)
+
+    # # formatting columns
+    # for column in df.columns[:2]:
+    #     if n_sigma_bounds == 1:
+    #         df = df.rename(columns={column: f"68% CL - {column}"})
+    #     elif n_sigma_bounds == 2:
+    #         df = df.rename(columns={column: f"95% CL - {column}"})
+    # df.columns = [bsm_names_to_latex[i] for i in df.columns]
+
+    return df
+
+@table
+def bsm_facs_std_fits(fits):
+    """
+    Generate a table summarizing the bounds of BSM coefficients in different fits and nsigma deviations.
+
+    This function processes a list of fits, extracting the BSM coefficients and
+    summarizing their mean, standard deviation, and confidence levels. The confidence
+    levels are computed as mean ± n_sigma * std.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        A dictionary mapping BSM factor names to their LaTeX representations.
+    n_sigma : int, optional
+        The multiplier for the standard deviation to define confidence level bounds, by default 2.
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
+        additional metrics like 'Best-fit shift' and 'Broadening'.
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.extend(bsm_fac_ops)
+    all_ops = list(dict.fromkeys(all_ops))
+
+    fit_names = [fit.label for fit in fits]
+
+    # Initialise df
+    df = pd.DataFrame(index=fit_names, columns=all_ops)
+
+    # plot all operators
+    for op in all_ops:
+        best_fits = []
+        bound_lengths = []
+        for fit in fits:
+            paths = replica_paths(fit)
+            bsm_facs_df = read_bsm_facs(paths)
+            if bsm_facs_df.get([op]) is not None:
+                values = bsm_facs_df[op]
+                std = values.std()
+                truncated_std = float(f"{std:.4f}")
+                # df[fit.label].loc[op] = f"({lower_dis}, {upper_dis})"
+                df[op].loc[fit.label] = truncated_std
+                # best-fit value
+                best_fits.append(std)
+            else:
+                df[op].loc[fit.label] = "Not in fit"
+                # if the operator is not in the fit, then append None
+                best_fits.append(np.nan)
+                bound_lengths.append(np.nan)
+
+    # # formatting columns
+    # for column in df.columns[:2]:
+    #     if n_sigma_bounds == 1:
+    #         df = df.rename(columns={column: f"68% CL - {column}"})
+    #     elif n_sigma_bounds == 2:
+    #         df = df.rename(columns={column: f"95% CL - {column}"})
+    # df.columns = [bsm_names_to_latex[i] for i in df.columns]
+
+    return df
+
 @figuregen
 def plot_smefit_internal_comparison(bsm_names_to_latex, smefit_reference_1, smefit_reference_2, bsm_names_to_plot_scales, smefit_labels):
     """
@@ -1383,7 +1607,7 @@ def plot_smefit_comparison(fits, bsm_names_to_latex, smefit_reference, bsm_names
         yield fig
 
 @figuregen
-def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
+def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales, fit_labels, selected_ops=None, nsigma=2):
     """
     Generates plots of the bounds for BSM coefficients from various fits.
 
@@ -1399,12 +1623,18 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
         Dictionary mapping BSM factor names to their LaTeX representations.
     bsm_names_to_plot_scales : dict
         Dictionary to scale the BSM names for plotting.
+    nsigma: int
+        Number of standard deviations to plot the confidence level.
 
     Yields
     ------
     fig : matplotlib.figure.Figure
         The matplotlib figure object for each generated plot.
     """
+    # test right nsigma
+    if nsigma not in [1,2,3]:
+        log.error("Wrong number of standard deviations. <nsigma> set to 2.")
+        nsigma = 2
     # extract all operators in the fits
     all_ops = []
     for fit in fits:
@@ -1414,6 +1644,12 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
         all_ops.append(bsm_fac_ops)
     # Remove repeated operators and reorder
     all_ops = reorder_cols({o for fit_ops in all_ops for o in fit_ops})
+    if selected_ops:
+        if set(selected_ops).issubset(set(all_ops)):
+            print("Printing only selected operators!")
+            all_ops = selected_ops
+        else:
+            print("Printing all operators!")
 
     # store the relevant values
     bounds_dict = {}
@@ -1433,7 +1669,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
                     values = bsm_facs_df[op]
                 mean = values.mean()
                 std = values.std()
-                cl_lower, cl_upper = (mean - 2*std, mean + 2*std)
+                cl_lower, cl_upper = (mean - nsigma*std, mean + nsigma*std)
                 # best-fit value
                 best_fits.append(mean)
                 # append bounds
@@ -1448,7 +1684,8 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
 
     # plot parameters
     scales = ['linear', 'symlog']
-    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB']
+    colour_key = ['#66C2A5', '#FC8D62', '#8DA0CB', '#E78AC3',
+                  '#A6D854', '#FFD92F', '#E5C494', '#B3B3B3']
 
     for scale in scales:
         # initialise plots
@@ -1456,6 +1693,8 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
 
         # line for SM prediction
         ax.axhline(y=0.0, color='k', linestyle='--', alpha=0.3, label='SM')
+        # confidence level - nsigma relation    
+        conf_level = {1: "68", 2: "95", 3: "99.7"}
 
         for fit in fits:
             bounds = bounds_dict[fit.label]
@@ -1464,7 +1703,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
             bounds_min = [bound[0] for bound in bounds]
             bounds_max= [bound[1] for bound in bounds]
             ax.scatter(x_coords, best_fits, color=colour_key[fits.index(fit)])
-            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label='95% CL ' + fit.label,
+            ax.vlines(x=x_coords, ymin=bounds_min, ymax=bounds_max, label=f'{conf_level[nsigma]}% CL ' + fit_labels[fit.label],
             color=colour_key[fits.index(fit)], lw=2.0)
 
         # set x positions for labels and labels
