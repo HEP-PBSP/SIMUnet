@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
-from keras.constraints import NonNeg
+from tensorflow.keras.constraints import NonNeg
 
 import numpy as np
 import hashlib
