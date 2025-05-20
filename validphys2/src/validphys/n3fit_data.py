@@ -14,7 +14,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-import yaml
+from validphys.utils import yaml_safe
 
 from reportengine import collect
 from reportengine.table import table
@@ -269,7 +269,7 @@ def fitting_data_dict(
                     prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
                     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
                 with open(path, 'rb') as f:
-                    fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+                    fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
                 datasets[i]['fixed_predictions'] = fixed_predictions
             else:
                 datasets[i]['use_fixed_predictions'] = False
@@ -484,13 +484,14 @@ def replica_training_mask(
 
     [345 rows x 1 columns]
     """
-    all_masks = np.concatenate([
-        ds_mask
-        for exp_masks in zip(exps_tr_masks)
-        for ds_mask in exp_masks
-    ])
+    broken_cuts = [ds_mask for exp_masks in zip(exps_tr_masks) for ds_mask in exp_masks]
+    new_broken_cuts = []
+    for cuts in broken_cuts:
+        new_broken_cuts += cuts
+    new_broken_cuts = [cuts.reshape((1,len(cuts))) for cuts in new_broken_cuts]
+
     return pd.DataFrame(
-        all_masks,
+        np.concatenate(new_broken_cuts, axis=1).T,
         columns=[f"replica {replica}"],
         index=experiments_index
     )

@@ -36,13 +36,14 @@ allowing to account for information on COMPOUND predictions and cuts. A lower
 level interface which operates with :py:class:`validphys.coredata.FKTableData`
 objects is also available.
 """
+
 import operator
 import functools
 
 import pandas as pd
 import numpy as np
 
-import yaml
+from validphys.utils import yaml_safe
 
 from validphys.pdfbases import evolution
 from validphys.fkparser import load_fktable, parse_cfactor
@@ -77,11 +78,13 @@ def _asy(a, b):
 def _smn(a, b, c, d):
     return (a + b) / (c + d)
 
+
 def _com(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t):
     return (a + b + c + d + e + f + g + h + i + j) / ( k + l + m + n + o + p + q + r + s + t)
 
 def _smt(a, b, c, d, e, f, g, h, i, j):
-    return (a + b + c + d + e + f + g + h + i + j)
+    return a + b + c + d + e + f + g + h + i + j
+
 
 def _id(a):
     return a
@@ -97,7 +100,10 @@ OP = {
     "NULL": _id,
 }
 
-class PredictionsRequireCutsError(Exception): pass
+
+class PredictionsRequireCutsError(Exception):
+    pass
+
 
 def _predictions(dataset, pdf, fkfunc):
     """Combine data on all the FKTables in the database according to the
@@ -135,7 +141,7 @@ def _predictions(dataset, pdf, fkfunc):
 
 
 def predictions(dataset, pdf):
-    """"Compute theory predictions for a given PDF and dataset. Information
+    """ "Compute theory predictions for a given PDF and dataset. Information
     regading the dataset, on cuts, CFactors and combinations of FKTables is
     taken into account to construct the predictions.
 
