@@ -10,6 +10,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 import os
+from validphys.utils import yaml_safe
 
 
 from validphys.covmats import INTRA_DATASET_SYS_NAME, dataset_t0_predictions
@@ -278,8 +279,6 @@ def level0_commondata_wc(
 
     level0_commondata_instances_wc = []
 
-    # import IPython; IPython.embed()
-
     for dataset in data.datasets:
             
         commondata_wc = dataset.commondata.load_commondata()
@@ -290,6 +289,37 @@ def level0_commondata_wc(
         # == Generate a new CommonData instance with central value given by Level 0 data generated with fakepdf ==#
         t0_prediction = dataset_t0_predictions(dataset=dataset,
                                                t0set=fakepdf)
+        # Contamination
+        if dataset.contamination:
+            theoryid = dataset.thspec.id
+            cont_path = l.datapath / f"theory_{theoryid}" / "simu_factors" / f"SIMU_{dataset.name}.yaml"
+            # load contamination parameters
+            cont_params = dataset.contamination_data
+            # load simu_card file
+            with open(cont_path, "r+") as stream:
+                simu_card = yaml_safe.load(stream)
+            stream.close()
+            # K-factors loading
+            k_factor = np.zeros(len(t0_prediction))
+            if cont_params:
+                for param in cont_params:
+                    # load the k_fac value
+                    value = param["value"]
+                    # load the linear combination coefficients
+                    lin_comb = param["linear_combination"]
+                    # load the BMS cross-section
+                    bsm_xs = np.zeros(len(t0_prediction))
+                    for op in lin_comb:
+                        # Check if the operator exists in simu_card[dataset.contamination]
+                        if op in simu_card[dataset.contamination]:
+                            bsm_xs += lin_comb.get(op, 0) * np.array(simu_card[dataset.contamination][op])[cuts]
+                        else:
+                            # Log a warning or handle the missing operator
+                            log.warning(f"Operator '{op}' not found for {dataset.name}. Setting K-factor to zero.")
+                    # compute the K-factor correction
+                    k_factor += value * bsm_xs / np.array(simu_card[dataset.contamination]["SM"])[cuts]
+            # update t0 prediction to BSM t0 prediction
+            t0_prediction *= (1. + k_factor)
         # N.B. cuts already applied to th. pred.
         level0_commondata_instances_wc.append(commondata_wc.with_central_value(t0_prediction))
 
@@ -468,7 +498,7 @@ def sm_predictions(
     sm_dict = {}
 
     for dataset in dataset_inputs:
-        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid)
+        data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid, new_commondata=dataset.new_commondata)
 
         sm_dict[dataset.name] = central_predictions(data, pdf)
 

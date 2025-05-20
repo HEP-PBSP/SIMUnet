@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 
 from validphys.coredata import FKTableData, CFactorData
+from validphys.pineparser import pineappl_reader
 
 
 
@@ -53,8 +54,13 @@ class GridInfo:
 def load_fktable(spec):
     """Load the data corresponding to a FKSpec object. The cfactors
     will be applied to the grid."""
-    with open_fkpath(spec.fkpath) as handle:
-        tabledata = parse_fktable(handle)
+    if spec.legacy:
+        with open_fkpath(spec.fkpath) as handle:
+            tabledata = parse_fktable(handle)
+    
+    else:
+        tabledata = pineappl_reader(spec)
+    
     if not spec.cfactors:
         return tabledata
 

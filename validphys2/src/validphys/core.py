@@ -328,7 +328,7 @@ class CommonDataSpec(TupleComp):
         if cuts is not None:
             cd = cd.with_cuts(cuts)
         return cd
-
+    
     @property
     def plot_kinlabels(self):
         return get_plot_kinlabels(self)
@@ -337,7 +337,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination, new_commondata):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -348,6 +348,7 @@ class DataSetInput(TupleComp):
         self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
+        self.new_commondata = new_commondata
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -585,12 +586,29 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None, theory_meta=None, legacy=True):
         self.fkpath = fkpath
-        self.cfactors = cfactors
+        self.cfactors = cfactors if cfactors is not None else []
+        self.legacy = legacy
         self.use_fixed_predictions = use_fixed_predictions
         self.fixed_predictions_path = fixed_predictions_path
+
+        # if not isinstance(fkpath, (tuple, list)):
+        #     self.legacy = True
+        # else:
+        #     fkpath = tuple(fkpath)
+        
+        if not self.legacy:
+            fkpath = tuple([fkpath])
+        self.theory_meta = theory_meta
+
+        # For non-legacy theory, add the metadata since it defines how the theory is to be loaded
+        # and thus, it should also define the hash of the class
+        # if not self.legacy:
+        #     super().__init__(fkpath, cfactors, self.metadata)
+        # else:
         super().__init__(fkpath, cfactors)
+        
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
     #to reuse the loaded one fails after it gets deleted.
@@ -598,6 +616,21 @@ class FKTableSpec(TupleComp):
     def load(self):
         return FKTable(str(self.fkpath), [str(factor) for factor in self.cfactors])
 
+
+    def load_cfactors(self):
+        """Each of the sub-fktables that form the complete FKTable can have several cfactors
+        applied to it. This function uses ``parse_cfactor`` to make them into CFactorData
+        """
+        from validphys.fkparser import parse_cfactor
+        if self.legacy:
+            raise NotImplementedError("cfactor loading from spec not implemented for old theories")
+        cfacs = []
+        for c in self.cfactors:
+            with open(c, "rb") as f:
+                cfacs.append(parse_cfactor(f))
+            f.close()    
+        return [cfacs]
+    
 class PositivitySetSpec(DataSetSpec):
     """Extends DataSetSpec to work around the particularities of the positivity datasets"""
 
