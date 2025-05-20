@@ -129,7 +129,7 @@ def _predictions(dataset, pdf, fkfunc):
             all_predictions.append(fkfunc(load_fktable(fk).with_cuts(cuts), pdf))
         else:
             with open(fk.fixed_predictions_path, 'rb') as f:
-                fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+                fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
             # Now need to reshape it according it to the expected number of predictions
             if fkfunc == central_fk_predictions:
                 all_predictions.append(pd.DataFrame(fixed_predictions, columns=['data']))
