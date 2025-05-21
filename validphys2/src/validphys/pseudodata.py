@@ -7,7 +7,6 @@ from collections import namedtuple
 import logging
 import hashlib
 
-import IPython.extensions
 import numpy as np
 import pandas as pd
 import os
@@ -412,7 +411,7 @@ def make_level1_data(
         to_append = []
         lv1_names = [lv1_cd.setname for lv1_cd in level1_commondata_instances_wc]
         for lv0_cd in level0_commondata_wc:
-            if not lv0_cd.setname in lv1_names:
+            if lv0_cd.setname not in lv1_names:
                 to_append.append(lv0_cd)
         for cd in to_append:
             level1_commondata_instances_wc.append(cd)
