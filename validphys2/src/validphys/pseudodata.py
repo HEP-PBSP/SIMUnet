@@ -7,6 +7,7 @@ from collections import namedtuple
 import logging
 import hashlib
 
+import IPython.extensions
 import numpy as np
 import pandas as pd
 import os
@@ -405,6 +406,17 @@ def make_level1_data(
         level1_commondata_instances_wc.append(
             level1_commondata_dict[xx].with_central_value(grp.values)
         )
+
+    # test for empty datasets
+    while len(level0_commondata_wc) != len(level1_commondata_instances_wc):
+        to_append = []
+        lv1_names = [lv1_cd.setname for lv1_cd in level1_commondata_instances_wc]
+        for lv0_cd in level0_commondata_wc:
+            if not lv0_cd.setname in lv1_names:
+                to_append.append(lv0_cd)
+        for cd in to_append:
+            level1_commondata_instances_wc.append(cd)
+
     # sort back so as to mantain same order as in level0_commondata_wc
     level1_commondata_instances_wc.sort(key=lambda x: dataset_order[x.setname])
 
