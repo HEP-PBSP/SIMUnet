@@ -206,7 +206,7 @@ def rebuild_commondata_without_cuts(
                     #This should really be nan's, but the c++ streams that read this
                     #do not have the right interface.
                     #https://stackoverflow.com/questions/11420263/is-it-possible-to-read-infinity-or-nan-values-using-input-streams
-                    zeros = '-0\t'*(2 + 2*nsys)
+                    zeros = '-0.\t'*(2 + 2*nsys)
                     newfile.write(f'{zeros}\n')
     else:
         with open(datapath_filename) as dtfile, \
@@ -226,7 +226,7 @@ def rebuild_commondata_without_cuts(
                 #This should really be nan's, but the c++ streams that read this
                 #do not have the right interface.
                 #https://stackoverflow.com/questions/11420263/is-it-possible-to-read-infinity-or-nan-values-using-input-streams
-                zeros = '-0\t'*(2 + 2*nsys)
+                zeros = '-0.\t'*(2 + 2*nsys)
                 newfile.write(f'{zeros}\n')
 
 #TODO: Deprecate get methods?
