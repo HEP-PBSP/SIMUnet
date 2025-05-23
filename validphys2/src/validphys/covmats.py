@@ -432,11 +432,13 @@ def groups_covmat_no_table(
     for group, group_covmat in zip(
             groups_data, groups_covmat_collection):
         name = group.name
-        df.loc[[name],[name]] = group_covmat
+        # test if group is not empty
+        if name in groups_index:
+            df.loc[[name],[name]] = group_covmat
     return df
 
 
-@table
+# @table
 def groups_covmat(groups_covmat_no_table):
     """Duplicate of groups_covmat_no_table but with a table decorator."""
     return groups_covmat_no_table
