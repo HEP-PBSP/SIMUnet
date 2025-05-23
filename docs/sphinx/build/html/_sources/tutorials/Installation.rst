@@ -68,7 +68,7 @@ The following instructions have been tested on MacOS systems with ``arm`` proces
 Dependencies installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To install SIMUnet on arm64 MacOS machines using ``conda``, we must create an environment which is able to accommodate a ``x86`` C++ compiler, e.g. ``clangxx_osx-64`` as we will see later. We must create a ``conda`` environment setting the ``CONDA_SUBDIR=osx-64`` since we want a ``x86_64`` environment:
+To install SIMUnet on arm64 MacOS machines using ``conda``, we must create an environment which is able to accommodate a ``x86`` C++ compiler, therefore, we must create a ``conda`` environment setting the ``CONDA_SUBDIR=osx-64``:
 
 .. code-block:: bash
 
@@ -134,9 +134,6 @@ Note that if your CPU has more than one core, which is the case for M-series Mac
 Moreover, the ``make install`` command will raise some non-stopping errors, which do invalidated the installation.
 
 The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce `theoretical predictions <https://docs.nnpdf.science/theory/index.html>`_, requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in ``simu_fac`` files, which exists for each dataset in the SIMUnet methodology. For a given dataset, the ``simu_fac`` file includes the SM theory prediction, and the SMEFT theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF ``theory_270`` folder, which will be automatically downloaded when required by the user's runcard.
-
-
-
 
 ..    name: simunet
     channels:
