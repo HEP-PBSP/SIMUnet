@@ -27,6 +27,7 @@ The dependencies need by to be installed via conda:
     conda install gxx_linux-64
     conda install pkg-config swig cmake
     conda install sysroot_linux-64=2.17
+    conda install pineappl=0.8.7
 
 
 .. _simunet-compilation-label-linux:
@@ -119,8 +120,6 @@ The SIMUnet code can be downloaded from GitHub:
     cd SIMUnet
     mkdir conda-bld
     cd conda-bld
-..    mkdir simunet_git
-..    cd simunet_git
 
 The code can then be compiled and installed with the following commands:
 
