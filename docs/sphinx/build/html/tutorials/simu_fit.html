@@ -3,40 +3,40 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simultaneous fits &#8212; SIMUnet  documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -45,11 +45,11 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script src="../_static/theme_logo_switcher.js"></script>
-    <script src="../_static/no_sidebar_overlap.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/simu_fit';</script>
+    <script src="../_static/theme_logo_switcher.js"></script>
+    <script src="../_static/no_sidebar_overlap.js"></script>
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -64,19 +64,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -98,12 +102,20 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -118,9 +130,13 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
+  
   
   
   
@@ -130,34 +146,45 @@
       
     
     
-    <img src="../_static/PBSP_white_line.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../_static/PBSP_white_line.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/PBSP_white_line.png" class="logo__image only-light" alt="SIMUnet  documentation - Home"/>
+    <script>document.write(`<img src="../_static/PBSP_white_line.png" class="logo__image only-dark" alt="SIMUnet  documentation - Home"/>`);</script>
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../methodology.html"><strong>Methodology</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features.html"><strong>Features</strong></a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials_overview.html"><strong>Tutorials</strong></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials_overview.html"><strong>Tutorials</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Installation.html">SIMUnet installation guide</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Simultaneous fits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contaminated_fit.html">Contaminated fits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simu_closure_test.html">SIMUnet closure test</a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html"><strong>Dataset selection</strong></a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../results/overview.html"><strong>Results</strong></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../results/overview.html"><strong>Results</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../results/drellyan.html">The Drell-Yan sector</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../results/top.html">The Top Sector</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../results/top.html">The Top Sector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../results/top_sm.html">SM PDF fits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../results/top_smeft.html">SMEFT-only fit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../results/top_simultaneous.html">Simultaneous SMEFT and PDF fits</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../simunet_analysis.html"><strong>Functions documentation</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
@@ -175,7 +202,7 @@
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -184,14 +211,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -266,26 +293,28 @@
 </button>
 
 
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script>
 
+
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -320,10 +349,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <p id="simufit">The <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> methodology can perform simultaneous fits of PDF and EFT coefficients.</p>
-<section id="simultaneous-fits">
+<div class="section" id="simultaneous-fits">
 <h1>Simultaneous fits<a class="headerlink" href="#simultaneous-fits" title="Permalink to this heading">#</a></h1>
 <p>This is a basic tutorial to perform simultaneous PDF-EFT fits with <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span>.
 The procedure consists of 3 steps:</p>
@@ -333,7 +362,7 @@ The procedure consists of 3 steps:</p>
 <li><p><a class="reference external" href="#upload-fit">Uploading the fit</a></p></li>
 <li><p><a class="reference external" href="#analyse-fit">Analysing the fit</a></p></li>
 </ol>
-<section id="id1">
+<div class="section" id="id1">
 <span id="id2"></span><h2>1. Preparing the runcard<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
 <p>The structure of <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> runcards is similar to the ones used in NNPDF, and more details can
 be found on their <a class="reference external" href="https://docs.nnpdf.science/n3fit/runcard_detailed.html">website</a>.</p>
@@ -624,8 +653,8 @@ of doing this:</p>
 <li><p>When <code class="docutils literal notranslate"><span class="pre">constant</span></code> is used, it assigns the parameter’s initial value directly to the value specified by the key, eliminating the element of randomness from this step.</p></li>
 </ul>
 <p>At this points, we can now run the fitting code.</p>
-</section>
-<section id="run-n3fit-fit">
+</div>
+<div class="section" id="run-n3fit-fit">
 <span id="id3"></span><h2>2. Running the fitting code<a class="headerlink" href="#run-n3fit-fit" title="Permalink to this heading">#</a></h2>
 <p>After preparing a <span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> runcard <code class="docutils literal notranslate"><span class="pre">runcard.yml</span></code>, we are now ready to run a fit. The pipeline
 is similar to the NNPDF framework, and the details can be found <a class="reference external" href="https://docs.nnpdf.science/tutorials/run-fit.html">here</a>.
@@ -647,8 +676,8 @@ as the PDFs that are load in a fixed-PDF fit have already been evolved!</p>
 <li><p>Finalise with <code class="docutils literal notranslate"><span class="pre">postfit</span> <span class="pre">number_of_replicas</span> <span class="pre">runcard_folder</span></code>, which filters replicas
 to yield the final PDF and EFT set. The number specified should match your desired final count.</p></li>
 </ol>
-</section>
-<section id="output-of-the-fit">
+</div>
+<div class="section" id="output-of-the-fit">
 <h2>Output of the fit<a class="headerlink" href="#output-of-the-fit" title="Permalink to this heading">#</a></h2>
 <p>As in NNPDF, every time a replica is finalised, the output is saved to the <a href="#id5"><span class="problematic" id="id6">`runcard/nnfit/replica_$replica`_</span></a>
 folder, which contains these files:</p>
@@ -662,23 +691,23 @@ folder, which contains these files:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">bsm_fac.csv</span></code>: file with the values of the EFT coefficients for this replica.</p></li>
 </ul>
 <p>Once the fit is complete, the next steps involve uploading and analysing the results.</p>
-</section>
-<section id="upload-fit">
+</div>
+<div class="section" id="upload-fit">
 <span id="id4"></span><h2>3. Uploading the fit<a class="headerlink" href="#upload-fit" title="Permalink to this heading">#</a></h2>
 <p>Once the fit is complete, the next steps involve uploading the results. This is particularly useful
 if, for example, you ran the fit on a cluster and want to make it avaiable to collaborators or download it
 from a different machine. You can upload the fit by using <code class="docutils literal notranslate"><span class="pre">vp-upload</span> <span class="pre">runcard_folder</span></code> and then fetch it
 with <code class="docutils literal notranslate"><span class="pre">vp-get</span> <span class="pre">fit</span> <span class="pre">fit_name</span></code>.</p>
-</section>
-<section id="analising-the-fit">
+</div>
+<div class="section" id="analising-the-fit">
 <span id="analyse-fit"></span><h2>4. Analising the fit<a class="headerlink" href="#analising-the-fit" title="Permalink to this heading">#</a></h2>
 <p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> has different functionalities that allow the user to analyse their results.
 The code inherits functions from <a class="reference external" href="https://docs.nnpdf.science/">NNPDF</a> and, on their website, the user can find further details and instructions
 on how to <a class="reference external" href="https://docs.nnpdf.science/tutorials/index.html#analysing-results">analyse results</a> when it comes to the PDFs.</p>
 <p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span>, additionally, contains a complete set of functions that allow the user to analyse the EFT space, and the interplay between the PDFs
 and the EFT coefficients. The complete documentation can be found on the Functions documentation tab.</p>
-</section>
-</section>
+</div>
+</div>
 
 
                 </article>
@@ -686,11 +715,10 @@ and the EFT coefficients. The complete documentation can be found on the Functio
 
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer d-print-none">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="Installation.html"
@@ -710,10 +738,7 @@ and the EFT coefficients. The complete documentation can be found on the Functio
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -721,6 +746,7 @@ and the EFT coefficients. The complete documentation can be found on the Functio
             
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
   <div class="page-toc tocsection onthispage">
@@ -754,6 +780,7 @@ By PBSP
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
       © Copyright 2023, PBSP.
@@ -780,8 +807,8 @@ By PBSP
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

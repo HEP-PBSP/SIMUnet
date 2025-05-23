@@ -3,14 +3,14 @@
 SIMUnet installation guide
 ==========================
 
-The installation process for SIMUnet is very similar to the one for NNPDF, more details can be found on their `website <https://docs.nnpdf.science/get-started/installation.html>`_. The only difference is that you need to clone the SIMUnet repository instead of the NNPDF one.
+The installation process for SIMUnet is very similar to the one for NNPDF, more details can be found on their `website <https://docs.nnpdf.science/get-started/installation.html>`_. The only difference is that you need to clone the SIMUnet repository from `SIMUnet GitHub <https://github.com/HEP-PBSP/SIMUnet>`_.
 
 .. _linux-installation:
 
 Linux
 -------------------------
 
- The following instructions have been tested on a Linux system.
+The following instructions have been tested on a Linux system.
 
 .. _dependencies-label-linux:
 
@@ -57,21 +57,89 @@ The SIMUnet code, in addition to the regular files that are needed in the NNPDF 
 
 .. _macos-arm-installation:
 
-M1/M2/M3 MacOS
+Arm64 MacOS
 -------------------
 
-The following instructions have been tested on MacOS systems with ``arm`` processors like M1, M2, and M3.
+The following instructions have been tested on MacOS systems with ``arm`` processors like, i.e. the M-series.
 
 .. _dependencies-label-macos:
 
 Dependencies installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to install SIMUnet on arm64 MacOS machines using ``conda``, we must create an environment which is able to accomodate a C++ compiler, e.g. ``clangxx_osx-64`` as we will see later. We must create a ``conda`` environment setting the ``CONDA_SUBDIR=osx-64`` since we want a ``x86_64`` environment, moreover, we will use the following ``yml`` file to build the environment with the right dependencies:
+To install SIMUnet on arm64 MacOS machines using ``conda``, we must create an environment which is able to accommodate a ``x86`` C++ compiler, e.g. ``clangxx_osx-64`` as we will see later. We must create a ``conda`` environment setting the ``CONDA_SUBDIR=osx-64`` since we want a ``x86_64`` environment:
 
-.. code-block:: yaml
+.. code-block:: bash
 
-    name: simunet
+    export CONDA_SUBDIR=osx-64
+
+Then, we create the ``simunet`` environment, we download a proper MacOSX-SDK in the base folder of the SIMUnet ``conda`` environment:
+
+.. code-block:: bash
+
+    conda create -n simunet
+    conda activate simunet
+    cd $CONDA_PREFIX
+    curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
+    tar -xzf MacOSX10.9.sdk.tar.xz
+
+We must set up the variable ``CONDA_BUILD_SYSROOT``:
+
+.. code-block:: bash
+
+    export CONDA_BUILD_SYSROOT=$CONDA_PREFIX/MacOSX10.9.sdk
+
+Then, we must install the correct dependencies to finally install SIMUnet:
+
+.. code-block:: bash
+
+    conda install --only-deps nnpdf=4.0.5
+    conda install tensorflow=2.10
+    conda install pkg-config=0.29.2 cmake=3.31.2 swig=4.0.2
+    conda install libarchive=3.4.2
+    conda install h5py=3.9.0 hdf5=1.14.0
+    conda install pineappl=0.8.7
+
+We spot an issue with ``librhash``, to solve it:
+
+.. code-block:: bash
+
+    ln -s $CONDA_PREFIX/lib/librhash.dylib $CONDA_PREFIX/lib/librhash.0.dylib
+
+.. _simunet-compilation-label-macos:
+
+Code compilation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The SIMUnet code can be downloaded from GitHub:
+
+.. code-block:: bash
+
+    git clone https://github.com/HEP-PBSP/SIMUnet.git
+    cd SIMUnet
+    mkdir conda-bld
+    cd conda-bld
+..    mkdir simunet_git
+..    cd simunet_git
+
+The code can then be compiled and installed with the following commands:
+
+.. code-block:: bash
+
+    cmake .. -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX
+    make
+    make install
+
+Note that if your CPU has more than one core, which is the case for M-series Mac machines, the option ``-j4`` can be used to speed up the ``make`` command.
+
+Moreover, the ``make install`` command will raise some non-stopping errors, which do invalidated the installation.
+
+The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce `theoretical predictions <https://docs.nnpdf.science/theory/index.html>`_, requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in ``simu_fac`` files, which exists for each dataset in the SIMUnet methodology. For a given dataset, the ``simu_fac`` file includes the SM theory prediction, and the SMEFT theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF ``theory_270`` folder, which will be automatically downloaded when required by the user's runcard.
+
+
+
+
+..    name: simunet
     channels:
         - anaconda
         - https://packages.nnpdf.science/public
@@ -402,69 +470,3 @@ In order to install SIMUnet on arm64 MacOS machines using ``conda``, we must cre
             - hypothesis==6.100.1
             - pathspec==0.12.1
     prefix: <path_to_root_conda_directory>/envs/simunet
-
-where ``<path_to_root_conda_directory>`` can be obtained using the following command line when the ``(base)`` environment is activated, in particular, we will obtain the absolute path to the ``(base)`` environment, `e.g.` the ``miniconda3`` folder if we use it.
-
-.. code-block:: bash
-
-    echo $CONDA_PREFIX
-
-Then, as we anticipated, we must set the ``CONDA_SUBDIR=osx-64``, create the environment from the ``yml`` file, and activate it
-
-.. code-block:: bash
-
-    CONDA_SUBDIR=osx-64 conda env create -f simunet.yml
-    conda activate simunet
-
-Another important step is installing a previous version of the MacOSX Software Development Kit (SDK), we can download the chosen version from `this link <https://github.com/phracker/MacOSX-SDKs/releases/>`_, we suggest ``MacOSX10.9.sdk.tar.xz``, which has been tested.
-
-.. code-block:: bash
-
-    curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.9.sdk.tar.xz
-
-once we have downloaded the ``tar.xz`` file we must untar it into the ``(base)`` environment folder
-
-.. code-block:: bash
-
-    tar xfz MacOSX10.9.sdk.tar.xz -C <path_to_root_conda_directory>
-
-where ``<path_to_root_conda_directory>`` is the same we obtained before. Then we must run the following command line to set the right path for the SDK that will be used during the installation of the SIMUnet C++ code
-
-.. code-block:: bash
-
-    export CONDA_BUILD_SYSROOT=<path_to_root_conda_directory>/MacOSX10.9.sdk
-
-.. _simunet-compilation-label-macos:
-
-Code compilation
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The SIMUnet code can be downloaded from GitHub:
-
-.. code-block:: bash
-
-    mkdir simunet_git
-    cd simunet_git
-    git clone https://github.com/HEP-PBSP/SIMUnet.git
-
-The code can then be compiled and installed with the following commands, first we have to move into the folder downloaded using ``git``, then we must create and place ourselves in the build folder:
-
-.. code-block:: bash
-
-    cd SIMUnet
-    mkdir conda-bld
-    cd conda-bld
-
-Finally, we can complete the installation with the following three steps:
-
-.. code-block:: bash
-
-    cmake .. -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX
-    make
-    make install
-
-Note that if your CPU has more than one core, which is the case for M1/M2/M3 Macs, the option ``-j4`` can be used to speed up the ``make`` command.
-
-Moreover, the ``make install`` command will raise some non-stopping errors, which do invalidated the installation.
-
-The SIMUnet code, in addition to the regular files that are needed in the NNPDF methodology to produce `theoretical predictions <https://docs.nnpdf.science/theory/index.html>`_, requires K-factors to account for the effect of SMEFT operators. These K-factors are implemented in ``simu_fac`` files, which exists for each dataset in the SIMUnet methodology. For a given dataset, the ``simu_fac`` file includes the SM theory prediction, and the SMEFT theory prediction at LO and/or NLO, if applicable. These K-factors are hosted in the NNPDF ``theory_270`` folder, which will be automatically downloaded when required by the user's runcard.
