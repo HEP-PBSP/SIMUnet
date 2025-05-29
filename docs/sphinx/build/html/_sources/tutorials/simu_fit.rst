@@ -386,8 +386,99 @@ with ``vp-get fit fit_name``.
 --------------------
 
 :math:`\text{SIMUnet}` has different functionalities that allow the user to analyse their results. 
-The code inherits functions from `NNPDF <https://docs.nnpdf.science/>`_ and, on their website, the user can find further details and instructions
-on how to `analyse results <https://docs.nnpdf.science/tutorials/index.html#analysing-results>`_ when it comes to the PDFs.
+These tools support both standard PDF analyses and EFT analyses.
 
-:math:`\text{SIMUnet}`, additionally, contains a complete set of functions that allow the user to analyse the EFT space, and the interplay between the PDFs
+Standard PDF Analysis
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+:math:`\text{SIMUnet}` inherits functions from the :math:`\text{validphys}` package of the `NNPDF <https://docs.nnpdf.science/>`_ group. 
+This provides the :math:`\text{validphys}` excecutable which is used to analyse data and fits by taking runcards written in YAML as an input.
+For more information, refer to the `NNPDF tutorial <https://docs.nnpdf.science/tutorials/index.html#analysing-results>`_
+
+Example analysis runcards can also be found in the `validphys2/examples <https://github.com/HEP-PBSP/SIMUnet/tree/main/validphys2/examples>`_ directory
+of the :math:`\text{SIMUnet}` repository. 
+
+
+EFT Analysis
+~~~~~~~~~~~~~~~~~~~~~~~~
+:math:`\text{SIMUnet}` additionally contains a complete set of functions that allow the user to analyse the EFT space, and the interplay between the PDFs
 and the EFT coefficients. The complete documentation can be found on the Functions documentation tab.
+
+Consider an example EFT analysis runcard in the :math:`\text{SIMUnet}` repository, named `bsm_only_report.yaml <https://github.com/HEP-PBSP/SIMUnet/blob/main/validphys2/examples/bsm_only_report.yaml>`_:
+
+
+.. code-block:: yaml
+
+  meta:
+  title: BSM results
+  author: MNC
+  keywords: [simunet, plots, validphys]
+
+
+The :code:`meta` section contains metadata used by the :math:`\text{validphys}` server. The :code:`title` and :code:`author` fields appear in report listings, 
+and the :code:`keywords` field improves searchability. Using consistent project-specific keywords is especially helpful in large-scale projects.
+
+.. code-block:: yaml
+
+  fit: 231120_lm_fixedPDF_alldata
+  fits: 
+    - 231120_lm_fixedPDF_alldata
+
+In this section, the fits to be analysed are specified. 
+
+.. code-block:: yaml
+
+  use_cuts: fromfit
+  pdf: {id: 231120_lm_fixedPDF_alldata, label: 231120_lm_fixedPDF_alldata}
+
+The :code:`use_cuts` key specifies whether to use the cuts from the fit (:code:`fromfit`) or the default cuts (:code:`internal`) as defined in 
+`/validphys2/src/validphys/cuts/filters.yaml <https://github.com/HEP-PBSP/SIMUnet/blob/main/validphys2/src/validphys/cuts/filters.yaml>`_.
+
+.. code-block:: yaml
+
+  simu_parameters:
+    # Dipoles
+    - {name: 'OtZ', scale: 1, latex: '$c_{tZ}$', plot_scale: 1}
+    - {name: 'OtW', scale: 1, latex: '$c_{tW}$', plot_scale: 100}
+    - {name: 'OtG', scale: 1, latex: '$c_{tG}$', plot_scale: 100}
+
+The :code:`simu_parameters` section defines the EFT coefficients to be analysed. Each coefficient has a name, a rescaling factor which is used during training
+, a latex representation for plots, and a plotting scale (for readability).
+
+.. code-block:: yaml
+
+  # Posterior distribution binnings
+  posterior_plots_settings:
+    same_bins: True
+    n_bins: 15
+    # rangex: [-0.5, 0.6]
+    # rangey: [0, 5]
+
+The :code:`posterior_plots_settings` section defines the settings for the posterior distribution plots. If :code:`same_bins` is set to :code:`True`, all posterior distributions will use the same binning. 
+The number of bins is specified by :code:`n_bins` and the :code:`rangex` and :code:`rangey` keys can be used to set the range of the x and y axes, respectively. If :code:`same_bins` is set to :code:`False`,
+the binning is set individually for each posterior distribution based on the fit data.
+
+.. code-block:: yaml
+
+  template_text: |
+    ### Comparison histograms of BSM factors
+    {@plot_nd_bsm_facs_fits@}
+
+    ### Plots of the bounds
+    {@plot_bsm_facs_bounds@}
+
+    ### BSM 68% residuals
+    {@plot_bsm_facs_68res@}
+
+    ### Combined 2D histograms
+    {@plot_2d_bsm_facs_fits@}
+
+    ### BSM correlations  
+    {@fits plot_bsm_corr@}
+
+  actions:
+    - report(main=True)
+
+The :code:`report(main=True)` command is what generates the report. We can customize the formatting of the report 
+using markdown syntax. Note for example that ### is used to create a header, and that the :code:`{@plot_nd_bsm_facs_fits@}` command is used to insert a histogram plot of the BSM factors.
+More examples of commands that can be used to insert plots can be found in the `Functions documentation <https://hep-pbsp.github.io/SIMUnet/sphinx/build/html/simunet_analysis.html#functions-documentation>`_.
