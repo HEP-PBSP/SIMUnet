@@ -340,7 +340,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-n3fit-fit">2. Running the fitting code</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-of-the-fit">Output of the fit</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#upload-fit">3. Uploading the fit</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analising-the-fit">4. Analising the fit</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyse-fit">4. Analysing the fit</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-pdf-analysis">Standard PDF Analysis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eft-analysis">EFT Analysis</a></li>
 </ul>
@@ -684,7 +684,7 @@ to yield the final PDF and EFT set. The number specified should match your desir
 </section>
 <section id="output-of-the-fit">
 <h2>Output of the fit<a class="headerlink" href="#output-of-the-fit" title="Permalink to this heading">#</a></h2>
-<p>As in NNPDF, every time a replica is finalised, the output is saved to the <a href="#id5"><span class="problematic" id="id6">`runcard/nnfit/replica_$replica`_</span></a>
+<p>As in NNPDF, every time a replica is finalised, the output is saved to the <a href="#id6"><span class="problematic" id="id7">`runcard/nnfit/replica_$replica`_</span></a>
 folder, which contains these files:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">chi2exps.log</span></code>: a log file with the χ² of the training.</p></li>
@@ -704,8 +704,8 @@ if, for example, you ran the fit on a cluster and want to make it avaiable to co
 from a different machine. You can upload the fit by using <code class="docutils literal notranslate"><span class="pre">vp-upload</span> <span class="pre">runcard_folder</span></code> and then fetch it
 with <code class="docutils literal notranslate"><span class="pre">vp-get</span> <span class="pre">fit</span> <span class="pre">fit_name</span></code>.</p>
 </section>
-<section id="analising-the-fit">
-<span id="analyse-fit"></span><h2>4. Analising the fit<a class="headerlink" href="#analising-the-fit" title="Permalink to this heading">#</a></h2>
+<section id="analyse-fit">
+<span id="id5"></span><h2>4. Analysing the fit<a class="headerlink" href="#analyse-fit" title="Permalink to this heading">#</a></h2>
 <p><span class="math notranslate nohighlight">\(\text{SIMUnet}\)</span> has different functionalities that allow the user to analyse their results.
 These tools support both standard PDF analyses and EFT analyses.</p>
 <section id="standard-pdf-analysis">
@@ -837,7 +837,7 @@ More examples of commands that can be used to insert plots can be found in the <
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-n3fit-fit">2. Running the fitting code</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output-of-the-fit">Output of the fit</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#upload-fit">3. Uploading the fit</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analising-the-fit">4. Analising the fit</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyse-fit">4. Analysing the fit</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-pdf-analysis">Standard PDF Analysis</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eft-analysis">EFT Analysis</a></li>
 </ul>
