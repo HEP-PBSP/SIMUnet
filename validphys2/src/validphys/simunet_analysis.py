@@ -42,7 +42,8 @@ from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 from validphys.loader import _get_nnpdf_profile
 
-from validphys.convolution import central_predictions
+from validphys.plotoptions.core import get_info, kitable
+from validphys.convolution import central_predictions, predictions
 
 log = logging.getLogger(__name__)
 
@@ -2137,3 +2138,56 @@ def write_datasets_chi2_dist_csv(
     chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
 
     chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+
+@figuregen
+def bsm_sm_ratio(data, pdf, load_datasets_contamination):
+
+    """
+    Generate figures which show the cumulative SMEFT K-factor applied to the datasets
+    according to the contamination parameters expressed in the runcard.
+
+    The function loads the SMEFT K-factor exploiting `validphys.simunet_analyisis.load_datasets_contamination`,
+    and to compute the PDF uncertainty on the SMEFT theory prediction, it takes advantage of
+    the `validphys.convolution.predictions` function.
+
+    Parameters
+    ----------
+
+    data: `core.DataGroupSpec`
+    
+    pdf: `core.PDF`
+
+    load_datasets_contamination: `dict`
+
+    Yields
+    -------
+
+    fig: `matplotlib.figure`
+    
+    """
+
+    # get datasets contamination
+    bsm_dict = load_datasets_contamination
+    # return figures
+    for dataset in data.datasets:
+        # initialise figure
+        fig, ax = plt.subplots()
+        # get info
+        info = get_info(dataset)
+        # get kin table & get x
+        table = kitable(data=dataset, info=info)
+        x = info.get_xcol(table=table)
+        # compute predictions
+        pred = predictions(dataset, pdf)
+        # central value
+        cv = pred[0].to_numpy()
+        # replica error
+        std = bsm_dict[dataset.name] * pred.loc[:,1:].std(axis=1).to_numpy() / cv
+        # plot
+        ax.axhline(y=1, linestyle='--', color='grey')
+        ax.errorbar(x=x, y=bsm_dict[dataset.name], yerr=std, fmt='o')
+        # formatting (title, labels, ...)
+        ax.set_title(label=info.dataset_label)
+        ax.set_xlabel(xlabel=info.xlabel)
+        ax.set_ylabel(ylabel=info.y_label)
+        yield fig
