@@ -115,6 +115,9 @@
 #include "CMS_HMDY_13TEV.h"
 #include "ATLAS_DY_2D_8TEV_LOWMASS.h"
 #include "ATLAS_WMU_8TEV.h"
+#include "ATLAS_1JET_13TEV_R04.h" // added ATLAS 1JET_13TEV_R04
+#include "ATLAS_2JET_13TEV_R04.h" // added ATLAS 2_JET_13TEV_R04
+#include "CMS_1JET_13TEV_R07.h" // added CMS_1JET_13TEV_R07
 /**
  * \param argv the filename containing the configuration
  */
@@ -182,8 +185,10 @@ vector<std::unique_ptr<CommonData>> InitCommonData()
   target.emplace_back(new ATLAS_1JET_8TEV_R06Filter());
   target.emplace_back(new ATLAS_1JET_8TEV_R06_DECFilter());
   target.emplace_back(new ATLAS_1JET_8TEV_R06_UNCFilter());
+  target.emplace_back(new ATLAS_1JET_13TEV_R04Filter()); //ATLAS_1JET_13TEV_R04
   target.emplace_back(new ATLAS_2JET_7TEV_R04Filter());
   target.emplace_back(new ATLAS_2JET_7TEV_R06Filter());
+  target.emplace_back(new ATLAS_2JET_13TEV_R04Filter()); //ATLAS_2JET_13TEV_R04
   target.emplace_back(new ATLAS_WP_JET_8TEV_PTFilter());
   target.emplace_back(new ATLAS_WM_JET_8TEV_PTFilter());
   target.emplace_back(new ATLAS_WP_JET_8TEV_PTJFilter());
@@ -232,6 +237,7 @@ vector<std::unique_ptr<CommonData>> InitCommonData()
   target.emplace_back(new CMSWMU8TEVFilter());
   target.emplace_back(new CMSZDIFF12Filter());
   target.emplace_back(new CMS_1JET_8TEVFilter());
+  target.emplace_back(new CMS_1JET_13TEV_R07Filter()); // CMS_1JET_13TEV_R07
   target.emplace_back(new CMS_2JET_3D_8TEVFilter());
   target.emplace_back(new CMS_2JET_7TEVFilter());
   target.emplace_back(new CMS_HMDY_13TEVFilter());
