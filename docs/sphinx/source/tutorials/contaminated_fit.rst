@@ -106,7 +106,7 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
 
     ############################################################
     theory:
-    theoryid: 200     # database id
+    theoryid: 270     # database id
 
     ############################################################
     trvlseed: 475038818

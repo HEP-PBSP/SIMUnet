@@ -105,7 +105,7 @@ For details about each process see each tutorial. Here is an example runcard:
 
     ############################################################
     theory:
-    theoryid: 200     # database id
+    theoryid: 270     # database id
 
     ############################################################
     trvlseed: 475038818
