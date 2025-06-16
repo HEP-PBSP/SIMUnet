@@ -34,7 +34,7 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     # frac: training fraction of datapoints for the PDFs
     # QCD: apply QCD K-factors
     # EWK: apply electroweak K-factors
-    # simu_fac: fit BSM coefficients using their K-factors in the dataset 
+    # simu_fac: fit BSM coefficients using their K-factors in the dataset
     # use_fixed_predictions:  if set to True it removes the PDF dependence of the dataset
     # sys: systematics treatment (see systypes)
 
@@ -82,19 +82,19 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     printpdf4gen: false # To print info on PDFs during minimization
     contamination_parameters:
         - name: 'W'
-        value: 0.00008
-        linear_combination:
-            'Olq3': -15.94
+            value: 0.00008
+            linear_combination:
+                'Olq3': -15.94
 
         - name: 'Y'
-        value: 1 
-        linear_combination:
-            'Olq1': 1.51606
-            'Oed': -6.0606
-            'Oeu': 12.1394
-            'Olu': 6.0606
-            'Old': -3.0394
-            'Oqe': 3.0394
+            value: 1
+            linear_combination:
+                'Olq1': 1.51606
+                'Oed': -6.0606
+                'Oeu': 12.1394
+                'Olu': 6.0606
+                'Old': -3.0394
+                'Oqe': 3.0394
 
     seed: 0
     rngalgo: 0
@@ -119,72 +119,72 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
 
 
     parameters: # This defines the parameter dictionary that is passed to the Model Trainer
-    nodes_per_layer: [25, 20, 8]
-    activation_per_layer: [tanh, tanh, linear]
-    initializer: glorot_normal
-    optimizer:
-        clipnorm: 6.073e-6
-        learning_rate: 2.621e-3
-        optimizer_name: Nadam
-    epochs: 30000
-    positivity:
-        initial: 184.8
-        multiplier:
-    integrability:
-        initial: 184.8
-        multiplier:
-    stopping_patience: 0.2
-    layer_type: dense
-    dropout: 0.0
-    threshold_chi2: 3.5
+        nodes_per_layer: [25, 20, 8]
+        activation_per_layer: [tanh, tanh, linear]
+        initializer: glorot_normal
+        optimizer:
+            clipnorm: 6.073e-6
+            learning_rate: 2.621e-3
+            optimizer_name: Nadam
+        epochs: 30000
+        positivity:
+            initial: 184.8
+            multiplier:
+        integrability:
+            initial: 184.8
+            multiplier:
+        stopping_patience: 0.2
+        layer_type: dense
+        dropout: 0.0
+        threshold_chi2: 3.5
 
     fitting:
-    # EVOL(QED) = sng=0,g=1,v=2,v3=3,v8=4,t3=5,t8=6,(pht=7)
-    # EVOLS(QED)= sng=0,g=1,v=2,v8=4,t3=4,t8=5,ds=6,(pht=7)
-    # FLVR(QED) = g=0, u=1, ubar=2, d=3, dbar=4, s=5, sbar=6, (pht=7)
-    fitbasis: EVOL  # EVOL (7), EVOLQED (8), etc.
-    basis:
-    - {fl: sng, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        1.093, 1.121], largex: [1.486, 3.287]}
-    - {fl: g, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.8329, 1.071], largex: [3.084, 6.767]}
-    - {fl: v, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.5202, 0.7431], largex: [1.556, 3.639]}
-    - {fl: v3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.1205, 0.4839], largex: [1.736, 3.622]}
-    - {fl: v8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.5864, 0.7987], largex: [1.559, 3.569]}
-    - {fl: t3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        -0.5019, 1.126], largex: [1.754, 3.479]}
-    - {fl: t8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        0.6305, 0.8806], largex: [1.544, 3.481]}
-    - {fl: t15, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
-        1.087, 1.139], largex: [1.48, 3.365]}
+        # EVOL(QED) = sng=0,g=1,v=2,v3=3,v8=4,t3=5,t8=6,(pht=7)
+        # EVOLS(QED)= sng=0,g=1,v=2,v8=4,t3=4,t8=5,ds=6,(pht=7)
+        # FLVR(QED) = g=0, u=1, ubar=2, d=3, dbar=4, s=5, sbar=6, (pht=7)
+        fitbasis: EVOL  # EVOL (7), EVOLQED (8), etc.
+        basis:
+        - {fl: sng, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            1.093, 1.121], largex: [1.486, 3.287]}
+        - {fl: g, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            0.8329, 1.071], largex: [3.084, 6.767]}
+        - {fl: v, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            0.5202, 0.7431], largex: [1.556, 3.639]}
+        - {fl: v3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            0.1205, 0.4839], largex: [1.736, 3.622]}
+        - {fl: v8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            0.5864, 0.7987], largex: [1.559, 3.569]}
+        - {fl: t3, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            -0.5019, 1.126], largex: [1.754, 3.479]}
+        - {fl: t8, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            0.6305, 0.8806], largex: [1.544, 3.481]}
+        - {fl: t15, pos: false, trainable: false, mutsize: [15], mutprob: [0.05], smallx: [
+            1.087, 1.139], largex: [1.48, 3.365]}
 
     ############################################################
     positivity:
-    posdatasets:
-    - {dataset: POSF2U, maxlambda: 1e6}        # Positivity Lagrange Multiplier
-    - {dataset: POSF2DW, maxlambda: 1e6}
-    - {dataset: POSF2S, maxlambda: 1e6}
-    - {dataset: POSFLL, maxlambda: 1e6}
-    - {dataset: POSDYU, maxlambda: 1e10}
-    - {dataset: POSDYD, maxlambda: 1e10}
-    - {dataset: POSDYS, maxlambda: 1e10}
-    - {dataset: POSF2C, maxlambda: 1e6}
-    - {dataset: POSXUQ, maxlambda: 1e6}        # Positivity of MSbar PDFs
-    - {dataset: POSXUB, maxlambda: 1e6}
-    - {dataset: POSXDQ, maxlambda: 1e6}
-    - {dataset: POSXDB, maxlambda: 1e6}
-    - {dataset: POSXSQ, maxlambda: 1e6}
-    - {dataset: POSXSB, maxlambda: 1e6}
-    - {dataset: POSXGL, maxlambda: 1e6}
+        posdatasets:
+        - {dataset: POSF2U, maxlambda: 1e6}        # Positivity Lagrange Multiplier
+        - {dataset: POSF2DW, maxlambda: 1e6}
+        - {dataset: POSF2S, maxlambda: 1e6}
+        - {dataset: POSFLL, maxlambda: 1e6}
+        - {dataset: POSDYU, maxlambda: 1e10}
+        - {dataset: POSDYD, maxlambda: 1e10}
+        - {dataset: POSDYS, maxlambda: 1e10}
+        - {dataset: POSF2C, maxlambda: 1e6}
+        - {dataset: POSXUQ, maxlambda: 1e6}        # Positivity of MSbar PDFs
+        - {dataset: POSXUB, maxlambda: 1e6}
+        - {dataset: POSXDQ, maxlambda: 1e6}
+        - {dataset: POSXDB, maxlambda: 1e6}
+        - {dataset: POSXSQ, maxlambda: 1e6}
+        - {dataset: POSXSB, maxlambda: 1e6}
+        - {dataset: POSXGL, maxlambda: 1e6}
 
     ############################################################
     integrability:
-    integdatasets:
-    - {dataset: INTEGXT8, maxlambda: 1e2}
-    - {dataset: INTEGXT3, maxlambda: 1e2}
+        integdatasets:
+        - {dataset: INTEGXT8, maxlambda: 1e2}
+        - {dataset: INTEGXT3, maxlambda: 1e2}
 
     ############################################################
     debug: false
