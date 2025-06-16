@@ -37,6 +37,8 @@ from validphys.convolution import (
     predictions,
     PredictionsRequireCutsError,
 )
+from validphys.plotoptions.core import get_info
+
 
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 
@@ -167,6 +169,55 @@ groups_data = collect("data", ("group_dataset_inputs_by_metadata",))
 experiments_data = collect("data", ("group_dataset_inputs_by_experiment",))
 
 procs_data = collect("data", ("group_dataset_inputs_by_process",))
+
+
+def data_index(data):
+
+    """
+    Parameters
+    ----------
+
+    data: core.DataGroupSpec
+
+    Returns
+    -------
+
+    pandas.MultiIndex
+
+    Example
+    -------
+
+    >>> from validphys.loader import Loader
+    >>> from validphys.results import data_index
+    >>> l = Loader()
+    >>> dataset = l.check_dataset(name="NMC",
+                                  theoryid=200
+                                  )
+    >>> experiment = l.check_experiment(name="data",
+                                        datasets=[dataset]
+                                        )
+    >>> data_index(experiment)
+
+    MultiIndex([('NMC', 'NMC',  16),
+                ('NMC', 'NMC',  21),
+                ('NMC', 'NMC',  22),
+                ...
+                ('NMC', 'NMC', 289),
+                ('NMC', 'NMC', 290),
+                ('NMC', 'NMC', 291)],
+                names=['experiment', 'dataset', 'id'], length=204)
+
+    """
+
+    tuples = []
+
+    for dataset in data.datasets:
+        exp = get_info(dataset).experiment
+        for i in dataset.cuts.load():
+            tp = (exp, dataset.name, i)
+            tuples.append(tp)
+    
+    return pd.MultiIndex.from_tuples(tuples, names=('experiment', 'dataset', 'id'))
 
 
 def groups_index(groups_data):
@@ -541,7 +592,7 @@ def dataset_inputs_results(
 # ``results`` to support this.
 # TODO: The above comment doesn't make sense after adding T0. Deprecate this
 def pdf_results(
-    dataset: (DataSetSpec, DataGroupSpec),
+    dataset: (DataSetSpec, DataGroupSpec), # type: ignore
     pdfs: Sequence,
     covariance_matrix,
     sqrt_covmat,
@@ -557,12 +608,12 @@ def pdf_results(
 @require_one("pdfs", "pdf")
 @remove_outer("pdfs", "pdf")
 def one_or_more_results(
-    dataset: (DataSetSpec, DataGroupSpec),
+    dataset: (DataSetSpec, DataGroupSpec), # type: ignore
     covariance_matrix,
     sqrt_covmat,
     dataset_bsm_factor,
-    pdfs: (type(None), Sequence) = None,
-    pdf: (type(None), PDF) = None,
+    pdfs: (type(None), Sequence) = None, # type: ignore
+    pdf: (type(None), PDF) = None, # type: ignore
 ):
     """Generate a list of results, where the first element is the data values,
     and the next is either the prediction for pdf or for each of the pdfs.

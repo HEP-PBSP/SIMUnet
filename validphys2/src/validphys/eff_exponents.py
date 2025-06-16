@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from reportengine import collect
-from reportengine.compat import yaml
+from validphys.utils import yaml_rt
 from reportengine.figure import figuregen
 from reportengine.floatformatting import format_number, significant_digits
 from reportengine.table import table
@@ -464,7 +464,7 @@ def iterate_preprocessing_yaml(
     (df_effexps,) = next_fit_eff_exps_table
     # Use round trip loader rather than safe_load in fit.as_input()
     with open(fit.path / "filter.yml", "r") as f:
-        filtermap = yaml.load(f, yaml.RoundTripLoader)
+        filtermap = yaml_rt.load(f,)
     previous_exponents = filtermap["fitting"]["basis"]
     basis = filtermap["fitting"]["fitbasis"]
     checked = check_basis(basis, None)
@@ -490,7 +490,7 @@ def iterate_preprocessing_yaml(
         previous_exponents[i]["largex"] = [
             fmt(beta) for beta in betas
         ]
-    return yaml.dump(filtermap, Dumper=yaml.RoundTripDumper)
+    return yaml_rt.dump(filtermap,)
 
 
 def update_runcard_description_yaml(
@@ -506,13 +506,13 @@ def update_runcard_description_yaml(
     ```
 
     """
-    filtermap = yaml.load(iterate_preprocessing_yaml, yaml.RoundTripLoader)
+    filtermap = yaml_rt.load(iterate_preprocessing_yaml,)
 
     # update description if necessary
     if _updated_description is not None:
         filtermap["description"] = _updated_description
 
-    return yaml.dump(filtermap, Dumper=yaml.RoundTripDumper)
+    return yaml_rt.dump(filtermap,)
 
 
 def iterated_runcard_yaml(
@@ -546,7 +546,7 @@ def iterated_runcard_yaml(
     ...     f.write(yaml_output)
 
     """
-    filtermap = yaml.load(update_runcard_description_yaml, yaml.RoundTripLoader)
+    filtermap = yaml_rt.load(update_runcard_description_yaml,)
     # iterate t0
     filtermap["datacuts"]["t0pdfset"] = fit.name
 
@@ -570,4 +570,4 @@ def iterated_runcard_yaml(
         if "filterseed" in closuretest_data:
             closuretest_data["filterseed"] = random.randrange(0, maxint)
 
-    return yaml.dump(filtermap, Dumper=yaml.RoundTripDumper)
+    return yaml_rt.dump(filtermap,)

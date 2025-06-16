@@ -13,6 +13,11 @@ import numpy as np
 
 from validobj import parse_input, ValidationError
 
+from ruamel.yaml import YAML
+
+yaml_safe = YAML(typ="safe")
+yaml_rt = YAML(typ="rt")
+
 
 def parse_yaml_inp(inp, spec, path):
     """Helper function to parse yaml using the `validobj` library and print
@@ -56,7 +61,6 @@ def parse_yaml_inp(inp, spec, path):
             current_exc = current_exc.__cause__
         raise ValidationError('\n'.join(error_text_lines)) from e
 
-        
 @contextlib.contextmanager
 def tempfile_cleaner(root, exit_func, exc, prefix=None, **kwargs):
     """A context manager to handle temporary directory creation and

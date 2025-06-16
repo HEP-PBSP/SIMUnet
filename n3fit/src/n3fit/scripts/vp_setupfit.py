@@ -35,7 +35,8 @@ import warnings
 
 from validphys.config import Environment, Config, EnvironmentError_, ConfigError
 from validphys.app import App
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
+from ruamel.yaml.error import YAMLError, MantissaNoDotYAML1_1Warning
 from reportengine import colors
 
 
@@ -134,14 +135,14 @@ class SetupFitConfig(Config):
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore',
-                                      yaml.error.MantissaNoDotYAML1_1Warning)
+                                      MantissaNoDotYAML1_1Warning)
                 #We need to specify the older version 1.1 to support the
                 #older configuration files, which liked to use on/off for
                 #booleans.
                 #The floating point parsing yields warnings everywhere, which
                 #we suppress.
-                file_content = yaml.safe_load(o, version='1.1')
-        except yaml.error.YAMLError as e:
+                file_content = yaml_safe.load(o)
+        except YAMLError as e:
             raise ConfigError(f"Failed to parse yaml file: {e}")
         if not isinstance(file_content, dict):
             raise ConfigError(f"Expecting input runcard to be a mapping, "

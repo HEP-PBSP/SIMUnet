@@ -14,7 +14,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-import yaml
+from validphys.utils import yaml_safe
 
 from reportengine import collect
 from reportengine.table import table
@@ -180,11 +180,20 @@ def _mask_fk_tables(dataset_dicts, tr_masks):
         vl_fks = []
         ex_fks = []
         vl_mask = ~tr_mask
+        
         for fktable_dict in dataset_dict["fktables"]:
-            tr_fks.append(fktable_dict["fktable"][tr_mask])
-            vl_fks.append(fktable_dict["fktable"][vl_mask])
-            ex_fks.append(fktable_dict.get("fktable"))
-            dataset_dict['ds_tr_mask'] = tr_mask
+            if not dataset_dict["use_fixed_predictions"]:
+                tr_fks.append(fktable_dict["fktable"][tr_mask])
+                vl_fks.append(fktable_dict["fktable"][vl_mask])
+                ex_fks.append(fktable_dict.get("fktable"))
+                dataset_dict['ds_tr_mask'] = tr_mask
+            # note: fixed observables have a fake fktable
+            else:
+                tr_fks.append(fktable_dict["fktable"])
+                vl_fks.append([])
+                ex_fks.append(fktable_dict.get("fktable"))
+                dataset_dict['ds_tr_mask'] = tr_mask
+
         dataset_dict["tr_fktables"] = tr_fks
         dataset_dict["vl_fktables"] = vl_fks
         dataset_dict["ex_fktables"] = ex_fks
@@ -243,13 +252,13 @@ def fitting_data_dict(
     # TODO: Plug in the python data loading when available. Including but not
     # limited to: central values, ndata, replica generation, covmat construction
     if data.datasets:
-        try:
-            spec_c = data.load()
-        except:
-            breakpoint()
-        ndata = spec_c.GetNData()
-        expdata_true = spec_c.get_cv().reshape(1, ndata)
-        datasets = common_data_reader_experiment(spec_c, data)
+        ndata = sum([ds.commondata.load_commondata(cuts=ds.cuts).ndata for ds in data.datasets])
+        expdata_true = np.array([])
+        for ds in data.datasets:
+            expdata_true = np.append(expdata_true, ds.commondata.load_commondata(cuts=ds.cuts).central_values)
+        expdata_true = expdata_true.reshape(1, ndata)
+        # expdata_true = np.array([ds.commondata.load_commondata(cuts=ds.cuts).central_values for ds in data.datasets]).reshape(1,ndata)
+        datasets = common_data_reader_experiment(data)
         for i in range(len(data.datasets)):
             if data.datasets[i].use_fixed_predictions:
                 datasets[i]['use_fixed_predictions'] = True
@@ -260,7 +269,7 @@ def fitting_data_dict(
                     prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
                     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
                 with open(path, 'rb') as f:
-                    fixed_predictions = np.array(yaml.safe_load(f)['SM_fixed'])
+                    fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
                 datasets[i]['fixed_predictions'] = fixed_predictions
             else:
                 datasets[i]['use_fixed_predictions'] = False
@@ -475,13 +484,14 @@ def replica_training_mask(
 
     [345 rows x 1 columns]
     """
-    all_masks = np.concatenate([
-        ds_mask
-        for exp_masks in zip(exps_tr_masks)
-        for ds_mask in exp_masks
-    ])
+    broken_cuts = [ds_mask for exp_masks in zip(exps_tr_masks) for ds_mask in exp_masks]
+    new_broken_cuts = []
+    for cuts in broken_cuts:
+        new_broken_cuts += cuts
+    new_broken_cuts = [cuts.reshape((1,len(cuts))) for cuts in new_broken_cuts]
+
     return pd.DataFrame(
-        all_masks,
+        np.concatenate(new_broken_cuts, axis=1).T,
         columns=[f"replica {replica}"],
         index=experiments_index
     )

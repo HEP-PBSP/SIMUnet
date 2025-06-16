@@ -28,7 +28,7 @@ from reportengine.configparser import (
 from reportengine.helputils import get_parser_type
 from reportengine.namespaces import NSList
 from reportengine import report
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
 
 from validphys.core import (
     DataGroupSpec,
@@ -38,6 +38,7 @@ from validphys.core import (
     MatchedCuts,
     SimilarCuts,
     ThCovMatSpec,
+    PDF,
 )
 from validphys.fitdata import fitted_replica_indexes, num_fitted_replicas
 from validphys.loader import (
@@ -171,6 +172,10 @@ class CoreConfig(configparser.Config):
         except NotImplementedError as e:
             raise ConfigError(str(e))
         return pdf
+    
+    def parse_fakepdf(self, name: str) -> PDF:
+        """PDF set used to generate the fake data in a closure test."""
+        return self.parse_pdf(name)
 
     def parse_load_weights_from_fit(self, name: str):
         """A fit in the results folder, containing at least a valid filter result."""
@@ -507,7 +512,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters_linear_combinations, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination", "new_commondata"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -517,6 +522,7 @@ class CoreConfig(configparser.Config):
                 "'dataset' must be a mapping with " "'dataset' and 'sysnum'"
             )
 
+        new_commondata = dataset.get("new_commondata", False)
         sysnum = dataset.get("sys")
         cfac = dataset.get("cfac", tuple())
         frac = dataset.get("frac", 1)
@@ -559,7 +565,8 @@ class CoreConfig(configparser.Config):
             custom_group=custom_group,
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
-            **bsm_data
+            **bsm_data,
+            new_commondata=new_commondata,
         )
 
     def parse_use_fitcommondata(self, do_use: bool):
@@ -746,6 +753,7 @@ class CoreConfig(configparser.Config):
         use_fixed_predictions = dataset_input.use_fixed_predictions
         contamination = dataset_input.contamination
         contamination_data = contamination_data
+        new_commondata = dataset_input.new_commondata
 
         try:
             ds = self.loader.check_dataset(
@@ -763,6 +771,7 @@ class CoreConfig(configparser.Config):
                 use_fixed_predictions=use_fixed_predictions,
                 contamination=contamination,
                 contamination_data=contamination_data,
+                new_commondata=new_commondata,
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
@@ -1318,7 +1327,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_filters.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1399,7 +1408,7 @@ class CoreConfig(configparser.Config):
 
         lock_token = "_defaults.lock.yaml"
         try:
-            return yaml.safe_load(
+            return yaml_safe.load(
                 read_text(validphys.cuts.lockfiles, f"{spec}{lock_token}")
             )
         except FileNotFoundError as e:
@@ -1696,7 +1705,7 @@ class CoreConfig(configparser.Config):
         pp = point_prescription
         th = theoryid.id
 
-        lsv = yaml.safe_load(
+        lsv = yaml_safe.load(
             read_text(validphys.scalevariations, "scalevariationtheoryids.yaml")
         )
 
@@ -1715,7 +1724,7 @@ class CoreConfig(configparser.Config):
             )
 
         # Find scales that correspond to this point prescription
-        pp_scales_dict = yaml.safe_load(
+        pp_scales_dict = yaml_safe.load(
             read_text(validphys.scalevariations, "pointprescriptions.yaml")
         )
 

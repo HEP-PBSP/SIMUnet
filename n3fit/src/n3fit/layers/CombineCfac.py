@@ -6,6 +6,7 @@ import hashlib
 
 from validphys import initialisation_specs
 
+
 class CombineCfacLayer(Layer):
     """
     Creates the combination layer of SIMUnet.
@@ -16,6 +17,7 @@ class CombineCfacLayer(Layer):
         scales,
         linear_names,
         initialisations,
+        analytic_initialisation,
         initialisation_seed,
         replica_number,
     ):
@@ -37,12 +39,15 @@ class CombineCfacLayer(Layer):
         # At this point, create a tf object with the correct random initialisation.
         initial_values = []
         assert len(initialisations) == len(linear_names)
+        index = 0
         for ini, name in zip(initialisations, linear_names):
-            hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (10 ** 18)
+            hash_value = int(hashlib.sha1(name.encode("utf-8")).hexdigest(), 16) % (
+                10**18
+            )
             seed = np.int32((initialisation_seed + replica_number) ^ hash_value)
 
             if isinstance(ini, initialisation_specs.ConstantInitialisation):
-                val = tf.constant(ini.value, dtype='float32', shape=(1,))
+                val = tf.constant(ini.value, dtype="float32", shape=(1,))
             elif isinstance(ini, initialisation_specs.UniformInitialisation):
                 val = tf.random_uniform_initializer(
                     minval=ini.minval,
@@ -52,31 +57,37 @@ class CombineCfacLayer(Layer):
             elif isinstance(ini, initialisation_specs.GaussianInitialisation):
                 tf.random.set_seed(seed)
                 val = tf.random.normal([1], ini.mean, ini.std_dev, tf.float32)
+            elif isinstance(ini, initialisation_specs.AnalyticInitialisation):
+                val = np.array([float(analytic_initialisation[index])])
             else:
                 raise RuntimeError(
                     "Invalid initialisation: choose form constant, uniform or Gaussian."
                 )
+            index += 1
             initial_values.append(val)
 
+        num_initial = len(initial_values)
+
         self.scales = np.array(scales, dtype=np.float32)
-        if len(initial_values) > 0:
+        if num_initial > 0:
             initial_values = tf.concat(initial_values, 0)
             initial_values = tf.math.multiply(initial_values, self.scales)
-
+            initial_values = tf.reshape(initial_values, (num_initial,))
             self.w = tf.Variable(
                 initial_value=initial_values,
                 trainable=True,
             )
         else:
             self.w = tf.Variable(
-                initial_value=tf.zeros(shape=(len(initial_values),), dtype="float32"),
+                initial_value=tf.zeros(shape=(num_initial,), dtype="float32"),
                 trainable=True,
             )
+
         self.scales = np.array(scales, dtype=np.float32)
         self.linear_names = linear_names
 
     def _compute_linear(self, linear_values):
-        scaled_values = linear_values/self.scales[:, np.newaxis]
+        scaled_values = linear_values / self.scales[:, np.newaxis]
         return tf.reduce_sum(self.w[:, tf.newaxis] * scaled_values, axis=0)
 
     def call(self, inputs, linear_values):
@@ -112,6 +123,9 @@ class CombineCfacLayer(Layer):
                 dtype=np.float32,
             )
             linear = self._compute_linear(linear_values)
+            linear = tf.cast(linear, tf.float32)
+            inputs = tf.cast(inputs, tf.float32)
+
             return (1 + linear) * inputs
 
         return inputs

@@ -1,64 +1,119 @@
 <div align="center">
-  <img src="doc/sphinx/source/_static/LogoNNPDF.png" height=100>
+  <img src="PBSP_logo.png" height=100>
 </div>
 
-![Build status](https://github.com/NNPDF/nnpdf/actions/workflows/tests.yml/badge.svg)
-[![DOI](https://zenodo.org/badge/118135201.svg)](https://zenodo.org/badge/latestdoi/118135201)
+[![DOI](Pending)](Pending)
 
-# NNPDF: An open-source machine learning framework for global analyses of parton distributions
+# SIMUnet: Leveraging open-source machine learning to explore the interplay between parton distribution functions and potential new physics
 
-[The NNPDF collaboration](http://nnpdf.science) determines the structure of the
-proton using Machine Learning methods. This is the main repository of the
-fitting and analysis frameworks. In particular it contains all the necessary
-tools to [reproduce](https://docs.nnpdf.science/tutorials/reproduce.html) the
-[NNPDF4.0 PDF determinations](https://arxiv.org/abs/2109.02653).
+[PBSP](https://www.pbsp.org.uk/) (Physics Beyond the Standard Proton) is an ERC funded project, led by Prof. Maria Ubiali and based at the Department of Applied Mathematics and Theoretical Physics at the University of Cambridge. The projects focuses on the global interpretation of the LHC data in terms of indirect searches for new physics, by providing a robust framework to globally interpret all subtle deviations from the SM predictions that might arise at colliders.
+
+The PBSP team has developed the SIMUnet methodology, which uses machine learning techniques to study the interplay between PDFs and potential new physics signals. Drawing upon
+the [NNPDF methodology](https://arxiv.org/abs/2109.02653), SIMUnet provides an augmented framework with a suite of tools that allows the user to
+
+- Perform simultaneous fits of PDFs and EFT coefficients
+- Perform Fixed-PDF fits of EFT coefficients
+- Assess the possible absorption of new physics by the PDFs
+- Study the interplay between PDFs and EFT coefficients 
+- Analyse the results and produce posterior distributions, correlations, confidence levels, and general quality metrics and plots
 
 ## Documentation
 
-The documentation is available at <https://docs.nnpdf.science/>
+The documentation is available at the official [SIMUnet website](https://hep-pbsp.github.io/SIMUnet/sphinx/build/html/index.html).
 
 ## Install
 
-See the [NNPDF installation
-guide](https://docs.nnpdf.science/get-started/installation.html) for the 
-conda package, and how to build from source.
-
-Please note
-that the [conda](https://docs.conda.io/en/latest/) based workflow described in
-the documentation is the only supported one. While it may be possible to set up
-the code in different ways, we won't be able to provide any assistance.
-
-We follow a rolling development model where the tip of the master branch is 
-expected to be stable, tested and correct. For more information see our 
-[releases and compatibility policy](https://docs.nnpdf.science/releases.html).
+See the [SIMUnet installation tutorial](https://hep-pbsp.github.io/SIMUnet/sphinx/build/html/tutorials/Installation.html).
 
 ## Cite
 
-This code is described in the following [paper](https://inspirehep.net/literature?sort=mostrecent&size=25&page=1&q=find%20eprint%202109.02671):
+The SIMUnet code has been developed in [the original paper](https://inspirehep.net/literature/2013000):
 
+```bibtex
+@article{Iranipour:2022iak,
+    author = "Iranipour, Shayan and Ubiali, Maria",
+    title = "{A new generation of simultaneous fits to LHC data using deep learning}",
+    eprint = "2201.07240",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.1007/JHEP05(2022)032",
+    journal = "JHEP",
+    volume = "05",
+    pages = "032",
+    year = "2022"
+}
 ```
-@article{Ball:2021xlu,
+
+and made public in the [official release](https://inspirehep.net/literature/2755426):
+
+```bibtex
+@article{Costantini:2024xae,
+    author = "Costantini, Mark N. and Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mantani, 
+    Luca and Morales Alvarado, Manuel and Moore, James M. and Ubiali, Maria",
+    title = "{SIMUnet: an open-source tool for simultaneous global fits of EFT Wilson coefficients and PDFs}",
+    eprint = "2402.03308",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    month = "2",
+    year = "2024"
+}
+```
+
+It is directly based on the [NNPDF open-source code](https://arxiv.org/abs/2109.02671):
+
+```bibtex
+@article{NNPDF:2021uiq,
     author = "Ball, Richard D. and others",
+    collaboration = "NNPDF",
     title = "{An open-source machine learning framework for global analyses of parton distributions}",
     eprint = "2109.02671",
     archivePrefix = "arXiv",
     primaryClass = "hep-ph",
     reportNumber = "Edinburgh 2021/13, Nikhef-2021-020, TIF-UNIMI-2021-12",
-    month = "9",
+    doi = "10.1140/epjc/s10052-021-09747-9",
+    journal = "Eur. Phys. J. C",
+    volume = "81",
+    number = "10",
+    pages = "958",
     year = "2021"
 }
 ```
 
-If you use the code to produce new results in a scientific publication, please
-follow the [Citation Policy](https://docs.nnpdf.science/get-started/cite.html),
-particularly in regards to the papers relevant for QCD NNLO and EW NLO
-calculations incorporated in the NNPDF dataset.
+The physics potential of the tool has been explored in:
 
-## Contribute
+```bibtex
+@article{Kassabov:2023hbm,
+    author = "Kassabov, Zahari and Madigan, Maeve and Mantani, Luca and Moore, James and Morales Alvarado, 
+    Manuel and Rojo, Juan and Ubiali, Maria",
+    title = "{The top quark legacy of the LHC Run II for PDF and SMEFT analyses}",
+    eprint = "2303.06159",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.1007/JHEP05(2023)205",
+    journal = "JHEP",
+    volume = "05",
+    pages = "205",
+    year = "2023"
+}
 
-We welcome bug reports or feature requests sent to the [issue
-tracker](https://github.com/NNPDF/nnpdf/issues). You may use the issue tracker
-for help and questions as well.
+@article{Hammou:2023heg,
+    author = "Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mangano, Michelangelo L. and 
+    Mantani, Luca and Moore, James and Alvarado, Manuel Morales and Ubiali, Maria",
+    title = "{Hide and seek: how PDFs can conceal new physics}",
+    eprint = "2307.10370",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "CERN-TH-2023-137",
+    doi = "10.1007/JHEP11(2023)090",
+    journal = "JHEP",
+    volume = "11",
+    pages = "090",
+    year = "2023"
+}
+```
 
-If you would like contribute to the code, please follow the [Contribution
-Guidelines](https://docs.nnpdf.science/contributing/index.html).
+Please consider citing these papers if you use the code.
+
+## Bugs and contributions
+
+If you find a bug or have a new feature idea, do not hesitate to drop them in our [issue tracker](https://github.com/HEP-PBSP/SIMUnet/issues).

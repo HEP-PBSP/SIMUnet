@@ -23,7 +23,8 @@ import numpy as np
 
 from reportengine import namespaces
 from reportengine.baseexceptions import AsInputError
-from reportengine.compat import yaml
+from validphys.utils import yaml_safe
+from ruamel.yaml import YAMLError
 
 from NNPDF import (LHAPDFSet as libNNPDF_LHAPDFSet,
     CommonData,
@@ -316,6 +317,18 @@ class CommonDataSpec(TupleComp):
         #TODO: Use better path handling in python 3.6
         return CommonData.ReadFile(str(self.datafile), str(self.sysfile))
 
+    def load_commondata(self, cuts=None):
+        """
+        Loads a coredata.CommonData object from a core.CommonDataSetSpec object
+        cuts are applied if provided.
+        """
+        # import here to avoid circular imports
+        from validphys.commondataparser import load_commondata
+        cd = load_commondata(self)
+        if cuts is not None:
+            cd = cd.with_cuts(cuts)
+        return cd
+    
     @property
     def plot_kinlabels(self):
         return get_plot_kinlabels(self)
@@ -324,7 +337,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination, new_commondata):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -335,6 +348,7 @@ class DataSetInput(TupleComp):
         self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
+        self.new_commondata = new_commondata
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):
@@ -513,7 +527,7 @@ class DataSetSpec(TupleComp):
             # pseudodata with.
             simu_fac_path = str(self.fkspecs[0].fkpath).split('fastkernel')[0] + "simu_factors/SIMU_" + cd.GetSetName() + ".yaml"
             with open(simu_fac_path, 'rb') as file:
-                simu_file = yaml.safe_load(file)
+                simu_file = yaml_safe.load(file)
             contamination_values = np.array([0.0]*cd.GetNData())
             if self.contamination_data:
                 for parameter in self.contamination_data:
@@ -572,12 +586,29 @@ class DataSetSpec(TupleComp):
         return self.name
 
 class FKTableSpec(TupleComp):
-    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None):
+    def __init__(self, fkpath, cfactors, use_fixed_predictions=False, fixed_predictions_path=None, theory_meta=None, legacy=True):
         self.fkpath = fkpath
-        self.cfactors = cfactors
+        self.cfactors = cfactors if cfactors is not None else []
+        self.legacy = legacy
         self.use_fixed_predictions = use_fixed_predictions
         self.fixed_predictions_path = fixed_predictions_path
+
+        # if not isinstance(fkpath, (tuple, list)):
+        #     self.legacy = True
+        # else:
+        #     fkpath = tuple(fkpath)
+        
+        if not self.legacy:
+            fkpath = tuple([fkpath])
+        self.theory_meta = theory_meta
+
+        # For non-legacy theory, add the metadata since it defines how the theory is to be loaded
+        # and thus, it should also define the hash of the class
+        # if not self.legacy:
+        #     super().__init__(fkpath, cfactors, self.metadata)
+        # else:
         super().__init__(fkpath, cfactors)
+        
 
     #NOTE: We cannot do this because Fkset owns the fktable, and trying
     #to reuse the loaded one fails after it gets deleted.
@@ -585,6 +616,21 @@ class FKTableSpec(TupleComp):
     def load(self):
         return FKTable(str(self.fkpath), [str(factor) for factor in self.cfactors])
 
+
+    def load_cfactors(self):
+        """Each of the sub-fktables that form the complete FKTable can have several cfactors
+        applied to it. This function uses ``parse_cfactor`` to make them into CFactorData
+        """
+        from validphys.fkparser import parse_cfactor
+        if self.legacy:
+            raise NotImplementedError("cfactor loading from spec not implemented for old theories")
+        cfacs = []
+        for c in self.cfactors:
+            with open(c, "rb") as f:
+                cfacs.append(parse_cfactor(f))
+            f.close()    
+        return [cfacs]
+    
 class PositivitySetSpec(DataSetSpec):
     """Extends DataSetSpec to work around the particularities of the positivity datasets"""
 
@@ -677,8 +723,8 @@ class FitSpec(TupleComp):
         log.debug('Reading input from fit configuration %s' , p)
         try:
             with p.open() as f:
-                d = yaml.safe_load(f)
-        except (yaml.YAMLError, FileNotFoundError) as e:
+                d = yaml_safe.load(f)
+        except (YAMLError, FileNotFoundError) as e:
             raise AsInputError(str(e)) from e
         d['pdf'] = {'id': self.name, 'label': self.label}
 
