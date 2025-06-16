@@ -82,13 +82,13 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
         printpdf4gen: false # To print info on PDFs during minimization
         contamination_parameters:
             - name: 'W'
-            value: 0.00008
-            linear_combination:
-            'Olq3': -15.94
+              value: 0.00008
+              linear_combination:
+              'Olq3': -15.94
 
             - name: 'Y'
-            value: 1
-            linear_combination:
+              value: 1
+              linear_combination:
                     'Olq1': 1.51606
                     'Oed': -6.0606
                     'Oeu': 12.1394
