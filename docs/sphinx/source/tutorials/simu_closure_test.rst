@@ -256,7 +256,7 @@ The fit needs then to be run as a BSM contaminated fit:
     $ vp-setupfit runcard.yaml
     $ vp-rebuild-data runcard_folder
     $ n3fit runcard.yaml replica_number
-    $ evolven3fut runcard_folder replica_number
+    $ evolven3fit runcard_folder replica_number
     $ postfit final_replica_number runcard_folder
 
 Every time a replica is finalized, the output is saved to the `runcard/nnfit/replica_$replica`_

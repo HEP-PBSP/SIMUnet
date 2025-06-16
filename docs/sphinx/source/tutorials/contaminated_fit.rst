@@ -282,7 +282,7 @@ fit can be run where the runcard is located by running the following command:
     $ vp-setupfit runcard.yaml
     $ vp-rebuild-data runcard_folder
     $ n3fit runcard.yaml replica_number
-    $ evolven3fut runcard_folder replica_number
+    $ evolven3fit runcard_folder replica_number
     $ postfit final_replica_number runcard_folder
 
 Here is a breakdown of what each command does:
