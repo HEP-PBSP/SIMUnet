@@ -41,27 +41,27 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     ############################################################
     dataset_inputs:
 
-    ### 'Standard' datasets ###
-    - {dataset: NMCPD_dw_ite, frac: 0.75}
-    - {dataset: NMC, frac: 0.75}
-    - {dataset: SLACP_dwsh, frac: 0.75}
-    - {dataset: HERACOMBCCEP, frac: 0.75}
-    - {dataset: HERACOMB_SIGMARED_C, frac: 0.75}
-    - {dataset: HERACOMB_SIGMARED_B, frac: 0.75}
-    - {dataset: DYE886R_dw_ite, frac: 0.75, cfac: ['QCD']}
-    - {dataset: DYE886P, frac: 0.75, cfac: ['QCD']}
-    - {dataset: DYE605_dw_ite, frac: 0.75, cfac: ['QCD']}
-    - {dataset: DYE906R_dw_ite, frac: 0.75, cfac: ['ACC', 'QCD']}
-    - {dataset: CDFZRAP_NEW, frac: 0.75, cfac: ['QCD']}
-    - {dataset: D0ZRAP_40, frac: 0.75, cfac: ['QCD']}
-    - {dataset: D0WMASY, frac: 0.75, cfac: ['QCD']}
-    - {dataset: ATLASWZRAP36PB, frac: 0.75, cfac: ['QCD']}
+        ### 'Standard' datasets ###
+        - {dataset: NMCPD_dw_ite, frac: 0.75}
+        - {dataset: NMC, frac: 0.75}
+        - {dataset: SLACP_dwsh, frac: 0.75}
+        - {dataset: HERACOMBCCEP, frac: 0.75}
+        - {dataset: HERACOMB_SIGMARED_C, frac: 0.75}
+        - {dataset: HERACOMB_SIGMARED_B, frac: 0.75}
+        - {dataset: DYE886R_dw_ite, frac: 0.75, cfac: ['QCD']}
+        - {dataset: DYE886P, frac: 0.75, cfac: ['QCD']}
+        - {dataset: DYE605_dw_ite, frac: 0.75, cfac: ['QCD']}
+        - {dataset: DYE906R_dw_ite, frac: 0.75, cfac: ['ACC', 'QCD']}
+        - {dataset: CDFZRAP_NEW, frac: 0.75, cfac: ['QCD']}
+        - {dataset: D0ZRAP_40, frac: 0.75, cfac: ['QCD']}
+        - {dataset: D0WMASY, frac: 0.75, cfac: ['QCD']}
+        - {dataset: ATLASWZRAP36PB, frac: 0.75, cfac: ['QCD']}
 
-    ### 'Contaminated' datasets ###
-    - {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-    - {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
-    - {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], contamination: 'EFT_LO'}
-    - {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
+        ### 'Contaminated' datasets ###
+        - {dataset: CMSDY1D12, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
+        - {dataset: CMS_HMDY_13TEV, frac: 0.75, cfac: ['QCD', 'EWK'], contamination: 'EFT_LO'}
+        - {dataset: ATLASDY2D8TEV, frac: 0.75, cfac: ['QCDEWK'], contamination: 'EFT_LO'}
+        - {dataset: ATLASZHIGHMASS49FB, frac: 0.75, cfac: ['QCD'], contamination: 'EFT_LO'}
 
     fixed_pdf_fit: False
     # load_weights_from_fit: 221103-jmm-no_top_1000_iterated # If this is uncommented, training starts here.
