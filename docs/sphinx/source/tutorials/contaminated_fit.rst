@@ -71,38 +71,38 @@ into the details of each part  later. Here is a complete SIMUnet runcard:
     # (possible contaminated) closure test.
     ############################################################
     closuretest:
-    filterseed: 0 # Random seed to be used in filtering data partitions
-    fakedata: true     # true = to use FAKEPDF to generate pseudo-data
-    fakepdf: NNPDF40_nnlo_as_01180      # Theory input for pseudo-data
-    errorsize: 1.0    # uncertainties rescaling
-    fakenoise: true    # true = to add random fluctuations to pseudo-data
-    rancutprob: 1.0   # Fraction of data to be included in the fit
-    rancutmethod: 0   # Method to select rancutprob data fraction
-    rancuttrnval: false # 0(1) to output training(valiation) chi2 in report
-    printpdf4gen: false # To print info on PDFs during minimization
-    contamination_parameters:
-        - name: 'W'
-          value: 0.00008
-          linear_combination:
-          'Olq3': -15.94
+        filterseed: 0 # Random seed to be used in filtering data partitions
+        fakedata: true     # true = to use FAKEPDF to generate pseudo-data
+        fakepdf: NNPDF40_nnlo_as_01180      # Theory input for pseudo-data
+        errorsize: 1.0    # uncertainties rescaling
+        fakenoise: true    # true = to add random fluctuations to pseudo-data
+        rancutprob: 1.0   # Fraction of data to be included in the fit
+        rancutmethod: 0   # Method to select rancutprob data fraction
+        rancuttrnval: false # 0(1) to output training(valiation) chi2 in report
+        printpdf4gen: false # To print info on PDFs during minimization
+        contamination_parameters:
+            - name: 'W'
+            value: 0.00008
+            linear_combination:
+            'Olq3': -15.94
 
-        - name: 'Y'
-          value: 1
-          linear_combination:
-                'Olq1': 1.51606
-                'Oed': -6.0606
-                'Oeu': 12.1394
-                'Olu': 6.0606
-                'Old': -3.0394
-                'Oqe': 3.0394
+            - name: 'Y'
+            value: 1
+            linear_combination:
+                    'Olq1': 1.51606
+                    'Oed': -6.0606
+                    'Oeu': 12.1394
+                    'Olu': 6.0606
+                    'Old': -3.0394
+                    'Oqe': 3.0394
 
-    seed: 0
-    rngalgo: 0
+        seed: 0
+        rngalgo: 0
     ############################################################
     datacuts:
-    t0pdfset: NNPDF40_nnlo_as_01180 # PDF set to generate t0 covmat
-    q2min: 3.49                        # Q2 minimum
-    w2min: 12.5                        # W2 minimum
+        t0pdfset: NNPDF40_nnlo_as_01180 # PDF set to generate t0 covmat
+        q2min: 3.49                        # Q2 minimum
+        w2min: 12.5                        # W2 minimum
 
     ############################################################
     theory:

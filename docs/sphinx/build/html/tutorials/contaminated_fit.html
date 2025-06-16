@@ -412,38 +412,38 @@ into the details of each part  later. Here is a complete SIMUnet runcard:</p>
 <span class="c1"># (possible contaminated) closure test.</span>
 <span class="c1">############################################################</span>
 <span class="nt">closuretest</span><span class="p">:</span>
-<span class="nt">filterseed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1"># Random seed to be used in filtering data partitions</span>
-<span class="nt">fakedata</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">     </span><span class="c1"># true = to use FAKEPDF to generate pseudo-data</span>
-<span class="nt">fakepdf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NNPDF40_nnlo_as_01180</span><span class="w">      </span><span class="c1"># Theory input for pseudo-data</span>
-<span class="nt">errorsize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">    </span><span class="c1"># uncertainties rescaling</span>
-<span class="nt">fakenoise</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">    </span><span class="c1"># true = to add random fluctuations to pseudo-data</span>
-<span class="nt">rancutprob</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">   </span><span class="c1"># Fraction of data to be included in the fit</span>
-<span class="nt">rancutmethod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">   </span><span class="c1"># Method to select rancutprob data fraction</span>
-<span class="nt">rancuttrnval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"> </span><span class="c1"># 0(1) to output training(valiation) chi2 in report</span>
-<span class="nt">printpdf4gen</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"> </span><span class="c1"># To print info on PDFs during minimization</span>
-<span class="nt">contamination_parameters</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;W&#39;</span>
-<span class="w">      </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00008</span>
-<span class="w">      </span><span class="nt">linear_combination</span><span class="p">:</span>
-<span class="w">      </span><span class="s">&#39;Olq3&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-15.94</span>
+<span class="w">    </span><span class="nt">filterseed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1"># Random seed to be used in filtering data partitions</span>
+<span class="w">    </span><span class="nt">fakedata</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">     </span><span class="c1"># true = to use FAKEPDF to generate pseudo-data</span>
+<span class="w">    </span><span class="nt">fakepdf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NNPDF40_nnlo_as_01180</span><span class="w">      </span><span class="c1"># Theory input for pseudo-data</span>
+<span class="w">    </span><span class="nt">errorsize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">    </span><span class="c1"># uncertainties rescaling</span>
+<span class="w">    </span><span class="nt">fakenoise</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">    </span><span class="c1"># true = to add random fluctuations to pseudo-data</span>
+<span class="w">    </span><span class="nt">rancutprob</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">   </span><span class="c1"># Fraction of data to be included in the fit</span>
+<span class="w">    </span><span class="nt">rancutmethod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">   </span><span class="c1"># Method to select rancutprob data fraction</span>
+<span class="w">    </span><span class="nt">rancuttrnval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"> </span><span class="c1"># 0(1) to output training(valiation) chi2 in report</span>
+<span class="w">    </span><span class="nt">printpdf4gen</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"> </span><span class="c1"># To print info on PDFs during minimization</span>
+<span class="w">    </span><span class="nt">contamination_parameters</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;W&#39;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.00008</span>
+<span class="w">        </span><span class="nt">linear_combination</span><span class="p">:</span>
+<span class="w">        </span><span class="s">&#39;Olq3&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-15.94</span>
 
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Y&#39;</span>
-<span class="w">      </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<span class="w">      </span><span class="nt">linear_combination</span><span class="p">:</span>
-<span class="w">            </span><span class="s">&#39;Olq1&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.51606</span>
-<span class="w">            </span><span class="s">&#39;Oed&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-6.0606</span>
-<span class="w">            </span><span class="s">&#39;Oeu&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.1394</span>
-<span class="w">            </span><span class="s">&#39;Olu&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6.0606</span>
-<span class="w">            </span><span class="s">&#39;Old&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-3.0394</span>
-<span class="w">            </span><span class="s">&#39;Oqe&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.0394</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Y&#39;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">        </span><span class="nt">linear_combination</span><span class="p">:</span>
+<span class="w">                </span><span class="s">&#39;Olq1&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.51606</span>
+<span class="w">                </span><span class="s">&#39;Oed&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-6.0606</span>
+<span class="w">                </span><span class="s">&#39;Oeu&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.1394</span>
+<span class="w">                </span><span class="s">&#39;Olu&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6.0606</span>
+<span class="w">                </span><span class="s">&#39;Old&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-3.0394</span>
+<span class="w">                </span><span class="s">&#39;Oqe&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.0394</span>
 
-<span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
-<span class="nt">rngalgo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">rngalgo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 <span class="c1">############################################################</span>
 <span class="nt">datacuts</span><span class="p">:</span>
-<span class="nt">t0pdfset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NNPDF40_nnlo_as_01180</span><span class="w"> </span><span class="c1"># PDF set to generate t0 covmat</span>
-<span class="nt">q2min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.49</span><span class="w">                        </span><span class="c1"># Q2 minimum</span>
-<span class="nt">w2min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.5</span><span class="w">                        </span><span class="c1"># W2 minimum</span>
+<span class="w">    </span><span class="nt">t0pdfset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NNPDF40_nnlo_as_01180</span><span class="w"> </span><span class="c1"># PDF set to generate t0 covmat</span>
+<span class="w">    </span><span class="nt">q2min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.49</span><span class="w">                        </span><span class="c1"># Q2 minimum</span>
+<span class="w">    </span><span class="nt">w2min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.5</span><span class="w">                        </span><span class="c1"># W2 minimum</span>
 
 <span class="c1">############################################################</span>
 <span class="nt">theory</span><span class="p">:</span>
