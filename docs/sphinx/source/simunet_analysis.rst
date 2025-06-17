@@ -5,3 +5,4 @@
 
 .. automodule:: validphys.simunet_analysis
    :members:
+   :exclude-members: l
