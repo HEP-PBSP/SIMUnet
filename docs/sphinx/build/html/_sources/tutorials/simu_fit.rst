@@ -356,7 +356,7 @@ The procedure can be summarised as follows:
 
 Output of the fit
 -----------------
-As in NNPDF, every time a replica is finalised, the output is saved to the `runcard/nnfit/replica_$replica`_
+As in NNPDF, every time a replica is finalised, the output is saved to the ``runcard/nnfit/replica_$replica``
 folder, which contains these files:
 
 - ``chi2exps.log``: a log file with the χ² of the training.

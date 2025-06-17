@@ -259,7 +259,7 @@ The fit needs then to be run as a BSM contaminated fit:
     $ evolven3fit runcard_folder replica_number
     $ postfit final_replica_number runcard_folder
 
-Every time a replica is finalized, the output is saved to the `runcard/nnfit/replica_$replica`_
+Every time a replica is finalized, the output is saved to the ``runcard/nnfit/replica_$replica``
 folder, which contains a number of files:
 
 - ``chi2exps.log``: a json log file with the χ² of the training every 100 epochs.
