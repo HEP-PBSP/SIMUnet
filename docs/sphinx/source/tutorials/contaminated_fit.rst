@@ -296,7 +296,7 @@ Here is a breakdown of what each command does:
 
     .. note::
        This step is not strictly necessary when producing a standard fit with
-       ``n3fit`` but it is required by :ref:`validphys <vp-index>`
+       ``n3fit`` but it is required by :ref:`validphys <analyse-fit>`
        and it should therefore always be done. Note that :ref:`vp-upload <upload-fit>`
        will fail unless this step has been followed. If necessary, this step can
        be done after the fit has been run.
