@@ -48,34 +48,34 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
     # sys: systematics treatment (see systypes)
 
     dataset_inputs:
-    # # DIS
-    - {dataset: HERACOMBNCEP460, frac: 0.75}
-    # # Drell - Yan
-    - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
-    # # ttbar
-    - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # # ttbar AC
-    - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # # TTZ
-    - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # # TTW
-    - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
-    # # single top
-    - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
-    # # tW
-    - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
-    # # W helicity
-    - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
-    # # tt gamma
-    - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # # tZ
-    - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    # # EWPO
-    - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
-    #  Higgs
-    - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
-    # Diboson
-    - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
+      # # DIS
+      - {dataset: HERACOMBNCEP460, frac: 0.75}
+      # # Drell - Yan
+      - {dataset: CMSDY1D12, cfac: ['QCD', 'EWK']}
+      # # ttbar
+      - {dataset: ATLASTTBARTOT7TEV, cfac: [QCD], simu_fac: "EFT_NLO"}
+      # # ttbar AC
+      - {dataset: ATLAS_TTBAR_8TEV_ASY, cfac: [QCD], simu_fac: "EFT_NLO"}
+      # # TTZ
+      - {dataset: ATLAS_TTBARZ_8TEV_TOTAL, simu_fac: "EFT_LO"}
+      # # TTW
+      - {dataset: ATLAS_TTBARW_8TEV_TOTAL, simu_fac: "EFT_LO"}
+      # # single top
+      - {dataset: ATLAS_SINGLETOP_TCH_7TEV_T, cfac: [QCD], simu_fac: "EFT_NLO"}
+      # # tW
+      - {dataset: ATLAS_SINGLETOPW_8TEV_TOTAL, simu_fac: "EFT_NLO"}
+      # # W helicity
+      - {dataset: ATLAS_WHEL_13TEV, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+      # # tt gamma
+      - {dataset: ATLAS_TTBARGAMMA_8TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+      # # tZ
+      - {dataset: ATLAS_SINGLETOPZ_13TEV_TOTAL, simu_fac: "EFT_LO", use_fixed_predictions: True}
+      # # EWPO
+      - {dataset: LEP_ZDATA, simu_fac: "EFT_LO", use_fixed_predictions: True}
+      #  Higgs
+      - {dataset: ATLAS_CMS_SSINC_RUNI, simu_fac: "EFT_NLO", use_fixed_predictions: True}
+      # Diboson
+      - {dataset: LEP_EEWW_182GEV, simu_fac: "EFT_LO", use_fixed_predictions: True}
 
 
     ############################################################
@@ -91,23 +91,23 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
 
     ############################################################
     simu_parameters:
-    # Dipoles
-    - {name: "OtG", scale: 0.01, initialisation: {type: uniform, minval: -10, maxval: 10} }
-    # Quark Currents
-    - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
-    # Lepton currents
-    - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
-    # linear combination
-    - name: 'Y'
-      linear_combination:
-        'Olq1 ': 1.51606
-        'Oed ': -6.0606
-        'Oeu ': 12.1394
-        'Olu ': 6.0606
-        'Old ': -3.0394
-        'Oqe ': 3.0394
-      scale: 1.0
-      initialisation: {type: uniform , minval: -1, maxval: 1}
+      # Dipoles
+      - {name: "OtG", scale: 0.01, initialisation: {type: uniform, minval: -10, maxval: 10} }
+      # Quark Currents
+      - {name: "Opt", scale: 0.1, initialisation: {type: gaussian, mean: 0, std_dev: 1} }
+      # Lepton currents
+      - {name: "O3pl", scale: 1.0, initialisation: {type: constant, value: 0} }
+      # linear combination
+      - name: 'Y'
+        linear_combination:
+          'Olq1 ': 1.51606
+          'Oed ': -6.0606
+          'Oeu ': 12.1394
+          'Olu ': 6.0606
+          'Old ': -3.0394
+          'Oqe ': 3.0394
+        scale: 1.0
+        initialisation: {type: uniform , minval: -1, maxval: 1}
 
     ############################################################
     datacuts:
@@ -117,7 +117,7 @@ into the details of each part  later. Here is a complete :math:`\text{SIMUnet}` 
 
     ############################################################
     theory:
-      theoryid: 200     # database id
+      theoryid: 270     # database id
 
     ############################################################
     trvlseed: 475038818
