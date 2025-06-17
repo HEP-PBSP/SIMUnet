@@ -7,8 +7,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Functions documentation &#8212; SIMUnet  documentation</title>
   
   
@@ -337,7 +336,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-validphys.simunet_analysis">
+  <div class="section" id="module-validphys.simunet_analysis">
 <span id="functions-documentation"></span><span id="func-docs"></span><h1><strong>Functions documentation</strong><a class="headerlink" href="#module-validphys.simunet_analysis" title="Permalink to this heading">#</a></h1>
 <p>Plots and analysis tools for SIMUnet.</p>
 <dl class="py function">
@@ -347,16 +346,16 @@ document.write(`
 <p>This function processes a list of fits and utilizes <cite>bsm_facs_bounds_fits</cite> to calculate and
 return the 68% CL bounds for BSM coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – A dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A pandas DataFrame containing the 68% CL bounds for each BSM factor in each fit.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -369,16 +368,16 @@ return the 68% CL bounds for BSM coefficients.</p>
 <p>This function processes a list of fits and utilizes <cite>bsm_facs_bounds_fits</cite> to calculate and
 return the 95% CL bounds for BSM coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – A dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A pandas DataFrame containing the 95% CL bounds for each BSM factor in each fit.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -389,16 +388,16 @@ return the 95% CL bounds for BSM coefficients.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">bsm_facs_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#bsm_facs_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.bsm_facs_bounds" title="Permalink to this definition">#</a></dt>
 <dd><p>Table generator to summarise information about the BSM coefficient results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM names to LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>DataFrame summarizing the bounds and statistics of BSM coefficients.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -412,19 +411,40 @@ return the 95% CL bounds for BSM coefficients.</p>
 summarizing their mean, standard deviation, and confidence levels. The confidence
 levels are computed as mean ± n_sigma * std.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – A dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 <li><p><strong>n_sigma</strong> (<em>int</em><em>, </em><em>optional</em>) – The multiplier for the standard deviation to define confidence level bounds, by default 2.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A pandas DataFrame containing the bounds for each BSM factor in each fit, along with
 additional metrics like ‘Best-fit shift’ and ‘Broadening’.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="validphys.simunet_analysis.compute_datasets_chi2_dist">
+<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_datasets_chi2_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">make_level1_list_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sm_predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups_covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_datasets_contamination</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#compute_datasets_chi2_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.compute_datasets_chi2_dist" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>make_level1_list_data</strong> – </p></li>
+<li><p><strong>sm_predictions</strong> – </p></li>
+<li><p><strong>groups_covmat</strong> – </p></li>
+<li><p><strong>load_contamination</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary of lists of chi2 per dataset</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -450,13 +470,13 @@ the best fit value.
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">display_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#display_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.display_format" title="Permalink to this definition">#</a></dt>
 <dd><p>Determines the format of the BSM factors to be displayed in the tables.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>series</strong> (<em>pd.Series</em>) – Series containing the BSM factors.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A list of formatted numbers representing the BSM factors.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -472,7 +492,7 @@ accumulates datasets by sectors, calculates the reduced covariance matrices for 
 and computes the Fisher information matrices. The diagonal elements of these matrices are
 extracted and normalized to provide a comparative view across sectors.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dataset_inputs</strong> (<em>list of Dataset objects</em>) – The datasets used for computing the Fisher information matrices.</p></li>
 <li><p><strong>theoryid</strong> (<em>int</em><em> or </em><em>array-like</em>) – Theory identifier(s) associated with the datasets.</p></li>
@@ -481,11 +501,11 @@ extracted and normalized to provide a comparative view across sectors.</p>
 <li><p><strong>pdf</strong> (<em>PDF object</em>) – The parton distribution function object.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A DataFrame with the normalized diagonal elements of the Fisher information matrices,
 indexed by simulation parameters and with sectors as columns.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -498,7 +518,7 @@ indexed by simulation parameters and with sectors as columns.</p>
 <p>This function computes the Fisher information matrix for Beyond the Standard Model (BSM) parameters
 given a dataset. It utilizes an internal function <cite>_compute_fisher_information_matrix</cite> to perform the computation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dataset_inputs</strong> (<em>array-like</em>) – The inputs from the dataset used for computing the Fisher information matrix.</p></li>
 <li><p><strong>groups_index</strong> (<em>array-like</em>) – Indexes representing different groups in the dataset.</p></li>
@@ -508,10 +528,10 @@ given a dataset. It utilizes an internal function <cite>_compute_fisher_informat
 <li><p><strong>pdf</strong> (<em>PDF object</em>) – The parton distribution function object.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The computed Fisher information matrix.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>array-like</p>
 </dd>
 </dl>
@@ -522,13 +542,13 @@ given a dataset. It utilizes an internal function <cite>_compute_fisher_informat
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">format_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#format_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.format_residuals" title="Permalink to this definition">#</a></dt>
 <dd><p>Formats residuals for display, splitting them into intervals.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>residuals</strong> (<em>list of float</em>) – List of residual values (mean/std) for BSM factors.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of intervals for display of residuals.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list of list</p>
 </dd>
 </dl>
@@ -540,20 +560,40 @@ given a dataset. It utilizes an internal function <cite>_compute_fisher_informat
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="validphys.simunet_analysis.load_datasets_contamination">
+<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">load_datasets_contamination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contamination_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoryid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_inputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#load_datasets_contamination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.load_datasets_contamination" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contamination_parameters</strong> (<em>dict with</em>) – </p></li>
+<li><p><strong>theoryid</strong> (<em>TheoryIDSpec</em>) – </p></li>
+<li><p><strong>dataset_inputs</strong> (<em>NSList of DataSetInput objects</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary of BSM k-factors to apply on certain datasets</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="validphys.simunet_analysis.plot_2d_bsm_facs">
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_2d_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replica_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_2d_bsm_facs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_2d_bsm_facs" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot two-dimensional distributions of the BSM coefficient results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing the BSM factors.</p></li>
 <li><p><strong>replica_data</strong> (<em>list</em>) – List of FitInfo.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>fig</strong> – A matplotlib figure object for the 2D distribution plot.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
@@ -566,13 +606,13 @@ given a dataset. It utilizes an internal function <cite>_compute_fisher_informat
 <p>This function takes a set of fits and compares the BSM factors between them. For each pair
 of BSM factors, it creates a 2D scatter plot with corresponding histograms on the x and y axes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX string representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for each pair of BSM factors.</p>
 </dd>
 </dl>
@@ -583,7 +623,7 @@ of BSM factors, it creates a 2D scatter plot with corresponding histograms on th
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_2d_bsm_facs_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replica_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_2d_bsm_facs_pair"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_2d_bsm_facs_pair" title="Permalink to this definition">#</a></dt>
 <dd><p>Auxiliary function to plot 2D plots of a pair of operators in a N-dimensional fits with BSM factors.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
 <li><p><strong>replica_data</strong> (<em>list</em>) – List of FitInfo.</p></li>
@@ -592,10 +632,10 @@ of BSM factors, it creates a 2D scatter plot with corresponding histograms on th
 <li><p><strong>op2</strong> (<em>str</em>) – The second operator name.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The figure object containing the 2D plot.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
@@ -606,14 +646,14 @@ of BSM factors, it creates a 2D scatter plot with corresponding histograms on th
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_bsm_2d_combs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replica_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_bsm_2d_combs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_bsm_2d_combs" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot two-dimensional distributions for all pairs of BSM coefficients in a fit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
 <li><p><strong>replica_data</strong> (<em>list</em>) – List of FitInfo.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM names to LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – A matplotlib figure object for each pair of BSM coefficient combination.</p>
 </dd>
 </dl>
@@ -624,7 +664,7 @@ of BSM factors, it creates a 2D scatter plot with corresponding histograms on th
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_bsm_corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_bsm_corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_bsm_corr" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot a correlation matrix to summarise information about the BSM coefficient results.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fit</strong> (<em>FitSpec</em>) – Object containing the specifications of the fit.</p></li>
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
@@ -632,10 +672,10 @@ of BSM factors, it creates a 2D scatter plot with corresponding histograms on th
 <li><p><strong>corr_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for coloration in the correlation matrix.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The figure object containing the correlation matrix plot.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
@@ -650,13 +690,13 @@ BSM (Beyond the Standard Model) coefficients. The residuals are calculated as th
 the coefficients divided by their standard deviation, providing a measure of deviation
 from the Standard Model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for the residual plot.</p>
 </dd>
 </dl>
@@ -670,14 +710,14 @@ from the Standard Model.</p>
 and confidence levels of the BSM coefficients. The confidence levels are calculated as mean ± 2*std.
 It supports both linear and symmetric logarithmic scales for the plots.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 <li><p><strong>bsm_names_to_plot_scales</strong> (<em>dict</em>) – Dictionary to scale the BSM names for plotting.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for each generated plot.</p>
 </dd>
 </dl>
@@ -688,7 +728,7 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_bsm_pdf_corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xplotting_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_threshold:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin:</span> <span class="pre">(&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;)</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax:</span> <span class="pre">(&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;)</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashed_line_flavours:</span> <span class="pre">(&lt;class</span> <span class="pre">'list'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'NoneType'&gt;)</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_bsm_pdf_corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_bsm_pdf_corr" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot the correlation between BSM factors and a PDF.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pdf</strong> (<em>PDF object</em>) – The parton distribution function being analyzed.</p></li>
 <li><p><strong>read_bsm_facs</strong> (<em>DataFrame</em><em> or </em><em>callable</em>) – Data or function representing BSM factors.</p></li>
@@ -701,7 +741,7 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 <li><p><strong>dashed_line_flavours</strong> (<em>list of str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – List of flavours to be plotted with dashed lines, by default None.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for the plot.</p></li>
 <li><p><strong>bsm_fac</strong> (<em>str</em>) – Name of the BSM factor being plotted.</p></li>
@@ -715,7 +755,7 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_bsm_pdf_corr_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xplotting_grids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_bsm_pdf_corr_fits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_bsm_pdf_corr_fits" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot correlations between BSM factors and multiple PDFs.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>pdfs</strong> (<em>list of PDF objects</em>) – List of parton distribution functions corresponding to the fits.</p></li>
@@ -724,7 +764,7 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Mapping of BSM factor names to their LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for the plot.</p>
 </dd>
 </dl>
@@ -735,16 +775,16 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_chi2_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replica_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_chi2_bsm_facs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_chi2_bsm_facs" title="Permalink to this definition">#</a></dt>
 <dd><p>Generates bsm_fac value - chi2 scatter plots for all replicas in a fit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
 <li><p><strong>replica_data</strong> (<em>list</em>) – List of FitInfo.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>fig</strong> – A matplotlib figure object for the chi2 scatter plot.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
@@ -758,17 +798,17 @@ It supports both linear and symmetric logarithmic scales for the plots.</p>
 and columns correspond to different sectors. This visualization helps in understanding the impact of various
 sectors on the coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fisher_information_by_sector</strong> (<em>pandas.DataFrame</em>) – The Fisher information matrix with sectors as columns and BSM coefficients as rows.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 <li><p><strong>bsm_sectors_to_latex</strong> (<em>dict</em>) – Dictionary mapping sector names to their LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The figure object containing the heatmap plot of the Fisher information.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
 </dd>
 </dl>
@@ -779,13 +819,13 @@ sectors on the coefficients.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_kde_bsm_facs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_kde_bsm_facs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_kde_bsm_facs" title="Permalink to this definition">#</a></dt>
 <dd><p>Plots the kernel estimation density for a distribution of BSM coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing the BSM factors.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM names to LaTeX representations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – A matplotlib figure object for the KDE plot.</p>
 </dd>
 </dl>
@@ -797,14 +837,14 @@ sectors on the coefficients.</p>
 <dd><p>Plot a histogram for each BSM coefficient.
 The nd is used for n-dimensional, if two BSM facs are present: use instead <code class="xref py py-func docutils literal notranslate"><span class="pre">validphys.results.plot_2d_bsm_facs()</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing the BSM factors.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM names to LaTeX representations.</p></li>
 <li><p><strong>posterior_plots_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Settings for posterior plots, such as number of bins and range settings.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – A matplotlib figure object for the histogram.</p>
 </dd>
 </dl>
@@ -815,14 +855,14 @@ The nd is used for n-dimensional, if two BSM facs are present: use instead <code
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_nd_bsm_facs_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsm_names_to_latex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posterior_plots_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#plot_nd_bsm_facs_fits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.plot_nd_bsm_facs_fits" title="Permalink to this definition">#</a></dt>
 <dd><p>Compare histograms of BSM factors between different fits in SIMUnet.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM names to their LaTeX representations.</p></li>
 <li><p><strong>posterior_plots_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing settings for posterior plots such as ‘n_bins’, ‘rangex’, ‘rangey’, and ‘same_bins’.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – A matplotlib figure object for each BSM coefficient comparison.</p>
 </dd>
 </dl>
@@ -837,7 +877,7 @@ from each. It plots the mean and standard deviation of the BSM coefficients for 
 along with confidence levels calculated as mean ± 2*std. It supports both linear and symmetric
 logarithmic scales for the plots.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fits</strong> (<em>NSList</em>) – List of FitSpec to be compared.</p></li>
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX representations.</p></li>
@@ -846,7 +886,7 @@ logarithmic scales for the plots.</p>
 <li><p><strong>smefit_label</strong> (<em>str</em>) – Label for the SMEFiT reference to be used in the plot.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for the comparison plot.</p>
 </dd>
 </dl>
@@ -860,7 +900,7 @@ logarithmic scales for the plots.</p>
 and the bounds for BSM (Beyond the Standard Model) coefficients, allowing for an easy comparison
 of the two fits. It supports both linear and symmetric logarithmic scales.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bsm_names_to_latex</strong> (<em>dict</em>) – Dictionary mapping BSM factor names to their LaTeX representations.</p></li>
 <li><p><strong>smefit_reference_1</strong> (<em>list of dicts</em>) – List of dictionaries containing BSM coefficient information for the first SMEFiT reference.</p></li>
@@ -869,7 +909,7 @@ of the two fits. It supports both linear and symmetric logarithmic scales.</p>
 <li><p><strong>smefit_labels</strong> (<em>list of str</em>) – Labels for the SMEFiT references to be used in the plot.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The matplotlib figure object for the comparison plot.</p>
 </dd>
 </dl>
@@ -881,13 +921,13 @@ of the two fits. It supports both linear and symmetric logarithmic scales.</p>
 <dd><p>Plot the average across replicas of training and validation chi2
 for a given epoch.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fit</strong> (<em>FitSpec</em>) – Object containing the specifications of the fit.</p></li>
 <li><p><strong>replica_paths</strong> (<em>list</em>) – List of paths to the replica data.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Yields</dt>
 <dd class="field-even"><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The figure object containing the plot.</p>
 </dd>
 </dl>
@@ -901,13 +941,13 @@ for a given epoch.</p>
 to return the eigenvalues. These eigenvalues represent the variance of the data along the
 principal components, which can be used to understand the dominant directions in the data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>fisher_information_matrix</strong> (<em>pd.DataFrame</em>) – The Fisher information matrix.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A DataFrame containing the eigenvalues of the Fisher information matrix.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -921,16 +961,16 @@ principal components, which can be used to understand the dominant directions in
 providing insights into the flat directions of the parameter space. These directions can
 indicate combinations of parameters that are less constrained by the data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fisher_information_matrix</strong> (<em>pd.DataFrame</em>) – The Fisher information matrix.</p></li>
 <li><p><strong>simu_parameters_names</strong> (<em>list of str</em>) – Names of the simulation parameters.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A DataFrame containing the principal component vectors, indexed by the simulation parameters.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -941,13 +981,13 @@ indicate combinations of parameters that are less constrained by the data.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">reorder_cols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#reorder_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.reorder_cols" title="Permalink to this definition">#</a></dt>
 <dd><p>Reorders columns based on predefined BSM factor display order.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>cols</strong> (<em>list</em>) – List of column names to be reordered.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Reordered list of columns.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -958,16 +998,16 @@ indicate combinations of parameters that are less constrained by the data.</p>
 <span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">tabulate_bsm_corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_bsm_facs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#tabulate_bsm_corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.tabulate_bsm_corr" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a correlation table for BSM coefficients similar to the corresponding plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fit</strong> (<em>FitSpec</em>) – Object containing the specifications of the fit.</p></li>
 <li><p><strong>read_bsm_facs</strong> (<em>pd.DataFrame</em>) – DataFrame containing BSM factors.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The correlation matrix as a DataFrame.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
@@ -980,7 +1020,7 @@ indicate combinations of parameters that are less constrained by the data.</p>
 <p>This function creates a new colormap based on a given colormap but truncated to the range specified
 by minval and maxval. This is useful for adjusting the range of colors used in a plot.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cmap</strong> (<em>matplotlib.colors.Colormap</em>) – The original colormap to be truncated.</p></li>
 <li><p><strong>minval</strong> (<em>float</em><em>, </em><em>optional</em>) – The minimum value of the new colormap, by default 0.0.</p></li>
@@ -988,16 +1028,30 @@ by minval and maxval. This is useful for adjusting the range of colors used in a
 <li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of discrete colors in the new colormap, by default 100.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The truncated colormap.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>matplotlib.colors.LinearSegmentedColormap</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="validphys.simunet_analysis.write_datasets_chi2_dist_csv">
+<span class="sig-prename descclassname"><span class="pre">validphys.simunet_analysis.</span></span><span class="sig-name descname"><span class="pre">write_datasets_chi2_dist_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_datasets_chi2_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level0_commondata_wc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validphys/simunet_analysis.html#write_datasets_chi2_dist_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#validphys.simunet_analysis.write_datasets_chi2_dist_csv" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf</strong> (<em>core.PDF</em>) – </p></li>
+<li><p><strong>compute_chi2</strong> – </p></li>
+<li><p><strong>level0_commondata_wc</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 
 
                 </article>
