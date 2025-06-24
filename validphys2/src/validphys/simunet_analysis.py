@@ -2034,7 +2034,12 @@ def load_datasets_contamination(
 
             k_factors = np.zeros(len(simu_card["SM_fixed"]))
             for op in cont_lin_comb:
-                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+                # Check if the operator exists in simu_card[dataset.contamination]
+                if op in simu_card[dataset.contamination]:
+                    k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+                else:
+                    # Log a warning and keep SMEFT K-factor to zero
+                    log.warning(f"Operator '{op}' not found for {dataset.name}. Setting K-factor to zero.")
             k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
 
             bsm_dict[dataset.name] = k_factors
@@ -2178,7 +2183,7 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination):
         table = kitable(data=dataset, info=info)
         x = info.get_xcol(table=table)
         # compute predictions
-        pred = predictions(dataset, pdf)
+        pred = predictions(dataset, pdf, cuts='nocuts')
         # central value
         cv = pred[0].to_numpy()
         # replica error
