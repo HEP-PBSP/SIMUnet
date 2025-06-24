@@ -179,7 +179,7 @@ def pineappl_reader(fkspec):
             log.error(f"Fatal error reading {fk_path}")
             raise e
 
-    cfactors = fkspec.load_cfactors()
+    cfactors = fkspec.load_cfactors()[0]
 
     # Extract metadata from the first grid
     pine_rep = pines[0]
@@ -206,8 +206,8 @@ def pineappl_reader(fkspec):
     shifts = fkspec.theory_meta.shifts
     normalization_per_fktable = fkspec.theory_meta.normalization
     fknames = [i.name.replace(f".{EXT}", "") for i in fkspec.fkpath]
-    if cfactors is not None:
-        cfactors = dict(zip(fknames, cfactors))
+    # if cfactors is not None:
+    #     cfactors = {name: [cfac] for name, cfac in zip(fknames, *cfactors)}
 
     # fktables in pineapplgrid are for obs = fk * f while previous fktables were obs = fk * xf
     # prepare the grid all tables will be divided by
@@ -222,8 +222,8 @@ def pineappl_reader(fkspec):
         # Start by reading possible cfactors if cfactor is not empty
         cfprod = 1.0
         if cfactors is not None:
-            for cfac in cfactors.get(fkname, []):
-                cfprod *= cfac.central_value
+            for cfac in cfactors:
+                cfprod *= cfac.central_value[ndata:ndata+p.table().shape[0]]
 
         # Read the table, remove bin normalization and apply cfactors
         raw_fktable = (cfprod * p.table().T / p.bin_normalizations()).T
