@@ -2175,22 +2175,24 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination):
     bsm_dict = load_datasets_contamination
     # return figures
     for dataset in data.datasets:
+        # get cuts from dataset
+        cuts = dataset.cuts.load()
         # initialise figure
         fig, ax = plt.subplots()
         # get info
         info = get_info(dataset)
         # get kin table & get x
         table = kitable(data=dataset, info=info)
-        x = info.get_xcol(table=table)
+        x = info.get_xcol(table=table)[cuts]
         # compute predictions
         pred = predictions(dataset, pdf)
         # central value
         cv = pred[0].to_numpy()
         # replica error
-        std = bsm_dict[dataset.name] * pred.loc[:,1:].std(axis=1).to_numpy() / cv
+        std = bsm_dict[dataset.name][cuts] * pred.loc[:,1:].std(axis=1).to_numpy() / cv
         # plot
         ax.axhline(y=1, linestyle='--', color='grey')
-        ax.errorbar(x=x, y=bsm_dict[dataset.name], yerr=std, fmt='o')
+        ax.errorbar(x=x, y=bsm_dict[dataset.name][cuts], yerr=std, fmt='o')
         # formatting (title, labels, ...)
         ax.set_title(label=info.dataset_label)
         ax.set_xlabel(xlabel=info.xlabel)
