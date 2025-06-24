@@ -2183,7 +2183,7 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination):
         table = kitable(data=dataset, info=info)
         x = info.get_xcol(table=table)
         # compute predictions
-        pred = predictions(dataset, pdf, cuts='nocuts')
+        pred = predictions(dataset, pdf)
         # central value
         cv = pred[0].to_numpy()
         # replica error
