@@ -436,7 +436,7 @@ def groups_covmat_no_table(
     return df
 
 
-@table
+# @table
 def groups_covmat(groups_covmat_no_table):
     """Duplicate of groups_covmat_no_table but with a table decorator."""
     return groups_covmat_no_table
