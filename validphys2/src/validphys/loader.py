@@ -174,24 +174,45 @@ def rebuild_commondata_without_cuts(
     ndata = metadata.ndata
     nsys = metadata.nsys
 
-    next_index = next(maskiter)
-    with open(filename_with_cuts, 'r') as fitfile, \
-         open(datapath_filename) as dtfile, \
-         open(newpath, 'w') as newfile:
-        newfile.write(dtfile.readline())
-        #discard this line
-        fitfile.readline()
-        for i in range(1 ,ndata+1):
-            #You gotta love mismatched indexing
-            if i-1 == next_index:
-                line = fitfile.readline()
-                line = re.sub(
-                        index_pattern, rf'\g<startspace>{i}', line, count=1)
-                newfile.write(line)
-                next_index = next(maskiter, None)
-                #drop the data file line
-                dtfile.readline()
-            else:
+    if len(mask):
+        next_index = next(maskiter)
+        with open(filename_with_cuts, 'r') as fitfile, \
+             open(datapath_filename) as dtfile, \
+             open(newpath, 'w') as newfile:
+            newfile.write(dtfile.readline())
+            #discard this line
+            fitfile.readline()
+            for i in range(1 ,ndata+1):
+                #You gotta love mismatched indexing
+                if i-1 == next_index:
+                    line = fitfile.readline()
+                    line = re.sub(
+                            index_pattern, rf'\g<startspace>{i}', line, count=1)
+                    newfile.write(line)
+                    next_index = next(maskiter, None)
+                    #drop the data file line
+                    dtfile.readline()
+                else:
+                    line = dtfile.readline()
+                    #check that we know where we are
+                    m = re.match(index_pattern, line)
+                    assert int(m.group('index')) == i
+                    #We have index, process type, and 3*kinematics
+                    #that we would like to keep.
+                    m = re.match(data_line_pattern, line)
+                    newfile.write(line[:m.end()])
+                    #And value, stat, *sys that we want to drop
+                    #Do not use string join to keep up with the ugly format
+                    #This should really be nan's, but the c++ streams that read this
+                    #do not have the right interface.
+                    #https://stackoverflow.com/questions/11420263/is-it-possible-to-read-infinity-or-nan-values-using-input-streams
+                    zeros = '-0.\t'*(2 + 2*nsys)
+                    newfile.write(f'{zeros}\n')
+    else:
+        with open(datapath_filename) as dtfile, \
+             open(newpath, 'w') as newfile:
+            newfile.write(dtfile.readline())
+            for i in range(1 ,ndata+1):
                 line = dtfile.readline()
                 #check that we know where we are
                 m = re.match(index_pattern, line)
@@ -205,7 +226,7 @@ def rebuild_commondata_without_cuts(
                 #This should really be nan's, but the c++ streams that read this
                 #do not have the right interface.
                 #https://stackoverflow.com/questions/11420263/is-it-possible-to-read-infinity-or-nan-values-using-input-streams
-                zeros = '-0\t'*(2 + 2*nsys)
+                zeros = '-0.\t'*(2 + 2*nsys)
                 newfile.write(f'{zeros}\n')
 
 #TODO: Deprecate get methods?
