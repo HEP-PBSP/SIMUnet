@@ -54,7 +54,7 @@ def main():
         if not os.path.exists(source_file):
             print(source_file)
             print(destination_file)
-            logging.warning(f"Replica {str(i+1)} not found. Skipping.")
+            logging.warning(f"Evolved exportgrid in replica {str(i+1)} of fixed-PDF fit not found. Skipping.")
             continue
 
         shutil.copy(source_file, destination_file)
