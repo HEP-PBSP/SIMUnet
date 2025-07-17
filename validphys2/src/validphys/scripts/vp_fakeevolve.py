@@ -48,11 +48,12 @@ def main():
     fixed_fit_dir = l.resultspath / fixed_fit
 
     for i in range(int(args.num_reps)):
-        source_file = fixed_fit_dir / 'nnfit' / ('replica_' + str(i+1)) / (fixed_fit + '.dat')
+        source_file = fixed_fit_dir / 'postfit' / ('replica_' + str(i+1)) / (fixed_fit + '.dat')
         destination_file = input_dir / 'nnfit' / ('replica_' + str(i+1)) / (input_fit + '.dat')
 
         if not os.path.exists(source_file):
             print(source_file)
+            print(destination_file)
             logging.warning(f"Replica {str(i+1)} not found. Skipping.")
             continue
 
