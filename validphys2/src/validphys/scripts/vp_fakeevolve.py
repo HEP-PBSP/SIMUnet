@@ -9,18 +9,11 @@ The script:
 
 import argparse
 import pathlib
-import sys
 import logging
-import prompt_toolkit
 import os
-
 import shutil
 
-from reportengine import colors
 from validphys.utils import yaml_safe
-
-from validphys.api import API
-
 from validphys.loader import Loader
 
 
@@ -43,7 +36,7 @@ def main():
     input_fit = args.fixed_simunet_fit
     input_dir = pathlib.Path(input_fit)
 
-    with open(input_dir / "filter.yml", "r") as file:
+    with open(input_dir / "filter.yml", "r", encoding="utf-8") as file:
         input_info = yaml_safe.load(file)
 
     fixed_fit = input_info["load_weights_from_fit"]
@@ -60,7 +53,8 @@ def main():
 
         if not os.path.exists(source_file):
             logging.warning(
-                f"Evolved exportgrid in replica {str(i+1)} of fixed-PDF fit not found. Skipping."
+                "Evolved exportgrid in replica %s of fixed-PDF fit not found. Skipping.",
+                str(i + 1),
             )
             continue
 
