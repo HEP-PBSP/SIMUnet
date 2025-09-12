@@ -2458,21 +2458,25 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
         # commondata with prediction central value
         cd = dataset.commondata.load_commondata(cuts=cuts).with_central_value(cv)
         # replica uncertainty (pdf uncertainty)
-        pdf_unc = pred.loc[:,1:].std(axis=1).to_numpy()
+        pdf_unc = pred.loc[:,1:].std(axis=1).to_numpy()**2
         # experimental uncertainties
-        stat_unc = np.sqrt(cd.stat_errors.to_numpy())
-        syst_unc = np.sqrt(np.diag(covmat_from_systematics(loaded_commondata_with_cuts=cd,
-                                                           dataset_input=None,
-                                                           use_weights_in_covmat=False,
-                                                           norm_threshold=norm_threshold,)))
+        stat_unc = cd.stat_errors.to_numpy()**2
+        syst_unc = np.diag(covmat_from_systematics(loaded_commondata_with_cuts=cd,
+                                                   dataset_input=None,
+                                                   use_weights_in_covmat=False,
+                                                   norm_threshold=norm_threshold,))
         # total uncertainty
-        tot_unc = np.sqrt(pdf_unc**2 + stat_unc**2 + syst_unc**2)
+        tot_unc = pdf_unc + stat_unc + syst_unc
         # plot
+        ax1.axhline(y=1.,
+                    color="grey",
+                    linestyle="--"
+        )
         ax1.errorbar(
             x=x,
             y=np.ones(dataset.commondata.ndata),
-            yerr=tot_unc/cv,
-            fmt="--",
+            yerr=np.sqrt(tot_unc)/cv,
+            fmt="D",
             label="SM prediction",
             color='grey'
         )
@@ -2480,22 +2484,23 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
             x=x,
             y=bsm_dict[dataset.name][cuts],
             label="SMEFT prediction",
+            zorder=4,
         )
         # decomposition of uncertainties
         ax2.step(x=x,
                  y=pdf_unc/tot_unc,
                  where="mid",
-                 label="$\sigma_{\\rm pdf}$ / $\sigma_{\\rm tot}$",
+                 label="$\sigma_{\\rm pdf}^2$ / $\sigma_{\\rm tot}^2$",
         )
         ax2.step(x=x,
                  y=stat_unc/tot_unc,
                  where="mid",
-                 label="$\sigma_{\\rm stat}$ / $\sigma_{\\rm tot}$",
+                 label="$\sigma_{\\rm stat}^2$ / $\sigma_{\\rm tot}^2$",
         )
         ax2.step(x=x,
                  y=syst_unc/tot_unc,
                  where="mid",
-                 label="$\sigma_{\\rm syst}$ / $\sigma_{\\rm tot}$",
+                 label="$\sigma_{\\rm syst}^2$ / $\sigma_{\\rm tot}^2$",
         )
 
         # formatting (title, labels, ...)
