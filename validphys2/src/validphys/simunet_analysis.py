@@ -44,6 +44,7 @@ from validphys.loader import _get_nnpdf_profile
 
 from validphys.plotoptions.core import get_info, kitable
 from validphys.convolution import central_predictions, predictions
+from validphys.covmats import covmat_from_systematics
 
 log = logging.getLogger(__name__)
 
@@ -2274,9 +2275,11 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
 
     cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
 
-    cont_name = contamination_parameters["name"]
-    cont_value = contamination_parameters["value"]
-    cont_lin_comb = contamination_parameters["linear_combination"]
+    cont_names, cont_values, cont_lin_combs = [], [], []
+    for c in contamination_parameters:
+        cont_names.append(c["name"])
+        cont_values.append(c["value"])
+        cont_lin_combs.append(c["linear_combination"])
 
     bsm_dict = {}
 
@@ -2288,31 +2291,29 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
 
         if cont_order == None:
             log.warning(f"{dataset.name} is not contaminated. Is it right?")
-            bsm_dict[dataset.name] = np.array([1.0])
+            bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
         elif not os.path.exists(bsmfile):
             log.error(
                 f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"
             )
-            bsm_dict[dataset.name] = np.array([1.0])
+            bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
         else:
-            log.info(f"Loading {dataset.name}")
+            log.info(f"Loading {dataset.name}.")
             with open(bsmfile, "r+") as stream:
                 simu_card = yaml_safe.load(stream)
             stream.close()
 
-            k_factors = np.zeros(len(simu_card["SM_fixed"]))
-            for op in cont_lin_comb:
-                # Check if the operator exists in simu_card[dataset.contamination]
-                if op in simu_card[dataset.contamination]:
-                    k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
-                else:
-                    # Log a warning and keep SMEFT K-factor to zero
-                    log.warning(
-                        f"Operator '{op}' not found for {dataset.name}. Setting K-factor to zero."
-                    )
-            k_factors = 1.0 + k_factors * cont_value / np.array(
-                simu_card[cont_order]["SM"]
-            )
+            k_factors = np.ones(len(simu_card[cont_order]["SM"]))
+            for cont_value, cont_lin_comb in zip(cont_values, cont_lin_combs):
+                k_fac = np.zeros(len(simu_card[cont_order]["SM"]))
+                for op in cont_lin_comb:
+                    # Check if the operator exists in simu_card[dataset.contamination]
+                    if op in simu_card[dataset.contamination]:
+                        k_fac += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+                    else:
+                        # Log a warning and keep SMEFT K-factor to zero
+                        log.warning(f"Operator '{op}' not found for {dataset.name}. Setting K-factor to zero.")
+                k_factors += k_fac * cont_value / np.array(simu_card[cont_order]["SM"])
 
             bsm_dict[dataset.name] = k_factors
 
@@ -2409,7 +2410,7 @@ def write_datasets_chi2_dist_csv(pdf, compute_datasets_chi2_dist, level0_commond
 
 
 @figuregen
-def bsm_sm_ratio(data, pdf, load_datasets_contamination):
+def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
     """
     Generate figures which show the cumulative SMEFT K-factor applied to the datasets
     according to the contamination parameters expressed in the runcard.
@@ -2441,7 +2442,10 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination):
         # get cuts from dataset
         cuts = dataset.cuts.load()
         # initialise figure
-        fig, ax = plt.subplots()
+        fig, (ax1,ax2) = plt.subplots(nrows=2, ncols=1,
+                                      sharex=True,
+                                      height_ratios=[1,1],
+                                      figsize=[8,5])
         # get info
         info = get_info(dataset)
         # get kin table & get x
@@ -2451,22 +2455,58 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination):
         pred = predictions(dataset, pdf)
         # central value
         cv = pred[0].to_numpy()
-        # replica error
-        std = bsm_dict[dataset.name][cuts] * pred.loc[:, 1:].std(axis=1).to_numpy() / cv
+        # commondata with prediction central value
+        cd = dataset.commondata.load_commondata(cuts=cuts).with_central_value(cv)
+        # replica uncertainty (pdf uncertainty)
+        pdf_unc = pred.loc[:,1:].std(axis=1).to_numpy()
+        # experimental uncertainties
+        stat_unc = np.sqrt(cd.stat_errors.to_numpy())
+        syst_unc = np.sqrt(np.diag(covmat_from_systematics(loaded_commondata_with_cuts=cd,
+                                                           dataset_input=None,
+                                                           use_weights_in_covmat=False,
+                                                           norm_threshold=norm_threshold,)))
+        # total uncertainty
+        tot_unc = np.sqrt(pdf_unc**2 + stat_unc**2 + syst_unc**2)
         # plot
-        ax.axhline(y=1, linestyle="--", color="grey", label="SM prediction")
-        ax.errorbar(
+        ax1.errorbar(
+            x=x,
+            y=np.ones(dataset.commondata.ndata),
+            yerr=tot_unc/cv,
+            fmt="--",
+            label="SM prediction",
+            color='grey'
+        )
+        ax1.scatter(
             x=x,
             y=bsm_dict[dataset.name][cuts],
-            yerr=std,
-            fmt="o",
             label="SMEFT prediction",
         )
-        # formatting (title, labels, ...)
-        ax.set_title(label=info.dataset_label)
-        ax.set_xlabel(xlabel=info.xlabel)
-        ax.set_ylabel(ylabel="SMEFT / SM ratio")
+        # decomposition of uncertainties
+        ax2.step(x=x,
+                 y=pdf_unc/tot_unc,
+                 where="mid",
+                 label="$\sigma_{\\rm pdf}$ / $\sigma_{\\rm tot}$",
+        )
+        ax2.step(x=x,
+                 y=stat_unc/tot_unc,
+                 where="mid",
+                 label="$\sigma_{\\rm stat}$ / $\sigma_{\\rm tot}$",
+        )
+        ax2.step(x=x,
+                 y=syst_unc/tot_unc,
+                 where="mid",
+                 label="$\sigma_{\\rm syst}$ / $\sigma_{\\rm tot}$",
+        )
 
+        # formatting (title, labels, ...)
+        ax1.set_title(label=info.dataset_label)
+        ax2.set_xlabel(xlabel=info.xlabel)
+        ax1.set_ylabel(ylabel="SMEFT / SM ratio")
+        ax2.set_ylabel(ylabel="Uncertainty\ndecomposition")
+        # percentage yticks
+        ax2.set_yticks([0., 0.5, 1.],
+                       labels=["0%", "50%", "100%"])
         # Add legend
-        ax.legend(loc="best", fontsize=12)
+        ax1.legend(loc="best",)
+        ax2.legend(loc="best",)
         yield fig
