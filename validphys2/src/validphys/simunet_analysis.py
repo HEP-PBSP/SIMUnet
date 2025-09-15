@@ -2450,7 +2450,10 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
         info = get_info(dataset)
         # get kin table & get x
         table = kitable(data=dataset, info=info)
-        x = info.get_xcol(table=table)[cuts]
+        try:
+            x = info.get_xcol(table=table)[cuts]
+        except IndexError:
+            x = info.get_xcol(table=table)
         # compute predictions
         pred = predictions(dataset, pdf)
         # central value
@@ -2474,7 +2477,7 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
         )
         ax1.errorbar(
             x=x,
-            y=np.ones(dataset.commondata.ndata),
+            y=np.ones(dataset.commondata.ndata)[cuts],
             yerr=np.sqrt(tot_unc)/cv,
             fmt="D",
             label="SM prediction",
