@@ -2276,10 +2276,10 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
     cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
 
     cont_names, cont_values, cont_lin_combs = [], [], []
-    for c in contamination_parameters:
-        cont_names.append(c["name"])
-        cont_values.append(c["value"])
-        cont_lin_combs.append(c["linear_combination"])
+    c = contamination_parameters
+    cont_names.append(c["name"])
+    cont_values.append(c["value"])
+    cont_lin_combs.append(c["linear_combination"])
 
     bsm_dict = {}
 
@@ -2291,7 +2291,7 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
 
         if cont_order == None:
             log.warning(f"{dataset.name} is not contaminated. Is it right?")
-            bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
+            bsm_dict[dataset.name] = np.array([1.0])
         elif not os.path.exists(bsmfile):
             log.error(
                 f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"
@@ -2407,6 +2407,113 @@ def write_datasets_chi2_dist_csv(pdf, compute_datasets_chi2_dist, level0_commond
     chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
 
     chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+
+
+@figuregen
+def data_theory_new(data, pdf, load_datasets_contamination, norm_threshold=None):
+    """
+
+    Parameters
+    ----------
+
+    data: `core.DataGroupSpec`
+
+    pdf: `core.PDF`
+
+    load_datasets_contamination: `dict`
+
+    Yields
+    -------
+
+    fig: `matplotlib.figure`
+
+    """
+    # return figures
+    for dataset in data.datasets:
+        # get cuts from dataset
+        cuts = dataset.cuts.load()
+        # initialise figure
+        fig, (ax1,ax2) = plt.subplots(nrows=2, ncols=1,
+                                      sharex=True,
+                                      height_ratios=[1,1],
+                                      figsize=[8,5])
+        # get info
+        info = get_info(dataset)
+        # get kin table & get x
+        table = kitable(data=dataset, info=info)
+        x = table['k1'].iloc[cuts].values
+        # compute predictions
+        pred = predictions(dataset, pdf)
+        # central value
+        cv = pred[0].to_numpy()
+        # commondata with prediction central value
+        cd = dataset.commondata.load_commondata(cuts=cuts)
+        # replica uncertainty (pdf uncertainty)
+        pdf_unc = pred.loc[:,1:].std(axis=1).to_numpy()**2
+        # experimental uncertainties
+        stat_unc = cd.stat_errors.to_numpy()**2
+        syst_unc = np.diag(covmat_from_systematics(loaded_commondata_with_cuts=cd,
+                                                   dataset_input=None,
+                                                   use_weights_in_covmat=False,
+                                                   norm_threshold=norm_threshold,))
+        # total uncertainty
+        tot_unc = stat_unc
+        ax1.errorbar(
+            x,
+            cd.central_values,
+            yerr=np.sqrt(tot_unc),
+            label="Experimental Data",
+            fmt="o",
+            alpha=0.5,
+        )
+        ax1.plot(
+            x,
+            cv,
+            label="Fitted (XT3_OBS)",
+            color='black'
+        )
+        for rep in pred.columns[1:]:
+            ax1.plot(
+                x,
+                pred[rep],
+                # yerr=np.sqrt(tot_unc)/cv,
+                # fmt="D",
+                color='grey',
+                alpha=0.5
+            )
+       
+        ax2.errorbar(
+            x=x,
+            y=np.ones(dataset.commondata.ndata),
+        
+            yerr=np.sqrt(tot_unc)/cd.central_values,
+        )
+        ax2.plot(
+            x,
+            cv/ cd.central_values,
+            color='black',
+        )
+        
+        for rep in pred.columns[1:]:
+            ax2.plot(
+                x,
+                pred[rep].values / cd.central_values.values,
+                color='grey',
+                alpha=0.5
+            )
+
+        # formatting (title, labels, ...)
+        ax1.set_title(label=info.dataset_label)
+        ax2.set_xlabel(xlabel=info.xlabel)
+        ax1.set_ylabel(ylabel=info.y_label)
+        ax2.set_ylabel(ylabel="")
+        # Add legend
+        ax1.legend(loc="best",)
+        ax2.legend(loc="best",)
+
+        # ax2.set_xticks([0,x.max()/2,x.max()],
+        #         labels=[0,0.5,1])
+        yield fig
 
 
 @figuregen
