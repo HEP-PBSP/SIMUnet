@@ -2466,10 +2466,11 @@ def data_theory_new(data, pdf, load_datasets_contamination, norm_threshold=None)
             fmt="o",
             alpha=0.5,
         )
+    
         ax1.plot(
             x,
             cv,
-            label="Fitted (XT3_OBS)",
+            label=f"Fitted({dataset})",
             color='black'
         )
         for rep in pred.columns[1:]:
