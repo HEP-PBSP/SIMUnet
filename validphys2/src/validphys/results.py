@@ -42,6 +42,7 @@ from validphys.plotoptions.core import get_info
 
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 
+from validphys.pineparser import pineappl_reader
 
 log = logging.getLogger(__name__)
 
@@ -385,7 +386,13 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
-        ndata = len(dataset.load().get_cv())
+        try:
+            ndata = len(dataset.load().get_cv())
+        except Exception:
+            fkspec = dataset.fkspecs[0]
+            fkdata = pineappl_reader(fkspec)
+            ndata = fkdata.ndata
+
         nrep = len(pdf)
         return np.ones((ndata, nrep))
 

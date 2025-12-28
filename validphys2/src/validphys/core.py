@@ -42,6 +42,7 @@ from validphys.theorydbutils import fetch_theory
 from validphys.hyperoptplot import HyperoptTrial
 from validphys.utils import experiments_to_dataset_inputs
 from validphys.lhapdfset import LHAPDFSet
+# from validphys.pineparser import pineappl_reader
 
 log = logging.getLogger(__name__)
 
@@ -513,7 +514,11 @@ class DataSetSpec(TupleComp):
 
         fktables = []
         for p in self.fkspecs:
-            fktable = p.load()
+            try:
+                fktable = p.load()
+            except Exception as e:
+                from validphys.pineparser import pineappl_reader
+                fktable = pineappl_reader(p)
             #IMPORTANT: We need to tell the python garbage collector to NOT free the
             #memory owned by the FKTable on garbage collection.
             #TODO: Do this automatically

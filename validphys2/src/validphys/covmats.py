@@ -410,8 +410,23 @@ def sqrt_covmat(covariance_matrix):
                          f"{dimensions[1]}")
 
     sqrt_diags = np.sqrt(np.diag(covariance_matrix))
-    correlation_matrix = covariance_matrix / sqrt_diags[:, np.newaxis] / sqrt_diags
+    # There are some zero entries in sqrt_diags, this gives errors when finding the cholesky decomposition.
+
+    if np.any(sqrt_diags == 0):
+        # Use safe method if there are zeros
+        outer = np.outer(sqrt_diags, sqrt_diags)
+        correlation_matrix = np.divide(
+            covariance_matrix, outer, out=np.zeros_like(covariance_matrix), where=outer!=0
+        )
+    else:
+        # Normal division if all variances are nonzero
+        correlation_matrix = covariance_matrix / sqrt_diags[:, np.newaxis] / sqrt_diags
+
+    # Always fix the diagonal
+    np.fill_diagonal(correlation_matrix, 1.0)
+    # correlation_matrix = covariance_matrix / sqrt_diags[:, np.newaxis] / sqrt_diags
     decomp = la.cholesky(correlation_matrix)
+
     sqrt_matrix = (decomp * sqrt_diags).T
     return sqrt_matrix
 
