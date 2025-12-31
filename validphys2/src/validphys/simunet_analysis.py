@@ -2107,6 +2107,117 @@ def compute_datasets_chi2_dist(
 
     return chi2_dict
 
+def compute_datasets_chi2(
+    level0_commondata_wc,
+    sm_predictions,
+    groups_covmat,
+    load_datasets_contamination,
+    read_bsm_facs,
+    dataset_inputs,
+    theoryid,
+):
+    """
+    Parameters
+    ----------
+
+    level0_commondata_wc: level0 data using 'fakepdf'
+
+    sm_predictions: SM predictions using 'pdf'
+
+    groups_covmat
+
+    load_contamination
+
+    read_bsm_facs: BSM factors from the fit
+
+    dataset_inputs
+
+    theoryid
+
+    Returns
+    -------
+
+    dict
+        dictionary of lists of chi2 per dataset
+
+    """
+
+    bsm_facs_df = read_bsm_facs
+
+    means = bsm_facs_df.mean()
+    central_pred = {}
+    if dataset_inputs is not None:
+        for dataset in dataset_inputs:
+            central_sm = sm_predictions[dataset.name]
+            bsm_factors = np.zeros(len(central_sm))
+            # dataset.simu_parameters_linear_combinations includes the contamination linear combinations
+            # This loads the whole dataset but we only need simu_facs - is there a way to clean this?
+            ds = l.check_dataset(
+                name=dataset.name,
+                theoryid=theoryid,
+                cfac=dataset.cfac,
+                simu_parameters_names=dataset.simu_parameters_names,
+                simu_parameters_linear_combinations=dataset.simu_parameters_linear_combinations,
+                use_fixed_predictions=dataset.use_fixed_predictions,
+                new_commondata=dataset.new_commondata,
+            )
+            bsm_fac = parse_simu_parameters_names_CF(
+                ds.simu_parameters_names_CF,
+                ds.simu_parameters_linear_combinations,
+                cuts=ds.cuts,
+            )
+            # bsm_fac = (contamination_value*k-factors)/SM pred in Simu_fac file
+
+            if bsm_fac != None:
+                coefficients = central_sm.to_numpy().T * np.array(
+                    [i.central_value for i in bsm_fac.values()]
+                )
+                for i, key in enumerate(bsm_fac.keys()):
+                    label = key.split("_")[-1]
+
+                    scaled_row = coefficients[i] * means[label]
+
+                    bsm_factors += scaled_row
+
+            central_pred[dataset.name] = central_sm.values.squeeze() * (1 + bsm_factors)
+
+    covmat = groups_covmat
+    data = level0_commondata_wc
+    contamination_factors = load_datasets_contamination
+
+    chi2_dict = {dataset.setname: [] for dataset in data}
+
+    for dataset in data:
+        data_name = dataset.setname
+        cont_fac = contamination_factors[data_name]
+
+        if cont_fac.shape[0] == 1:
+            data_values = dataset.central_values * cont_fac
+        else:
+            indices = dataset.commondata_table_indices
+            data_values = dataset.central_values * cont_fac[indices]
+
+        num_data = dataset.ndata
+
+        covmat_dataset = (
+            covmat.xs(data_name, level=1, drop_level=False)
+            .T.xs(data_name, level=1, drop_level=False)
+            .values
+        )
+
+        theory = central_pred[data_name]
+
+        diff = (data_values - theory).squeeze()
+
+        if diff.size == 1:
+            chi2 = diff**2 / covmat_dataset[0, 0] / num_data
+        else:
+            chi2 = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) / num_data
+
+        chi2_dict[data_name].append(chi2)
+
+    return chi2_dict
+
 
 def write_datasets_chi2_dist_csv(
         pdf,
