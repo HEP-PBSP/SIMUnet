@@ -2001,10 +2001,6 @@ def load_datasets_contamination(
 
     cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
 
-    cont_name = contamination_parameters["name"]
-    cont_value = contamination_parameters["value"]
-    cont_lin_comb = contamination_parameters["linear_combination"]
-
     bsm_dict = {}
 
     for dataset in dataset_inputs:
@@ -2032,11 +2028,26 @@ def load_datasets_contamination(
             stream.close()
 
             k_factors = np.zeros(len(simu_card["SM_fixed"]))
-            for op in cont_lin_comb:
-                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
-            k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
 
-            bsm_dict[dataset.name] = k_factors
+            for cont_params in contamination_parameters:
+                cont_name = cont_params["name"]
+                cont_value = cont_params["value"]
+                cont_lin_comb = cont_params["linear_combination"]
+
+                if cont_value == 0.:
+                    continue
+
+                for op in cont_lin_comb:
+                    if op in simu_card[cont_order]:
+                        k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
+                        
+
+            sm_array = np.array(simu_card[cont_order]["SM"])
+            total_factor = 1. + (k_factors*cont_value) / sm_array
+            print(f"Dataset {dataset.name} contaminated with factor {cont_value} on order {cont_order}")
+            print(f"Total BSM factor min: {total_factor.min()}, max: {total_factor.max()}")
+
+            bsm_dict[dataset.name] = total_factor
 
     return bsm_dict
 
@@ -2244,6 +2255,37 @@ def write_datasets_chi2_dist_csv(
 
     df_ndat = pd.DataFrame(ndata)
     df_chi2 = pd.DataFrame(compute_datasets_chi2_dist)
+
+    chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
+
+    chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+
+
+def write_datasets_chi2_csv(
+        pdf,
+        compute_datasets_chi2,
+        level0_commondata_wc
+    ):
+
+    """
+    Parameters
+    ----------
+
+    pdf: core.PDF
+
+    compute_chi2
+
+    level0_commondata_wc
+
+    Returns
+    -------
+    
+    """
+
+    ndata = {dataset.setname: [dataset.ndata] for dataset in level0_commondata_wc}
+
+    df_ndat = pd.DataFrame(ndata)
+    df_chi2 = pd.DataFrame(compute_datasets_chi2)
 
     chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
 
