@@ -42,7 +42,8 @@ from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 from validphys.loader import _get_nnpdf_profile
 
-from validphys.convolution import central_predictions
+from validphys.convolution import central_predictions, predictions
+from validphys.results import ThPredictionsResult, dataset_bsm_factor
 
 log = logging.getLogger(__name__)
 
@@ -2119,6 +2120,7 @@ def compute_datasets_chi2_dist(
     return chi2_dict
 
 def compute_datasets_chi2(
+    pdf,
     level0_commondata_wc,
     sm_predictions,
     groups_covmat,
@@ -2156,7 +2158,9 @@ def compute_datasets_chi2(
     bsm_facs_df = read_bsm_facs
 
     means = bsm_facs_df.mean()
+    stds = bsm_facs_df.std()
     central_pred = {}
+    pdf_covmats = {}
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
             central_sm = sm_predictions[dataset.name]
@@ -2190,9 +2194,18 @@ def compute_datasets_chi2(
 
                     bsm_factors += scaled_row
 
-            central_pred[dataset.name] = central_sm.values.squeeze() * (1 + bsm_factors)
+            central_pred[dataset.name] = central_sm.values.squeeze() * (1 + bsm_factors) 
+            # Do we want to use this or rep_bsm_predictions which is the mean over all replicas?
 
-    covmat = groups_covmat
+            # Finding PDF/SMEFT fit covmat from replicas
+            rep_sm_predictions = predictions(ds, pdf)
+            bsm_factor=dataset_bsm_factor(ds,pdf,read_bsm_facs)
+            rep_bsm_predictions = rep_sm_predictions * bsm_factor
+            replicas = rep_bsm_predictions.iloc[:, 1:]
+            pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True)
+            
+    covmat = groups_covmat # This is the experimental covmat
+
     data = level0_commondata_wc
     contamination_factors = load_datasets_contamination
 
@@ -2214,7 +2227,7 @@ def compute_datasets_chi2(
             covmat.xs(data_name, level=1, drop_level=False)
             .T.xs(data_name, level=1, drop_level=False)
             .values
-        )
+        ) + pdf_covmats[data_name]
 
         theory = central_pred[data_name]
 
