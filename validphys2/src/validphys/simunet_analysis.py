@@ -2045,8 +2045,6 @@ def load_datasets_contamination(
 
             sm_array = np.array(simu_card[cont_order]["SM"])
             total_factor = 1. + (k_factors*cont_value) / sm_array
-            print(f"Dataset {dataset.name} contaminated with factor {cont_value} on order {cont_order}")
-            print(f"Total BSM factor min: {total_factor.min()}, max: {total_factor.max()}")
 
             bsm_dict[dataset.name] = total_factor
 
@@ -2163,10 +2161,6 @@ def compute_datasets_chi2(
     pdf_covmats = {}
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
-            central_sm = sm_predictions[dataset.name]
-            bsm_factors = np.zeros(len(central_sm))
-            # dataset.simu_parameters_linear_combinations includes the contamination linear combinations
-            # This loads the whole dataset but we only need simu_facs - is there a way to clean this?
             ds = l.check_dataset(
                 name=dataset.name,
                 theoryid=theoryid,
@@ -2176,26 +2170,6 @@ def compute_datasets_chi2(
                 use_fixed_predictions=dataset.use_fixed_predictions,
                 new_commondata=dataset.new_commondata,
             )
-            bsm_fac = parse_simu_parameters_names_CF(
-                ds.simu_parameters_names_CF,
-                ds.simu_parameters_linear_combinations,
-                cuts=ds.cuts,
-            )
-            # bsm_fac = (contamination_value*k-factors)/SM pred in Simu_fac file
-
-            if bsm_fac != None:
-                coefficients = central_sm.to_numpy().T * np.array(
-                    [i.central_value for i in bsm_fac.values()]
-                )
-                for i, key in enumerate(bsm_fac.keys()):
-                    label = key.split("_")[-1]
-
-                    scaled_row = coefficients[i] * means[label]
-
-                    bsm_factors += scaled_row
-
-            central_pred[dataset.name] = central_sm.values.squeeze() * (1 + bsm_factors) 
-            # Do we want to use this or rep_bsm_predictions which is the mean over all replicas?
 
             # Finding PDF/SMEFT fit covmat from replicas
             rep_sm_predictions = predictions(ds, pdf)
@@ -2203,6 +2177,7 @@ def compute_datasets_chi2(
             rep_bsm_predictions = rep_sm_predictions * bsm_factor
             replicas = rep_bsm_predictions.iloc[:, 1:]
             pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True)
+            central_pred[dataset.name] = rep_bsm_predictions.iloc[:, 0].values.squeeze() #Prediction with mean PDF and mean BSM factor
             
     covmat = groups_covmat # This is the experimental covmat
 
