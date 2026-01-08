@@ -2126,6 +2126,8 @@ def compute_datasets_chi2(
     read_bsm_facs,
     dataset_inputs,
     theoryid,
+    dataset_inputs_covmat_t0_considered,
+    simu_parameters_scales
 ):
     """
     Parameters
@@ -2152,13 +2154,25 @@ def compute_datasets_chi2(
         dictionary of lists of chi2 per dataset
 
     """
+    # import IPython ; IPython.embed()
+    central_pred_scaled = {}
+    pdf_covmats_scaled = {}
+    t0_covmat = dataset_inputs_covmat_t0_considered
+    if simu_parameters_scales:
+        scaled_bsm = read_bsm_facs / simu_parameters_scales
+    else:
+        scaled_bsm = read_bsm_facs
+    t0_covmats = {}
+    start = 0
+    for dataset in level0_commondata_wc:
+        name = dataset.setname
+        ndata = dataset.ndata
 
-    bsm_facs_df = read_bsm_facs
+        t0_covmats[name] = t0_covmat[start:start+ndata,
+                                    start:start+ndata]
 
-    means = bsm_facs_df.mean()
-    stds = bsm_facs_df.std()
-    central_pred = {}
-    pdf_covmats = {}
+        start += ndata
+
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
             ds = l.check_dataset(
@@ -2173,18 +2187,19 @@ def compute_datasets_chi2(
 
             # Finding PDF/SMEFT fit covmat from replicas
             rep_sm_predictions = predictions(ds, pdf)
-            bsm_factor=dataset_bsm_factor(ds,pdf,read_bsm_facs)
-            rep_bsm_predictions = rep_sm_predictions * bsm_factor
-            replicas = rep_bsm_predictions.iloc[:, 1:]
-            pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True)
-            central_pred[dataset.name] = rep_bsm_predictions.iloc[:, 0].values.squeeze() #Prediction with mean PDF and mean BSM factor
-            
+            bsm_factor_scaled = dataset_bsm_factor(ds,pdf,scaled_bsm)
+            rep_bsm_predictions_scaled = rep_sm_predictions * bsm_factor_scaled
+            replicas_scaled = rep_bsm_predictions_scaled.iloc[:, 1:]
+            pdf_covmats_scaled[dataset.name] = np.cov(replicas_scaled, rowvar=True)
+            central_pred_scaled[dataset.name] = rep_bsm_predictions_scaled.iloc[:, 0].values.squeeze() #Prediction with mean PDF and mean BSM factor
+
     covmat = groups_covmat # This is the experimental covmat
 
     data = level0_commondata_wc
     contamination_factors = load_datasets_contamination
 
-    chi2_dict = {dataset.setname: [] for dataset in data}
+    chi2_dict_exp = {dataset.setname: [] for dataset in data}
+    chi2_dict_t0 = {dataset.setname: [] for dataset in data}
 
     for dataset in data:
         data_name = dataset.setname
@@ -2201,21 +2216,25 @@ def compute_datasets_chi2(
         covmat_dataset = (
             covmat.xs(data_name, level=1, drop_level=False)
             .T.xs(data_name, level=1, drop_level=False)
-            .values
-        ) + pdf_covmats[data_name]
+            .values) + pdf_covmats_scaled[data_name]
 
-        theory = central_pred[data_name]
+        covmat_dataset_t0 = t0_covmats[data_name] + pdf_covmats_scaled[data_name]
 
-        diff = (data_values - theory).squeeze()
+        theory_scaled = central_pred_scaled[data_name]
 
-        if diff.size == 1:
-            chi2 = diff**2 / covmat_dataset[0, 0] / num_data
+        diff_scaled = (data_values - theory_scaled).squeeze()
+
+        if diff_scaled.size == 1:
+            chi2_exp = diff_scaled**2 / covmat_dataset[0, 0] / num_data
+            chi2_t0 = diff_scaled**2 / covmat_dataset_t0[0, 0] / num_data
         else:
-            chi2 = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) / num_data
+            chi2_exp = (diff_scaled.T @ np.linalg.inv(covmat_dataset) @ diff_scaled) / num_data
+            chi2_t0 = (diff_scaled.T @ np.linalg.inv(covmat_dataset_t0) @ diff_scaled) / num_data
 
-        chi2_dict[data_name].append(chi2)
+        chi2_dict_exp[data_name].append(chi2_exp)
+        chi2_dict_t0[data_name].append(chi2_t0)
 
-    return chi2_dict
+    return chi2_dict_exp, chi2_dict_t0
 
 
 def write_datasets_chi2_dist_csv(
@@ -2273,8 +2292,9 @@ def write_datasets_chi2_csv(
     ndata = {dataset.setname: [dataset.ndata] for dataset in level0_commondata_wc}
 
     df_ndat = pd.DataFrame(ndata)
-    df_chi2 = pd.DataFrame(compute_datasets_chi2)
+    df_chi2_dict_exp = pd.DataFrame(compute_datasets_chi2[0])
+    df_chi2_dict_t0 = pd.DataFrame(compute_datasets_chi2[1])
 
-    chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
+    chi2 = pd.concat([df_ndat, df_chi2_dict_exp, df_chi2_dict_t0], ignore_index=True)
 
     chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
