@@ -2195,7 +2195,8 @@ def compute_datasets_chi2(
 
     chi2_dict_exp = {dataset.setname: [] for dataset in data}
     chi2_dict_t0 = {dataset.setname: [] for dataset in data}
-
+    tot_chi2_exp = 0
+    tot_chi2_t0 = 0
     for dataset in data:
         data_name = dataset.setname
         cont_fac = contamination_factors[data_name]
@@ -2223,13 +2224,20 @@ def compute_datasets_chi2(
             chi2_exp = diff**2 / covmat_dataset[0, 0] / num_data
             chi2_t0 = diff**2 / covmat_dataset_t0[0, 0] / num_data
         else:
-            chi2_exp = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) / num_data
-            chi2_t0 = (diff.T @ np.linalg.inv(covmat_dataset_t0) @ diff) / num_data
+            chi2_exp = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) 
+            chi2_t0 = (diff.T @ np.linalg.inv(covmat_dataset_t0) @ diff)
+            chi2_exp_red = chi2_exp / num_data
+            chi2_t0_red = chi2_t0 / num_data
 
-        chi2_dict_exp[data_name].append(chi2_exp)
-        chi2_dict_t0[data_name].append(chi2_t0)
+            tot_chi2_exp += chi2_exp
+            tot_chi2_t0 += chi2_t0
 
-    return chi2_dict_exp, chi2_dict_t0
+        chi2_dict_exp[data_name].append(chi2_exp_red)
+        chi2_dict_t0[data_name].append(chi2_t0_red)
+    total_ndata = sum([dataset.ndata for dataset in data])
+    tot_chi2_exp_red = tot_chi2_exp / total_ndata
+    tot_chi2_t0_red = tot_chi2_t0 / total_ndata
+    return chi2_dict_exp, chi2_dict_t0, tot_chi2_exp_red, tot_chi2_t0_red
 
 
 def write_datasets_chi2_dist_csv(
@@ -2284,12 +2292,29 @@ def write_datasets_chi2_csv(
     
     """
 
-    ndata = {dataset.setname: [dataset.ndata] for dataset in level0_commondata_wc}
+    rows = []
+    global_chi2_exp = compute_datasets_chi2[2]
+    global_chi2_t0 = compute_datasets_chi2[3]
+    for dataset in level0_commondata_wc:
+        name = dataset.setname
+        rows.append({
+            "dataset": name,
+            "ndata": dataset.ndata,
+            "chi2_exp": compute_datasets_chi2[0][name],
+            "chi2_t0": compute_datasets_chi2[1][name],
+        })
 
-    df_ndat = pd.DataFrame(ndata)
-    df_chi2_dict_exp = pd.DataFrame(compute_datasets_chi2[0])
-    df_chi2_dict_t0 = pd.DataFrame(compute_datasets_chi2[1])
+    df = pd.DataFrame(rows)
 
-    chi2 = pd.concat([df_ndat, df_chi2_dict_exp, df_chi2_dict_t0], ignore_index=True)
+    df = pd.concat(
+    [pd.DataFrame([{
+         "dataset": "GLOBAL",
+         "ndata": sum(d.ndata for d in level0_commondata_wc),
+         "chi2_exp": global_chi2_exp,
+         "chi2_t0": global_chi2_t0,
+     }]),
+     df
+    ],
+    ignore_index=True)
 
-    chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+    df.to_csv(f"{pdf}_chi2_dist.csv", index=False)
