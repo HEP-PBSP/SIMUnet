@@ -2221,8 +2221,10 @@ def compute_datasets_chi2(
         diff = (data_values - theory).squeeze()
 
         if diff.size == 1:
-            chi2_exp = diff**2 / covmat_dataset[0, 0] / num_data
-            chi2_t0 = diff**2 / covmat_dataset_t0[0, 0] / num_data
+            chi2_exp = diff**2 / covmat_dataset[0, 0]
+            chi2_t0 = diff**2 / covmat_dataset_t0[0, 0]
+            chi2_exp_red = chi2_exp / num_data
+            chi2_t0_red = chi2_t0 / num_data
         else:
             chi2_exp = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) 
             chi2_t0 = (diff.T @ np.linalg.inv(covmat_dataset_t0) @ diff)
