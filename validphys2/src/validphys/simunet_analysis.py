@@ -2185,7 +2185,7 @@ def compute_datasets_chi2(
             bsm_factor = dataset_bsm_factor(ds,pdf,read_bsm_facs)
             rep_bsm_predictions = rep_sm_predictions * bsm_factor
             replicas = rep_bsm_predictions.iloc[:, 1:]
-            pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True)
+            pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True,bias=True)
             central_pred[dataset.name] = rep_bsm_predictions.iloc[:, 0].values.squeeze() #Prediction with mean PDF and mean BSM factor
 
     covmat = groups_covmat # This is the experimental covmat
