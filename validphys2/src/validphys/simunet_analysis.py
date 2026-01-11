@@ -2040,12 +2040,10 @@ def load_datasets_contamination(
 
                 for op in cont_lin_comb:
                     if op in simu_card[cont_order]:
-                        k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
-                        
-
+                        k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op]) * cont_value
+                                    
             sm_array = np.array(simu_card[cont_order]["SM"])
-            total_factor = 1. + (k_factors*cont_value) / sm_array
-
+            total_factor = 1. + (k_factors / sm_array)
             bsm_dict[dataset.name] = total_factor
 
     return bsm_dict
