@@ -388,7 +388,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
         # where ndata is the number of post cut datapoints
         try:
             ndata = len(dataset.load().get_cv())
-        except Exception as e:
+        except Exception:
             ndata = (len(central_predictions(dataset, pdf)))
         nrep = len(pdf)
         return np.ones((ndata, nrep))

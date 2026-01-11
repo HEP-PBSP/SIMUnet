@@ -2031,7 +2031,6 @@ def load_datasets_contamination(
             k_factors = np.zeros(len(simu_card["SM_fixed"]))
 
             for cont_params in contamination_parameters:
-                cont_name = cont_params["name"]
                 cont_value = cont_params["value"]
                 cont_lin_comb = cont_params["linear_combination"]
 
