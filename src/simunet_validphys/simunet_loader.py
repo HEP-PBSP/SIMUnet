@@ -1,16 +1,34 @@
-from validphys.loader import Loader, CfactorNotFound, LoaderError, FKTableNotFound, InconsistentMetaDataError
+import logging
+from validphys.loader import (
+    Loader,
+    CfactorNotFound,
+    LoaderError,
+    RemoteLoader,
+    RemoteLoaderError,
+    LoadFailedError,
+)
 from validphys.core import CutsPolicy, TheoryIDSpec
 from validphys.utils import yaml_safe
-from .simunet_core import SIMUnetDataSetSpec, SIMUnetFKTableSpec
-from .simunet_pineparser import parse_theory_meta
-from validphys.pineparser import  TheoryMeta
+from .simunet_core import SIMUnetDataSetSpec
 import importlib.resources
 from pathlib import Path
 import yaml
-import os
+
+log = logging.getLogger(__name__)
+
 
 class SIMUnetLoader(Loader):
-    def get_simu_parameters_name_dict(self, setname, simu_parameters_names, theoryid):
+    def __init__(self, profile=None):
+        super().__init__(profile)
+        package_root: Path = importlib.resources.files("simunet_validphys")
+
+        project_root = package_root.parent.parent
+
+        simudata_path = project_root / "simudata"
+
+        self.simudata_path = simudata_path
+
+    def get_simu_parameters_name_dict(self, setname, simu_parameters_names):
         """
         Parameters
         ----------
@@ -20,20 +38,12 @@ class SIMUnetLoader(Loader):
         simu_parameters_names: list
                 list containing the joined `simu_fac` and operator
 
-        theoryid: str
-
         Returns
         -------
         dict
 
         """
-
-        _, theopath = self.check_theoryID(theoryid)
         simu_fac_names_paths = {}
-
-        package_root: Path = importlib.resources.files("simunet_validphys")
-
-        project_root = package_root.parent.parent
 
         yaml_path = (
             Path(importlib.resources.files("nnpdf_data"))
@@ -57,13 +67,12 @@ class SIMUnetLoader(Loader):
             raise KeyError(
                 f"Could not find old dataset name corresponding to '{setname}' in dataset_names.yml"
             )
+        simudata_path = self.simudata_path
+        simufactorpath = simudata_path / "simu_factors" / f"SIMU_{setname_old}.yaml"
 
-        simufactorpath = (
-            project_root / "simudata" / "simu_factors" / f"SIMU_{setname_old}.yaml"
-        )
         if not simufactorpath.exists():
             msg = (
-                f"Could not find a SIMU factor for setname in {theopath}. "
+                f"Could not find a SIMU factor for setname in {simufactorpath}. "
                 f"The path {simufactorpath} does not exist."
             )
             raise CfactorNotFound(msg)
@@ -106,16 +115,14 @@ class SIMUnetLoader(Loader):
         use_fixed_predictions=False,
         contamination=None,
         contamination_data=None,
-        # new_commondata=False,
+        variant=None,
     ):
 
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
 
-        theoryno, theopath = theoryid
-
         commondata = self.check_commondata(
-            name, sysnum, use_fitcommondata=use_fitcommondata, fit=fit
+            name, sysnum, use_fitcommondata=use_fitcommondata, fit=fit, variant=variant
         )
 
         fkspec, op = self._check_theory_old_or_new(theoryid, commondata, cfac)
@@ -138,7 +145,7 @@ class SIMUnetLoader(Loader):
 
         if simu_parameters_names is not None:
             simu_parameters_names_CF = self.get_simu_parameters_name_dict(
-                name, simu_parameters_names, theoryno
+                name, simu_parameters_names
             )
         else:
             simu_parameters_names_CF = None
@@ -159,57 +166,43 @@ class SIMUnetLoader(Loader):
             contamination=contamination,
             contamination_data=contamination_data,
         )
-    
-    def check_fktable(self, theoryid, setname, cfac, use_fixed_predictions=False, new_commondata=False, is_compound=False):
-        _, theopath = self.check_theoryID(theoryid)
 
-        if use_fixed_predictions:
-            fkpath = theopath/ 'fastkernel' / ('FK_FAKEKTABLE.dat')
-            if not fkpath.exists():
-                raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
-            # Also set the fixed predictions path
-            fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
-            cfactors = self.check_cfactor(theoryid, setname, cfac)
-            return SIMUnetFKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
-        # Only works if cfactor name is same as setname
-        cfactors = self.check_cfactor(theoryid, setname, cfac)
-        
-        # use different file name for the FK table if the commondata is new
-        if new_commondata:
-            # Need to pass a TheoryMeta object to FKTableSpec
-            path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
-            if not path_metadata.exists():
-                raise InconsistentMetaDataError(f"Could not find '_metadata.yaml' file for set {setname}."
-                                                f"File '{path_metadata}' not found.")
-            # get observable name from the setname
-            with open(path_metadata, 'r') as f:
-                metadata = yaml_safe.load(f)
-            # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
-            fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
-            fkpath = tuple([theopath/ 'fastkernel' / (f'{fktable}.pineappl.lz4') for fktable in fktables])
-            for path in fkpath:
-                if not path.exists():
-                    raise FKTableNotFound(("Could not find FKTable for set '%s'. "
-                    "File '%s' not found") % (setname, path) )
-                
-            common_prefix = os.path.commonprefix([metadata['setname'], setname])
-            
-            observable_name = setname[len(common_prefix):]
-            if observable_name.startswith('_'):
-                observable_name = observable_name[1:]
-            if is_compound:
-                theory_meta = TheoryMeta(FK_tables=[fkpath], operation="NULL", conversion_factor=1., shifts=None, normalization=None, comment=None)
-            else:
-                theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)
-            
-            return SIMUnetFKTableSpec(fkpath, cfactors, 
-                               theory_meta=theory_meta,
-                               legacy=False)
-        else:
-            fkpath = theopath/ 'fastkernel' / ('FK_%s.dat' % setname)
 
-            if not fkpath.exists():
-                raise FKTableNotFound(("Could not find FKTable for set '%s'. "
-                "File '%s' not found") % (setname, fkpath) )
-            
-            return SIMUnetFKTableSpec(fkpath, cfactors)
+# Can I simplify this? I only need to change the loader which is parsed into this
+class SIMUFallbackLoader(SIMUnetLoader, RemoteLoader):
+    """
+    A loader that first tries to find resources locally
+    (using SIMUnetLoader.check_*) and if it fails,
+    it tries to download them (using RemoteLoader.download_*).
+    """
+
+    def make_checker(self, resource):
+        # Intercept check_* methods
+        orig = super().__getattribute__("check_" + resource)
+        download = getattr(self, "download_" + resource)
+
+        @functools.wraps(orig)
+        def f(*args, **kwargs):
+            try:
+                return orig(*args, **kwargs)
+            except LoadFailedError as e:
+                saved_exception = e
+                log.info(
+                    f"Could not find resource ({resource}): {saved_exception}. "
+                    "Attempting to download it."
+                )
+                try:
+                    download(*args, **kwargs)
+                except RemoteLoaderError as e:
+                    log.error(f"Failed to download resource: {e}")
+                    raise e
+                except LoadFailedError:
+                    log.error("Resource not in remote repository.")
+                    raise saved_exception
+                except requests.RequestException as e:
+                    log.error(f"Connection problem: {e}")
+                    raise saved_exception from e
+                else:
+                    return orig(*args, **kwargs)
+
+        return f

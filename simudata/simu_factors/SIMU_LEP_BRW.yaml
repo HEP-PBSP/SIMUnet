@@ -1,0 +1,23 @@
+metadata:
+  ref: arXiv:1302.3415
+  author: Luca Mantani
+  ufomodel: SMEFTatNLO
+  flavour: dim6top
+  date: 16/10/2023
+  pdf: None
+  info_SM_fixed: arXiv:1701.06424
+  observable: BrENu  BrMuNu  BrTauNu
+  bins: []
+
+SM_fixed: [0.1083, 0.1083, 0.1083]
+
+theory_cov:
+- [1.0e-08, 0.0, 0.0]
+- [0.0, 1.0e-08, 0.0]
+- [0.0, 0.0, 1.0e-08]
+
+EFT_LO:
+  SM: [0.1111111111111111, 0.1111111111111111, 0.1111111111111111]
+  O3pq: [-0.0089813505832869, -0.0089813505832869, -0.0089813505832869]
+  Oll: [0.0, 0.0, 0.0]
+  O3pl: [0.008981350583286998, 0.008981350583286998, 0.008981350583287]

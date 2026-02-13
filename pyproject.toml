@@ -11,6 +11,7 @@ authors = [
 ]
 dependencies = [
     "nnpdf>=4.1.2",
+    "seaborn>=0.12",
 ]
 requires-python = ">=3.10"
 
