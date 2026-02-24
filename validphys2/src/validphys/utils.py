@@ -375,7 +375,7 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
             cd_line += f"\t{data_value:20.12e}\t{stats[i]:20.12e}\t"
 
             # for j, sys in enumerate(uncertainty_values):
-            sys = uncertainty_values[i]
+            sys = sys_uncertainty_values[i]
             for j, (sys_name, sys_val) in enumerate(sys.items()):
                 if sys_name == 'stat':
                     continue
