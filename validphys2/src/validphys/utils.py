@@ -324,9 +324,20 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
     uncertainty_values = uncertainty['bins']
     n_sys = uncertainty_yaml_to_systype(path_uncertainty_yaml, name_dataset, observable, write_to_file=False)
     stats = []
+    sys_uncertainty_values = []
     for entr in uncertainty_values:
-        try: stats.append(entr["stat"])
-        except KeyError: stats.append(0.)
+        entr_copy = entr.copy()
+        if "stat" in entr_copy:
+            stat_value = entr_copy.pop("stat")
+        elif "Stat. unc." in entr_copy:
+            stat_value = entr_copy.pop("Stat. unc.")
+            # print(stat_value)
+        else:
+            stat_value = 0.0
+   
+        stats.append(stat_value)
+        sys_uncertainty_values.append(entr_copy)
+
     stats = np.array(stats)
 
     # get data values
@@ -351,12 +362,15 @@ def convert_new_data_to_old(path_data_yaml, path_uncertainty_yaml, path_kinemati
             cd_line = f"{i+1:6}\t{metadata['implemented_observables'][0]['process_type']:6}\t"
 
             for index in [0, 1, 2]:
-                if kin_values[i][kin_names[index]]['mid'] == None:
-                    kin_values[i][kin_names[index]]['mid'] = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
+                value = kin_values[i][kin_names[index]]['mid']
+
+                if value == None:
+                    value = (kin_values[i][kin_names[index]]['min'] + kin_values[i][kin_names[index]]['max']) / 2
                 if kin_names[index] == "pT":
-                    cd_line += f"{kin_values[i][kin_names[index]]['mid']**2:20.12e}\t"
-                else:
-                    cd_line += f"{kin_values[i][kin_names[index]]['mid']:20.12e}\t"
+                    cd_line += f"{value**2:20.12e}\t"
+                if not isinstance(value, (int, float)):
+                    value = 0.0
+                cd_line += f"{value:20.12e}\t"
 
             cd_line += f"\t{data_value:20.12e}\t{stats[i]:20.12e}\t"
 
