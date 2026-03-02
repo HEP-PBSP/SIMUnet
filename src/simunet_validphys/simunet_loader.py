@@ -176,33 +176,4 @@ class SIMUFallbackLoader(SIMUnetLoader, RemoteLoader):
     it tries to download them (using RemoteLoader.download_*).
     """
 
-    def make_checker(self, resource):
-        # Intercept check_* methods
-        orig = super().__getattribute__("check_" + resource)
-        download = getattr(self, "download_" + resource)
-
-        @functools.wraps(orig)
-        def f(*args, **kwargs):
-            try:
-                return orig(*args, **kwargs)
-            except LoadFailedError as e:
-                saved_exception = e
-                log.info(
-                    f"Could not find resource ({resource}): {saved_exception}. "
-                    "Attempting to download it."
-                )
-                try:
-                    download(*args, **kwargs)
-                except RemoteLoaderError as e:
-                    log.error(f"Failed to download resource: {e}")
-                    raise e
-                except LoadFailedError:
-                    log.error("Resource not in remote repository.")
-                    raise saved_exception
-                except requests.RequestException as e:
-                    log.error(f"Connection problem: {e}")
-                    raise saved_exception from e
-                else:
-                    return orig(*args, **kwargs)
-
-        return f
+    pass
