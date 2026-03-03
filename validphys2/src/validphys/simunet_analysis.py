@@ -2291,7 +2291,12 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
 
         if cont_order == None:
             log.warning(f"{dataset.name} is not contaminated. Is it right?")
-            bsm_dict[dataset.name] = np.array([1.0])
+            try:
+                bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
+            except AttributeError:
+                data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid, new_commondata=dataset.new_commondata)
+                bsm_dict[dataset.name] = np.ones(data.commondata.ndata)
+
         elif not os.path.exists(bsmfile):
             log.error(
                 f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"
@@ -2558,7 +2563,10 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
         info = get_info(dataset)
         # get kin table & get x
         table = kitable(data=dataset, info=info)
-        x = info.get_xcol(table=table)[cuts]
+        try:
+            x = info.get_xcol(table=table)[cuts]
+        except IndexError:
+            x = info.get_xcol(table=table)
         # compute predictions
         pred = predictions(dataset, pdf)
         # central value
@@ -2582,7 +2590,7 @@ def bsm_sm_ratio(data, pdf, load_datasets_contamination, norm_threshold=None):
         )
         ax1.errorbar(
             x=x,
-            y=np.ones(dataset.commondata.ndata),
+            y=np.ones(dataset.commondata.ndata)[cuts],
             yerr=np.sqrt(tot_unc)/cv,
             fmt="D",
             label="SM prediction",
