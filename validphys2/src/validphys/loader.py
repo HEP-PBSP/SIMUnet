@@ -361,10 +361,10 @@ class Loader(LoaderBase):
                 raise FKTableNotFound("Could not find the fake FK-table for fixed observables!")
             # Also set the fixed predictions path
             fixed_predictions_path = theopath/ 'simu_factors' / ('SIMU_%s.yaml' % setname)
-            cfactors = self.check_cfactor(theoryID, setname, cfac)
+            cfactors = self.check_cfactor(theoryID, setname, cfac, new_commondata=new_commondata)
             return FKTableSpec(fkpath, cfactors, use_fixed_predictions=True, fixed_predictions_path=fixed_predictions_path)
         
-        cfactors = self.check_cfactor(theoryID, setname, cfac)
+        cfactors = self.check_cfactor(theoryID, setname, cfac, new_commondata=new_commondata)
         
         # use different file name for the FK table if the commondata is new
         if new_commondata:
@@ -455,18 +455,40 @@ class Loader(LoaderBase):
         fkspec= self.check_fktable(theoryID, setname, cfac)
         return fkspec.load()
 
-    def check_cfactor(self, theoryID, setname, cfactors):
+    def check_cfactor(self, theoryID, setname, cfactors, new_commondata=False):
+        print('Checking cfactors for theoryID', theoryID, 'setname', setname, 'cfactors', cfactors, 'new_commondata', new_commondata)
         _, theopath = self.check_theoryID(theoryID)
         cf = []
         for cfactor in cfactors:
-            cfactorpath = (theopath / 'cfactor' /
-                           'CF_{cfactor}_{setname}.dat'.format(**locals()))
-            if not cfactorpath.exists():
-                msg = ("Could not find cfactor '{cfactor}' for FKTable {setname} "
-                       "in theory {theoryID}. File {cfactorpath} does not "
-                       "exist.").format(**locals())
-                raise CfactorNotFound(msg)
-            cf.append(cfactorpath)
+            if new_commondata:
+                path_metadata = theopath / 'fastkernel' / f'{setname}_metadata.yaml'
+                if not path_metadata.exists():
+                    raise InconsistentMetaDataError(f"Could not find '_metadata.yaml' file for set {setname}."
+                                                    f"File '{path_metadata}' not found.")
+                # get observable name from the setname
+                with open(path_metadata, 'r') as f:
+                    metadata = yaml_safe.load(f)
+                # NOTE: write a "_metadata.yaml" file for each observable (then `metadata["implemented_observables"][0]` makes sense)
+                fktables = metadata["implemented_observables"][0]["theory"]["FK_tables"][0]
+                for fktable in fktables:
+                    cfactorpath = (theopath / 'cfactor' /
+                                f'CF_{cfactor}_{fktable}.dat')
+                    if not cfactorpath.exists():
+                        msg = ("Could not find cfactor '{cfactor}' for FKTable {fktable} "
+                               "in theory {theoryID}. File {cfactorpath} does not "
+                               "exist.").format(**locals())
+                        raise CfactorNotFound(msg)
+
+                    cf.append(cfactorpath)
+            else:
+                cfactorpath = (theopath / 'cfactor' /
+                            'CF_{cfactor}_{setname}.dat'.format(**locals()))
+                if not cfactorpath.exists():
+                    msg = ("Could not find cfactor '{cfactor}' for FKTable {setname} "
+                        "in theory {theoryID}. File {cfactorpath} does not "
+                        "exist.").format(**locals())
+                    raise CfactorNotFound(msg)
+                cf.append(cfactorpath)
 
         return tuple(cf)
 
