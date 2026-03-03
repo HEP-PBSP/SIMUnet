@@ -222,7 +222,9 @@ def pineappl_reader(fkspec):
     normalization_per_fktable = fkspec.theory_meta.normalization
     fknames = [i.name.replace(f".{EXT}", "") for i in fkspec.fkpath]
     if cfactors is not None:
-        cfactors = dict(zip(fknames, cfactors))
+        cfactors_dict = {
+            fk: [cfac] for fk, cfac in zip(fknames, cfactors[0])
+        }
 
     # fktables in pineapplgrid are for obs = fk * f while previous fktables were obs = fk * xf
     # prepare the grid all tables will be divided by
@@ -237,7 +239,7 @@ def pineappl_reader(fkspec):
         # Start by reading possible cfactors if cfactor is not empty
         cfprod = 1.0
         if cfactors is not None:
-            for cfac in cfactors.get(fkname, []):
+            for cfac in cfactors_dict.get(fkname, []):
                 cfprod *= cfac.central_value
 
         # Read the table, remove bin normalization and apply cfactors

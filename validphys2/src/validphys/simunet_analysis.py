@@ -2415,7 +2415,7 @@ def write_datasets_chi2_dist_csv(pdf, compute_datasets_chi2_dist, level0_commond
 
 
 @figuregen
-def data_theory_new(data, pdf, load_datasets_contamination, norm_threshold=None):
+def data_theory_new(data, pdf, plot_replicas=False, norm_threshold=None):
     """
 
     Parameters
@@ -2425,7 +2425,9 @@ def data_theory_new(data, pdf, load_datasets_contamination, norm_threshold=None)
 
     pdf: `core.PDF`
 
-    load_datasets_contamination: `dict`
+    plot_replicas: `bool`
+
+    norm_threshold: `float`
 
     Yields
     -------
@@ -2461,65 +2463,91 @@ def data_theory_new(data, pdf, load_datasets_contamination, norm_threshold=None)
                                                    dataset_input=None,
                                                    use_weights_in_covmat=False,
                                                    norm_threshold=norm_threshold,))
+        # stat are included in syst_unc
         # total uncertainty
-        tot_unc = stat_unc
-        ax1.errorbar(
-            x,
-            cd.central_values,
-            yerr=np.sqrt(tot_unc),
-            label="Experimental Data",
-            fmt="o",
-            alpha=0.5,
-        )
-    
-        ax1.plot(
-            x,
-            cv,
-            label=f"Fitted({dataset})",
-            color='black'
-        )
-        for rep in pred.columns[1:]:
-            ax1.plot(
-                x,
-                pred[rep],
-                # yerr=np.sqrt(tot_unc)/cv,
-                # fmt="D",
-                color='grey',
-                alpha=0.5
-            )
-       
-        ax2.errorbar(
-            x=x,
-            y=np.ones(dataset.commondata.ndata),
-        
-            yerr=np.sqrt(tot_unc)/cd.central_values,
-        )
-        ax2.plot(
-            x,
-            cv/ cd.central_values,
-            color='black',
-        )
-        
-        for rep in pred.columns[1:]:
-            ax2.plot(
-                x,
-                pred[rep].values / cd.central_values.values,
-                color='grey',
-                alpha=0.5
+        tot_unc = syst_unc 
+
+
+        # Identify segments of x where it is increasing or decreasing
+        # so we can split the plot into segments 
+        dx = np.diff(x)
+        signs = np.sign(dx)
+        final_points_of_segments = np.where(signs == -1)
+        # Add one to get the index of the first point of the next segment
+        change_points = final_points_of_segments[0] + 1
+
+        split_indices = np.concatenate(([0], change_points, [len(x)]))
+
+        # --- Loop through segments ---
+        for i in range(len(split_indices) - 1):
+            start, end = split_indices[i], split_indices[i + 1]
+
+            x_seg = x[start:end]
+            y_seg = cd.central_values[start:end]
+            tot_unc_seg = tot_unc[start:end]
+            cv_seg = cv[start:end]
+
+            fig, (ax1, ax2) = plt.subplots(
+                nrows=2, ncols=1, sharex=True, figsize=[8, 5], height_ratios=[1, 1]
             )
 
-        # formatting (title, labels, ...)
-        ax1.set_title(label=info.dataset_label)
-        ax2.set_xlabel(xlabel=info.xlabel)
-        ax1.set_ylabel(ylabel=info.y_label)
-        ax2.set_ylabel(ylabel="")
-        # Add legend
-        ax1.legend(loc="best",)
-        ax2.legend(loc="best",)
+            # Plot experimental data
+            ax1.errorbar(
+                x_seg,
+                y_seg,
+                yerr=np.sqrt(tot_unc_seg),
+                label="Experimental Data",
+                fmt="o",
+                alpha=0.5,
+            )
+            # Plot fitted central value
+            ax1.scatter(
+                x_seg,
+                cv_seg,
+                label=f"Fitted({dataset})",
+                color='black'
+            )
+            # Plot replicas
+            if plot_replicas:
+                for rep in pred.columns[1:]:
+                    ax1.plot(
+                        x_seg,
+                        pred[rep].values[start:end],
+                        color='grey',
+                        alpha=0.5
+                    )
 
-        # ax2.set_xticks([0,x.max()/2,x.max()],
-        #         labels=[0,0.5,1])
-        yield fig
+            # Ratio plot
+            ax2.errorbar(
+                x_seg,
+                np.ones_like(x_seg),
+                yerr=np.sqrt(tot_unc_seg)/y_seg
+            )
+            ax2.scatter(
+                x_seg,
+                cv_seg / y_seg,
+                color='black',
+            )
+            if plot_replicas:
+                for rep in pred.columns[1:]:
+                    ax2.plot(
+                        x_seg,
+                        pred[rep].values[start:end]/y_seg,
+                        color='grey',
+                        alpha=0.5
+                    )
+
+            # Formatting
+            seg_label = f"{info.dataset_label} - Points {start} to {end}"
+            ax1.set_title(seg_label)
+            ax2.set_xlabel(info.xlabel)
+            ax1.set_ylabel(info.y_label)
+            ax2.set_ylabel("")
+            ax1.legend(loc="best")
+            ax2.legend(loc="best")
+            ax2.set_xscale(info.x_scale)
+
+            yield fig
 
 
 @figuregen

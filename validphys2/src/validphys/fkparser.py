@@ -60,6 +60,7 @@ def load_fktable(spec):
     
     else:
         tabledata = pineappl_reader(spec)
+        return tabledata #cfactors are already applied in pineappl_reader
     
     if not spec.cfactors:
         return tabledata
