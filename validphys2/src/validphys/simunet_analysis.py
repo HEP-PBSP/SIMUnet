@@ -2291,7 +2291,12 @@ def load_datasets_contamination(contamination_parameters, theoryid, dataset_inpu
 
         if cont_order == None:
             log.warning(f"{dataset.name} is not contaminated. Is it right?")
-            bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
+            try:
+                bsm_dict[dataset.name] = np.ones(dataset.commondata.ndata)
+            except AttributeError:
+                data = l.check_dataset(dataset.name, cfac=dataset.cfac, theoryid=theoryid, new_commondata=dataset.new_commondata)
+                bsm_dict[dataset.name] = np.ones(data.commondata.ndata)
+
         elif not os.path.exists(bsmfile):
             log.error(
                 f"Could not find a BSM-factor for {dataset.name}. Are you sure they exist in the given theory?"

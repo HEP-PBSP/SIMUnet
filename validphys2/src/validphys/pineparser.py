@@ -185,13 +185,28 @@ def pineappl_reader(fkspec):
     pine_rep = pines[0]
 
     # Is it hadronic? (at the moment only hadronic and DIS are considered)
-    hadronic = pine_rep.key_values()["initial_state_1"] == pine_rep.key_values()["initial_state_2"]
+    try:
+        init1 = pine_rep.key_values()["initial_state_1"]
+        init2 = pine_rep.key_values()["initial_state_2"]
+    except (AttributeError, KeyError):
+        # Pineappl v1 uses metadata, not key_values
+        meta = pine_rep.metadata
+        init1 = meta["initial_state_1"]
+        init2 = meta["initial_state_2"]
+    hadronic = init1 == init2
     # Sanity check (in case at some point we start fitting things that are not protons)
-    if hadronic and pine_rep.key_values()["initial_state_1"] != "2212":
+    if hadronic and init1 != "2212":
         raise ValueError(
             "pineappl_reader is not prepared to read a hadronic fktable with no protons!"
         )
-    Q0 = np.sqrt(pine_rep.muf2())
+    try:
+        Q0 = np.sqrt(pine_rep.muf2())
+
+    except AttributeError:
+        # Pineappl v1 uses metadata
+        import json
+        Q0 = json.loads(meta["theory_card"])["Q0"]
+
     xgrid = np.array([])
     for pine in pines:
         xgrid = np.union1d(xgrid, pine.x_grid())
