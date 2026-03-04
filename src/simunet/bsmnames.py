@@ -1,7 +1,7 @@
 "`""Helpers for parsing bsm"""
 
 def linear_datum_to_op(name:str):
-    """Convert something like "None_OtZ" to OtZ"""
+    """Convert something like ``None_OtZ`` to OtZ"""
     return name.rsplit("_", 1)[1]
 
 def get_bsm_data(
