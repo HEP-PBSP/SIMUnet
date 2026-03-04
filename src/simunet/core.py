@@ -45,13 +45,7 @@ class SIMUnetDataSetSpec(DataSetSpec):
     def load_commondata(self):
         """Strips the commondata loading from `load`"""
 
-        cd = self.commondata.load()
-
-        if self.cuts is not None:
-            loaded_cuts = self.cuts.load()
-            if not (hasattr(loaded_cuts, "_full") and loaded_cuts._full):
-                intmask = [int(ele) for ele in loaded_cuts]
-                cd = cd.with_cuts(intmask)
+        cd = super().load_commondata()
 
         cd.contamination = self.contamination
         cd.contamination_data = self.contamination_data
@@ -73,28 +67,6 @@ class SIMUnetFKTableSpec(FKTableSpec):
         self.use_fixed_predictions = use_fixed_predictions
         self.fixed_predictions_path = fixed_predictions_path
         self.contamination = contamination
-
-        self.legacy = False
-
-        # NOTE: The legacy interface is currently used by fkparser to decide
-        # whether to read an FKTable using the old parser or the pineappl parser
-        # this attribute (and the difference between both) might be removed in future
-        # releases of NNPDF so please don't write code that relies on it
-        if not isinstance(fkpath, (tuple, list)):
-            self.legacy = True
-        else:
-            # Make it into a tuple only for the new format
-            fkpath = tuple(fkpath)
-
-        self.fkpath = fkpath
-        self.metadata = metadata
-
-        # For non-legacy theory, add the metadata since it defines how the theory is to be loaded
-        # and thus, it should also define the hash of the class
-        if not self.legacy:
-            super().__init__(fkpath, cfactors, self.metadata)
-        else:
-            super().__init__(fkpath, cfactors)
 
 
 class SIMUnetDataSetInput(DataSetInput):

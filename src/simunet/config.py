@@ -8,7 +8,7 @@ import logging
 
 from reportengine.environment import EnvironmentError_
 from reportengine.configparser import ConfigError, element_of
-from reportengine import configparser, report
+from reportengine import report
 
 from nnpdf_data import legacy_to_new_map
 from validphys.loader import (

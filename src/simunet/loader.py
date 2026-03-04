@@ -167,8 +167,6 @@ class SIMUnetLoader(Loader):
             contamination_data=contamination_data,
         )
 
-
-# Can I simplify this? I only need to change the loader which is parsed into this
 class SIMUFallbackLoader(SIMUnetLoader, RemoteLoader):
     """
     A loader that first tries to find resources locally
