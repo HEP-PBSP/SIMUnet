@@ -11,8 +11,8 @@ import logging
 
 from reportengine import api
 from validphys.app import providers
-from simunet_validphys.app import simunet_providers
-from simunet_validphys.simunet_config import SIMUConfig, SIMUEnvironment
+from simunet.app import simunet_providers
+from simunet.config import SIMUConfig, SIMUEnvironment
 
 log = logging.getLogger(__name__)
 

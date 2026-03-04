@@ -37,8 +37,8 @@ def get_bsm_data(
 
     """
     # default value
-    new_simu_parameters_names = []
-    new_simu_parameters_linear_combinations = {}
+    new_simu_parameters_names = None
+    new_simu_parameters_linear_combinations = None
 
     if simu_parameters is not None and simu_fac is not None:
         new_simu_parameters_names = [

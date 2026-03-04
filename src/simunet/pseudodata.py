@@ -1,4 +1,4 @@
-from simunet_validphys.simunet_loader import SIMUnetLoader
+from simunet.loader import SIMUnetLoader
 from validphys.utils import yaml_safe
 import logging
 import numpy as np
@@ -18,7 +18,7 @@ def level0_commondata_wc(data, fakepdf):
     ----------
 
     data : validphys.core.DataGroupSpec
-    which contains simunet_validphys.simunet_core.SIMUnetDataSetSpec datasets
+    which contains simunet.core.SIMUnetDataSetSpec datasets
 
     fakepdf: validphys.core.PDF
 

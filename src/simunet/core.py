@@ -43,7 +43,7 @@ class SIMUnetDataSetSpec(DataSetSpec):
 
     @functools.lru_cache
     def load_commondata(self):
-        """Strips the commondata loading from `load`"""
+        """Attaches contamination to the loaded commondata"""
 
         cd = super().load_commondata()
 

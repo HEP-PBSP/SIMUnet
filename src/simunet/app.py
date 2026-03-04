@@ -1,14 +1,15 @@
 """
-simunet_validphys.app.py
+simunet.app.py
 
 """
 
 from validphys.app import App
-from simunet_validphys.simunet_config import SIMUConfig
+from simunet.config import SIMUConfig
 
 
 simunet_providers = [
-    "simunet_validphys.simunet_pseudodata",
+    "simunet.pseudodata"
+
 ]
 
 

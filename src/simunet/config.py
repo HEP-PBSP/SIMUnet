@@ -1,8 +1,8 @@
 from collections.abc import Mapping, Sequence
 from validphys.config import CoreConfig, Environment
-from simunet_validphys.simunet_loader import SIMUnetLoader, SIMUFallbackLoader
-from simunet_validphys.simunet_core import SIMUnetDataSetInput
-import simunet_validphys.bsmnames as bsmnames
+from simunet.loader import SIMUnetLoader, SIMUFallbackLoader
+from simunet.core import SIMUnetDataSetInput
+import simunet.bsmnames as bsmnames
 
 import logging
 
@@ -260,7 +260,6 @@ class SIMUCoreConfig(CoreConfig):
             simu_fac,
             simu_parameters,
             simu_parameters_names,
-            n_simu_parameters,
             simu_parameters_linear_combinations,
         )
 

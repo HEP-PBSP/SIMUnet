@@ -9,7 +9,7 @@ from validphys.loader import (
 )
 from validphys.core import CutsPolicy, TheoryIDSpec
 from validphys.utils import yaml_safe
-from .simunet_core import SIMUnetDataSetSpec
+from .core import SIMUnetDataSetSpec
 import importlib.resources
 from pathlib import Path
 import yaml
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 class SIMUnetLoader(Loader):
     def __init__(self, profile=None):
         super().__init__(profile)
-        package_root: Path = importlib.resources.files("simunet_validphys")
+        package_root: Path = importlib.resources.files("simunet")
 
         project_root = package_root.parent.parent
 
