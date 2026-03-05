@@ -6,11 +6,11 @@ simunet.app.py
 from validphys.app import App
 from simunet.config import SIMUConfig
 
-
 simunet_providers = [
     "simunet.pseudodata",
     "simunet.analysis",
-    "reportengine.report"
+    "simunet.results",
+    "reportengine.report",
 ]
 
 
