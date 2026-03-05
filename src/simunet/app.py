@@ -8,8 +8,9 @@ from simunet.config import SIMUConfig
 
 
 simunet_providers = [
-    "simunet.pseudodata"
-
+    "simunet.pseudodata",
+    "simunet.analysis",
+    "reportengine.report"
 ]
 
 

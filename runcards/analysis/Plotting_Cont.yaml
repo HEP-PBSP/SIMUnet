@@ -1,0 +1,29 @@
+meta:
+  title: Contaminated Plots
+  keywords: [example]
+  author: Ella Cole
+
+pdf:
+  id: NNPDF40_nnlo_aS_01180
+  label: NNPDF40_nnlo_aS_01180
+
+fakepdf: NNPDF40_nnlo_aS_01180
+
+theoryid: 40000000
+
+use_cuts: internal
+
+dataset_inputs:
+  - {dataset: ATLASZHIGHMASS49FB, contamination: EFT_LO}
+
+contamination_parameters:
+  name: "W"
+  value: 0.00008
+  linear_combination: 
+    Olq3: -15.94
+
+template_text: |
+  {@plot_data_theory_contaminated@}
+
+actions_:
+  - report(main=true)

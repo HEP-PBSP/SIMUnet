@@ -41,7 +41,6 @@ class SIMUEnvironment(Environment):
 
             loader_class = SIMUnetLoader
         else:
-
             loader_class = SIMUFallbackLoader
         # loader_class = SIMUnetLoader
         try:
@@ -59,9 +58,15 @@ class SIMUEnvironment(Environment):
 
 
 class SIMUCoreConfig(CoreConfig):
+    environment_class = SIMUEnvironment
 
-    # def loader(self):
-    #     return self.environment.loader
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.environment = SIMUEnvironment()
+
+    @property
+    def loader(self):
+        return self.environment.loader
 
     def produce_dataset(
         self,
@@ -276,5 +281,8 @@ class SIMUCoreConfig(CoreConfig):
         )
 
 
-class SIMUConfig(report.Config, SIMUCoreConfig):
+class SIMUConfig(
+    SIMUCoreConfig,
+    report.Config,
+):
     """..."""
