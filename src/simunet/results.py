@@ -48,7 +48,6 @@ class SIMUnetThPredictionsResult(ThPredictionsResult):
             else:
                 preds = [predictions(d, pdf) for d in datasets]
             th_predictions = pd.concat(preds)
-            # import IPython; IPython.embed()
             if load_dataset_contamination is not None:
                 th_predictions *= (
                     1.0 + load_dataset_contamination[dataset.name][:, None]
