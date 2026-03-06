@@ -4,7 +4,7 @@ simunet.app.py
 """
 
 from validphys.app import App
-from simunet.config import SIMUConfig
+from simunet.config import SIMUConfig, SIMUEnvironment
 
 simunet_providers = [
     "simunet.pseudodata",
@@ -16,6 +16,7 @@ simunet_providers = [
 
 class SIMUnetApp(App):
     config_class = SIMUConfig
+    environment_class = SIMUEnvironment
 
 
 def main():

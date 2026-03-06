@@ -42,7 +42,6 @@ class SIMUEnvironment(Environment):
             loader_class = SIMUnetLoader
         else:
             loader_class = SIMUFallbackLoader
-        # loader_class = SIMUnetLoader
         try:
 
             self.loader = loader_class()
@@ -58,11 +57,6 @@ class SIMUEnvironment(Environment):
 
 
 class SIMUCoreConfig(CoreConfig):
-    environment_class = SIMUEnvironment
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.environment = SIMUEnvironment()
 
     @property
     def loader(self):
@@ -155,6 +149,13 @@ class SIMUCoreConfig(CoreConfig):
             return len(simu_parameters)
         return 0
 
+    def produce_contamination_data(self, closuretest):
+        print("Producing contamination data")
+        if "contamination_parameters" in closuretest.keys():
+            return closuretest["contamination_parameters"]
+        else:
+            return None
+
     def produce_simu_parameters_linear_combinations(self, simu_parameters=None):
         """Produces the list of linear combinations for each of the parameters entering the
         simultaneous fit.
@@ -174,8 +175,6 @@ class SIMUCoreConfig(CoreConfig):
         self,
         dataset: Mapping,
         simu_parameters_names,
-        simu_parameters_scales,
-        n_simu_parameters,
         simu_parameters_linear_combinations,
         simu_parameters=None,
         allow_legacy_names: bool = True,
@@ -281,8 +280,5 @@ class SIMUCoreConfig(CoreConfig):
         )
 
 
-class SIMUConfig(
-    SIMUCoreConfig,
-    report.Config,
-):
+class SIMUConfig(report.Config, SIMUCoreConfig):
     """..."""

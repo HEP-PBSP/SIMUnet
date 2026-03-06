@@ -71,7 +71,7 @@ def level0_commondata_wc(data, fakepdf):
                     value = param["value"]
                     # load the linear combination coefficients
                     lin_comb = param["linear_combination"]
-                    # load the BMS cross-section
+                    # load the BSM cross-section
                     bsm_xs = np.zeros(len(t0_prediction))
                     for op in lin_comb:
                         # Check if the operator exists in simu_card[dataset.contamination]

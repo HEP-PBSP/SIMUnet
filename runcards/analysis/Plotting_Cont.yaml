@@ -1,5 +1,5 @@
 meta:
-  title: Contaminated Plots
+  title: Contaminated
   keywords: [example]
   author: Ella Cole
 
@@ -16,14 +16,17 @@ use_cuts: internal
 dataset_inputs:
   - {dataset: ATLASZHIGHMASS49FB, contamination: EFT_LO}
 
-contamination_parameters:
-  name: "W"
-  value: 0.00008
-  linear_combination: 
-    Olq3: -15.94
+closuretest:
+  contamination_parameters:
+    - name: 'W'
+      value: 0.00008
+      linear_combination:
+          'Olq3': -15.94
 
 template_text: |
+  {@ with dataset_inputs @}
   {@plot_data_theory_contaminated@}
+  {@ endwith @}
 
 actions_:
   - report(main=true)
