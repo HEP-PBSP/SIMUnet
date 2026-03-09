@@ -1,5 +1,5 @@
 from simunet.core import SIMUnetDataSetSpec
-from validphys.core import PDF
+from validphys.core import PDF, DataGroupSpec
 from validphys.results import DataResult, ThPredictionsResult
 from reportengine.checks import remove_outer, require_one
 from validphys.convolution import (
