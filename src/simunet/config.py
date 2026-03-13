@@ -248,6 +248,7 @@ class SIMUCoreConfig(CoreConfig):
             variant=variant,
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
+            simu_fac=simu_fac,
             **bsm_data,
         )
 

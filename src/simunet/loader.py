@@ -85,6 +85,7 @@ class SIMUnetLoader(Loader):
                 f"The 'SM_fixed' key is not present in the SIMU file at {simufactorpath}."
             )
 
+        # TODO: to ask, why can't we read here the file directly instead of doing it in the provider
         # assign to each operator name the same simufactorpath
         for simu_parameters_name in simu_parameters_names:
             simu_fac_names_paths[simu_parameters_name] = simufactorpath
@@ -111,7 +112,6 @@ class SIMUnetLoader(Loader):
         contamination_data=None,
         variant=None,
     ):
-
         if not isinstance(theoryid, TheoryIDSpec):
             theoryid = self.check_theoryID(theoryid)
 
