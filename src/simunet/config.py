@@ -1,37 +1,25 @@
 from collections.abc import Mapping, Sequence
-from validphys.config import CoreConfig, Environment
-from simunet.loader import SIMUnetLoader, SIMUFallbackLoader
-from simunet.core import SIMUnetDataSetInput
-import simunet.bsmnames as bsmnames
-
 import logging
-
-from reportengine.environment import EnvironmentError_
-from reportengine.configparser import ConfigError, element_of
-from reportengine import report
+import numbers
 
 from nnpdf_data import legacy_to_new_map
-from validphys.loader import (
-    DataNotFoundError,
-    LoaderError,
-    LoadFailedError,
-)
+from reportengine import report
+from reportengine.configparser import ConfigError, element_of
+from reportengine.environment import EnvironmentError_
+import simunet.bsmnames as bsmnames
+from simunet.core import SIMUnetDataSetInput
+from simunet.loader import SIMUFallbackLoader, SIMUnetLoader
+from validphys.config import CoreConfig, Environment
+from validphys.loader import DataNotFoundError, LoaderError, LoadFailedError
 from validphys.plotoptions.core import get_info
-
-import numbers
 
 log = logging.getLogger(__name__)
 
 
 class SIMUEnvironment(Environment):
-    def __init__(
-        self, *, this_folder=None, net=True, upload=False, dry=False, **kwargs
-    ):
-        super().__init__(
-            this_folder=this_folder, net=net, upload=upload, dry=dry, **kwargs
-        )
+    def __init__(self, *, this_folder=None, net=True, upload=False, dry=False, **kwargs):
+        super().__init__(this_folder=this_folder, net=net, upload=upload, dry=dry, **kwargs)
         if not net:
-
             loader_class = SIMUnetLoader
         elif dry and net:
             log.warning(
@@ -46,10 +34,7 @@ class SIMUEnvironment(Environment):
 
             self.loader = loader_class()
         except LoaderError as e:
-            log.error(
-                "Failed to find the paths. These are configured "
-                "in the nnprofile settings"
-            )
+            log.error("Failed to find the paths. These are configured " "in the nnprofile settings")
             raise EnvironmentError_(e) from e
 
         self.results_path = self.loader.resultspath
@@ -84,9 +69,7 @@ class SIMUCoreConfig(CoreConfig):
         weight = dataset_input.weight
         variant = dataset_input.variant
         simu_parameters_names = dataset_input.simu_parameters_names
-        simu_parameters_linear_combinations = (
-            dataset_input.simu_parameters_linear_combinations
-        )
+        simu_parameters_linear_combinations = dataset_input.simu_parameters_linear_combinations
         use_fixed_predictions = dataset_input.use_fixed_predictions
         contamination = dataset_input.contamination
         contamination_data = contamination_data
@@ -203,18 +186,14 @@ class SIMUCoreConfig(CoreConfig):
                 if name.startswith(("POS", "NNPDF_POS")):
                     raise ConfigError("Please, use `posdataset` for positivity")
         except KeyError:
-            raise ConfigError(
-                "'dataset' must be a mapping with " "'dataset' and 'sysnum'"
-            )
+            raise ConfigError("'dataset' must be a mapping with " "'dataset' and 'sysnum'")
 
         # Ensure that we can actually read the `dataset_input` before failure
         kdiff = dataset.keys() - accepted_keys
         for k in kdiff:
             # Abuse ConfigError to get the suggestions.
             log.warning(
-                ConfigError(
-                    f"Key '{k}' in dataset_input not known ({name}).", k, accepted_keys
-                )
+                ConfigError(f"Key '{k}' in dataset_input not known ({name}).", k, accepted_keys)
             )
 
         cfac = dataset.get("cfac", tuple())
@@ -230,17 +209,13 @@ class SIMUCoreConfig(CoreConfig):
         if not isinstance(weight, numbers.Real):
             raise ConfigError(f"'weight' must be a number, not '{weight}' ({name})")
         if weight < 0:
-            raise ConfigError(
-                f"'weight' must be greater than zero not '{weight}' ({name})"
-            )
+            raise ConfigError(f"'weight' must be greater than zero not '{weight}' ({name})")
 
         variant = dataset.get("variant")
         sysnum = dataset.get("sys")
 
         if variant is not None and sysnum is not None:
-            raise ConfigError(
-                f"The 'variant' and 'sys' keys cannot be used together ({name})"
-            )
+            raise ConfigError(f"The 'variant' and 'sys' keys cannot be used together ({name})")
 
         # The old -> new name mapping can only be used with allow_legacy_names = True
         # which from 4.1 will default to False.
@@ -261,10 +236,7 @@ class SIMUCoreConfig(CoreConfig):
         simu_fac = dataset.get("simu_fac", None)
 
         bsm_data = bsmnames.get_bsm_data(
-            simu_fac,
-            simu_parameters,
-            simu_parameters_names,
-            simu_parameters_linear_combinations,
+            simu_fac, simu_parameters, simu_parameters_names, simu_parameters_linear_combinations
         )
 
         return SIMUnetDataSetInput(

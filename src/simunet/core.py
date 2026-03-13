@@ -1,5 +1,6 @@
-from validphys.core import DataSetSpec, FKTableSpec, DataSetInput
 import functools
+
+from validphys.core import DataSetInput, DataSetSpec, FKTableSpec
 
 
 class SIMUnetDataSetSpec(DataSetSpec):

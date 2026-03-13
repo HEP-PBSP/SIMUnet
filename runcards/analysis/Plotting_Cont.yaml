@@ -4,10 +4,10 @@ meta:
   author: Ella Cole
 
 pdf:
-  id: NNPDF40_nnlo_aS_01180
-  label: NNPDF40_nnlo_aS_01180
+  id: NNPDF40_nnlo_as_01180
+  label: NNPDF40_nnlo_as_01180
 
-fakepdf: NNPDF40_nnlo_aS_01180
+fakepdf: NNPDF40_nnlo_as_01180
 
 theoryid: 40000000
 

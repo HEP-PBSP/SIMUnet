@@ -1,18 +1,14 @@
-import logging
-from validphys.loader import (
-    Loader,
-    CfactorNotFound,
-    LoaderError,
-    RemoteLoader,
-    RemoteLoaderError,
-    LoadFailedError,
-)
-from validphys.core import CutsPolicy, TheoryIDSpec
-from validphys.utils import yaml_safe
-from .core import SIMUnetDataSetSpec
 import importlib.resources
+import logging
 from pathlib import Path
+
 import yaml
+
+from validphys.core import CutsPolicy, TheoryIDSpec
+from validphys.loader import CfactorNotFound, FallbackLoader, Loader, LoaderError
+from validphys.utils import yaml_safe
+
+from .core import SIMUnetDataSetSpec
 
 log = logging.getLogger(__name__)
 
@@ -46,9 +42,7 @@ class SIMUnetLoader(Loader):
         simu_fac_names_paths = {}
 
         yaml_path = (
-            Path(importlib.resources.files("nnpdf_data"))
-            / "commondata"
-            / "dataset_names.yml"
+            Path(importlib.resources.files("nnpdf_data")) / "commondata" / "dataset_names.yml"
         )
         with open(yaml_path, "r") as f:
             dataset_map = yaml.safe_load(f)
@@ -167,7 +161,8 @@ class SIMUnetLoader(Loader):
             contamination_data=contamination_data,
         )
 
-class SIMUFallbackLoader(SIMUnetLoader, RemoteLoader):
+
+class SIMUFallbackLoader(SIMUnetLoader, FallbackLoader):
     """
     A loader that first tries to find resources locally
     (using SIMUnetLoader.check_*) and if it fails,
