@@ -17,6 +17,7 @@ requires-python = ">=3.10"
 
 [project.scripts]
 simunet = "simunet.app:main"
+simun3fit = "simunet.simufit.simun3fit_exec:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

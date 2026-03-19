@@ -3,21 +3,32 @@ import numpy as np
 from n3fit.backends import MetaLayer
 
 
+def _choose_initializer(ini_dict, scale=1.0):
+    # TODO change to a provider
+    if ini_dict["type"] == "uniform":
+        max_v = ini_dict["maxval"] / scale
+        min_v = ini_dict["minval"] / scale
+        return MetaLayer.select_initializer("random_uniform", minval=min_v, maxval=max_v)
+    elif ini_dict["type"] == "constant":
+        return MetaLayer.init_constant(ini_dict["value"] / scale)
+    raise ValueError(f"{ini_dict} not understood")
+
+
 class CombineCfacLayer(MetaLayer):
 
-    def __init__(self, simu_parameters, **kwargs):
+    def __init__(self, simu_parameters, name="SimunetFactor", **kwargs):
         self._simu_parameters = simu_parameters
         self._kernel = []
-        self._linear_comb = [i["linear_combination"] for i in simu_parameters]
-        super().__init__(**kwargs)
+        self.scales = []
+        self._linear_comb = []
+        for parameter in simu_parameters:
+            self.scales.append(parameter.get("scale", 1.0))
+            self._linear_comb.append(parameter.get("linear_combination", {parameter["name"]: 1.0}))
+        super().__init__(name=name, **kwargs)
 
     def build(self, input_shape):
         for parameter in self._simu_parameters:
-            ini = parameter["initialisation"]
-            initializer = MetaLayer.select_initializer(
-                "random_uniform", minval=ini["minval"], maxval=ini["maxval"]
-            )
-            # TODO: deal with seeds and initialization
+            initializer = _choose_initializer(parameter["initialisation"])
             ker = self.builder_helper(
                 name=parameter["name"],
                 kernel_shape=(1,),  # TODO here we could have a different one per replica
@@ -25,6 +36,7 @@ class CombineCfacLayer(MetaLayer):
                 trainable=True,
             )
             self._kernel.append(ker)
+        super().build(input_shape)
 
     def apply_linear_comb(self, cfactors=None):
         """Take all cfactors and returns a list of pre-computed values to call this function with."""
@@ -32,11 +44,12 @@ class CombineCfacLayer(MetaLayer):
             return [0.0] * len(self._linear_comb)
 
         lin_comb = []
-        for linear_combination in self._linear_comb:
+        for linear_combination, scale in zip(self._linear_comb, self.scales):
             tmp = 0.0
             for k, v in linear_combination.items():
-                tmp += np.array(cfactors[k]) * v
-            lin_comb.append(tmp)
+                # TODO: when there is no value for a given operator, take it as 0, is this ok???
+                tmp += np.array(cfactors.get(k, 0.0)) * v
+            lin_comb.append(tmp / scale)
         return lin_comb
 
     def call(self, linear_comb):

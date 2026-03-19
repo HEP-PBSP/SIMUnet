@@ -2,6 +2,8 @@
 Contains the providers that n3fit will use and that we want to override
 """
 
+import numpy as np
+
 from validphys.n3fit_data import fittable_datasets_masked as vanilla_fittable_datasets_masked
 from validphys.utils import yaml_safe
 
@@ -27,7 +29,7 @@ def fittable_datasets_masked(data, simu_layer=None):
 
     # Loop over the SIMUnetDataSetSpec
     for data_input, dataset, fittable_dataset in zip(data, data.datasets, ret):
-        if dataset.contamination is None:
+        if dataset.simu_parameters_names_CF is None:
             # Nothing to do here
             continue
 
@@ -39,7 +41,8 @@ def fittable_datasets_masked(data, simu_layer=None):
                 cfac_data = yaml_safe.load(stream)
 
             cfactors_raw = simu_layer.apply_linear_comb(cfac_data[data_input.simu_fac])
-            cfactors = [i[cuts] for i in cfactors_raw]
+            cfactors = [np.take(i, indices=cuts, mode="clip") for i in cfactors_raw]
+            break
 
         # TODO this is ugly, but needs to be beautified in n3fit not here
         fittable_dataset.fktables_data[0].simunet_cfactors = cfactors

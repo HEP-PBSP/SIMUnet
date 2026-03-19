@@ -4,6 +4,7 @@ from pathlib import Path
 
 import yaml
 
+from nnpdf_data.validphys_compatibility import new_to_legacy_map
 from validphys.core import CutsPolicy, TheoryIDSpec
 from validphys.loader import CfactorNotFound, FallbackLoader, Loader, LoaderError
 from validphys.utils import yaml_safe
@@ -40,36 +41,23 @@ class SIMUnetLoader(Loader):
 
         """
         simu_fac_names_paths = {}
+        simufactorpath = self.simudata_path / "simu_factors" / f"SIMU_{setname}.yaml"
 
-        yaml_path = (
-            Path(importlib.resources.files("nnpdf_data")) / "commondata" / "dataset_names.yml"
-        )
-        with open(yaml_path, "r") as f:
-            dataset_map = yaml.safe_load(f)
-
-        setname_old = None
-        for old, value in dataset_map.items():
-            if isinstance(value, dict):
-                if value.get("dataset") == setname:
-                    setname_old = old
-                    break
-            elif value == setname:
-                setname_old = old
-                break
-
-        if setname_old is None:
-            raise KeyError(
-                f"Could not find old dataset name corresponding to '{setname}' in dataset_names.yml"
-            )
-        simudata_path = self.simudata_path
-        simufactorpath = simudata_path / "simu_factors" / f"SIMU_{setname_old}.yaml"
-
+        # First check whether the simunet factor exists with the new name, otherwise try the old one
         if not simufactorpath.exists():
-            msg = (
-                f"Could not find a SIMU factor for setname in {simufactorpath}. "
-                f"The path {simufactorpath} does not exist."
-            )
-            raise CfactorNotFound(msg)
+            setname_old = new_to_legacy_map(setname, "legacy")[0]
+
+            if setname_old is None:
+                raise CfactorNotFound(f"Could not find a SIMU factor for {setname}")
+
+            simufactorpath = self.simudata_path / "simu_factors" / f"SIMU_{setname_old}.yaml"
+
+            if not simufactorpath.exists():
+                msg = (
+                    f"Could not find a SIMU factor for {setname_old}. "
+                    f"The path {simufactorpath} does not exist."
+                )
+                raise CfactorNotFound(msg)
 
         # test whether all the mandatory keys are present
         with open(simufactorpath, "rb") as stream:
