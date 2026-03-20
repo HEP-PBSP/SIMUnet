@@ -52,7 +52,7 @@ class SimunfitApp(N3FitApp):
         layer = simufit._REGISTRY["layer"]
         # TODO: for multireplica, need to loop over replicas
         # instead of just taking the first one
-        ret = {i.name: w.tolist() for i, w in zip(layer.weights, weights)}
+        ret = {i.name: (w / s).tolist() for i, w, s in zip(layer.weights, weights, layer.scales)}
 
         simu_path = (
             self.environment.replica_path

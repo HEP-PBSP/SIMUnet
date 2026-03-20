@@ -47,13 +47,12 @@ class CombineCfacLayer(MetaLayer):
         for linear_combination, scale in zip(self._linear_comb, self.scales):
             tmp = 0.0
             for k, v in linear_combination.items():
-                # TODO: when there is no value for a given operator, take it as 0, is this ok???
-                tmp += np.array(cfactors.get(k, 0.0)) * v
+                tmp += np.array(cfactors.get(k, 0.0)) / np.array(cfactors["SM"]) * v
             lin_comb.append(tmp / scale)
         return lin_comb
 
-    def call(self, linear_comb):
+    def call(self, linear_comb, observables):
         wsum = 0.0
         for kernel, arr in zip(self._kernel, linear_comb):
             wsum += kernel * arr
-        return 1.0 + wsum
+        return (1.0 + wsum) * observables

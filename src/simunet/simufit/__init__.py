@@ -41,7 +41,7 @@ def _patch_me_up():
         if self.simunet_layer is None:
             return observables
 
-        return self.simunet_layer(self.simunet_cfactors) * observables
+        return self.simunet_layer(self.simunet_cfactors, observables)
 
     Observable.__init__ = _init_patch
     Observable.call = _call_patch
