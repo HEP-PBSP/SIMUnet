@@ -153,6 +153,15 @@ class SIMUCoreConfig(CoreConfig):
             return simu_parameters_linear_combinations
         return []
 
+    def produce_bsm_names_to_latex(self, simu_parameters=None):
+        if simu_parameters is None:
+            return None
+        else:
+            bsm_names_to_latex = {}
+            for entry in simu_parameters:
+                bsm_names_to_latex[entry['name']] = entry['latex']
+            return bsm_names_to_latex
+
     @element_of("dataset_inputs")
     def parse_dataset_input(
         self,
@@ -251,6 +260,24 @@ class SIMUCoreConfig(CoreConfig):
             simu_fac=simu_fac,
             **bsm_data,
         )
+
+    def parse_posterior_plots_settings(self, settings):
+        known_keys = {"same_bins", "n_bins", "rangex", "rangey", "add_bounds"}
+
+        kdiff = settings.keys() - known_keys
+        for k in kdiff:
+            log.warning(
+                ConfigError(f"Key '{k}' in posterior_plots_settings not known.", k, known_keys)
+            )
+
+        posterior_plots_settings = {
+            "same_bins": settings.get("same_bins", False),
+            "n_bins": settings.get("n_bins", 10),
+            "rangex": settings.get("rangex", None),
+            "rangey": settings.get("rangey", None),
+            "add_bounds": settings.get("add_bounds", False),
+        }
+        return posterior_plots_settings
 
 
 class SIMUConfig(report.Config, SIMUCoreConfig):
