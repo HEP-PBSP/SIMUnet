@@ -423,7 +423,11 @@ class Loader(LoaderBase):
             if op.upper() == "NULL":
                 raise CompoundNotFound
             names = [tab[0] for tab in metadata["implemented_observables"][0]["theory"]["FK_tables"]]
-            tables = [self.check_fktable(theoryID, name, cfac, new_commondata=new_commondata, is_compound=True) for name in names]
+            print('Arguements for compound check:', theoryID, names, cfac, new_commondata)
+            try:
+                tables = [self.check_fktable(theoryID, name, cfac, new_commondata=new_commondata, is_compound=True) for name in names]
+            except InconsistentMetaDataError as e:
+                tables = [self.check_fktable(theoryID, setname, cfac, new_commondata=new_commondata, is_compound=True)]
         else:
             try:
                 with compound_spec_path.open() as f:
