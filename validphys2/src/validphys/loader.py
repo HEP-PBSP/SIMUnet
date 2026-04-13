@@ -390,7 +390,8 @@ class Loader(LoaderBase):
             if observable_name.startswith('_'):
                 observable_name = observable_name[1:]
             if is_compound:
-                theory_meta = TheoryMeta(FK_tables=[fkpath], operation="NULL", conversion_factor=1., shifts=None, normalization=None, comment=None)
+                conversion_factor = metadata["implemented_observables"][0]["theory"].get("conversion_factor", 1.)
+                theory_meta = TheoryMeta(FK_tables=[fkpath], operation="NULL", conversion_factor=conversion_factor, shifts=None, normalization=None, comment=None)
             else:
                 theory_meta = parse_theory_meta(path_metadata, observable_name=observable_name)
             
@@ -407,7 +408,7 @@ class Loader(LoaderBase):
             return FKTableSpec(fkpath, cfactors)
             
 
-    def check_compound(self, theoryID, setname, cfac, new_commondata=False):
+    def check_compound(self, theoryID, setname, cfac, use_fixed_predictions=False, new_commondata=False):
         thid, theopath = self.check_theoryID(theoryID)
         compound_spec_path = theopath / 'compound' / ('FK_%s-COMPOUND.dat' % setname)
         if new_commondata:
@@ -423,11 +424,7 @@ class Loader(LoaderBase):
             if op.upper() == "NULL":
                 raise CompoundNotFound
             names = [tab[0] for tab in metadata["implemented_observables"][0]["theory"]["FK_tables"]]
-            print('Arguements for compound check:', theoryID, names, cfac, new_commondata)
-            try:
-                tables = [self.check_fktable(theoryID, name, cfac, new_commondata=new_commondata, is_compound=True) for name in names]
-            except InconsistentMetaDataError as e:
-                tables = [self.check_fktable(theoryID, setname, cfac, new_commondata=new_commondata, is_compound=True)]
+            tables = [self.check_fktable(theoryID, name, cfac, new_commondata=new_commondata, use_fixed_predictions=use_fixed_predictions, is_compound=True) for name in names]
         else:
             try:
                 with compound_spec_path.open() as f:
