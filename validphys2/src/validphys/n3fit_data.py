@@ -274,7 +274,6 @@ def fitting_data_dict(
                 with open(path, 'rb') as f:
                     fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
                 datasets[i]['fixed_predictions'] = fixed_predictions
-                print('Fixed predictions for dataset {}: {}'.format(data.datasets[i].name, fixed_predictions))
             else:
                 datasets[i]['use_fixed_predictions'] = False
     else:
