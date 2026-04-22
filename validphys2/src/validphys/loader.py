@@ -457,7 +457,6 @@ class Loader(LoaderBase):
         return fkspec.load()
 
     def check_cfactor(self, theoryID, setname, cfactors, new_commondata=False):
-        print('Checking cfactors for theoryID', theoryID, 'setname', setname, 'cfactors', cfactors, 'new_commondata', new_commondata)
         _, theopath = self.check_theoryID(theoryID)
         cf = []
         for cfactor in cfactors:
