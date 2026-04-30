@@ -2,26 +2,17 @@ from simunet.core import SIMUnetDataSetSpec
 from validphys.core import PDF, DataGroupSpec
 from validphys.results import DataResult, ThPredictionsResult
 from reportengine.checks import remove_outer, require_one
-from validphys.convolution import (
-    PredictionsRequireCutsError,
-    central_predictions,
-    predictions,
-)
+from validphys.convolution import PredictionsRequireCutsError, central_predictions, predictions
 
 import pandas as pd
+import numpy as np
 
 from collections.abc import Sequence
 
 
 class SIMUnetThPredictionsResult(ThPredictionsResult):
     def __init__(
-        self,
-        dataobj,
-        stats_class,
-        datasetnames=None,
-        label=None,
-        pdf=None,
-        theoryid=None,
+        self, dataobj, stats_class, datasetnames=None, label=None, pdf=None, theoryid=None
     ):
         super().__init__(
             dataobj=dataobj,
@@ -33,9 +24,7 @@ class SIMUnetThPredictionsResult(ThPredictionsResult):
         )
 
     @classmethod
-    def from_convolution(
-        cls, pdf, dataset, load_dataset_contamination, central_only=False
-    ):
+    def from_convolution(cls, pdf, dataset, load_dataset_contamination, central_only=False):
         # This should work for both single dataset and whole groups
         try:
             datasets = dataset.datasets
@@ -49,9 +38,7 @@ class SIMUnetThPredictionsResult(ThPredictionsResult):
                 preds = [predictions(d, pdf) for d in datasets]
             th_predictions = pd.concat(preds)
             if load_dataset_contamination is not None:
-                th_predictions *= (
-                    1.0 + load_dataset_contamination[dataset.name][:, None]
-                )
+                th_predictions *= 1.0 + load_dataset_contamination[dataset.name][:, None]
 
         except PredictionsRequireCutsError as e:
             raise PredictionsRequireCutsError(
@@ -62,9 +49,7 @@ class SIMUnetThPredictionsResult(ThPredictionsResult):
         label = cls.make_label(pdf, dataset)
         thid = dataset.thspec.id
         datasetnames = [i.name for i in datasets]
-        return cls(
-            th_predictions, pdf.stats_class, datasetnames, label, pdf=pdf, theoryid=thid
-        )
+        return cls(th_predictions, pdf.stats_class, datasetnames, label, pdf=pdf, theoryid=thid)
 
 
 def simu_results(
@@ -83,9 +68,7 @@ def simu_results(
     """
     return (
         DataResult(dataset, covariance_matrix, sqrt_covmat),
-        SIMUnetThPredictionsResult.from_convolution(
-            pdf, dataset, load_datasets_contamination
-        ),
+        SIMUnetThPredictionsResult.from_convolution(pdf, dataset, load_datasets_contamination),
     )
 
 
@@ -103,6 +86,9 @@ def simunet_one_or_more_results(
         return simu_results(
             dataset, pdf, covariance_matrix, sqrt_covmat, load_datasets_contamination
         )
-    return simu_pdf_results(
-        dataset, pdfs, covariance_matrix, sqrt_covmat, load_datasets_contamination
+    raise NotImplementedError(
+        "Not yet implemented for SIMUnet, only single PDF results are currently supported."
     )
+    # return simu_pdf_results(
+    #     dataset, pdfs, covariance_matrix, sqrt_covmat, load_datasets_contamination
+    # )
