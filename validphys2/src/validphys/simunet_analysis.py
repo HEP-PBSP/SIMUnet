@@ -2123,7 +2123,8 @@ def compute_datasets_chi2(
     read_bsm_facs,
     dataset_inputs,
     theoryid,
-    dataset_inputs_covmat_t0_considered
+    dataset_inputs_covmat_t0_considered,
+    pdf_uncertainty=True
 ):
     """
     Parameters
@@ -2150,6 +2151,7 @@ def compute_datasets_chi2(
         dictionary of lists of chi2 per dataset
 
     """
+    print('PDF_UNCERTAINTY:', pdf_uncertainty)
     central_pred = {}
     pdf_covmats = {}
     t0_covmat = dataset_inputs_covmat_t0_considered
@@ -2209,7 +2211,9 @@ def compute_datasets_chi2(
         covmat_dataset = (
             covmat.xs(data_name, level=1, drop_level=False)
             .T.xs(data_name, level=1, drop_level=False)
-            .values) + pdf_covmats[data_name]
+            .values) 
+        if pdf_uncertainty == True:
+            covmat_dataset += pdf_covmats[data_name]
 
         covmat_dataset_t0 = t0_covmats[data_name] + pdf_covmats[data_name]
 
