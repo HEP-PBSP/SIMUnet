@@ -20,6 +20,9 @@ freeze_pdf: True
 # TODO: at the moment the weights have to be downloaded manually
 load: "replica.weights.h5"
 
+analytic_initialisation: False # True
+analytic_pdf: NNPDF40MC_nnlo_as_01180
+
 simu_parameters:
   - name: 'Y'
     linear_combination:

@@ -153,6 +153,10 @@ class SIMUCoreConfig(CoreConfig):
             return simu_parameters_linear_combinations
         return []
 
+    def load_default_data_grouping(self, spec):
+        """Load the default grouping of data"""
+        return "ALL"
+
     @element_of("dataset_inputs")
     def parse_dataset_input(
         self,

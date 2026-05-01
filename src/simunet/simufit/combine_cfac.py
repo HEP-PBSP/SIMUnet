@@ -19,14 +19,25 @@ class CombineCfacLayer(MetaLayer):
     def __init__(self, simu_parameters, name="SimunetFactor", **kwargs):
         self._simu_parameters = simu_parameters
         self._kernel = []
-        self.scales = []
-        self._linear_comb = []
-        for parameter in simu_parameters:
-            self.scales.append(parameter.get("scale", 1.0))
-            self._linear_comb.append(parameter.get("linear_combination", {parameter["name"]: 1.0}))
         super().__init__(name=name, **kwargs)
 
+    def apply_linear_comb(self, cfactors=None):
+        """Take all cfactors and returns a list of pre-computed values to call this function with."""
+        if cfactors is None:
+            return [0.0] * len(self._simu_parameters)
+
+        lin_comb = []
+        for parameter in self._simu_parameters:
+            linear_combination = parameter.get("linear_combination", {parameter["name"]: 1.0})
+            scale = parameter.get("scale", 1.0)
+            tmp = 0.0
+            for k, v in linear_combination.items():
+                tmp += np.array(cfactors.get(k, 0.0)) / np.array(cfactors["SM"]) * v
+            lin_comb.append(tmp / scale)
+        return lin_comb
+
     def build(self, input_shape):
+        """Build stage should only be run at compile time or first inference.""" 
         for parameter in self._simu_parameters:
             initializer = _choose_initializer(parameter["initialisation"])
             ker = self.builder_helper(
@@ -37,19 +48,6 @@ class CombineCfacLayer(MetaLayer):
             )
             self._kernel.append(ker)
         super().build(input_shape)
-
-    def apply_linear_comb(self, cfactors=None):
-        """Take all cfactors and returns a list of pre-computed values to call this function with."""
-        if cfactors is None:
-            return [0.0] * len(self._linear_comb)
-
-        lin_comb = []
-        for linear_combination, scale in zip(self._linear_comb, self.scales):
-            tmp = 0.0
-            for k, v in linear_combination.items():
-                tmp += np.array(cfactors.get(k, 0.0)) / np.array(cfactors["SM"]) * v
-            lin_comb.append(tmp / scale)
-        return lin_comb
 
     def call(self, linear_comb, observables):
         wsum = 0.0
