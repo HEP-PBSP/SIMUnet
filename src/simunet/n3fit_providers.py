@@ -6,6 +6,7 @@ import numpy as np
 
 from validphys.n3fit_data import fittable_datasets_masked as vanilla_fittable_datasets_masked
 from validphys.utils import yaml_safe
+from simunet import simufit
 
 # I'm assuming the information necessary is in the data and needs to be propagated to the fittable dataset
 # minimal changes are necessary if instead we need to propagate this to the fktable instead
@@ -18,11 +19,16 @@ def fittable_datasets_masked(data, simu_layer=None, simu_parameters=None, analyt
     if simu_layer is None:
         return ret
 
-    if analytic_initialisation:
-        # TODO: modify `simu_parameters`
-        # TODO: check that after the dictionary is modified here, it is also modified inside the layer
-        # otherwise a `layer._update_parameters` method needs to be added
-        pass
+    if simufit._REGISTRY.get("layer") is None:
+        if analytic_initialisation:
+            # TODO: modify `simu_parameters`
+            # TODO: check that after the dictionary is modified here, it is also modified inside the layer
+            # otherwise a `layer._update_parameters` method needs to be added
+            pass
+        simu_layer_generated = simu_layer(simu_parameters)
+        simufit._REGISTRY["layer"] = simu_layer_generated
+    else:
+        simu_layer_generated = simufit._REGISTRY["layer"]
 
     # At this point we have the information on the simunet parameters twice
     # once in the `simu_layer` and once in

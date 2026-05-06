@@ -36,6 +36,12 @@ class CombineCfacLayer(MetaLayer):
             lin_comb.append(tmp / scale)
         return lin_comb
 
+    @property
+    def scales(self):
+        """Return the scales in self._simu_parameters as an iterable."""
+        for parameter in self._simu_parameters:
+            yield parameter.get("scale", 1.0)
+
     def build(self, input_shape):
         """Build stage should only be run at compile time or first inference.""" 
         for parameter in self._simu_parameters:

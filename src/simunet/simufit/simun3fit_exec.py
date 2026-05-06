@@ -30,11 +30,10 @@ class SimufitConfig(SIMUConfig, N3FitConfig):
 
         from simunet.simufit.combine_cfac import CombineCfacLayer
 
-        lay = CombineCfacLayer(simunet_parameters)
+        lay = lambda simpar: CombineCfacLayer(simpar)
 
         # Update the register
         simufit._REGISTRY["freeze"] = freeze_pdf
-        simufit._REGISTRY["layer"] = lay
 
         return lay
 
