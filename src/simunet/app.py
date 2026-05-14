@@ -5,12 +5,14 @@ simunet.app.py
 
 from validphys.app import App
 from simunet.config import SIMUConfig, SIMUEnvironment
+from validphys import pseudodata
 
 simunet_providers = [
     "simunet.pseudodata",
     "simunet.analysis",
     "simunet.results",
     "reportengine.report",
+    "validphys.pseudodata",
 ]
 
 
