@@ -42,6 +42,92 @@ def analytic_solution(data, theorySM, theorylin, covmat):
     return (sol, minval)
 
 
+def construct_analytic_initialisation(
+    data,
+    theoryid,
+    replica,
+    analytic_initialisation_pdf,
+    make_replica,
+    groups_covmat,
+    simu_parameters,
+    use_th_covmat=False,
+):
+    """
+    Constructs the analytic initialisation for the simu_parameters.
+    """
+    sm_predictions = []
+    linear_bsm = []
+    th_covmat = []
+    exp_data = make_replica
+    # TODO: Check that this changes with contamination
+    nop = len(simu_parameters)
+    for ds in data:
+        dataset_spec = l.check_dataset(
+            name=ds.name,
+            theoryid=theoryid,
+            cfac=ds.cfac,
+            contamination=ds.contamination,
+            simu_parameters_names=ds.simu_parameters_names,
+            simu_parameters_linear_combinations=ds.simu_parameters_linear_combinations,
+        )
+        cuts = dataset_spec.cuts.load()
+        ndat = len(cuts)
+        pred_values = SIMUnetThPredictionsResult.from_convolution(
+            PDF(analytic_initialisation_pdf), dataset_spec, load_dataset_contamination=None
+        ).error_members[replica][cuts]
+        sm_predictions.append(pred_values)
+
+        if ds.simu_parameters_names is not None:
+            simu_dict = l.get_simu_parameters_name_dict(
+                ds.name, simu_parameters_names=ds.simu_parameters_names
+            )
+            simu_path = list(simu_dict.values())[0]
+            with open(simu_path, "rb") as stream:
+                simu_info = yaml_safe.load(stream)
+            columns = []
+            for param in ds.simu_parameters_linear_combinations:
+                model = "_".join(param.split("_")[:-1])
+                column = np.zeros((ndat,))
+                for key in ds.simu_parameters_linear_combinations[param]:
+                    if key in simu_info[model].keys():
+                        model_values = [simu_info[model][key][i] for i in cuts]
+                        column += np.array(
+                            model_values * ds.simu_parameters_linear_combinations[param][key]
+                        )
+                column = column / np.array([simu_info[model]["SM"][i] for i in cuts]) * pred_values
+                columns += [column]
+            linear_bsm.append(np.array(columns).T)
+
+            if (
+                use_th_covmat == True
+                and "theory_cov" in simu_info.keys()
+                and len(simu_info["theory_cov"]) > 0
+            ):
+                th_covmat += [np.array(simu_info["theory_cov"])]
+            else:
+                th_covmat += [np.zeros((ndat, ndat))]
+        else:
+
+            linear_bsm.append(np.zeros((ndat, nop)))
+            th_covmat += [np.zeros((ndat, ndat))]
+
+    sm_predictions = np.concatenate(sm_predictions)
+    linear_bsm = np.concatenate(linear_bsm)
+
+    th_covmat = sp.linalg.block_diag(*th_covmat)
+    th_covmat = th_covmat.T
+    total_covmat = groups_covmat + th_covmat
+
+    sol, minval = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat)
+    simu_parameters_scales = [1 / abs(ini) for ini in sol]
+    log.info("The analytic solution is " + str(sol))
+    log.info("The minimum is achieved at chi2=" + str(minval))
+    for param, scale, init in zip(simu_parameters, simu_parameters_scales, sol):
+        param["scale"] = float(scale)
+        param["initialisation"] = {"type": "constant", "value": float(init)}
+    return simu_parameters
+
+
 # I'm assuming the information necessary is in the data and needs to be propagated to the fittable dataset
 # minimal changes are necessary if instead we need to propagate this to the fktable instead
 
@@ -67,98 +153,17 @@ def fittable_datasets_masked(
         return ret
 
     if simufit._REGISTRY.get("layer") is None:
-        # TODO: Make this more functional
         if analytic_initialisation:
-            sm_predictions = []
-            linear_bsm = []
-            th_covmat = []
-            cuts_dict = {}
-            # TODO: modify `simu_parameters`
-            # TODO: check that after the dictionary is modified here, it is also modified inside the layer
-            # otherwise a `layer._update_parameters` method needs to be added
-            exp_data = (
-                make_replica  # Unlike ret, this is the data which will be used for this replica
+            simu_parameters = construct_analytic_initialisation(
+                data,
+                theoryid,
+                replica,
+                analytic_initialisation_pdf,
+                make_replica,
+                groups_covmat,
+                simu_parameters,
+                use_th_covmat=use_th_covmat,
             )
-            # TODO: Check that this changes with contamination
-            nop = len(simu_parameters)
-            for ds in data:
-
-                dataset_spec = l.check_dataset(
-                    name=ds.name,
-                    theoryid=theoryid,
-                    cfac=ds.cfac,
-                    contamination=ds.contamination,
-                    simu_parameters_names=ds.simu_parameters_names,
-                    simu_parameters_linear_combinations=ds.simu_parameters_linear_combinations,
-                )
-                cuts = dataset_spec.cuts.load()
-                cuts_dict[ds.name] = cuts
-                ndat = len(cuts)
-                pred_values = SIMUnetThPredictionsResult.from_convolution(
-                    PDF(analytic_initialisation_pdf), dataset_spec, load_dataset_contamination=None
-                ).error_members[replica][cuts]
-                sm_predictions.append(pred_values)
-
-                if ds.simu_parameters_names is not None:
-                    simu_dict = l.get_simu_parameters_name_dict(
-                        ds.name, simu_parameters_names=ds.simu_parameters_names
-                    )
-                    simu_path = list(simu_dict.values())[0]
-                    with open(simu_path, "rb") as stream:
-                        simu_info = yaml_safe.load(stream)
-                    columns = []
-                    for param in ds.simu_parameters_linear_combinations:
-                        model = '_'.join(param.split("_")[:-1])
-                        column = np.zeros((ndat,))
-                        for key in ds.simu_parameters_linear_combinations[param]:
-                            if key in simu_info[model].keys():
-                                model_values = [simu_info[model][key][i] for i in cuts]
-                                column += np.array(
-                                    model_values
-                                    * ds.simu_parameters_linear_combinations[param][key]
-                                )
-                        column = (
-                            column
-                            / np.array([simu_info[model]['SM'][i] for i in cuts])
-                            * pred_values
-                        )
-                        columns += [column]
-                    linear_bsm.append(np.array(columns).T)
-
-                    if (
-                        use_th_covmat == True
-                        and 'theory_cov' in simu_info.keys()
-                        and len(simu_info['theory_cov']) > 0
-                    ):
-                        th_covmat += [np.array(simu_info['theory_cov'])]
-                    else:
-                        th_covmat += [np.zeros((ndat, ndat))]
-                else:
-
-                    linear_bsm.append(np.zeros((ndat, nop)))
-                    th_covmat += [np.zeros((ndat, ndat))]
-
-            sm_predictions = np.concatenate(sm_predictions)
-            linear_bsm = np.concatenate(linear_bsm)
-
-            th_covmat = sp.linalg.block_diag(*th_covmat)
-
-            th_covmat = th_covmat.T
-
-            covmat = groups_covmat
-            total_covmat = covmat + th_covmat
-
-            analytic_initialisation, minval = analytic_solution(
-                exp_data, sm_predictions, linear_bsm, total_covmat
-            )
-            simu_parameters_scales = [1 / abs(ini) for ini in analytic_initialisation]
-            log.info("The analytic solution is " + str(analytic_initialisation))
-            log.info("The minimum is achieved at chi2=" + str(minval))
-            for param, scale, init in zip(
-                simu_parameters, simu_parameters_scales, analytic_initialisation
-            ):
-                param["scale"] = float(scale)
-                param["initialisation"] = {"type": "constant", "value": float(init)}
         simu_layer_generated = simu_layer(simu_parameters)
         simufit._REGISTRY["layer"] = simu_layer_generated
     else:
