@@ -74,8 +74,10 @@ def construct_analytic_initialisation(
         ndat = len(cuts)
         pred_values = SIMUnetThPredictionsResult.from_convolution(
             PDF(analytic_initialisation_pdf), dataset_spec, load_dataset_contamination=None
-        ).error_members[replica][cuts]
-        sm_predictions.append(pred_values)
+        ).error_members[:][cuts]
+        sm_predictions.append(pred_values[0])  # Central Value
+        pred_replicas = pred_values[1:]  # Replicas
+        pdf_covmat = np.cov(pred_replicas)
 
         if ds.simu_parameters_names is not None:
             simu_dict = l.get_simu_parameters_name_dict(
@@ -116,7 +118,7 @@ def construct_analytic_initialisation(
 
     th_covmat = sp.linalg.block_diag(*th_covmat)
     th_covmat = th_covmat.T
-    total_covmat = groups_covmat + th_covmat
+    total_covmat = groups_covmat + th_covmat + pdf_covmat
 
     sol, minval = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat)
     simu_parameters_scales = [1 / abs(ini) for ini in sol]
