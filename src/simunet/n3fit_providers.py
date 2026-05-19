@@ -128,23 +128,39 @@ def construct_analytic_initialisation(
     return simu_parameters
 
 
+def simu_parameters_analytic(
+    data,
+    theoryid,
+    replica,
+    analytic_initialisation_pdf,
+    make_replica,
+    groups_covmat,
+    simu_parameters,
+    analytic_initialisation=False,
+    use_th_covmat=False,
+):
+    """
+    Constructs the analytic initialisation for the simu_parameters if requested.
+    """
+    if analytic_initialisation:
+        return construct_analytic_initialisation(
+            data,
+            theoryid,
+            replica,
+            analytic_initialisation_pdf,
+            make_replica,
+            groups_covmat,
+            simu_parameters,
+            use_th_covmat=use_th_covmat,
+        )
+    return simu_parameters
+
+
 # I'm assuming the information necessary is in the data and needs to be propagated to the fittable dataset
 # minimal changes are necessary if instead we need to propagate this to the fktable instead
 
 
-def fittable_datasets_masked(
-    data,
-    make_replica,
-    replica,
-    theoryid,
-    groups_covmat,
-    simu_layer=None,
-    simu_parameters=None,
-    analytic_initialisation=False,
-    analytic_initialisation_pdf=None,
-    use_th_covmat=False,
-):
-    # TODO: set analytic_intialisation to True if initialisation in runcard is analytic
+def fittable_datasets_masked(data, simu_layer=None, simu_parameters_analytic=None):
     # TODO: Looks at use_th_covmat
     """Note: for anayltic solution the data must be grouped together (default in simunet: ALL)."""
 
@@ -153,18 +169,7 @@ def fittable_datasets_masked(
         return ret
 
     if simufit._REGISTRY.get("layer") is None:
-        if analytic_initialisation:
-            simu_parameters = construct_analytic_initialisation(
-                data,
-                theoryid,
-                replica,
-                analytic_initialisation_pdf,
-                make_replica,
-                groups_covmat,
-                simu_parameters,
-                use_th_covmat=use_th_covmat,
-            )
-        simu_layer_generated = simu_layer(simu_parameters)
+        simu_layer_generated = simu_layer(simu_parameters_analytic)
         simufit._REGISTRY["layer"] = simu_layer_generated
     else:
         simu_layer_generated = simufit._REGISTRY["layer"]
