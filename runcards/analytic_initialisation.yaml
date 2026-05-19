@@ -1,0 +1,111 @@
+# Runcard for contaminated PDF fit with SIMUnet
+#
+############################################################
+description: Runcard template for a SMEFT only fit with parameters initialised analytically
+
+############################################################
+# frac: training fraction of datapoints for the PDFs
+# simu_fac: fit BSM coefficients using their K-factors in the dataset
+# use_fixed_predictions:  if set to True it removes the PDF dependence of the dataset
+# sys: systematics treatment (see systypes)
+
+############################################################
+dataset_inputs:
+# # # Drell - Yan
+- {dataset: ATLAS_Z0_8TEV_HIMASS_M-Y, variant: legacy, simu_fac: "EFT_LO"}
+- {dataset: CMS_Z0_7TEV_DIMUON_2D, simu_fac: "EFT_LO"}
+#  #ttbar
+# - {dataset: CMS_TTBAR_13TEV_TOT_X-SEC, variant: legacy,simu_fac: "EFT_NLO"} #No FK-table in theory 40_000_000?
+
+
+diagonal_basis: False
+freeze_pdf: True
+load_weights_from_fit: 260619_try_get_older_nnpdf40_reference
+
+simu_parameters:
+# 4 Fermions 2L2Q
+- {name: 'Olq1', scale: 0.01, initialisation: {type: analytic}}
+
+
+
+analytic_initialisation: True
+analytic_initialisation_pdf: 221103-jmm-no_top_1000_iterated
+
+###########################################################
+# The closure test namespace tells us the settings for the
+# (possible contaminated) closure test.
+############################################################
+closuretest:
+  filterseed: 0                               # Random seed to be used in filtering data partitions
+  fakedata: true                              # true = to use FAKEPDF to generate pseudo-data
+  fakepdf: NNPDF40_nnlo_as_01180              # Theory input for pseudo-data
+  errorsize: 1.0                              # uncertainties rescaling
+  fakenoise: false                            # true = to add random fluctuations to pseudo-data
+  rancutprob: 1.0                             # Fraction of data to be included in the fit
+  rancutmethod: 0                             # Method to select rancutprob data fraction
+  rancuttrnval: false                         # 0(1) to output training(valiation) chi2 in report
+  printpdf4gen: false                         # To print info on PDFs during minimization
+
+  ############################################################
+datacuts:
+    t0pdfset: NNPDF40_nnlo_as_01180          # PDF set to generate t0 covmat
+    q2min: 3.49                              # Q2 minimum
+    w2min: 12.5                              # W2 minimum
+
+############################################################
+theory:
+    theoryid: 40000000    # database id
+
+############################################################
+trvlseed: 475038818
+nnseed: 2394641471
+mcseed: 1831662593
+genrep: true      # true = generate MC replicas, false = use real data
+
+############################################################
+
+
+parameters: # This defines the parameter dictionary that is passed to the Model Trainer
+    nodes_per_layer: [25, 20, 8]
+    activation_per_layer: [tanh, tanh, linear]
+    initializer: glorot_normal
+    optimizer:
+        clipnorm: 6.073e-6
+        learning_rate: 2.621e-3
+        optimizer_name: Nadam
+    epochs: 4000
+    positivity:
+        initial: 184.8
+        multiplier:
+    integrability:
+        initial: 184.8
+        multiplier:
+    stopping_patience: 0.1
+    layer_type: dense
+    dropout: 0.0
+    threshold_chi2: 3.5
+
+fitting:
+    savepseudodata: true
+    fitbasis: EVOL
+    basis:
+    - {fl: sng, trainable: false, smallx: [1.094, 1.119], largex: [1.433, 2.806]}
+    - {fl: g, trainable: false, smallx: [0.7867, 1.043], largex: [2.477, 6.714]}
+    - {fl: v, trainable: false, smallx: [0.4564, 0.7583], largex: [1.513, 3.332]}
+    - {fl: v3, trainable: false, smallx: [0.1292, 0.4533], largex: [1.732, 3.25]}
+    - {fl: v8, trainable: false, smallx: [0.5621, 0.7706], largex: [1.514, 3.533]}
+    - {fl: t3, trainable: false, smallx: [-0.4874, 1.0], largex: [1.789, 3.337]}
+    - {fl: t8, trainable: false, smallx: [0.6215, 0.871], largex: [1.511, 3.507]}
+    - {fl: t15, trainable: false, smallx: [1.07, 1.137], largex: [1.44, 2.955]}
+
+############################################################
+positivity:
+    posdatasets: []
+
+############################################################
+integrability:
+    integdatasets: []
+
+############################################################
+debug: false
+maxcores: 4
