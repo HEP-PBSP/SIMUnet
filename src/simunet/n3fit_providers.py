@@ -58,6 +58,7 @@ def construct_analytic_initialisation(
     sm_predictions = []
     linear_bsm = []
     th_covmat = []
+    all_pred_replicas = []
     exp_data = make_replica
     # TODO: Check that this changes with contamination
     nop = len(simu_parameters)
@@ -74,10 +75,11 @@ def construct_analytic_initialisation(
         ndat = len(cuts)
         pred_values = SIMUnetThPredictionsResult.from_convolution(
             PDF(analytic_initialisation_pdf), dataset_spec, load_dataset_contamination=None
-        ).error_members[:][cuts]
-        sm_predictions.append(pred_values[0])  # Central Value
-        pred_replicas = pred_values[1:]  # Replicas
-        pdf_covmat = np.cov(pred_replicas)
+        ).error_members
+        central_value = pred_values[:, 0]
+        sm_predictions.append(central_value)  # Central Value
+        pred_replicas = pred_values[:, 1:]  # Replicas
+        all_pred_replicas.append(pred_replicas)
 
         if ds.simu_parameters_names is not None:
             simu_dict = l.get_simu_parameters_name_dict(
@@ -96,7 +98,9 @@ def construct_analytic_initialisation(
                         column += np.array(
                             model_values * ds.simu_parameters_linear_combinations[param][key]
                         )
-                column = column / np.array([simu_info[model]["SM"][i] for i in cuts]) * pred_values
+                column = (
+                    column / np.array([simu_info[model]["SM"][i] for i in cuts]) * central_value
+                )
                 columns += [column]
             linear_bsm.append(np.array(columns).T)
 
@@ -118,6 +122,8 @@ def construct_analytic_initialisation(
 
     th_covmat = sp.linalg.block_diag(*th_covmat)
     th_covmat = th_covmat.T
+    pred_replicas_all_datasets = np.concatenate(all_pred_replicas, axis=0)
+    pdf_covmat = np.cov(pred_replicas_all_datasets)
     total_covmat = groups_covmat + th_covmat + pdf_covmat
 
     sol, minval = analytic_solution(exp_data, sm_predictions, linear_bsm, total_covmat)
