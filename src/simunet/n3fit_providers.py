@@ -9,7 +9,6 @@ from validphys.utils import yaml_safe
 from simunet import simufit
 from validphys.core import PDF
 from simunet.results import SIMUnetThPredictionsResult
-import pandas as pd
 import scipy as sp
 
 from simunet.loader import SIMUnetLoader
@@ -45,7 +44,6 @@ def analytic_solution(data, theorySM, theorylin, covmat):
 def construct_analytic_initialisation(
     data,
     theoryid,
-    replica,
     analytic_initialisation_pdf,
     make_replica,
     groups_covmat,
