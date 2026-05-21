@@ -1,0 +1,109 @@
+bins:
+- m_ttBar:
+    min: null
+    mid: 362.5
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 440.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 530.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 640.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 780.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 940.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 1135.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 1375.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null
+- m_ttBar:
+    min: null
+    mid: 1750.0
+    max: null
+  m_t2:
+    min: null
+    mid: 30032.89
+    max: null
+  sqrts:
+    min: null
+    mid: 13000.0
+    max: null

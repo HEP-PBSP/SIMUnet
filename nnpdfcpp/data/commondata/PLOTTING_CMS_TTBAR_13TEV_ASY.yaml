@@ -1,5 +1,0 @@
-dataset_label: "CMS 13TeV $t\\bar{t}$ asymmetry $A_C$"
-x: k1
-y_label: '$A_C$' 
-experiment: "CMS"
-nnpdf31_process: TTBAR

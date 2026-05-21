@@ -1,5 +1,0 @@
-dataset_label: "ATLAS/CMS 8TeV $t\\bar{t}$ asymmetry $A_C$"
-x: k1
-y_label: '$A_C$' 
-experiment: "ATLAS-CMS"
-nnpdf31_process: TTBAR

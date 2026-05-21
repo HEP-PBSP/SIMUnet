@@ -1,0 +1,140 @@
+setname: HLLHC_DY_7TEV
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: DY
+  experiment: HLLHC
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: HL
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: HL DY 7TeV
+    units: ''
+  process_type: EWK_MLL
+  tables: []
+  npoints: []
+  ndata: 8
+  plotting:
+    dataset_label: HL DY 7TeV
+    x_label: $M$ (GeV)
+    y_label: $d\sigma/dM$ (pb/GeV)
+    y_scale: log
+    normalize:
+      y_scale: linear
+    plot_x: k2
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_HL.yaml
+  theory:
+    FK_tables:
+    - - FK_DY_HL_7TEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_HL.yaml
+  data_central: data_DEFAULT_HL.yaml
+- observable_name: W0
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: HL DY 7TeV
+    units: ''
+  process_type: EWK_MLL
+  tables: []
+  npoints: []
+  ndata: 8
+  plotting:
+    dataset_label: HL DY 7TeV
+    x_label: $M$ (GeV)
+    y_label: $d\sigma/dM$ (pb/GeV)
+    y_scale: log
+    normalize:
+      y_scale: linear
+    plot_x: k2
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_W0.yaml
+  theory:
+    FK_tables:
+    - - FK_DY_HL_7TEV_W0p00008
+  data_uncertainties:
+  - uncertainties_DEFAULT_W0.yaml
+  data_central: data_DEFAULT_W0.yaml
+- observable_name: Y0
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: HL DY 7TeV
+    units: ''
+  process_type: EWK_MLL
+  tables: []
+  npoints: []
+  ndata: 8
+  plotting:
+    dataset_label: HL DY 7TeV
+    x_label: $M$ (GeV)
+    y_label: $d\sigma/dM$ (pb/GeV)
+    y_scale: log
+    normalize:
+      y_scale: linear
+    plot_x: k2
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_Y0.yaml
+  theory:
+    FK_tables:
+    - - FK_DY_HL_7TEV_Y0p00015
+  data_uncertainties:
+  - uncertainties_DEFAULT_Y0.yaml
+  data_central: data_DEFAULT_Y0.yaml

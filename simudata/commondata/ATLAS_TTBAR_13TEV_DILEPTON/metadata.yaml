@@ -1,0 +1,51 @@
+setname: ATLAS_TTBAR_13TEV_DILEPTON
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: TOP
+  experiment: ATLAS
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: TOTAL
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: ATLAS $\sigma_{t\bar{t}}^{\rm tot}$ (dilepton) 13 TeV
+    units: ''
+  process_type: INC
+  tables: []
+  npoints: []
+  ndata: 1
+  plotting:
+    dataset_label: ATLAS $\sigma_{t\bar{t}}^{\rm tot}$ (dilepton) 13 TeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_TOTAL.yaml
+  theory:
+    FK_tables:
+    - - FK_ATLAS_TTBAR_13TEV_DILEPTON_TOTAL
+  data_uncertainties:
+  - uncertainties_DEFAULT_TOTAL.yaml
+  data_central: data_DEFAULT_TOTAL.yaml

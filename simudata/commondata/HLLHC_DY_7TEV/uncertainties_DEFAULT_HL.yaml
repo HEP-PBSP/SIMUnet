@@ -1,0 +1,38 @@
+definitions:
+  stat:
+    description: Uncorrelated statistical uncertainties
+    treatment: ADD
+    type: UNCORR
+  sys_corr_1:
+    description: 'Sys uncertainty idx: 1'
+    treatment: MULT
+    type: UNCORR
+  sys_corr_2:
+    description: 'Sys uncertainty idx: 2'
+    treatment: MULT
+    type: DY_HL
+bins:
+- stat: 0.0
+  sys_corr_1: 1.800823694911e-05
+  sys_corr_2: 2.235057767503e-05
+- stat: 0.0
+  sys_corr_1: 8.017410204976e-06
+  sys_corr_2: 6.901294124689e-06
+- stat: 0.0
+  sys_corr_1: 3.496415337313e-06
+  sys_corr_2: 2.202124980715e-06
+- stat: 0.0
+  sys_corr_1: 1.884059276793e-06
+  sys_corr_2: 6.65766988423e-07
+- stat: 0.0
+  sys_corr_1: 9.487320607585e-07
+  sys_corr_2: 2.050708111021e-07
+- stat: 0.0
+  sys_corr_1: 5.697857058946e-07
+  sys_corr_2: 8.563168819195e-08
+- stat: 0.0
+  sys_corr_1: 2.385267257808e-07
+  sys_corr_2: 2.114978330848e-08
+- stat: 0.0
+  sys_corr_1: 8.602770518866e-08
+  sys_corr_2: 4.444207056228e-09

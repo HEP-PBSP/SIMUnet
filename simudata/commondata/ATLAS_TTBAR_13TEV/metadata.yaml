@@ -1,0 +1,56 @@
+setname: ATLAS_TTBAR_13TEV
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: TOP
+  experiment: ATLAS
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: TTMNORM
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: ATLAS $t\bar{t}$ invariant mass $m_{t\bar{t}}$
+    units: ''
+  process_type: HQP_MQQ
+  tables: []
+  npoints: []
+  ndata: 9
+  plotting:
+    dataset_label: ATLAS $t\bar{t}$ invariant mass $m_{t\bar{t}}$
+    y_label: $(1/\sigma_{t\bar{t}})d\sigma_{t\bar{t}}/dm_{t\bar{t}}$ (1/GeV)
+    figure_by:
+    - m_t2
+    plot_x: m_ttBar
+  kinematic_coverage:
+  - m_ttBar
+  - m_t2
+  - sqrts
+  kinematics:
+    variables:
+      m_ttBar:
+        description: Variable m_ttBar
+        label: m_ttBar
+        units: ''
+      m_t2:
+        description: Variable m_t2
+        label: m_t2
+        units: ''
+      sqrts:
+        description: Collision energy
+        label: sqrts
+        units: ''
+    file: kinematics_TTMNORM.yaml
+  theory:
+    FK_tables:
+    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_NUM
+    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_DEN
+    operation: RATIO
+  data_uncertainties:
+  - uncertainties_DEFAULT_TTMNORM.yaml
+  data_central: data_DEFAULT_TTMNORM.yaml

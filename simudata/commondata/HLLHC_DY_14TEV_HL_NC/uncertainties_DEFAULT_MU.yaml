@@ -1,0 +1,50 @@
+definitions:
+  stat:
+    description: Uncorrelated statistical uncertainties
+    treatment: ADD
+    type: UNCORR
+  sys_corr_1:
+    description: 'Sys uncertainty idx: 1'
+    treatment: MULT
+    type: UNCORR
+  sys_corr_2:
+    description: 'Sys uncertainty idx: 2'
+    treatment: MULT
+    type: HLLHC
+bins:
+- stat: 8.890790740426e-07
+  sys_corr_1: 3.184631830129e-06
+  sys_corr_2: 7.094552101025e-06
+- stat: 6.05288332151e-07
+  sys_corr_1: 1.495363201118e-06
+  sys_corr_2: 3.331289990862e-06
+- stat: 3.397823784845e-07
+  sys_corr_1: 6.954100794725e-07
+  sys_corr_2: 1.549197302407e-06
+- stat: 2.242411992663e-07
+  sys_corr_1: 3.010731727892e-07
+  sys_corr_2: 6.707146773972e-07
+- stat: 1.264169138158e-07
+  sys_corr_1: 1.287853383252e-07
+  sys_corr_2: 2.869010740746e-07
+- stat: 8.018604149181e-08
+  sys_corr_1: 9.803263563468e-08
+  sys_corr_2: 1.179336694453e-07
+- stat: 5.497709331857e-08
+  sys_corr_1: 4.558093610922e-08
+  sys_corr_2: 5.483405620293e-08
+- stat: 4.053529452555e-08
+  sys_corr_1: 2.354432577297e-08
+  sys_corr_2: 2.832392208009e-08
+- stat: 2.180221998556e-08
+  sys_corr_1: 1.042071769042e-08
+  sys_corr_2: 1.253616683392e-08
+- stat: 1.34823331617e-08
+  sys_corr_1: 7.485685898516e-09
+  sys_corr_2: 4.918921411842e-09
+- stat: 6.53238293688e-09
+  sys_corr_1: 2.74890159843e-09
+  sys_corr_2: 1.806331592706e-09
+- stat: 8.78323143427e-10
+  sys_corr_1: 2.323589460656e-10
+  sys_corr_2: 1.526854600274e-10

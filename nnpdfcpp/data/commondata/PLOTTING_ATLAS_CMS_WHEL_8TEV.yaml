@@ -1,5 +1,0 @@
-dataset_label: "ATLAS/CMS $W$-helicities 8 TeV"
-
-y_label: '$F_0$/$F_L$'
-experiment: "ATLAS-CMS"
-nnpdf31_process: TTBAR
