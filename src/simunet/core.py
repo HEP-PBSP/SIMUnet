@@ -35,7 +35,6 @@ class SIMUnetDataSetSpec(DataSetSpec):
         )
         self.simu_parameters_names_CF = simu_parameters_names_CF
 
-        # These are important because they are ORDERED correctly, but the dictionaries might not be
         self.simu_parameters_names = simu_parameters_names
         self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions

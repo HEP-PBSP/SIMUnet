@@ -62,7 +62,7 @@ class SIMUCoreConfig(CoreConfig):
         Use the cuts from the fit, if provided. If check_plotting is set to
         True, attempt to lod and check the PLOTTING files
         (note this may cause a noticeable slowdown in general)."""
-        print("Producing dataset with SIMUCoreConfig")
+        log.info("Producing dataset with SIMUCoreConfig")
         name = dataset_input.name
         cfac = dataset_input.cfac
         frac = dataset_input.frac
@@ -154,7 +154,7 @@ class SIMUCoreConfig(CoreConfig):
                 Old: -3.0394
                 Oqe: 3.0394
         """
-        print("Producing contamination data")
+        log.info("Producing contamination data")
         if "contamination_parameters" in closuretest.keys():
             return closuretest["contamination_parameters"]
         else:
