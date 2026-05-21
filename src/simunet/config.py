@@ -133,6 +133,27 @@ class SIMUCoreConfig(CoreConfig):
         return 0
 
     def produce_contamination_data(self, closuretest):
+        """
+        Produces the contamination data diction from the closuretest runcard entry
+
+        Example in the runcard:
+        -----------------------
+        closuretest:
+        contamination_parameters:
+            - name: 'W'
+            value: 0.00008
+            linear_combination:
+                'Olq3': -15.94
+            - name: 'Y'
+                value: 0.05
+                linear_combination:
+                Olq1: 1.51606
+                Oed: -6.0606
+                Oeu: 12.1394
+                Olu: 6.0606
+                Old: -3.0394
+                Oqe: 3.0394
+        """
         print("Producing contamination data")
         if "contamination_parameters" in closuretest.keys():
             return closuretest["contamination_parameters"]
