@@ -83,6 +83,7 @@ class SIMUnetDataSetInput(DataSetInput):
         simu_parameters_linear_combinations,
         use_fixed_predictions,
         contamination,
+        simu_fac,
     ):
         super().__init__(
             name=name,
@@ -97,3 +98,4 @@ class SIMUnetDataSetInput(DataSetInput):
         self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
+        self.simu_fac = simu_fac

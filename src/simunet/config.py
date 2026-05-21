@@ -174,6 +174,10 @@ class SIMUCoreConfig(CoreConfig):
             return simu_parameters_linear_combinations
         return []
 
+    def load_default_data_grouping(self, spec):
+        """Load the default grouping of data"""
+        return "ALL"
+
     @element_of("dataset_inputs")
     def parse_dataset_input(
         self,
@@ -269,6 +273,7 @@ class SIMUCoreConfig(CoreConfig):
             variant=variant,
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
+            simu_fac=simu_fac,
             **bsm_data,
         )
 

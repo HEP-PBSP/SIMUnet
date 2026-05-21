@@ -13,10 +13,11 @@ dependencies = [
     "nnpdf>=4.1.2",
     "seaborn>=0.12",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 
 [project.scripts]
 simunet = "simunet.app:main"
+simun3fit = "simunet.simufit.simun3fit_exec:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
