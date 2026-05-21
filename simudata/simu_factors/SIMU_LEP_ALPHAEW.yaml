@@ -1,0 +1,30 @@
+metadata:
+  ref: PDG review
+  author: Luca Mantani
+  ufomodel: SMEFTatNLO
+  flavour: dim6top
+  date: 16/10/2023
+  pdf: None
+  info_SM_fixed: PDG review
+  observable: alpha_EW(MZ)
+  bins: []
+
+SM_fixed: [0.007799703611262771]
+
+theory_cov:
+- [6.254593711564668e-11]
+
+EFT_LO:
+  SM: [0.0075614599158798]
+  OpWB: [-0.0017120500419173]
+  OpD: [-0.0007992669331533]
+  Ope: [0.0]
+  OpqMi: [0.0]
+  OpQM: [0.0]
+  O3pq: [0.0]
+  O3pQ3: [0.0]
+  Opui: [0.0]
+  Opdi: [0.0]
+  Oll: [0.0004584068263754]
+  Opl: [0.0]
+  O3pl: [-0.0009168136527508]

@@ -1,0 +1,32 @@
+metadata:
+  ref: arXiv:1702.02859
+  author: Luca Mantani
+  ufomodel: SMEFTatNLO
+  flavour: dim6top
+  date: 11/10/2023
+  pdf: NNPDF40notop
+  info_SM_fixed: NNPDF40notop validphys
+  observable: Inclusive
+  bins: []
+
+SM_fixed: [53.33]
+
+EFT_LO:
+  SM: [56.431187]
+  OtW: [2.4599436999999997]
+  O3pQ3: [6.837466099999999]
+  O83qq: [-0.00010197016]
+  O13qq: [-19.528688]
+  O3pl: [-13.701492203599999]
+  Oll: [6.8507461017999995]
+  O3pq: [6.8507461017999995]
+
+EFT_NLO:
+  SM: [57.05]
+  OtW: [2.562]
+  O3pQ3: [6.904]
+  O83qq: [0.9529]
+  O13qq: [-19.66]
+  O3pl: [-13.85174]
+  Oll: [6.92587]
+  O3pq: [6.92587]

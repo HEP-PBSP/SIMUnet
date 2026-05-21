@@ -1,0 +1,51 @@
+metadata:
+  ref: arXiv:1604.05538
+  author: Luca Mantani
+  ufomodel: SMEFTatNLO
+  flavour: dim6top
+  date: 04/09/2023
+  pdf: NNPDF40
+  info_SM_fixed: NNPDF40notop + validphys
+  observable: Charge asymmetry inclusive
+  bins: []
+
+SM_fixed: [0.007768]
+
+theory_cov:
+- - - []
+
+EFT_LO:
+  SM: [0.006941]
+  OtG: [0.0004922122084282568]
+  O8qd: [-0.0008097]
+  O1qd: [0.0005172]
+  O1qu: [0.001234]
+  O8qu: [-0.001872]
+  O1dt: [0.0004105]
+  O8dt: [0.001113]
+  O1qt: [0.001733]
+  O8qt: [-0.00267]
+  O1ut: [0.0009707]
+  O8ut: [0.002647]
+  O11qq: [0.001366]
+  O13qq: [0.0005874]
+  O81qq: [0.003783]
+  O83qq: [0.001556]
+
+EFT_NLO:
+  SM: [0.006941]
+  OtG: [0.0004922122084282568]
+  O8qd: [-0.0008097]
+  O1qd: [0.0005172]
+  O1qu: [0.001234]
+  O8qu: [-0.001872]
+  O1dt: [0.0004105]
+  O8dt: [0.001113]
+  O1qt: [0.001733]
+  O8qt: [-0.00267]
+  O1ut: [0.0009707]
+  O8ut: [0.002647]
+  O11qq: [0.001366]
+  O13qq: [0.0005874]
+  O81qq: [0.003783]
+  O83qq: [0.001556]
