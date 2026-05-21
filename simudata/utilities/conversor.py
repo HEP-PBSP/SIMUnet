@@ -1,0 +1,347 @@
+#!/usr/bin/env python3
+
+import functools
+import traceback
+from argparse import ArgumentParser
+from pathlib import Path
+
+import pandas as pd
+from yaml import safe_dump, safe_load
+
+
+def read_commondata_csv(commondatafile):
+    """Read the old format commondata which were csv files we sparkling formatting
+    This is directly taken from validphys
+    """
+    commondatatable = pd.read_csv(commondatafile, sep=r"\s+", skiprows=1, header=None)
+    # Do we have NaNs? files with wrong formatting?
+    commondataheader = ["entry", "process", "kin1", "kin2", "kin3", "data", "stat"]
+    nsys = (commondatatable.shape[1] - len(commondataheader)) // 2
+
+    commondataheader += ["ADD", "MULT"] * nsys
+    commondatatable.columns = commondataheader
+    commondatatable.set_index("entry", inplace=True)
+    return commondatatable
+
+
+def create_data(commondata_df):
+    """Given a commondata dataframe, extract the central data and create a dictionary
+    ready to be yamld'd"""
+    data = commondata_df["data"].values
+    return {"data_central": data.tolist()}
+
+
+def create_kinematics(df):
+    """Create kinematics dictionary with kin1, kin2, kin3 . . ."""
+    kin_df = df[["kin1", "kin2", "kin3"]]
+    bins = []
+    for _, b in kin_df.T.items():
+        tmp = {}
+        for k, val in b.items():
+            tmp[f"k{k[-1]}"] = {"min": None, "mid": val, "max": None}
+        bins.append(tmp)
+    return {"bins": bins}
+
+
+def create_uncertainties(df, systype_file, is_default=False, use_multiplicative=False):
+    """Create the uncertainties dictionary from the old cd information
+
+    We first clean the dataframe to have only the systematic uncertainties
+    and then even-indexes will be ADD uncertainties and odd-indexes MULT uncertainties
+
+    Such that e.g., unc 4 in the systype file, if it is MULT, will correspond to index 7
+    """
+    stat = df["stat"].values.tolist()
+    data = df["data"].values
+
+    to_drop = ["process", "kin1", "kin2", "kin3", "data", "stat"]
+    unc_df = df.drop(to_drop, axis=1)
+
+    sys_df = pd.read_csv(systype_file, sep=r"\s+", skiprows=1, header=None, index_col=0)
+    definitions = {}
+
+    for i, unc_type in sys_df.T.items():
+        definitions[f"sys_corr_{i}"] = {
+            "description": f"Sys uncertainty idx: {i}",
+            "treatment": unc_type[1],
+            "type": unc_type[2],
+        }
+
+    # Check whether the number of uncertainties in the systype file is consistent with the df
+    if len(unc_df.columns) != len(sys_df) * 2:
+        # If this happened and this is the (true) DEFAULT, crash
+        if is_default:
+            raise ValueError("Different number of systematics in systype file and commondata")
+        return {}
+
+    bins = []
+    for idx, bin_data in unc_df.T.items():
+        tmp = {"stat": stat[idx - 1]}
+        for n, (key, info) in enumerate(definitions.items()):
+            if info["treatment"] not in ["ADD", "MULT"]:
+                raise ValueError(f"Treatment type: {info['treatment']} not recognized")
+            if use_multiplicative:
+                tmp[key] = float(bin_data[2 * n + 1] * data[idx - 1] / 100.0)
+            else:
+                tmp[key] = float(bin_data[2 * n])
+        bins.append(tmp)
+
+    # Now add stat to the definitions
+    definitions_out = {
+        "stat": {
+            "description": "Uncorrelated statistical uncertainties",
+            "treatment": "ADD",
+            "type": "UNCORR",
+        },
+        **definitions,
+    }
+
+    return {"definitions": definitions_out, "bins": bins}
+
+
+def create_plotting(plotting_file, plotting_type=None):
+    """Create the plotting dictionary by merging the plotting file of the commondata
+    and the plotting type associated to it
+    """
+    type_info = {}
+    if plotting_type is not None and plotting_type.exists():
+        type_info = safe_load(plotting_type.read_text())
+
+    plotting_data = safe_load(plotting_file.read_text())
+
+    plotting_dict = {**type_info, **plotting_data}
+
+    plotting_dict["plot_x"] = plotting_dict.pop("x", "idat")
+    plotting_dict.pop("kinematics_override", None)
+    return plotting_dict
+
+
+def _gen_k(kx):
+    """Generate k{x} variable"""
+    return {"description": f"Variable {kx}", "label": f"{kx}", "units": ""}
+
+
+def create_obs_dict(commondata_df, plotting_dict, theory_dict, obs_name="PLACEHOLDER"):
+    """Create the observable dictionary by combining available information
+    in the commondata dataframe and the plotting_dict
+
+    It doesn't fill any data files (i.e., uncertainties, data or kinematics)
+    """
+    final_plotting_dict = dict(plotting_dict)
+
+    # Extract necessary information
+    ndata = len(commondata_df)
+    process_type = commondata_df["process"][1]
+
+    description = final_plotting_dict.pop("process_description", "DESCRIPTION_PLACEHOLDER")
+    label = final_plotting_dict["dataset_label"]
+    units = ""
+
+    final_plotting_dict.pop("nnpdf31_process")
+    final_plotting_dict.pop("experiment")
+
+    # Sub-dicts
+    observable = {"description": description, "label": label, "units": units}
+
+    coverage = ["k1", "k2", "k3"]
+    kinematics = {"variables": {i: _gen_k(i) for i in coverage}}
+
+    return {
+        "observable_name": obs_name,
+        "observable": observable,
+        "process_type": process_type,
+        "tables": [],
+        "npoints": [],
+        "ndata": ndata,
+        "plotting": final_plotting_dict,
+        "kinematic_coverage": coverage,
+        "kinematics": kinematics,
+        "theory": theory_dict,
+        "data_uncertainties": [],
+    }
+
+
+def yaml_dump_wrapper(data, target_file, dry=False, **kwargs):
+    """Wrapper around safe_sump in order to use the dry flag"""
+    if dry:
+        return None
+    safe_dump(data, target_file.open("w", encoding="utf-8"), **kwargs)
+
+
+def convert_old_to_new(
+    old_file,
+    plotting_file,
+    sys_file,
+    new_name,
+    new_variant=None,
+    merge_exists=False,
+    output_folder=Path("converted_commondata"),
+    dry=False,
+    variant=None,
+    compound=None,
+):
+    """
+    Converts the old dataset defined by the old data, plotting and sys file into the new format.
+    Use ``new_name`` (which will be broken down as <EXPERIMENT>_<ENERGY>_<PROCESS>_<OBS>)
+
+    Note, plotting-type file by process is being ignored in this implementation.
+
+    If new_variant is given, the data and uncertainties will fall into the given variant.
+    If ``merge_exists`` is True then the dataset will be searched for in the validphys database
+    and use as the basis of the new one.
+    """
+    if merge_exists:
+        raise NotImplementedError("Not implemented yet")
+
+    if new_variant is None:
+        variant_name = "DEFAULT"
+    else:
+        variant_name = new_variant
+
+    yaml_safe_dump = functools.partial(yaml_dump_wrapper, dry=dry)
+
+    obs_name = new_name.rsplit("_", 1)[-1]
+    set_name = new_name.replace(f"_{obs_name}", "")
+
+    set_folder = output_folder / set_name
+    set_folder.mkdir(exist_ok=True, parents=True)
+
+    # Read the commondata file
+    commondata_df = read_commondata_csv(old_file)
+
+    kinematics_dict = create_kinematics(commondata_df)
+    data_dict = create_data(commondata_df)
+    plotting_dict = create_plotting(plotting_file)
+    if compound is not None:
+        fks = []
+        for line in Path(compound).read_text().split("\n"):
+            info = safe_load(line)
+            if isinstance(info, dict):
+                if "FK" in info:
+                    fks.append([info["FK"]])
+                elif "OP" in info:
+                    op = info["OP"]
+        theory_dict = {"FK_tables": fks, "operation": op}
+    else:
+        theory_dict = {"FK_tables": [[old_file.stem.replace("DATA_", "FK_")]]}
+
+    uncertainties_dict = create_uncertainties(commondata_df, sys_file, is_default=True)
+    obs_dict = create_obs_dict(commondata_df, plotting_dict, theory_dict, obs_name=obs_name)
+
+    metadata_path = set_folder / "metadata.yaml"
+    if metadata_path.exists():
+        metadata = safe_load(metadata_path.read_text())
+        # Perform sanity checks
+        nnpdf_md = metadata["nnpdf_metadata"]
+        try:
+            assert nnpdf_md["experiment"] == plotting_dict["experiment"]
+            assert nnpdf_md["nnpdf31_process"] == plotting_dict["nnpdf31_process"]
+            assert metadata.get("setname") == set_name
+        except AssertionError:
+            print(traceback.format_exc())
+            import ipdb
+
+            ipdb.set_trace()
+
+        # Check whether the observable already exists
+        already_implemented = [i["observable_name"] for i in metadata["implemented_observables"]]
+        if obs_name in already_implemented:
+            raise ValueError(f"{obs_name} already implemented for {set_name}")
+    else:
+        # Create it from scratch
+        # Create it anew!
+        nnpdf_md = {
+            "nnpdf31_process": plotting_dict["nnpdf31_process"],
+            "experiment": plotting_dict["experiment"],
+        }
+        metadata = {
+            "setname": set_name,
+            "version": 1,
+            "version_comment": "Port of old commondata",
+            "nnpdf_metadata": nnpdf_md,
+            "arXiv": {"url": ""},
+            "iNSPIRE": {"url": ""},
+            "hepdata": {"url": "", "version": -1},
+            "implemented_observables": [],
+        }
+
+    kin_path = set_folder / f"kinematics_{obs_name}.yaml"
+    yaml_safe_dump(kinematics_dict, kin_path, sort_keys=False)
+    obs_dict["kinematics"]["file"] = kin_path.name
+
+    # The lines below should be different for positivity datasets
+    data_path = set_folder / f"data_{variant_name}_{obs_name}.yaml"
+    unc_path = set_folder / f"uncertainties_{variant_name}_{obs_name}.yaml"
+
+    yaml_safe_dump(data_dict, data_path)
+    yaml_safe_dump(uncertainties_dict, unc_path, sort_keys=False)
+
+    if new_variant is None:
+        obs_dict["data_uncertainties"] = [unc_path.name]
+        obs_dict["data_central"] = data_path.name
+    else:
+        new_var = {
+            "data_uncertainties": [unc_path.name],
+            "data_central": data_path.name,
+        }
+        if "variants" not in obs_dict:
+            obs_dict["variants"] = {}
+        obs_dict["variants"][variant_name] = new_var
+
+    metadata["implemented_observables"].append(obs_dict)
+    yaml_safe_dump(metadata, metadata_path, sort_keys=False)
+    print(f"Written new cd for {set_name}_{obs_name} to {set_folder}")
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("dataset_name", help="Target name of the dataset", type=str)
+    parser.add_argument("old_dat_file", help=".dat file of the old dataset", type=Path)
+    parser.add_argument(
+        "--old_plotting_file",
+        help="plotting .yaml file of the old dataset (by default it will be autodiscovered from the dataset)",
+        type=Path,
+    )
+    parser.add_argument(
+        "--old_sys_file",
+        help="systype file of the old dataset (by default it will be autodiscovered from the dataset)",
+        type=Path,
+    )
+    parser.add_argument(
+        "--old_compound",
+        help="Old compound file, if not given we will assume it gets the default name",
+    )
+    parser.add_argument("--variant", help="Create the new dataset as the given variant", type=str)
+    parser.add_argument(
+        "--merge_exists",
+        help="If a dataset already exists in validphys with this name, merge the new info with this dataset in the output",
+        action="store_true",
+    )
+
+    args = parser.parse_args()
+
+    old_file = args.old_dat_file
+    old_name = args.old_dat_file.stem.replace("DATA_", "")
+
+    if (pfile := args.old_plotting_file) is None:
+        pfile = old_file.parent / f"PLOTTING_{old_name}.yaml"
+
+    if (sfile := args.old_sys_file) is None:
+        sfile = old_file.parent / "systypes" / f"SYSTYPE_{old_name}_DEFAULT.dat"
+
+    # Check whether we can automagically find the plotting and systype file or whether we need to ask for clarifications
+    for check_me in [old_file, pfile, sfile]:
+        if not check_me.exists():
+            raise FileNotFoundError(f"Couldn't find {check_me}")
+
+    # TODO: we need to autodiscover the possibility of having a compound file
+    # _and_ preparing (or running) the conversion of the FkTable to a pineappl grid
+    convert_old_to_new(
+        old_file,
+        pfile,
+        sfile,
+        args.dataset_name,
+        variant=args.variant,
+        merge_exists=args.merge_exists,
+        compound=args.old_compound,
+    )
