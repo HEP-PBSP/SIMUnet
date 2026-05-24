@@ -512,7 +512,7 @@ class CoreConfig(configparser.Config):
     def parse_dataset_input(self, dataset: Mapping, simu_parameters_names, simu_parameters_scales, n_simu_parameters, simu_parameters_linear_combinations, simu_parameters=None):
         """The mapping that corresponds to the dataset specifications in the
         fit files"""
-        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination"}
+        known_keys = {"dataset", "sys", "cfac", "frac", "weight", "custom_group", "simu_fac", "use_fixed_predictions", "contamination", "new_commondata", "bsm_sector"}
         try:
             name = dataset["dataset"]
             if not isinstance(name, str):
@@ -525,6 +525,7 @@ class CoreConfig(configparser.Config):
         sysnum = dataset.get("sys")
         cfac = dataset.get("cfac", tuple())
         frac = dataset.get("frac", 1)
+        bsm_sector = dataset.get("bsm_sector", None)
         use_fixed_predictions = dataset.get("use_fixed_predictions", False)
         contamination = dataset.get("contamination", None)
         if not isinstance(frac, numbers.Real):
@@ -564,7 +565,9 @@ class CoreConfig(configparser.Config):
             custom_group=custom_group,
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
-            **bsm_data
+            **bsm_data,
+            new_commondata=new_commondata,
+            bsm_sector=bsm_sector,
         )
 
     def parse_use_fitcommondata(self, do_use: bool):

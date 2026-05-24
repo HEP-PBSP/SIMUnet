@@ -187,8 +187,9 @@ def _warn_any_pdf_not_montecarlo(pdfs):
 class ReplicaPDFPlotter(PDFPlotter):
     def draw(self, pdf, grid, flstate):
         ax = flstate.ax
-        next_prop = next(ax._get_lines.prop_cycler)
-        color = next_prop['color']
+        # next_prop = next(ax._get_lines.prop_cycler)
+        # color = next_prop['color']
+        color = ax._get_lines.get_next_color()
         flavour_grid = grid.select_flavour(flstate.flindex)
         stats = flavour_grid.grid_values
         gv = stats.data
@@ -417,10 +418,11 @@ class BandPDFPlotter(PDFPlotter):
         handles = flstate.handles
         # Take only the flavours we are interested in
         stats = grid.select_flavour(flstate.flindex).grid_values
-        pcycler = ax._get_lines.prop_cycler
-        #This is ugly but can't think of anything better
+        # pcycler = ax._get_lines.prop_cycler
+        # #This is ugly but can't think of anything better
 
-        next_prop = next(pcycler)
+        # next_prop = next(pcycler)
+        next_prop = {'color': ax._get_lines.get_next_color()}
         cv = stats.central_value()
         xgrid = grid.xgrid
         #Ignore spurious normalization warnings

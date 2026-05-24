@@ -211,6 +211,10 @@ simu_parameters:
   - {name: 'OpWB', scale: 1, plot_scale: 1, latex: '$c_{\varphi W B}$'}
   - {name: 'Opd', scale: 1, plot_scale: 1, latex: '$c_{\varphi Box}$'}
   - {name: 'OpD', scale: 1, plot_scale: 1, latex: '$c_{\varphi D}$'}
+  # New Beta
+  - {name: 'Opud', scale: 1, plot_scale: 100, latex: '$c_{pud}$'}
+  - {name: 'OulS', scale: 1, plot_scale: 100000, latex: '$c_{uls}$'}
+  - {name: 'OulT', scale: 1, plot_scale: 10000, latex: '$c_{ulT}$'}
   
 
 actions_:

@@ -337,7 +337,7 @@ class CommonDataSpec(TupleComp):
 class DataSetInput(TupleComp):
     """Represents whatever the user enters in the YAML to specify a
     dataset."""
-    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination):
+    def __init__(self, *, name, sys, cfac, frac, weight, custom_group, simu_parameters_names, simu_parameters_linear_combinations, use_fixed_predictions, contamination, new_commondata,bsm_sector):
         self.name=name
         self.sys=sys
         self.cfac = cfac
@@ -348,6 +348,8 @@ class DataSetInput(TupleComp):
         self.simu_parameters_linear_combinations = simu_parameters_linear_combinations
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
+        self.bsm_sector = bsm_sector
+        self.new_commondata = new_commondata
         super().__init__(name, sys, cfac, frac, weight, custom_group)
 
     def __str__(self):

@@ -151,8 +151,13 @@ class ThPredictionsResult(StatsResult):
             ) from e
 
         label = cls.make_label(pdf, dataset)
-
-        return cls(th_predictions, pdf.stats_class, bsm_factor, label)
+        try:
+            final = cls(th_predictions, pdf.stats_class, bsm_factor[dataset.cuts.load()], label)
+        except IndexError as e:
+            # import IPython; IPython.embed()
+            print('Dataset:', dataset.name)
+            final = cls(th_predictions, pdf.stats_class, bsm_factor, label)
+        return final
 
 
 class PositivityResult(StatsResult):

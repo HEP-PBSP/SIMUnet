@@ -20,6 +20,12 @@ import matplotlib.colors as colors
 import pandas as pd
 import seaborn as sns
 import itertools
+from scipy.stats import multivariate_normal, chi2
+from matplotlib.patches import Ellipse
+import numpy as np
+import matplotlib.transforms as transforms
+from matplotlib.patches import Patch
+from scipy.stats import multivariate_normal, chi2
 
 from validphys.utils import yaml_safe
 import os
@@ -68,13 +74,16 @@ def display_format(series):
     """
     return [format_number(x, digits=2) for x in series]
 
+
 BSM_FAC_DISPLAY = ['OtZ', 'OtW', 'OtG', 
 'Opt', 'O3pQ3', 'O3pq', 'OpQM', 'OpqMi', 'Opui', 'Opdi', 'O3pl', 'Opl', 'Ope',
 'O1qd', 'O1qu', 'O1dt', 'O1qt', 'O1ut', 'O11qq', 'O13qq',
 'O8qd', 'O8qu', 'O8dt', 'O8qt', 'O8ut', 'O81qq', 'O83qq',
 'OQt8', 'OQQ1', 'OQQ8', 'OQt1', 'Ott1', 'Oeu', 'Olu', 'Oed',
 'Olq3', 'Olq1', 'Oqe', 'Old', 'Oll',  'Omup', 'Otap', 'Otp',
-'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',]
+'Obp', 'Ocp', 'OG', 'OWWW', 'OpG', 'OpW', 'OpB', 'OpWB', 'Opd', 'OpD',
+'Opud', 'OulS', 'OulT']
+
 
 def reorder_cols(cols):
     """
@@ -1475,7 +1484,20 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
             # note that bsm_names_to_plot_scales can be None
             if bsm_names_to_plot_scales:
                 if bsm_names_to_plot_scales[op] != 1:
-                    bsm_latex_names += [str(bsm_names_to_plot_scales[op]) + '$\cdot$' + bsm_names_to_latex[op]]
+                    scale_name = bsm_names_to_plot_scales[op]
+                    if scale_name > 999:
+                        formatted = f"{scale_name:.0e}"
+                        base, exp = formatted.split("e")
+                        if base != "1":
+                            scale_name = f"${base} \\times 10^{{{int(exp)}}}$"
+                        else:
+                            scale_name = f"$10^{{{int(exp)}}}$"
+                        # import IPython ;IPython.embed()
+                    bsm_latex_names += [
+                        str(scale_name)
+                        + "$\cdot$"
+                        + bsm_names_to_latex[op]
+                    ]
                 else:
                     bsm_latex_names += [bsm_names_to_latex[op]]
         ax.set_xticklabels(bsm_latex_names, rotation='vertical', fontsize=10)
@@ -1503,7 +1525,7 @@ def plot_bsm_facs_bounds(fits, bsm_names_to_latex, bsm_names_to_plot_scales):
             ax.set_yscale(scale)
 
         # final formatting
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.17))
         ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_adjustable("datalim")
@@ -1902,8 +1924,20 @@ def _compute_fisher_information_matrix(dataset_inputs, theoryid, groups_covmat, 
     bsm_factors = []
     if dataset_inputs is not None:
         for dataset in dataset_inputs:
-            ds = l.check_dataset(name=dataset.name, theoryid=theoryid, cfac=dataset.cfac, simu_parameters_names=dataset.simu_parameters_names, simu_parameters_linear_combinations=dataset.simu_parameters_linear_combinations, use_fixed_predictions=dataset.use_fixed_predictions)
-            bsm_fac = parse_simu_parameters_names_CF(ds.simu_parameters_names_CF, ds.simu_parameters_linear_combinations, cuts=ds.cuts)
+            ds = l.check_dataset(
+                name=dataset.name,
+                theoryid=theoryid,
+                cfac=dataset.cfac,
+                simu_parameters_names=dataset.simu_parameters_names,
+                simu_parameters_linear_combinations=dataset.simu_parameters_linear_combinations,
+                use_fixed_predictions=dataset.use_fixed_predictions,
+                new_commondata=dataset.new_commondata,
+            )
+            bsm_fac = parse_simu_parameters_names_CF(
+                ds.simu_parameters_names_CF,
+                ds.simu_parameters_linear_combinations,
+                cuts=ds.cuts,
+            )
             central_sm = central_predictions(ds, pdf)
             coefficients = central_sm.to_numpy().T * np.array([i.central_value for i in bsm_fac.values()])
             bsm_factors += [coefficients] 
@@ -2039,6 +2073,299 @@ def load_datasets_contamination(
             bsm_dict[dataset.name] = k_factors
 
     return bsm_dict
+
+
+@figuregen
+def plot_2d_bsm_facs_fits_seaborn(fits, bsm_names_to_latex):
+    """
+    Generate 2D scatter plots and histograms comparing BSM factor values across different fits.
+
+    This function takes a set of fits and compares the BSM factors between them. For each pair
+    of BSM factors, it creates a 2D scatter plot with corresponding histograms on the x and y axes.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX string representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each pair of BSM factors.
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators
+    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+    # get all pairs
+    pairs = itertools.combinations(all_ops, 2)
+    # plot all pairs of operators
+    for pair in pairs:
+        op_1, op_2 = pair
+        if bsm_names_to_latex.get(op_1) is not None and bsm_names_to_latex.get(op_2) is not None:
+            # use this size to keep them sqaure
+            fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+            ax.ticklabel_format(axis="both", scilimits=(0, 0), style="sci", useOffset=True)
+
+            divider = make_axes_locatable(ax)
+            # append axes to the top and to the right for the histograms
+            ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+            ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+            # Make some labels invisible
+            ax_histx.xaxis.set_tick_params(labelbottom=False)
+            ax_histy.yaxis.set_tick_params(labelleft=False)
+            legend_handles = []
+            legend_labels = []
+            color_cycle = itertools.cycle(plt.rcParams["axes.prop_cycle"].by_key()["color"])
+            for fit in fits:
+                paths = replica_paths(fit)
+                bsm_facs_df = read_bsm_facs(paths)
+                # display the result in the figure only if the fit has the two operators in the pair
+                if (
+                    bsm_facs_df.get([op_1]) is not None
+                    and bsm_facs_df.get([op_2]) is not None
+                ):
+                    x = bsm_facs_df[op_1].values
+                    y = bsm_facs_df[op_2].values
+
+                    # 2D histogram (density plot)
+                    kde = sns.kdeplot(
+                        x=x, y=y, fill=True, ax=ax, alpha=0.5, levels=50, label=fit.label, thresh=0.011
+                    )
+
+                    sns.kdeplot(
+                        x=x,
+                        y=y,
+                        fill=False,
+                        ax=ax,
+                        levels = [0.011, 0.135, 0.607],  # 1σ, 2σ, 3σ
+                        linewidths=1.5,
+                        label=fit.label,
+                    )
+                    # Create a proxy artist for the legend
+                    color = next(color_cycle)
+                    from matplotlib.patches import Patch
+
+                    proxy = Patch(facecolor=color, alpha=0.6, label=fit.label)
+                    legend_handles.append(proxy)
+                    legend_labels.append(fit.label)
+
+                    # populate the histograms
+                    ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5, density=True)
+                    ax_histy.hist(
+                        bsm_facs_df.get([op_2]),
+                        orientation="horizontal",
+                        alpha=0.5,
+                        density=True,
+                    )
+
+            # ax_histx.grid(False)
+            # ax_histy.grid(False)
+
+            ax.set_xlim(-0.027, 0.05027088301199811)
+            ax.set_ylim(-0.08246078830505825, 0.185597644578891)
+            ax_histx.set_xlim(-0.027, 0.05027088301199811)
+            ax_histy.set_ylim(-0.08246078830505825, 0.185597644578891)
+
+            ax.set_xlabel(
+                bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14
+            )
+            ax.set_ylabel(
+                bsm_names_to_latex[op_2] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14
+            )
+
+            ax.legend(handles=legend_handles, labels=legend_labels)
+            ax.set_axisbelow(True)
+
+            yield fig
+
+
+@figuregen
+def plot_2d_bsm_facs_fits_ellipses(fits, bsm_names_to_latex):
+    """
+    Generate 2D confidence intervals and histograms comparing BSM factor values across different fits.
+
+    This function takes a set of fits and compares the BSM factors between them. For each pair
+    of BSM factors, it creates a 2D plot with confidence ellipses and corresponding histograms on the x and y axes.
+
+    Parameters
+    ----------
+    fits : NSList
+        List of FitSpec to be compared.
+    bsm_names_to_latex : dict
+        Dictionary mapping BSM factor names to their LaTeX string representations.
+
+    Yields
+    ------
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object for each pair of BSM factors.
+    """
+    # extract all operators in the fits
+    all_ops = []
+    for fit in fits:
+        paths = replica_paths(fit)
+        bsm_facs_df = read_bsm_facs(paths)
+        bsm_fac_ops = bsm_facs_df.columns.tolist()
+        all_ops.append(bsm_fac_ops)
+    # Remove repeated operators
+    all_ops = {o for fit_ops in all_ops for o in fit_ops}
+    # get all pairs
+    pairs = itertools.combinations(all_ops, 2)
+    # plot all pairs of operators
+    for pair in pairs:
+        op_1, op_2 = pair
+        if op_1 in bsm_names_to_latex and op_2 in bsm_names_to_latex:
+            # use this size to keep them sqaure
+            fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+            ax.ticklabel_format(
+                axis="both", scilimits=(0, 0), style="sci", useOffset=True
+            )
+
+            divider = make_axes_locatable(ax)
+            # append axes to the top and to the right for the histograms
+            ax_histx = divider.append_axes("top", 0.5, pad=0.5, sharex=ax)
+            ax_histy = divider.append_axes("right", 0.5, pad=0.3, sharey=ax)
+
+            # Make some labels invisible
+            ax_histx.xaxis.set_tick_params(labelbottom=False)
+            ax_histy.yaxis.set_tick_params(labelleft=False)
+            legend_handles = []
+            legend_labels = []
+            color_cycle = itertools.cycle(
+                plt.rcParams["axes.prop_cycle"].by_key()["color"]
+            )
+            x_min_global = None
+            x_max_global = None
+            y_min_global = None
+            y_max_global = None
+            for fit in fits:
+                color = next(color_cycle)
+                paths = replica_paths(fit)
+                bsm_facs_df = read_bsm_facs(paths)
+                # display the result in the figure only if the fit has the two operators in the pair
+                if (
+                    bsm_facs_df.get([op_1]) is not None
+                    and bsm_facs_df.get([op_2]) is not None
+                ):
+                    op_1 = "Olq3"
+                    op_2 = "Olq1"
+                    x = bsm_facs_df[op_1].values
+                    y = bsm_facs_df[op_2].values
+
+                    # Determine global min and max for setting limits later
+                    y_max_fit = max(y)
+                    y_min_fit = min(y)
+                    x_max_fit = max(x)
+                    x_min_fit = min(x)
+
+                    # Initialize global values with first fit's data
+                    if x_max_global is None:
+                        x_max_global = x_max_fit
+                        x_min_global = x_min_fit
+                        y_max_global = y_max_fit
+                        y_min_global = y_min_fit
+                    else:
+                        # Update global values
+                        if x_max_fit > x_max_global:
+                            x_max_global = x_max_fit
+                        if x_min_fit < x_min_global:
+                            x_min_global = x_min_fit
+                        if y_max_fit > y_max_global:
+                            y_max_global = y_max_fit
+                        if y_min_fit < y_min_global:
+                            y_min_global = y_min_fit
+
+                    mean = [np.mean(x), np.mean(y)]
+                    cov = np.cov(x, y)
+
+                    rv = multivariate_normal(mean, cov)
+
+                    x_padding = 0.25 * (max(x) - min(x))
+                    y_padding = 0.25 * (max(y) - min(y))
+
+                    x_range = np.linspace(min(x) - x_padding, max(x) + x_padding, 100)
+                    y_range = np.linspace(min(y) - y_padding, max(y) + y_padding, 100)
+
+                    X, Y = np.meshgrid(x_range, y_range)
+                    pos = np.dstack((X, Y))
+
+                    Z = rv.pdf(pos)
+                    pos_flat = np.column_stack([X.ravel(), Y.ravel()])
+                    inv_cov = np.linalg.inv(cov)
+                    md_sq = np.sum(
+                        (pos_flat - mean) @ inv_cov * (pos_flat - mean), axis=1
+                    )
+                    md_sq = md_sq.reshape(X.shape)
+
+                    # Contour at Mahalanobis distances corresponding to 1, 2, 3 std devs
+                    # For 2D: std_dev^2 = chi2.ppf(confidence_level, df=2)
+                    # std_levels = [1, 2, 3]
+                    confidence_levels = [
+                        0.393,
+                        0.865,
+                    ]  # [0.393, 0.865, 0.989]  # Mahalanobis squared distances for 1σ, 2σ, 3σ in 2D
+                    # md_levels = [std_dev**2 for std_dev in std_levels]
+                    md_levels = chi2.ppf(confidence_levels, df=2)
+                    cs = ax.contour(
+                        X, Y, md_sq, levels=md_levels, colors=color, alpha=0.8
+                    )
+                    if (
+                        color != "#8da0cb" and color != "#66c2a5"
+                    ):  # and color!='#fc8d62':
+                        ax.clabel(
+                            cs,
+                            inline=1,
+                            fontsize=10,
+                            fmt=lambda x: f"{np.sqrt(x):.0f}σ",
+                        )
+
+                    proxy = Patch(facecolor=color, alpha=0.6, label=fit.label)
+                    legend_handles.append(proxy)
+                    legend_labels.append(fit.label)
+
+                    # populate the histograms
+                    ax_histx.hist(bsm_facs_df.get([op_1]), alpha=0.5, density=True)
+                    ax_histy.hist(
+                        bsm_facs_df.get([op_2]),
+                        orientation="horizontal",
+                        alpha=0.5,
+                        density=True,
+                    )
+
+            # Also set the histogram axes limits to match
+
+            # ax.set_xlim(1.1*x_min_global, 1.1*x_max_global)
+            # ax.set_ylim(1.6*y_min_global, 1.1*y_max_global)
+            # ax_histx.set_xlim(1.1*x_min_global, 1.1*x_max_global)
+            # ax_histy.set_ylim(1.4*y_min_global, 1*y_max_global)
+
+            # print(f"Global x limits: {1.1*x_min_global}, {1.1*x_max_global}")
+            # print(f"Global y limits: {1.6*y_min_global}, {1.1*y_max_global}")
+
+            ax.set_xlim(-0.027, 0.05027088301199811)
+            ax.set_ylim(-0.08246078830505825, 0.185597644578891)
+            ax_histx.set_xlim(-0.027, 0.05027088301199811)
+            ax_histy.set_ylim(-0.08246078830505825, 0.185597644578891)
+            ax.set_xlabel(
+                bsm_names_to_latex[op_1] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14
+            )
+            ax.set_ylabel(
+                bsm_names_to_latex[op_2] + r"$/\Lambda^2$ [TeV$^{-2}]$", fontsize=14
+            )
+
+            ax.legend(handles=legend_handles, labels=legend_labels, loc="upper right")
+            ax.set_axisbelow(True)
+
+            yield fig
+
 
 
 def compute_datasets_chi2_dist(
