@@ -390,7 +390,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
-        ndata = len(dataset.load().get_cv())
+        ndata = dataset.commondata.ndata
         nrep = len(pdf)
         return np.ones((ndata, nrep))
 

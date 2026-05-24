@@ -5,11 +5,11 @@ wrappers.
 
 """
 import dataclasses
-from typing import Dict
+import yaml
 
 import numpy as np
 import pandas as pd
-
+from validphys.commondatawriter import write_commondata_to_file, write_systype_to_file
 
 @dataclasses.dataclass(eq=False)
 class FKTableData:
@@ -96,6 +96,68 @@ class FKTableData:
         newndata = len(cuts)
         newsigma = self.sigma.loc[cuts]
         return dataclasses.replace(self, ndata=newndata, sigma=newsigma)
+
+    def get_np_fktable(self):
+        """Returns the fktable as a dense numpy array that can be directly
+        manipulated with numpy
+
+        The return shape is:
+            (ndata, nx, nbasis) for DIS
+            (ndata, nx, nx, nbasis) for hadronic
+        where nx is the length of the xgrid
+        and nbasis the number of flavour contributions that contribute
+        """
+        # Read up the shape of the output table
+        ndata = self.ndata
+        nx = len(self.xgrid)
+        nbasis = self.sigma.shape[1]
+
+        if ndata == 0:
+            if self.hadronic:
+                return np.zeros((ndata, nbasis, nx, nx))
+            return np.zeros((ndata, nbasis, nx))
+
+        # Make the dataframe into a dense numpy array
+
+        # First get the data index out of the way
+        # this is necessary because cuts/shifts and for performance reasons
+        # otherwise we will be putting things in a numpy array in very awkward orders
+        ns = self.sigma.unstack(level=("data",), fill_value=0)
+        x1 = ns.index.get_level_values(0)
+
+        if self.hadronic:
+            x2 = ns.index.get_level_values(1)
+            fk_raw = np.zeros((nx, nx, ns.shape[1]))
+            fk_raw[x2, x1, :] = ns.values
+
+            # The output is (ndata, basis, x1, x2)
+            fktable = fk_raw.reshape((nx, nx, nbasis, ndata)).T
+        else:
+            fk_raw = np.zeros((nx, ns.shape[1]))
+            fk_raw[x1, :] = ns.values
+
+            # The output is (ndata, basis, x1)
+            fktable = fk_raw.reshape((nx, nbasis, ndata)).T
+
+        return fktable
+    
+    
+    @property
+    def luminosity_mapping(self):
+        """Return the flavour combinations that contribute to the fktable
+        in the form of a single array
+
+        The return shape is:
+            (nbasis,) for DIS
+            (nbasis*2,) for hadronic
+        """
+        basis = self.sigma.columns.to_numpy()
+        if self.hadronic:
+            ret = np.zeros(14 * 14, dtype=bool)
+            ret[basis] = True
+            basis = np.array(np.where(ret.reshape(14, 14))).T.reshape(-1)
+        return basis
+
 
 
 @dataclasses.dataclass(eq=False)
@@ -302,3 +364,18 @@ class CommonData:
         tb = self.commondata_table.copy()
         tb["data"] = cv
         return dataclasses.replace(self, commondata_table=tb)
+
+    def export(self, path):
+        """Export the data, and error types
+         Use the same format as libNNPDF:
+
+        - A DATA_<dataset>.dat file with the dataframe of accepted points
+        - A systypes/STYPES_<dataset>.dat file with the error types
+        """
+
+        dat_path = path / f"DATA_{self.setname}.dat"
+        sys_path = path / "systypes" / f"SYSTYPE_{self.setname}_DEFAULT.dat"
+        sys_path.parent.mkdir(exist_ok=True)
+
+        write_systype_to_file(self, sys_path)
+        write_commondata_to_file(self, dat_path)

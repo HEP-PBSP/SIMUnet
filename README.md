@@ -27,9 +27,9 @@ See the [SIMUnet installation tutorial](https://hep-pbsp.github.io/SIMUnet/sphin
 
 ## Cite
 
-The SIMUnet code has been developed in [the original paper](https://inspirehep.net/literature/2013000)
+The SIMUnet code has been developed in [the original paper](https://inspirehep.net/literature/2013000):
 
-```
+```bibtex
 @article{Iranipour:2022iak,
     author = "Iranipour, Shayan and Ubiali, Maria",
     title = "{A new generation of simultaneous fits to LHC data using deep learning}",
@@ -44,11 +44,12 @@ The SIMUnet code has been developed in [the original paper](https://inspirehep.n
 }
 ```
 
-and the [official release](https://inspirehep.net/literature/2755426) 
+and made public in the [official release](https://inspirehep.net/literature/2755426):
 
-```
+```bibtex
 @article{Costantini:2024xae,
-    author = "Costantini, Mark N. and Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mantani, Luca and Morales Alvarado, Manuel and Moore, James M. and Ubiali, Maria",
+    author = "Costantini, Mark N. and Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mantani, 
+    Luca and Morales Alvarado, Manuel and Moore, James M. and Ubiali, Maria",
     title = "{SIMUnet: an open-source tool for simultaneous global fits of EFT Wilson coefficients and PDFs}",
     eprint = "2402.03308",
     archivePrefix = "arXiv",
@@ -58,7 +59,60 @@ and the [official release](https://inspirehep.net/literature/2755426)
 }
 ```
 
-so please cite these references if you use the code.
+It is directly based on the [NNPDF open-source code](https://arxiv.org/abs/2109.02671):
+
+```bibtex
+@article{NNPDF:2021uiq,
+    author = "Ball, Richard D. and others",
+    collaboration = "NNPDF",
+    title = "{An open-source machine learning framework for global analyses of parton distributions}",
+    eprint = "2109.02671",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "Edinburgh 2021/13, Nikhef-2021-020, TIF-UNIMI-2021-12",
+    doi = "10.1140/epjc/s10052-021-09747-9",
+    journal = "Eur. Phys. J. C",
+    volume = "81",
+    number = "10",
+    pages = "958",
+    year = "2021"
+}
+```
+
+The physics potential of the tool has been explored in:
+
+```bibtex
+@article{Kassabov:2023hbm,
+    author = "Kassabov, Zahari and Madigan, Maeve and Mantani, Luca and Moore, James and Morales Alvarado, 
+    Manuel and Rojo, Juan and Ubiali, Maria",
+    title = "{The top quark legacy of the LHC Run II for PDF and SMEFT analyses}",
+    eprint = "2303.06159",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    doi = "10.1007/JHEP05(2023)205",
+    journal = "JHEP",
+    volume = "05",
+    pages = "205",
+    year = "2023"
+}
+
+@article{Hammou:2023heg,
+    author = "Hammou, Elie and Kassabov, Zahari and Madigan, Maeve and Mangano, Michelangelo L. and 
+    Mantani, Luca and Moore, James and Alvarado, Manuel Morales and Ubiali, Maria",
+    title = "{Hide and seek: how PDFs can conceal new physics}",
+    eprint = "2307.10370",
+    archivePrefix = "arXiv",
+    primaryClass = "hep-ph",
+    reportNumber = "CERN-TH-2023-137",
+    doi = "10.1007/JHEP11(2023)090",
+    journal = "JHEP",
+    volume = "11",
+    pages = "090",
+    year = "2023"
+}
+```
+
+Please consider citing these papers if you use the code.
 
 ## Bugs and contributions
 
