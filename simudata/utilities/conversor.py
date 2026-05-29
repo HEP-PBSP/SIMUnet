@@ -1,12 +1,64 @@
 #!/usr/bin/env python3
+"""
+This script converts old data files from NNPDF into the new format.
+
+Note that it takes some shortcuts, such as using kin1, kin2, kin3, as the kinematic variables.
+Some actions from validphys no longer accept non-descriptive variables for the kinematics so datasets
+cannot be automatically ported to the NNPDF repo without manual action.
+Fits can be run, but cuts need to either be applied to the `kin1`, `kin2` and `kin3` kinematics or the variables modified.
+"""
 
 import functools
+import re
 import traceback
 from argparse import ArgumentParser
 from pathlib import Path
 
 import pandas as pd
 from yaml import safe_dump, safe_load
+
+_tev_searcher = re.compile(r"^\d+TEV$")
+
+
+def _autoname(old_name):
+    """Generate a new "NNPDF-like" name.
+
+    It keeps the EXP_ name from simunet.
+    It searchers for a XTEV string and puts it in the energy field.
+    Then leaves the rest the same.
+    If no observable is available it adds a generic `_OBS`.
+
+    E.g.
+        ATLAS_SINGLETOP_SCH_13TEV_TOTAL -> ATLAS_SINGLETOP_13TEV_SCH_TOTAL
+        ATLAS_WHEL_13TEV -> ATLAS_WHEL_13TEV_OBS
+        ATLAS_SSINC_RUNII_ZGAM -> ATLAS_SSINC_NOTFIXED_RUNII_ZGAM
+    """
+    EXPERIMENTS = tuple([f"{i}_" for i in ("ATLAS", "CMS", "LHCB", "ATLAS_CMS", "LEP")])
+    if not old_name.startswith(EXPERIMENTS):
+        raise NotImplementedError(f"Not sure what to do with {old_name}")
+    new_name = old_name.replace("ATLAS_CMS", "ATLASCMS")
+
+    split_parts = new_name.split("_")
+    if len(split_parts) < 3:
+        split_parts.append("OBS")
+
+    if _tev_searcher.match(split_parts[2]) is None:
+        # So there is no energy value at the expected point...
+        for i, part in enumerate(split_parts):
+            if _tev_searcher.match(part) is not None:
+                # Oh, but we found one somewhere else!
+                split_parts.pop(i)
+                # Remove it and insert it back at position 2!
+                split_parts.insert(2, part)
+                break
+        else:
+            # If we don't find any energy value, assume it is not fixed
+            split_parts.insert(2, "NOTFIXED")
+
+    if len(split_parts) < 4:
+        split_parts.append("OBS")
+
+    return "_".join(split_parts)
 
 
 def read_commondata_csv(commondatafile):
@@ -293,10 +345,49 @@ def convert_old_to_new(
     print(f"Written new cd for {set_name}_{obs_name} to {set_folder}")
 
 
+def main(args):
+    """Run the script."""
+    old_file = args.old_dat_file
+    old_name = args.old_dat_file.stem.replace("DATA_", "")
+
+    if (pfile := args.old_plotting_file) is None:
+        pfile = old_file.parent / f"PLOTTING_{old_name}.yaml"
+
+    if (sfile := args.old_sys_file) is None:
+        sfile = old_file.parent / "systypes" / f"SYSTYPE_{old_name}_DEFAULT.dat"
+
+    # Check whether we can automagically find the plotting and systype file or whether we need to ask for clarifications
+    for check_me in [old_file, pfile, sfile]:
+        if not check_me.exists():
+            raise FileNotFoundError(f"Couldn't find {check_me}")
+
+    if args.dataset_name is None:
+        dataset_name = _autoname(old_name)
+        # print(f"Converting {old_name} into {dataset_name}")
+    else:
+        dataset_name = args.dataset_name
+
+    # TODO: we need to autodiscover the possibility of having a compound file
+    # _and_ preparing (or running) the conversion of the FkTable to a pineappl grid
+
+    convert_old_to_new(
+        old_file,
+        pfile,
+        sfile,
+        dataset_name,
+        variant=args.variant,
+        merge_exists=args.merge_exists,
+        compound=args.old_compound,
+    )
+
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("dataset_name", help="Target name of the dataset", type=str)
     parser.add_argument("old_dat_file", help=".dat file of the old dataset", type=Path)
+    parser.add_argument(
+        "--dataset_name",
+        help="Target name of the dataset, if not given it will be automagically generated",
+        type=str,
+    )
     parser.add_argument(
         "--old_plotting_file",
         help="plotting .yaml file of the old dataset (by default it will be autodiscovered from the dataset)",
@@ -319,29 +410,11 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
-    old_file = args.old_dat_file
-    old_name = args.old_dat_file.stem.replace("DATA_", "")
-
-    if (pfile := args.old_plotting_file) is None:
-        pfile = old_file.parent / f"PLOTTING_{old_name}.yaml"
-
-    if (sfile := args.old_sys_file) is None:
-        sfile = old_file.parent / "systypes" / f"SYSTYPE_{old_name}_DEFAULT.dat"
-
-    # Check whether we can automagically find the plotting and systype file or whether we need to ask for clarifications
-    for check_me in [old_file, pfile, sfile]:
-        if not check_me.exists():
-            raise FileNotFoundError(f"Couldn't find {check_me}")
-
-    # TODO: we need to autodiscover the possibility of having a compound file
-    # _and_ preparing (or running) the conversion of the FkTable to a pineappl grid
-    convert_old_to_new(
-        old_file,
-        pfile,
-        sfile,
-        args.dataset_name,
-        variant=args.variant,
-        merge_exists=args.merge_exists,
-        compound=args.old_compound,
-    )
+    try:
+        main(args)
+    except NotImplementedError:
+        print(f"Not sure how to deal with {args.old_dat_file}")
+    except FileNotFoundError:
+        print(f"{args.old_dat_file} not found")
+    except IndexError:
+        print(f"{args.old_dat_file}")
