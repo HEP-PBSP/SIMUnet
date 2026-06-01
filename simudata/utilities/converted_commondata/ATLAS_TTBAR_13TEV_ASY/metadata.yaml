@@ -46,8 +46,8 @@ implemented_observables:
     file: kinematics_2022.yaml
   theory:
     FK_tables:
-    - - FK_ATLAS_TTBAR_13TEV_ASY_2022_PLUS.dat
-    - - FK_ATLAS_TTBAR_13TEV_ASY_2022_MINUS.dat
+    - - FK_ATLAS_TTBAR_13TEV_ASY_2022_PLUS
+    - - FK_ATLAS_TTBAR_13TEV_ASY_2022_MINUS
     operation: ASY
   data_uncertainties:
   - uncertainties_DEFAULT_2022.yaml

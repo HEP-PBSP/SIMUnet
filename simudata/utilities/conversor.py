@@ -10,11 +10,13 @@ Fits can be run, but cuts need to either be applied to the `kin1`, `kin2` and `k
 
 import functools
 import re
+import subprocess as sp
 import traceback
 from argparse import ArgumentParser
 from pathlib import Path
 
 import pandas as pd
+from validphys.api import API
 from yaml import safe_dump, safe_load
 
 _tev_searcher = re.compile(r"^\d+TEV$")
@@ -231,6 +233,7 @@ def convert_old_to_new(
     dry=False,
     variant=None,
     compound=None,
+    theory_conversion=None,
 ):
     """
     Converts the old dataset defined by the old data, plotting and sys file into the new format.
@@ -270,7 +273,7 @@ def convert_old_to_new(
             info = safe_load(line)
             if isinstance(info, dict):
                 if "FK" in info:
-                    fks.append([info["FK"]])
+                    fks.append([info["FK"].replace(".dat", "")])
                 elif "OP" in info:
                     op = info["OP"]
         theory_dict = {"FK_tables": fks, "operation": op}
@@ -344,6 +347,30 @@ def convert_old_to_new(
     yaml_safe_dump(metadata, metadata_path, sort_keys=False)
     print(f"Written new cd for {set_name}_{obs_name} to {set_folder}")
 
+    if theory_conversion is not None:
+        theory_path = API.theoryid(theoryid=theory_conversion).path
+        fkfolder = theory_path / "fastkernel"
+        pinefolder = theory_path / "pineappl_version"
+        pinefolder.mkdir(exist_ok=True)
+        for operator in theory_dict["FK_tables"]:
+            for fk_table in operator:
+                fk_path = fkfolder / f"{fk_table}.dat"
+                pi_path = pinefolder / f"{fk_table}.pineappl.lz4"
+                if not fk_path.exists():
+                    print(f" > Not found {fk_path} for {new_name}")
+                else:
+                    sp.run(
+                        [
+                            "pineappl",
+                            "import",
+                            fk_path,
+                            pi_path,
+                            "NNPDF40_nnlo_as_01180",
+                        ],
+                        capture_output=True,
+                    )
+                    print(f" > Converted {fk_table} to {pi_path}")
+
 
 def main(args):
     """Run the script."""
@@ -367,9 +394,6 @@ def main(args):
     else:
         dataset_name = args.dataset_name
 
-    # TODO: we need to autodiscover the possibility of having a compound file
-    # _and_ preparing (or running) the conversion of the FkTable to a pineappl grid
-
     convert_old_to_new(
         old_file,
         pfile,
@@ -378,7 +402,9 @@ def main(args):
         variant=args.variant,
         merge_exists=args.merge_exists,
         compound=args.old_compound,
+        theory_conversion=args.theory_conversion,
     )
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -407,6 +433,11 @@ if __name__ == "__main__":
         "--merge_exists",
         help="If a dataset already exists in validphys with this name, merge the new info with this dataset in the output",
         action="store_true",
+    )
+    parser.add_argument(
+        "--theory_conversion",
+        help="Takes as value a <theoryId>, if given, will try to convert said theory to the new format",
+        type=int,
     )
 
     args = parser.parse_args()

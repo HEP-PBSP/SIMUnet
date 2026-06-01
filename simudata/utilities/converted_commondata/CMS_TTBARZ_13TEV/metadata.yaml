@@ -85,8 +85,8 @@ implemented_observables:
     file: kinematics_PTZNORM.yaml
   theory:
     FK_tables:
-    - - FK_CMS_TTBARZ_13TEV_PTZNORM_NUM.dat
-    - - FK_CMS_TTBARZ_13TEV_PTZNORM_DEN.dat
+    - - FK_CMS_TTBARZ_13TEV_PTZNORM_NUM
+    - - FK_CMS_TTBARZ_13TEV_PTZNORM_DEN
     operation: RATIO
   data_uncertainties:
   - uncertainties_DEFAULT_PTZNORM.yaml

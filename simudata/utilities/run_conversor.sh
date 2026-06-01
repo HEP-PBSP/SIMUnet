@@ -20,7 +20,7 @@ do
         then
             extra_args="--old_compound ${COMPOUND}"
         fi
-        python conversor.py ${DATA_FILE} ${extra_args}
+        python conversor.py ${DATA_FILE} ${extra_args} --theory_conversion ${SIMUNET_THEORY} < /dev/tty
         unset extra_args
     fi
 done < $CSV_INFO

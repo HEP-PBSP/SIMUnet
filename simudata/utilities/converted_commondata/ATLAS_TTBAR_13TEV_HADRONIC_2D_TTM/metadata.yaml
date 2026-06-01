@@ -49,8 +49,8 @@ implemented_observables:
     file: kinematics_ABSYTTNORM.yaml
   theory:
     FK_tables:
-    - - FK_ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM_NUM.dat
-    - - FK_ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM_DEN.dat
+    - - FK_ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM_NUM
+    - - FK_ATLAS_TTBAR_13TEV_HADRONIC_2D_TTM_ABSYTTNORM_DEN
     operation: RATIO
   data_uncertainties:
   - uncertainties_DEFAULT_ABSYTTNORM.yaml

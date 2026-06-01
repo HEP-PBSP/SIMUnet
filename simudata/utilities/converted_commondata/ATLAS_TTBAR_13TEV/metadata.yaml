@@ -48,8 +48,8 @@ implemented_observables:
     file: kinematics_TTMNORM.yaml
   theory:
     FK_tables:
-    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_NUM.dat
-    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_DEN.dat
+    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_NUM
+    - - FK_ATLAS_TTBAR_13TEV_TTMNORM_DEN
     operation: RATIO
   data_uncertainties:
   - uncertainties_DEFAULT_TTMNORM.yaml

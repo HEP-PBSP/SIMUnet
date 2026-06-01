@@ -85,8 +85,8 @@ implemented_observables:
     file: kinematics_YTNORM.yaml
   theory:
     FK_tables:
-    - - FK_CMS_SINGLETOP_TCH_13TEV_YTNORM_NUM.dat
-    - - FK_CMS_SINGLETOP_TCH_13TEV_YTNORM_DEN.dat
+    - - FK_CMS_SINGLETOP_TCH_13TEV_YTNORM_NUM
+    - - FK_CMS_SINGLETOP_TCH_13TEV_YTNORM_DEN
     operation: RATIO
   data_uncertainties:
   - uncertainties_DEFAULT_YTNORM.yaml
