@@ -13,6 +13,9 @@ simunet_providers = [
     "simunet.results",
     "reportengine.report",
     "validphys.pseudodata",
+    "validphys.covmats",
+    "validphys.results",
+    "validphys.commondata"
 ]
 
 

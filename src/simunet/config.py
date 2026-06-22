@@ -62,7 +62,6 @@ class SIMUCoreConfig(CoreConfig):
         Use the cuts from the fit, if provided. If check_plotting is set to
         True, attempt to lod and check the PLOTTING files
         (note this may cause a noticeable slowdown in general)."""
-        print("Producing dataset with SIMUCoreConfig")
         name = dataset_input.name
         cfac = dataset_input.cfac
         frac = dataset_input.frac
@@ -71,6 +70,7 @@ class SIMUCoreConfig(CoreConfig):
         simu_parameters_names = dataset_input.simu_parameters_names
         simu_parameters_linear_combinations = dataset_input.simu_parameters_linear_combinations
         use_fixed_predictions = dataset_input.use_fixed_predictions
+        bsm_sector = dataset_input.bsm_sector
         contamination = dataset_input.contamination
         contamination_data = contamination_data
 
@@ -90,6 +90,7 @@ class SIMUCoreConfig(CoreConfig):
                 use_fixed_predictions=use_fixed_predictions,
                 contamination=contamination,
                 contamination_data=contamination_data,
+                bsm_sector=bsm_sector
             )
         except DataNotFoundError as e:
             raise ConfigError(str(e), name, self.loader.available_datasets)
@@ -157,6 +158,15 @@ class SIMUCoreConfig(CoreConfig):
         """Load the default grouping of data"""
         return "ALL"
 
+    def produce_bsm_names_to_latex(self, simu_parameters=None):
+        if simu_parameters is None:
+            return None
+        else:
+            bsm_names_to_latex = {}
+            for entry in simu_parameters:
+                bsm_names_to_latex[entry['name']] = entry['latex']
+            return bsm_names_to_latex
+
     @element_of("dataset_inputs")
     def parse_dataset_input(
         self,
@@ -178,6 +188,7 @@ class SIMUCoreConfig(CoreConfig):
             "simu_fac",
             "use_fixed_predictions",
             "contamination",
+            "bsm_sector",
         }
         try:
             name = dataset["dataset"]
@@ -243,6 +254,7 @@ class SIMUCoreConfig(CoreConfig):
             simu_fac, simu_parameters, simu_parameters_names, simu_parameters_linear_combinations
         )
 
+        bsm_sector = dataset.get("bsm_sector", None)[0]
         return SIMUnetDataSetInput(
             name=name,
             cfac=cfac,
@@ -253,6 +265,7 @@ class SIMUCoreConfig(CoreConfig):
             use_fixed_predictions=use_fixed_predictions,
             contamination=contamination,
             simu_fac=simu_fac,
+            bsm_sector=bsm_sector,
             **bsm_data,
         )
 

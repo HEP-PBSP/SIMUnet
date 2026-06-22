@@ -21,6 +21,7 @@ class SIMUnetDataSetSpec(DataSetSpec):
         use_fixed_predictions=False,
         contamination=None,
         contamination_data=None,
+        bsm_sector=None,
     ):
         super().__init__(
             name=name,
@@ -41,6 +42,7 @@ class SIMUnetDataSetSpec(DataSetSpec):
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
         self.contamination_data = contamination_data
+        self.bsm_sector = bsm_sector
 
     @functools.lru_cache
     def load_commondata(self):
@@ -85,6 +87,7 @@ class SIMUnetDataSetInput(DataSetInput):
         use_fixed_predictions,
         contamination,
         simu_fac,
+        bsm_sector=None
     ):
         super().__init__(
             name=name,
@@ -100,3 +103,4 @@ class SIMUnetDataSetInput(DataSetInput):
         self.use_fixed_predictions = use_fixed_predictions
         self.contamination = contamination
         self.simu_fac = simu_fac
+        self.bsm_sector = bsm_sector

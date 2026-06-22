@@ -68,6 +68,7 @@ def construct_analytic_initialisation(
             contamination=ds.contamination,
             simu_parameters_names=ds.simu_parameters_names,
             simu_parameters_linear_combinations=ds.simu_parameters_linear_combinations,
+            variant=ds.variant,
         )
         cuts = dataset_spec.cuts.load()
         ndat = len(cuts)
@@ -152,7 +153,6 @@ def simu_parameters_analytic(
         return construct_analytic_initialisation(
             data,
             theoryid,
-            replica,
             analytic_initialisation_pdf,
             make_replica,
             groups_covmat,
@@ -160,7 +160,6 @@ def simu_parameters_analytic(
             use_th_covmat=use_th_covmat,
         )
     return simu_parameters
-
 
 # I'm assuming the information necessary is in the data and needs to be propagated to the fittable dataset
 # minimal changes are necessary if instead we need to propagate this to the fktable instead
