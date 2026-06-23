@@ -254,7 +254,7 @@ class SIMUCoreConfig(CoreConfig):
             simu_fac, simu_parameters, simu_parameters_names, simu_parameters_linear_combinations
         )
 
-        bsm_sector = dataset.get("bsm_sector", None)[0]
+        bsm_sector = str(dataset.get("bsm_sector", None))
         return SIMUnetDataSetInput(
             name=name,
             cfac=cfac,
