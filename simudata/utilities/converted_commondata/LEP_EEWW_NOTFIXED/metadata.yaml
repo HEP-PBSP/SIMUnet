@@ -1,0 +1,170 @@
+setname: LEP_EEWW_NOTFIXED
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: DIBOSON
+  experiment: LEP
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: 182GEV
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: Combined W- differential angular cross section in 10 angular bins at sqrt(s)=182
+      GeV
+    units: ''
+  process_type: EWK_RAP
+  tables: []
+  npoints: []
+  ndata: 10
+  plotting:
+    dataset_label: Combined W- differential angular cross section in 10 angular bins
+      at sqrt(s)=182 GeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_182GEV.yaml
+  theory:
+    FK_tables:
+    - - FK_LEP_EEWW_182GEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_182GEV.yaml
+  data_central: data_DEFAULT_182GEV.yaml
+- observable_name: 189GEV
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: Combined W- differential angular cross section in 10 angular bins at sqrt(s)=189
+      GeV
+    units: ''
+  process_type: EWK_RAP
+  tables: []
+  npoints: []
+  ndata: 10
+  plotting:
+    dataset_label: Combined W- differential angular cross section in 10 angular bins
+      at sqrt(s)=189 GeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_189GEV.yaml
+  theory:
+    FK_tables:
+    - - FK_LEP_EEWW_189GEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_189GEV.yaml
+  data_central: data_DEFAULT_189GEV.yaml
+- observable_name: 198GEV
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: Combined W- differential angular cross section in 10 angular bins at sqrt(s)=198
+      GeV
+    units: ''
+  process_type: EWK_RAP
+  tables: []
+  npoints: []
+  ndata: 10
+  plotting:
+    dataset_label: Combined W- differential angular cross section in 10 angular bins
+      at sqrt(s)=198 GeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_198GEV.yaml
+  theory:
+    FK_tables:
+    - - FK_LEP_EEWW_198GEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_198GEV.yaml
+  data_central: data_DEFAULT_198GEV.yaml
+- observable_name: 206GEV
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: Combined W- differential angular cross section in 10 angular bins at sqrt(s)=206
+      GeV
+    units: ''
+  process_type: EWK_RAP
+  tables: []
+  npoints: []
+  ndata: 10
+  plotting:
+    dataset_label: Combined W- differential angular cross section in 10 angular bins
+      at sqrt(s)=206 GeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_206GEV.yaml
+  theory:
+    FK_tables:
+    - - FK_LEP_EEWW_206GEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_206GEV.yaml
+  data_central: data_DEFAULT_206GEV.yaml

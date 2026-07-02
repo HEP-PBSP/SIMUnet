@@ -14,7 +14,7 @@ theoryid: 40000000
 use_cuts: internal
 
 dataset_inputs:
-  - {dataset: ATLASZHIGHMASS49FB, contamination: EFT_LO}
+  - {dataset: ATLAS_Z0_7TEV_49FB_HIMASS, contamination: EFT_LO}
 
 closuretest:
   contamination_parameters:

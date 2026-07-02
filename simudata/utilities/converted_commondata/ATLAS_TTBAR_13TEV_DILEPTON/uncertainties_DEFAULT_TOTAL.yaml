@@ -1,0 +1,22 @@
+definitions:
+  stat:
+    description: Uncorrelated statistical uncertainties
+    treatment: ADD
+    type: UNCORR
+  sys_corr_1:
+    description: 'Sys uncertainty idx: 1'
+    treatment: ADD
+    type: UNCORR
+  sys_corr_2:
+    description: 'Sys uncertainty idx: 2'
+    treatment: ADD
+    type: UNCORR
+  sys_corr_3:
+    description: 'Sys uncertainty idx: 3'
+    treatment: ADD
+    type: UNCORR
+bins:
+- stat: 3.6
+  sys_corr_1: 11.5
+  sys_corr_2: 15.7
+  sys_corr_3: 1.9
