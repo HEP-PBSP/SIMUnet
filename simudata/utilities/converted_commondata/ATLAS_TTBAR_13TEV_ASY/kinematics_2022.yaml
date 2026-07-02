@@ -1,0 +1,61 @@
+bins:
+- k1:
+    min: null
+    mid: 250.0
+    max: null
+  k2:
+    min: null
+    mid: 30032.89
+    max: null
+  k3:
+    min: null
+    mid: 13000.0
+    max: null
+- k1:
+    min: null
+    mid: 625.0
+    max: null
+  k2:
+    min: null
+    mid: 30032.89
+    max: null
+  k3:
+    min: null
+    mid: 13000.0
+    max: null
+- k1:
+    min: null
+    mid: 875.0
+    max: null
+  k2:
+    min: null
+    mid: 30032.89
+    max: null
+  k3:
+    min: null
+    mid: 13000.0
+    max: null
+- k1:
+    min: null
+    mid: 1250.0
+    max: null
+  k2:
+    min: null
+    mid: 30032.89
+    max: null
+  k3:
+    min: null
+    mid: 13000.0
+    max: null
+- k1:
+    min: null
+    mid: 1750.0
+    max: null
+  k2:
+    min: null
+    mid: 30032.89
+    max: null
+  k3:
+    min: null
+    mid: 13000.0
+    max: null

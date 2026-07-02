@@ -1,0 +1,88 @@
+setname: ATLAS_SSINC_NOTFIXED_RUNII
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: HIGGS
+  experiment: ATLAS
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: ZGAM
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: ATLAS $\mu_{H \rightarrow Z \gamma}$ 13 TeV
+    units: ''
+  process_type: INC
+  tables: []
+  npoints: []
+  ndata: 1
+  plotting:
+    dataset_label: ATLAS $\mu_{H \rightarrow Z \gamma}$ 13 TeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_ZGAM.yaml
+  theory:
+    FK_tables:
+    - - FK_ATLAS_SSINC_RUNII_ZGAM
+  data_uncertainties:
+  - uncertainties_DEFAULT_ZGAM.yaml
+  data_central: data_DEFAULT_ZGAM.yaml
+- observable_name: MUMU
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: ATLAS $\mu_{H \rightarrow \mu^+ \mu^-}$ 13 TeV
+    units: ''
+  process_type: INC
+  tables: []
+  npoints: []
+  ndata: 1
+  plotting:
+    dataset_label: ATLAS $\mu_{H \rightarrow \mu^+ \mu^-}$ 13 TeV
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_MUMU.yaml
+  theory:
+    FK_tables:
+    - - FK_ATLAS_SSINC_RUNII_MUMU
+  data_uncertainties:
+  - uncertainties_DEFAULT_MUMU.yaml
+  data_central: data_DEFAULT_MUMU.yaml

@@ -1,0 +1,53 @@
+setname: CMS_HMDY_13TEV
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: DY
+  experiment: CMS
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: OBS
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: CMS HM DY 13 TeV - combined channel
+    units: ''
+  process_type: EWK_MLL
+  tables: []
+  npoints: []
+  ndata: 43
+  plotting:
+    dataset_label: CMS HM DY 13 TeV - combined channel
+    y_label: $d\sigma/dM_{\ell\ell}$ (pb)
+    y_scale: log
+    plot_x: k2
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_OBS.yaml
+  theory:
+    FK_tables:
+    - - FK_CMS_HMDY_13TEV
+  data_uncertainties:
+  - uncertainties_DEFAULT_OBS.yaml
+  data_central: data_DEFAULT_OBS.yaml

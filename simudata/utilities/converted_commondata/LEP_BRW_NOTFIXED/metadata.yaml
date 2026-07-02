@@ -1,0 +1,53 @@
+setname: LEP_BRW_NOTFIXED
+version: 1
+version_comment: Port of old commondata
+nnpdf_metadata:
+  nnpdf31_process: EWPO
+  experiment: LEP
+arXiv:
+  url: ''
+iNSPIRE:
+  url: ''
+hepdata:
+  url: ''
+  version: -1
+implemented_observables:
+- observable_name: OBS
+  observable:
+    description: DESCRIPTION_PLACEHOLDER
+    label: r"\mathcal{B}(W \rightarrow e^{-} \bar{v}_e), \mathcal{B}(W \rightarrow
+      \mu^{-} \bar{v}_{\mu}), \mathcal{B}(W \rightarrow \tau^{-} \bar{v}_{\tau})"
+    units: ''
+  process_type: INC
+  tables: []
+  npoints: []
+  ndata: 3
+  plotting:
+    dataset_label: r"\mathcal{B}(W \rightarrow e^{-} \bar{v}_e), \mathcal{B}(W \rightarrow
+      \mu^{-} \bar{v}_{\mu}), \mathcal{B}(W \rightarrow \tau^{-} \bar{v}_{\tau})"
+    plot_x: idat
+  kinematic_coverage:
+  - k1
+  - k2
+  - k3
+  kinematics:
+    variables:
+      k1:
+        description: Variable k1
+        label: k1
+        units: ''
+      k2:
+        description: Variable k2
+        label: k2
+        units: ''
+      k3:
+        description: Variable k3
+        label: k3
+        units: ''
+    file: kinematics_OBS.yaml
+  theory:
+    FK_tables:
+    - - FK_LEP_BRW
+  data_uncertainties:
+  - uncertainties_DEFAULT_OBS.yaml
+  data_central: data_DEFAULT_OBS.yaml
