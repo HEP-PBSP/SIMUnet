@@ -22,6 +22,9 @@ class SIMUnetLoader(Loader):
         project_root = package_root.parent.parent
 
         simudata_path = project_root / "simudata"
+        local_commondata_path = simudata_path / "commondata"
+        if local_commondata_path.exists():
+            self.commondata_folders = (local_commondata_path, *self.commondata_folders)
 
         self.simudata_path = simudata_path
 

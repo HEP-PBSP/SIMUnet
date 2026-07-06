@@ -2,7 +2,7 @@ setname: ATLAS_TTBAR_13TEV_HADRONIC
 version: 1
 version_comment: Port of old commondata
 nnpdf_metadata:
-  nnpdf31_process: TOP
+  nnpdf31_process: TTBAR
   experiment: ATLAS
 arXiv:
   url: ''
