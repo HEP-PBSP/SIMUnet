@@ -6,9 +6,9 @@ from conversor import _autoname
 from yaml import safe_load
 import shutil
 # Configuration
-CSV_FILE_PATH = "data_maps_without_T.csv"  # Replace with your actual CSV file path
+CSV_FILE_PATH = "data_maps.csv"  # Replace with your actual CSV file path
 TARGET_DIR = Path(
-    "/Users/ellacole/codes/simunet/simunet_nnpdf/simudata/utilities/converted_commondata"
+    "/Users/ellacole/codes/simunet/simunet_nnpdf/simudata/commondata"
 )
 CFACTORS_DIR = Path(
     "/Users/ellacole/miniconda3/envs/simunet_mac/share/NNPDF/data/theory_270/cfactor")
