@@ -299,3 +299,10 @@ class ewk_pseudorapity_sqrt_scale(ewk_rap_sqrt_scale):
     def new_labels(self, *old_labels):
         superlabels = super().new_labels(*old_labels)
         return (r'$\eta$', *superlabels[1:])
+
+class transverse_mass_squared_mass_charge():
+    def __call__(self, k1, k2, k3):
+        return k1, k2 ,k3
+
+    def new_labels(self, *old_labels):
+        return ('$m_T^2$ (GeV$^2$)', '$M^2$ (GeV)', 'charge (Null)')

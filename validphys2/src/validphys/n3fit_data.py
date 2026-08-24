@@ -268,9 +268,13 @@ def fitting_data_dict(
                 if str(data.datasets[i].fkspecs[0].fkpath).endswith('fastkernel/FK_FAKEKTABLE.dat'):
                     prefix = str(data.datasets[i].fkspecs[0].fkpath)[:-28]
                     path = Path(prefix + "simu_factors/" + 'SIMU_' + data.datasets[i].name + '.yaml')
+                else: # If new_commondata
+                    thpath = data.datasets[i].thspec.path
+                    path = thpath / "simu_factors" / f"SIMU_{data.datasets[i].name}.yaml"
                 with open(path, 'rb') as f:
                     fixed_predictions = np.array(yaml_safe.load(f)['SM_fixed'])
                 datasets[i]['fixed_predictions'] = fixed_predictions
+                print('Fixed predictions for dataset {}: {}'.format(data.datasets[i].name, fixed_predictions))
             else:
                 datasets[i]['use_fixed_predictions'] = False
     else:
