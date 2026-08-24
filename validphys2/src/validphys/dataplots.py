@@ -30,6 +30,17 @@ from validphys.utils import sane_groupby_iter, split_ranges, scale_from_grid
 
 log = logging.getLogger(__name__)
 
+SH_PROC = {'Drell-Yan Rapidity Distribution': 'Drell-Yan $y_{l\\bar{l}}$ Dist.',
+           'Drell-Yan Mass Distribution': 'Drell-Yan $M_{l\\bar{l}}$ Dist.',
+           'Heavy Quarks Total Cross Section': 'Heavy Quarks $\\sigma_\\text{tot}$',
+           'Jet Transverse Momentum Distribution': 'V+J $p_T^J$ Dist.',
+           'Drell-Yan Transverse Momentum Distribution': 'Drell-Yan $p_T$ Dist.',
+           'Heavy Quarks Production Rapidity Distribution': 'Heavy Quarks $y_{t\\bar{t}}$ Dist.',
+           'Heavy Quarks Production Single Quark Rapidity Distribution': 'Heavy Quarks $y_{t}$ Dist.',
+           'Jets Rapidity Distribution': 'Inclusive-jets $p_T$, $y$ Dist.',
+           'Dijets Invariant Mass and Rapidity Distribution': 'Dijets $M_\\text{jj}$, $y^*$ Dist.',
+           'Heavy Quarks Production Mass Distribution': 'Heavy Quarks $M_{t\\bar{t}}$ Dist.',}
+
 @figure
 def plot_chi2dist_experiments(total_chi2_data, experiments_chi2_stats, pdf):
     """Plot the distribution of chi²s of the members of the pdfset."""
@@ -1068,6 +1079,7 @@ def plot_xq2(
     data_input,
     Q2min=None,
     Q2max=None,
+    Q2cut=None,
     display_cuts:bool=True,
     marker_by:str='process type',
     highlight_label:str='highlight',
@@ -1270,7 +1282,7 @@ def plot_xq2(
             #This is to get the label key
             coords = [], []
         ax.plot(*coords,
-            label=key,
+            label=SH_PROC[key] if key in SH_PROC else key,
             markeredgewidth=1,
             markeredgecolor=None,
             **key_options[key],
@@ -1297,11 +1309,21 @@ def plot_xq2(
         )
 
     ax.set_title("Kinematic coverage")
-    ax.legend()
     ax.set_xlabel('$x$')
     ax.set_ylabel(r'$Q^2$ (GeV$^2$)')
     ax.set_xscale('log')
     ax.set_yscale('log')
+
+    if Q2cut and Q2max:
+        args = {'zorder': 3, 'color': 'black', 'linestyle': '--'}
+        l,r = ax.get_xlim()
+        for i in range(len(Q2cut)-1):
+            ax.fill_between([0,2], y1=Q2cut[i], y2=Q2cut[i+1], alpha=(i+1)*.1, label="$Q_\\text{cut}$ = "+f"{np.sqrt(Q2cut[i]):.0f} GeV", **args)
+        ax.fill_between([0,2], y1=Q2cut[-1], y2=2*Q2max, alpha=len(Q2cut)*.1, label="$Q_\\text{cut}$ = "+f"{np.sqrt(Q2cut[-1]):.0f} GeV", **args)
+        ax.set_xlim(l,r)
+
+    
+    ax.legend(framealpha=1., ncol=2-(marker_by == "dataset")) 
 
     _, curr_Q2max = ax.get_ylim()
     if Q2min:

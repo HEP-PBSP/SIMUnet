@@ -1356,6 +1356,14 @@ class CoreConfig(configparser.Config):
         """
         return spec
 
+    def parse_added_filter_rules(self, rules: (list, type(None)) = None):
+        """
+        Returns a tuple of AddedFilterRule objects. Rules are immutable after parsing.
+        AddedFilterRule objects inherit from FilterRule objects.
+        """
+        from validphys.filters import AddedFilterRule
+        return tuple(AddedFilterRule(**rule) for rule in rules) if rules else None
+
     def produce_rules(
         self,
         theoryid,
@@ -1364,6 +1372,7 @@ class CoreConfig(configparser.Config):
         default_filter_rules=None,
         filter_rules=None,
         default_filter_rules_recorded_spec_=None,
+        added_filter_rules=None,
     ):
 
         """Produce filter rules based on the user defined input and defaults."""
@@ -1396,8 +1405,22 @@ class CoreConfig(configparser.Config):
             ]
         except RuleProcessingError as e:
             raise ConfigError(f"Error Processing filter rules: {e}") from e
+        
+        if added_filter_rules:
+            for i, rule in enumerate(added_filter_rules):
+                try:
+                    rule_list.append(
+                        Rule(
+                            initial_data=rule,
+                            defaults=defaults,
+                            theory_parameters=theory_parameters,
+                            loader=self.loader,
+                        )
+                    )
+                except RuleProcessingError as e:
+                    raise ConfigError(f"Error processing added rule {i+1}: {e}") from e
 
-        return rule_list
+        return tuple(rule_list)
 
     @configparser.record_from_defaults
     def parse_default_filter_settings(self, spec: (str, type(None))):
