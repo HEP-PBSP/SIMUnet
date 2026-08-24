@@ -36,6 +36,7 @@ from validphys.calcutils import (
 from validphys.convolution import (
     predictions,
     PredictionsRequireCutsError,
+    central_predictions
 )
 from validphys.plotoptions.core import get_info
 
@@ -385,7 +386,10 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     if parsed_bsm_facs is None:
         # We want an array of ones that ndata x nrep
         # where ndata is the number of post cut datapoints
-        ndata = len(dataset.load().get_cv())
+        try:
+            ndata = len(dataset.load().get_cv())
+        except Exception:
+            ndata = (len(central_predictions(dataset, pdf)))
         nrep = len(pdf)
         return np.ones((ndata, nrep))
 
@@ -408,7 +412,7 @@ def dataset_bsm_factor(dataset, pdf, read_bsm_facs):
     if not read_bsm_facs.empty:
         replica_result = 1 + np.sum(scaled_replicas, axis=2)
     else:
-        replica_result = np.ones((len(dataset.load().get_cv()), len(pdf)-1))
+        replica_result = np.ones((ndata, len(pdf)-1))
     
     average_result = np.mean(replica_result, axis=1, keepdims=True)
     result = np.concatenate((average_result, replica_result), axis=1)

@@ -42,7 +42,8 @@ from validphys.loader import Loader
 from validphys.n3fit_data_utils import parse_simu_parameters_names_CF
 from validphys.loader import _get_nnpdf_profile
 
-from validphys.convolution import central_predictions
+from validphys.convolution import central_predictions, predictions
+from validphys.results import ThPredictionsResult, dataset_bsm_factor
 
 log = logging.getLogger(__name__)
 
@@ -2001,10 +2002,6 @@ def load_datasets_contamination(
 
     cont_path = l.datapath / f"theory_{theoryid.id}" / "simu_factors"
 
-    cont_name = contamination_parameters["name"]
-    cont_value = contamination_parameters["value"]
-    cont_lin_comb = contamination_parameters["linear_combination"]
-
     bsm_dict = {}
 
     for dataset in dataset_inputs:
@@ -2032,11 +2029,21 @@ def load_datasets_contamination(
             stream.close()
 
             k_factors = np.zeros(len(simu_card["SM_fixed"]))
-            for op in cont_lin_comb:
-                k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op])
-            k_factors = 1. + k_factors * cont_value / np.array(simu_card[cont_order]["SM"])
 
-            bsm_dict[dataset.name] = k_factors
+            for cont_params in contamination_parameters:
+                cont_value = cont_params["value"]
+                cont_lin_comb = cont_params["linear_combination"]
+
+                if cont_value == 0.:
+                    continue
+
+                for op in cont_lin_comb:
+                    if op in simu_card[cont_order]:
+                        k_factors += cont_lin_comb[op] * np.array(simu_card[cont_order][op]) * cont_value
+                                    
+            sm_array = np.array(simu_card[cont_order]["SM"])
+            total_factor = 1. + (k_factors / sm_array)
+            bsm_dict[dataset.name] = total_factor
 
     return bsm_dict
 
@@ -2107,6 +2114,134 @@ def compute_datasets_chi2_dist(
 
     return chi2_dict
 
+def compute_datasets_chi2(
+    pdf,
+    level0_commondata_wc,
+    sm_predictions,
+    groups_covmat,
+    load_datasets_contamination,
+    read_bsm_facs,
+    dataset_inputs,
+    theoryid,
+    dataset_inputs_covmat_t0_considered,
+    pdf_uncertainty=True
+):
+    """
+    Parameters
+    ----------
+
+    level0_commondata_wc: level0 data using 'fakepdf'
+
+    sm_predictions: SM predictions using 'pdf'
+
+    groups_covmat
+
+    load_contamination
+
+    read_bsm_facs: BSM factors from the fit
+
+    dataset_inputs
+
+    theoryid
+
+    Returns
+    -------
+
+    dict
+        dictionary of lists of chi2 per dataset
+
+    """
+    print('PDF_UNCERTAINTY:', pdf_uncertainty)
+    central_pred = {}
+    pdf_covmats = {}
+    t0_covmat = dataset_inputs_covmat_t0_considered
+
+    t0_covmats = {}
+    start = 0
+    for dataset in level0_commondata_wc:
+        name = dataset.setname
+        ndata = dataset.ndata
+
+        t0_covmats[name] = t0_covmat[start:start+ndata,
+                                    start:start+ndata]
+
+        start += ndata
+
+    if dataset_inputs is not None:
+        for dataset in dataset_inputs:
+            ds = l.check_dataset(
+                name=dataset.name,
+                theoryid=theoryid,
+                cfac=dataset.cfac,
+                simu_parameters_names=dataset.simu_parameters_names,
+                simu_parameters_linear_combinations=dataset.simu_parameters_linear_combinations,
+                use_fixed_predictions=dataset.use_fixed_predictions,
+                new_commondata=dataset.new_commondata,
+            )
+
+            # Finding PDF/SMEFT fit covmat from replicas
+            rep_sm_predictions = predictions(ds, pdf)
+            bsm_factor = dataset_bsm_factor(ds,pdf,read_bsm_facs)
+            rep_bsm_predictions = rep_sm_predictions * bsm_factor
+            replicas = rep_bsm_predictions.iloc[:, 1:]
+            pdf_covmats[dataset.name] = np.cov(replicas, rowvar=True,bias=True)
+            central_pred[dataset.name] = rep_bsm_predictions.iloc[:, 0].values.squeeze() #Prediction with mean PDF and mean BSM factor
+
+    covmat = groups_covmat # This is the experimental covmat
+
+    data = level0_commondata_wc
+    contamination_factors = load_datasets_contamination
+
+    chi2_dict_exp = {dataset.setname: [] for dataset in data}
+    chi2_dict_t0 = {dataset.setname: [] for dataset in data}
+    tot_chi2_exp = 0
+    tot_chi2_t0 = 0
+    for dataset in data:
+        data_name = dataset.setname
+        cont_fac = contamination_factors[data_name]
+
+        if cont_fac.shape[0] == 1:
+            data_values = dataset.central_values * cont_fac
+        else:
+            indices = dataset.commondata_table_indices
+            data_values = dataset.central_values * cont_fac[indices]
+
+        num_data = dataset.ndata
+
+        covmat_dataset = (
+            covmat.xs(data_name, level=1, drop_level=False)
+            .T.xs(data_name, level=1, drop_level=False)
+            .values) 
+        if pdf_uncertainty == True:
+            covmat_dataset += pdf_covmats[data_name]
+
+        covmat_dataset_t0 = t0_covmats[data_name] + pdf_covmats[data_name]
+
+        theory = central_pred[data_name]
+
+        diff = (data_values - theory).squeeze()
+
+        if diff.size == 1:
+            chi2_exp = diff**2 / covmat_dataset[0, 0]
+            chi2_t0 = diff**2 / covmat_dataset_t0[0, 0]
+            chi2_exp_red = chi2_exp / num_data
+            chi2_t0_red = chi2_t0 / num_data
+        else:
+            chi2_exp = (diff.T @ np.linalg.inv(covmat_dataset) @ diff) 
+            chi2_t0 = (diff.T @ np.linalg.inv(covmat_dataset_t0) @ diff)
+            chi2_exp_red = chi2_exp / num_data
+            chi2_t0_red = chi2_t0 / num_data
+
+            tot_chi2_exp += chi2_exp
+            tot_chi2_t0 += chi2_t0
+
+        chi2_dict_exp[data_name].append(chi2_exp_red)
+        chi2_dict_t0[data_name].append(chi2_t0_red)
+    total_ndata = sum([dataset.ndata for dataset in data])
+    tot_chi2_exp_red = tot_chi2_exp / total_ndata
+    tot_chi2_t0_red = tot_chi2_t0 / total_ndata
+    return chi2_dict_exp, chi2_dict_t0, tot_chi2_exp_red, tot_chi2_t0_red
+
 
 def write_datasets_chi2_dist_csv(
         pdf,
@@ -2137,3 +2272,52 @@ def write_datasets_chi2_dist_csv(
     chi2 = pd.concat([df_ndat, df_chi2], ignore_index=True)
 
     chi2.to_csv(f"{pdf}_chi2_dist.csv", index=False)
+
+
+def write_datasets_chi2_csv(
+        pdf,
+        compute_datasets_chi2,
+        level0_commondata_wc
+    ):
+
+    """
+    Parameters
+    ----------
+
+    pdf: core.PDF
+
+    compute_chi2
+
+    level0_commondata_wc
+
+    Returns
+    -------
+    
+    """
+
+    rows = []
+    global_chi2_exp = compute_datasets_chi2[2]
+    global_chi2_t0 = compute_datasets_chi2[3]
+    for dataset in level0_commondata_wc:
+        name = dataset.setname
+        rows.append({
+            "dataset": name,
+            "ndata": dataset.ndata,
+            "chi2_exp": compute_datasets_chi2[0][name],
+            "chi2_t0": compute_datasets_chi2[1][name],
+        })
+
+    df = pd.DataFrame(rows)
+
+    df = pd.concat(
+    [pd.DataFrame([{
+         "dataset": "GLOBAL",
+         "ndata": sum(d.ndata for d in level0_commondata_wc),
+         "chi2_exp": global_chi2_exp,
+         "chi2_t0": global_chi2_t0,
+     }]),
+     df
+    ],
+    ignore_index=True)
+
+    df.to_csv(f"{pdf}_chi2_dist.csv", index=False)
