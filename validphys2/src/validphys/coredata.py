@@ -316,13 +316,16 @@ class CommonData:
 
         """
         add_systype = self.systype_table[self.systype_table["type"] == "ADD"]
-        # NOTE: Index with list here so that return is always a DataFrame, even
-        # if N_sys = 1 (else a Series could be returned)
-        add_table = self.systematics_table.loc[:, ["ADD"]]
-        # Minus 1 because iloc starts from 0, while the systype counting starts
-        # from 1.
-        add_table = add_table.iloc[:, add_systype.index - 1]
-        add_table.columns = add_systype["name"].to_numpy()
+        if self.nsys:
+            # NOTE: Index with list here so that return is always a DataFrame, even
+            # if N_sys = 1 (else a Series could be returned)
+            add_table = self.systematics_table.loc[:, ["ADD"]]
+            # Minus 1 because iloc starts from 0, while the systype counting starts
+            # from 1.
+            add_table = add_table.iloc[:, add_systype.index - 1]
+            add_table.columns = add_systype["name"].to_numpy()
+        else:
+            add_table = pd.DataFrame(np.zeros(self.ndata))
         return add_table.loc[:, add_table.columns != "SKIP"]
 
     @property
@@ -355,9 +358,12 @@ class CommonData:
         """
         if central_values is None:
             central_values = self.central_values.to_numpy()
-        converted_mult_errors = (
-            self.multiplicative_errors * central_values[:, np.newaxis] / 100
-        )
+        if self.nsys:
+            converted_mult_errors = (
+                self.multiplicative_errors * central_values[:, np.newaxis] / 100
+            )
+        else:
+            converted_mult_errors = pd.DataFrame(np.zeros(self.ndata))
         return pd.concat((self.additive_errors, converted_mult_errors), axis=1)
 
     def with_central_value(self, cv):
